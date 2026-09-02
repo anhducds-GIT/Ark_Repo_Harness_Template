@@ -27,6 +27,10 @@ const OUT = "template";
 /* Script nào đi theo template. `feature-parity.mjs` CỐ Ý không có mặt: nó so hai nhánh worker
    của riêng repo Chrome, không phải hạ tầng chung. */
 const PORTABLE_SCRIPTS = [
+  // `claim.mjs` PHẢI đi theo: mục 1 của luật bắt mọi phiên nhận/trả quyền bằng lệnh này, và
+  // audit độc lập 03/09 bắt được đúng chỗ đó — repo nhà khai luật bắt buộc dùng một file KHÔNG
+  // TỒN TẠI. Luật trỏ tới một lệnh không chạy được thì nó không phải luật, nó là chữ.
+  "claim.mjs",
   "repo-structure.mjs",
   "build-dashboard.mjs",
   "check-bootstrap.mjs",

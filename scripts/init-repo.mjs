@@ -60,8 +60,13 @@ function thuMucTrong(dich) {
 const THIS = fileURLToPath(import.meta.url);
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   const args = process.argv.slice(2);
-  const dich = args.find((a) => !a.startsWith("--"));
-  const ten = args[args.indexOf("--ten") + 1];
+  // PHẢI bỏ qua GIÁ TRỊ của `--ten` khi tìm đường dẫn đích. Bản đầu chỉ lấy tham số đầu tiên
+  // không bắt đầu bằng `--`, nên `--ten "Kho Tài Liệu" ./dich` dựng repo ở thư mục tên
+  // "Kho Tài Liệu" và bỏ qua `./dich` hoàn toàn — ghi sai chỗ, thoát 0, không một lời cảnh báo.
+  // Audit độc lập bắt được 03/09, và nó vừa tạo một thư mục rác ngay trong repo nhà.
+  const iTen = args.indexOf("--ten");
+  const ten = iTen >= 0 ? args[iTen + 1] : undefined;
+  const dich = args.find((a, i) => !a.startsWith("--") && i !== iTen + 1);
   const giuPhuLucNghe = args.includes("--kho-nghe");
 
   if (!dich || !args.includes("--ten") || !ten || ten.startsWith("--")) {

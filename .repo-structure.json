@@ -26,13 +26,13 @@
       "note": "tài liệu bốn tầng: studies, briefs, archive, adr"
     },
     "scripts/": {
-      "steward": "_root",
+      "steward": "_code",
       "mutability": "rw",
       "ownership_mode": "root",
       "note": "bộ sinh + cổng kiểm + đẩy an toàn"
     },
     "tests/": {
-      "steward": "_root",
+      "steward": "_code",
       "mutability": "rw",
       "ownership_mode": "root",
       "note": "suite gốc repo"
@@ -44,7 +44,7 @@
       "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá"
     },
     "template/": {
-      "steward": "_root",
+      "steward": "_template",
       "mutability": "rw",
       "ownership_mode": "root",
       "note": "bản trích do build-template.mjs sinh — SINH TỰ ĐỘNG, sửa tay là mất ở lần sinh sau"

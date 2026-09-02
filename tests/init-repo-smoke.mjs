@@ -8,7 +8,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -71,6 +71,25 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     assert.equal(readFileSync(join(banRon, "viec-cua-toi.txt"), "utf8"), "dung xoa", "file cu phai con NGUYEN VEN");
     ok("từ chối thư mục đang có nội dung, và không chạm vào file có sẵn");
   } finally { rmSync(banRon, { recursive: true, force: true }); }
+}
+
+/* ---- 4b. Thứ tự tham số không được làm nó ghi sai chỗ -------------------- */
+{
+  // Audit độc lập bắt 03/09: `--ten "X" <đích>` dựng repo ở thư mục tên "X" và bỏ qua <đích>
+  // hoàn toàn — ghi sai chỗ, thoát 0, không một lời cảnh báo. Nó vừa tạo một thư mục rác ngay
+  // trong repo nhà. Lọt vì bản đầu lấy "tham số đầu tiên không bắt đầu bằng --", mà giá trị của
+  // `--ten` đúng là như thế.
+  const cha = mkdtempSync(join(tmpdir(), "init-thutu-"));
+  try {
+    for (const thuTu of [["--ten", "Ten Co Dau Cach", join(cha, "a")], [join(cha, "b"), "--ten", "Ten Co Dau Cach"]]) {
+      const run = spawnSync(process.execPath, [join(ROOT, "scripts", "init-repo.mjs"), ...thuTu], { cwd: cha, encoding: "utf8" });
+      const dich = thuTu.find((x) => x.startsWith(cha));
+      assert.equal(run.status, 0, `thu tu ${JSON.stringify(thuTu)} phai chay duoc: ${String(run.stderr).slice(0, 300)}`);
+      assert.ok(existsSync(join(dich, "AGENTS.md")), `phai dung repo o DUNG duong dan da cho: ${dich}`);
+      assert.ok(!existsSync(join(cha, "Ten Co Dau Cach")), "khong duoc dung repo o thu muc mang TEN repo");
+    }
+    ok("thứ tự tham số: đặt --ten trước hay sau đều dựng đúng chỗ, không tạo thư mục theo tên repo");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
 }
 
 /* ---- 5. Chạy THẬT: repo dựng ra phải tự sạch ---------------------------- */
