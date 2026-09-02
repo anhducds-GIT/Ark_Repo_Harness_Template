@@ -20,7 +20,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { claimPrefixesFrom, ownershipKeys, readStructureFromDisk, unitsFrom } from "../scripts/repo-structure.mjs";
+import { claimPrefixesFrom, kiemKhoaLa, ownershipKeys, readStructureFromDisk, unitsFrom } from "../scripts/repo-structure.mjs";
 import { grandfatheredNote } from "../scripts/check-bootstrap.mjs";
 import { isBehaviourFile } from "../scripts/build-dashboard.mjs";
 
@@ -141,7 +141,16 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   // cũng qua được. Phải chứng minh nó KHÔNG ném với đầu vào đúng.
   assert.doesNotThrow(() => unitsFrom({ units: { root_dir: "pkgs", marker: "manifest.json", depth: 2 } }),
     "khai DUNG thi khong duoc nem — neu nem thi phep kiem tren khong chung minh duoc gi");
-  ok("doc cau hinh: khai sai thi NEM (3 ca), khai dung thi khong (doi chung duong)");
+  // GÕ SAI TÊN TRƯỜNG cũng phải bị bắt, không chỉ gõ sai GIÁ TRỊ. Cấu hình vẫn là JSON hợp lệ,
+  // vẫn parse ngon, và hậu quả không hiện ra ở đâu: `root_dri` làm bộ máy quét sai thư mục,
+  // `mutabilty` làm vùng bằng chứng KHÔNG CÒN được bảo vệ chỉ-thêm. Cả hai đều im.
+  assert.equal(kiemKhoaLa({ units: { root_dri: "pkgs" } }).length, 1, "go sai ten truong trong units phai bi bat");
+  assert.equal(kiemKhoaLa({ areas: { "evidence/": { mutabilty: "append-only" } } }).length, 1,
+    "go sai `mutabilty` phai bi bat — no lam MAT lop bao ve chi-them ma khong bao gi");
+  // ĐỐI CHỨNG DƯƠNG: cấu hình đúng và các trường chú thích `_...` không được bị kêu oan.
+  assert.deepEqual(kiemKhoaLa({ units: { _doc: "ghi chú", root_dir: "pkgs", marker: "m.json", depth: 2, ten: "Gói" } }), []);
+  assert.deepEqual(kiemKhoaLa(readStructureFromDisk(ROOT)), [], "cau hinh THAT cua repo nay phai sach");
+  ok("doc cau hinh: sai gia tri thi NEM · sai TEN TRUONG cung bi bat · khai dung thi khong");
 }
 
 /* ---- 4. Cổng kiểm cấu trúc phải XANH trên chính repo này ------------------- */

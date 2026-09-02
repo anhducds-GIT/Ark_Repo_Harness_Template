@@ -450,7 +450,25 @@ check("Test xanh", () => {
       msg: `REPO CHƯA CÓ SUITE GỐC: \`package.json\` không khai \`scripts.test\`, nên cổng KHÔNG kiểm được một dòng code nào của bạn. Đây là "chưa kiểm", không phải "đã đạt" — thêm suite rồi khai \`scripts.test\` thì cổng mới có răng.`
     };
   }
-  if (!suites.length && !rootSuite) return { ok: true, msg: "Không package nào của bạn có suite bị ảnh hưởng." };
+  /* KHÔNG CÓ SUITE NÀO CHẠY ≠ ĐÃ KIỂM XONG.
+   *
+   * Bản cũ trả XANH ở đây bất kể chuyện gì đã xảy ra trong phiên. Ca đo được ở repo NAV ngày
+   * 03/09: **trả quyền xong là mục "Test xanh" tự chuyển từ ĐỎ sang XANH** — cùng một cây làm
+   * việc, suite không đổi một chữ. Vì trả quyền làm `myRootAreas` rỗng, nhánh `skipped` phía
+   * trên không vào, và rơi thẳng xuống dòng này.
+   *
+   * Phân biệt hai chuyện khác hẳn nhau, và bản cũ gộp chúng làm một:
+   *   - phiên KHÔNG đổi gì  → đúng là không có gì phải kiểm. XANH thật.
+   *   - phiên CÓ đổi mà không suite nào chạy → CHƯA KIỂM. Phải là `BỎ`, và mã thoát 2. */
+  if (!suites.length && !rootSuite) {
+    const coThayDoi = sessionChanges.length > 0;
+    if (!coThayDoi) return { ok: true, msg: "Phiên này không đổi file nào — không có gì phải kiểm." };
+    return {
+      ok: true,
+      skipped: true,
+      msg: `Phiên này đổi ${sessionChanges.length} file nhưng KHÔNG suite nào chạy. Đây là "chưa kiểm", không phải "đã đạt". Nhận vùng mình đang sửa (\`claim.mjs --take\`), và khai \`scripts.test\` trong package.json.`
+    };
+  }
   const lines = [];
   if (rootSuite) {
     try {
