@@ -3,12 +3,12 @@ schema: extension-status/v2
 id: ark-repo-harness
 name: Ark Repo Harness
 lifecycle: building
-owner: claude-template-finish
+owner: harness-vong2
 priority_rank: 1
-next_step: "Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh"
+next_step: "Đóng nốt cổng kiểm ở hai repo vừa migrate, rồi mới bỏ được nhãn chưa-chứng-minh"
 version_source: package.json
-current_focus: "Bịt các lỗ audit tìm ra, và viết sổ tay cho AI để không trôi cách làm"
-human_action: "Chỉ giúp một repo đang sống, không phải extension, càng nhỏ càng tốt — để thử lửa"
+current_focus: "Vá các lỗ mà hai lần migrate thật và audit độc lập vạch ra — cổng từng báo xanh khi không kiểm được gì"
+human_action: "Repo NAV có bộ test cũ đỏ sẵn từ trước khi migrate — quy trình cấm tôi tự dọn nợ cũ. Anh nói một câu: dọn hay để nguyên"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---
