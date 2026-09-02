@@ -416,6 +416,7 @@ const coDongMoi = (rel) => {
   // Cộng cả phần đã commit chưa push lẫn phần còn trong cây làm việc. Thiếu vế nào cũng sai:
   // ghi Log rồi commit thì cây làm việc sạch; ghi mà chưa commit thì diff với remote lại rỗng.
   let them = 0;
+  let xoa = 0;
   let doDuoc = false;
   for (const args of [
     originMainResolves ? ["diff", "--numstat", "origin/main", "--", rel] : null,
@@ -425,11 +426,14 @@ const coDongMoi = (rel) => {
     const ra = git(...args);
     if (!ra) continue;
     for (const dong of ra.split("\n").filter(Boolean)) {
-      const n = Number(dong.split("\t")[0]);
-      if (Number.isFinite(n)) { them += n; doDuoc = true; }
+      const [a, b] = dong.split(String.fromCharCode(9));
+      if (Number.isFinite(Number(a))) { them += Number(a); xoa += Number(b) || 0; doDuoc = true; }
     }
   }
-  return doDuoc ? them > 0 : null;   // null = không đo được, không phải "không có"
+  // THEM DONG, chu khong phai "co dung vao". Sua mot chu trong dong Log CU cho ra `1 them /
+  // 1 xoa` — van la `them > 0`, nen ban dau cham dat. Nhung Log la thu CHI DUOC THEM: viet lai
+  // dong cu la viet lai lich su cua phien truoc. Nen doi xoa = 0.
+  return doDuoc ? (them > 0 && xoa === 0) : null;   // null = khong do duoc, khong phai "khong co"
 };
 
 check("HANDOFF đã ghi Log phiên này", () => {

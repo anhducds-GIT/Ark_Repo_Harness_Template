@@ -15,7 +15,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -255,6 +255,62 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   assert.equal(isBehaviourFile("evidence/run-1/a.json"), false);
   assert.equal(isBehaviourFile("docs/x.md"), false);
   ok("san pham may sinh khong bi dem la code doi (va code that thi van bi dem)");
+}
+
+/* ---- 7. Sửa vùng gốc mà không ghi Log thì phải ĐỎ ------------------------ */
+{
+  // Bản cũ chỉ duyệt `myPackages`. Repo KHÔNG có package con — như chính repo bộ khung này —
+  // thì phép kiểm luôn trả "Không có gì phải ghi", kể cả khi phiên vừa viết lại nửa bộ máy.
+  // Tức luật "phiên sau phải biết phiên trước làm gì" chưa từng được cưỡng chế ở đúng nơi việc
+  // nặng nhất diễn ra. Audit độc lập bắt được 03/09.
+  //
+  // Ba ca, và ca thứ ba là chỗ dễ tưởng đã xong nhất: `git diff --numstat` cho một dòng bị SỬA
+  // ra `1 thêm / 1 xoá`, nên phép đo "có dòng thêm" vẫn đạt. Log là thứ CHỈ ĐƯỢC THÊM.
+  const fx = mkdtempSync(join(tmpdir(), "harness-log-"));
+  try {
+    const at = (...a) => execFileSync("git", a, { cwd: fx, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(fx, "scripts"), { recursive: true });
+    mkdirSync(join(fx, ".agents"), { recursive: true });
+    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
+    copyFileSync(join(ROOT, "AGENTS.md"), join(fx, "AGENTS.md"));
+    writeFileSync(join(fx, ".agents", "claims.json"), JSON.stringify({ claims: { _code: { owner: "thu", task: "t" } } }), "utf8");
+    writeFileSync(join(fx, "HANDOFF.md"), "# HANDOFF\n\n## Log\n- cu\n", "utf8");
+    writeFileSync(join(fx, "package.json"), JSON.stringify({ name: "fx", private: true, type: "module", scripts: { test: "node -e 0" } }), "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "nen");
+
+    const chay = () => {
+      const r = spawnSync(process.execPath, [join(fx, "scripts", "session-check.mjs"), "--as", "thu"], { cwd: fx, encoding: "utf8" });
+      const out = String(r.stdout || "") + String(r.stderr || "");
+      const i = out.indexOf("HANDOFF đã ghi Log");
+      return out.slice(Math.max(0, i - 10), i + 260);
+    };
+
+    const themVaoCode = () => writeFileSync(join(fx, "scripts", "claim.mjs"),
+      readFileSync(join(fx, "scripts", "claim.mjs"), "utf8") + "\n// doi\n", "utf8");
+
+    // (a) sửa code vùng gốc, KHÔNG ghi Log -> ĐỎ
+    themVaoCode();
+    assert.match(chay(), /ĐỎ/, "sua vung goc ma khong ghi Log thi phai DO");
+
+    // (b) THÊM một dòng Log -> XANH
+    writeFileSync(join(fx, "HANDOFF.md"), readFileSync(join(fx, "HANDOFF.md"), "utf8") + "- moi\n", "utf8");
+    assert.match(chay(), /XANH/, "them dong Log that thi phai XANH");
+
+    // (c) chỉ SỬA dòng Log cũ, không thêm dòng nào -> ĐỎ.
+    //     Không có ca này thì phép đo "có dòng thêm" trông như đã canh, thật ra không: một dòng
+    //     bị sửa cũng cho `them > 0`.
+    at("add", "-A"); at("commit", "-q", "-m", "moc");
+    themVaoCode();
+    writeFileSync(join(fx, "HANDOFF.md"), readFileSync(join(fx, "HANDOFF.md"), "utf8").replace("- cu", "- cu sua"), "utf8");
+    assert.match(chay(), /ĐỎ/, "sua dong Log CU khong phai la ghi Log — phai DO");
+
+    ok("Log vung goc: khong ghi thi DO · them dong thi XANH · sua dong cu van DO");
+  } finally { rmSync(fx, { recursive: true, force: true }); }
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
