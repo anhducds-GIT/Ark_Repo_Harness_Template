@@ -278,7 +278,16 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
     copyFileSync(join(ROOT, "AGENTS.md"), join(fx, "AGENTS.md"));
-    writeFileSync(join(fx, ".agents", "claims.json"), JSON.stringify({ claims: { _code: { owner: "thu", task: "t" } } }), "utf8");
+    const cauHinhFx = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"));
+    // Khai DU moi steward. Thieu mot khoa thi phep kiem "bat bien quyen so huu" do, va khoi
+    // nay se doc nham cai do do la ket qua cua chinh no.
+    const claimsFx = { claims: {} };
+    for (const v of Object.values(cauHinhFx.areas ?? {})) {
+      const k = v?.steward; if (k) claimsFx.claims[k] = { owner: null, task: null };
+    }
+    claimsFx.claims._root = { owner: "thu", task: "t" };
+    claimsFx.claims._code = { owner: "thu", task: "t" };
+    writeFileSync(join(fx, ".agents", "claims.json"), JSON.stringify(claimsFx), "utf8");
     writeFileSync(join(fx, "HANDOFF.md"), "# HANDOFF\n\n## Log\n- cu\n", "utf8");
     writeFileSync(join(fx, "package.json"), JSON.stringify({ name: "fx", private: true, type: "module", scripts: { test: "node -e 0" } }), "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "nen");
@@ -286,8 +295,11 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     const chay = () => {
       const r = spawnSync(process.execPath, [join(fx, "scripts", "session-check.mjs"), "--as", "thu"], { cwd: fx, encoding: "utf8" });
       const out = String(r.stdout || "") + String(r.stderr || "");
-      const i = out.indexOf("HANDOFF đã ghi Log");
-      return out.slice(Math.max(0, i - 10), i + 260);
+      // Lay DUNG dong cua phep kiem nay. Cat theo cua so ky tu thi de nuot nham dau hieu
+      // cua phep kiem KE BEN, va phep kiem se xanh/do vi ly do khong lien quan.
+      const ds = out.split(String.fromCharCode(10));
+      const k = ds.findIndex((l) => l.includes("HANDOFF đã ghi Log"));
+      return k < 0 ? "(khong thay phep kiem HANDOFF)" : ds.slice(k, k + 2).join(String.fromCharCode(10));
     };
 
     const themVaoCode = () => writeFileSync(join(fx, "scripts", "claim.mjs"),

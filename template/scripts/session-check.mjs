@@ -266,6 +266,26 @@ check("Vùng bằng chứng không bị sửa", () => {
   return { ok: true, msg: "Bằng chứng cũ nguyên vẹn." };
 });
 
+/* HÀNG GIẢ TRONG FIXTURE KHÔNG PHẢI SECRET.
+ *
+ * Bộ quét mở rộng ra mọi loại file lập tức báo nhầm một fixture có thật ở repo NAV:
+ * `token = "test-one-session-token"`. Nó khớp dạng `token = <22 ký tự>`, và nó hoàn toàn vô hại.
+ *
+ * Vì sao chuyện này đáng sửa NGAY chứ không phải "chấp nhận cho chắc": một cổng hay báo nhầm sẽ
+ * bị người ta tắt, hoặc tệ hơn — bị lướt qua theo thói quen. Lúc đó nó không còn canh gì nữa,
+ * mà vẫn hiện lên màn hình như đang canh.
+ *
+ * Cách phân biệt: secret thật không tự khai mình là đồ giả. Chuỗi mang một trong các dấu dưới
+ * đây là fixture, biến mẫu, hoặc chỗ trống chờ điền. */
+const DAU_HANG_GIA = [
+  "test", "example", "sample", "dummy", "fake", "placeholder", "your-", "your_",
+  "changeme", "change-me", "redacted", "xxxxx", "abcdef", "<", "${", "{{", "...", "…"
+];
+function laHangGia(doan) {
+  const thap = doan.toLowerCase();
+  return DAU_HANG_GIA.some((d) => thap.includes(d));
+}
+
 /* ---- 3. Secret ---------------------------------------------------------- */
 check("Không có secret lọt vào repo", () => {
   const tracked = git("ls-files").split("\n").filter(Boolean);
@@ -303,7 +323,10 @@ check("Không có secret lọt vào repo", () => {
     if (buf.subarray(0, 8192).includes(0)) { khongDocDuoc.push(`${file} (nhị phân)`); continue; }
     daDoc += 1;
     const text = buf.toString("utf8");
-    if (patterns.some((p) => p.test(text))) suspects.push(file);
+    for (const p of patterns) {
+      const m = text.match(p);
+      if (m && !laHangGia(m[0])) { suspects.push(file); break; }
+    }
   }
   if (suspects.length) return { ok: false, msg: `Nghi có token thật trong: ${suspects.join(", ")}. Kiểm tra bằng mắt trước khi commit.` };
   const duoi = khongDocDuoc.length
@@ -316,12 +339,35 @@ check("Không có secret lọt vào repo", () => {
 check("File mới đã khai vào Bản đồ file", () => {
   const added = sessionChanges.filter((c) => /^(A|\?\?)/.test(c.code)).map((c) => c.file).filter(mine);
   const undeclared = [];
+  /* TÌM BẢN ĐỒ BẰNG MỐC, KHÔNG BẰNG SỐ MỤC.
+   *
+   * Bản đầu đóng cứng `## 6.` … `## 7.` — tức là số mục trong `AGENTS.md` CỦA BỘ KHUNG. Repo
+   * thật hiếm khi có cùng số mục: repo "Project 3 AI Agent Unify" có 8 mục KHÔNG ĐÁNH SỐ, nên
+   * không tìm thấy đoạn nào, `map` rỗng, và **mọi file mới đều bị coi là chưa khai**. Cổng đỏ
+   * hàng loạt, không có cách sửa nào ngoài việc viết lại `AGENTS.md` của repo đích cho giống
+   * repo nhà — đúng thứ mà quy trình migrate ghi rõ là KHÔNG thuộc phạm vi.
+   *
+   * Ba cách tìm, theo thứ tự tin cậy giảm dần. Không thấy thì nói THẲNG là không thấy, chứ
+   * không im lặng coi như bản đồ rỗng — hai chuyện đó cần hai cách sửa khác hẳn nhau. */
   const mapSection = (text) => {
     const lines = String(text ?? "").replaceAll("\r", "").split("\n");
-    const start = lines.findIndex((line) => /^## 6\./.test(line));
-    const end = lines.findIndex((line, index) => index > start && /^## 7\./.test(line));
-    return start >= 0 && end > start ? lines.slice(start, end).join("\n") : "";
+
+    // (1) Mốc tường minh. Repo nào muốn chắc chắn thì đặt hai dòng này quanh bản đồ.
+    const b = lines.findIndex((l) => l.includes("<!-- BAN-DO:BEGIN -->"));
+    const e = lines.findIndex((l, i) => i > b && l.includes("<!-- BAN-DO:END -->"));
+    if (b >= 0 && e > b) return lines.slice(b, e).join("\n");
+
+    // (2) Tiêu đề gọi đúng tên việc, ở BẤT KỲ cấp nào, có đánh số hay không.
+    const laTieuDe = (l) => /^#{1,6}\s/.test(l);
+    const start = lines.findIndex((l) => laTieuDe(l) && /bản đồ file|sổ tay mở khi cần|file map/i.test(l));
+    if (start >= 0) {
+      const cap = lines[start].match(/^#+/)[0].length;
+      const end = lines.findIndex((l, i) => i > start && laTieuDe(l) && l.match(/^#+/)[0].length <= cap);
+      return lines.slice(start, end > start ? end : lines.length).join("\n");
+    }
+    return null;   // null = KHÔNG TÌM THẤY, khác hẳn "" = tìm thấy nhưng rỗng
   };
+  const thieuBanDo = [];
   const mentionsExactPath = (text, relPath) => {
     const escaped = relPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     // Chấp nhận link Markdown, inline-code hoặc lệnh có chứa đúng đường dẫn. Hai biên cấm
@@ -340,7 +386,14 @@ check("File mới đã khai vào Bản đồ file", () => {
     const rest = pkgDir ? file.slice(pkgDir.length + 1) : file;
     if (!rest || rest === "AGENTS.md") continue;
     const map = mapSection(fs.readFileSync(agentsPath, "utf8"));
+    if (map === null) { thieuBanDo.push(path.join(base, "AGENTS.md").replaceAll("\\", "/")); continue; }
     if (!mentionsExactPath(map, rest)) undeclared.push(file);
+  }
+  // Không tìm thấy bản đồ là một lỗi RIÊNG, có cách sửa RIÊNG. Gộp nó vào "chưa khai" là bảo
+  // người ta đi khai từng file vào một mục không tồn tại.
+  const thieu = [...new Set(thieuBanDo)];
+  if (thieu.length) {
+    return { ok: false, msg: `KHÔNG TÌM THẤY Bản đồ file trong: ${thieu.join(", ")}. Cổng không biết đối chiếu vào đâu. Sửa: đặt hai dòng \`<!-- BAN-DO:BEGIN -->\` và \`<!-- BAN-DO:END -->\` quanh bảng bản đồ, HOẶC đặt tiêu đề chứa chữ "Bản đồ file".` };
   }
   const unique = [...new Set(undeclared)];
   if (unique.length) return { ok: false, msg: `Chưa khai vào Bản đồ file của package: ${unique.join(", ")}. Không khai = không tồn tại (luật gốc).` };
@@ -348,14 +401,68 @@ check("File mới đã khai vào Bản đồ file", () => {
 });
 
 /* ---- 5. HANDOFF phải được ghi ------------------------------------------- */
+/* VÙNG GỐC REPO CŨNG PHẢI GHI LOG — trước đây chỉ package mới phải.
+ *
+ * Bản cũ duyệt đúng `myPackages`. Repo nào KHÔNG có package con — như chính repo bộ khung này —
+ * thì phép kiểm luôn trả "Không có gì phải ghi", kể cả khi phiên vừa viết lại nửa bộ máy. Tức
+ * luật "phiên sau phải biết phiên trước làm gì" chưa từng được cưỡng chế ở đúng nơi việc nặng
+ * nhất diễn ra. Audit độc lập bắt được 03/09.
+ *
+ * Và "đã chạm file" chưa đủ: sửa một khoảng trắng trong dòng Log CŨ cũng tính là đã ghi. Log là
+ * thứ CHỈ ĐƯỢC THÊM, nên bằng chứng đúng phải là CÓ DÒNG MỚI. Đo bằng `--numstat`; đo không
+ * được thì hạ về phép cũ và nói rõ là chỉ đo được tới đó — chứ không im lặng coi như đạt. */
+const laHandoff = (f) => /(^|\/)HANDOFF\.md$/i.test(f);
+const coDongMoi = (rel) => {
+  // Cộng cả phần đã commit chưa push lẫn phần còn trong cây làm việc. Thiếu vế nào cũng sai:
+  // ghi Log rồi commit thì cây làm việc sạch; ghi mà chưa commit thì diff với remote lại rỗng.
+  let them = 0;
+  let xoa = 0;
+  let doDuoc = false;
+  for (const args of [
+    originMainResolves ? ["diff", "--numstat", "origin/main", "--", rel] : null,
+    ["diff", "--numstat", "HEAD", "--", rel]
+  ]) {
+    if (!args) continue;
+    const ra = git(...args);
+    if (!ra) continue;
+    for (const dong of ra.split("\n").filter(Boolean)) {
+      const [a, b] = dong.split(String.fromCharCode(9));
+      if (Number.isFinite(Number(a))) { them += Number(a); xoa += Number(b) || 0; doDuoc = true; }
+    }
+  }
+  // THEM DONG, chu khong phai "co dung vao". Sua mot chu trong dong Log CU cho ra `1 them /
+  // 1 xoa` — van la `them > 0`, nen ban dau cham dat. Nhung Log la thu CHI DUOC THEM: viet lai
+  // dong cu la viet lai lich su cua phien truoc. Nen doi xoa = 0.
+  return doDuoc ? (them > 0 && xoa === 0) : null;   // null = khong do duoc, khong phai "khong co"
+};
+
 check("HANDOFF đã ghi Log phiên này", () => {
-  const missing = myPackages.filter((pkg) => {
-    const codeChanged = touched.some((f) => f.startsWith(`${pkg}/`) && !/HANDOFF\.md$/.test(f));
-    if (!codeChanged) return false;
-    return !touched.some((f) => f.startsWith(`${pkg}/`) && /HANDOFF\.md$/.test(f));
-  });
-  if (missing.length) return { ok: false, msg: `Đã sửa nhưng chưa ghi Log vào HANDOFF.md: ${missing.join(", ")}. Phiên sau sẽ mù.` };
-  return { ok: true, msg: myPackages.length ? "Đã ghi Log." : "Không có gì phải ghi." };
+  const thieu = [];
+  const chiSuaChoCu = [];
+
+  for (const pkg of myPackages) {
+    const codeChanged = touched.some((f) => f.startsWith(pkg + "/") && !laHandoff(f));
+    if (!codeChanged) continue;
+    const file = pkg + "/HANDOFF.md";
+    if (!touched.some((f) => f.startsWith(pkg + "/") && laHandoff(f))) { thieu.push(file); continue; }
+    if (coDongMoi(file) === false) chiSuaChoCu.push(file);
+  }
+
+  // Vùng gốc: một file bất kỳ ngoài package, thuộc vùng mình đang giữ.
+  const chamGoc = touched.some((f) => !laHandoff(f) && !myPackages.some((p) => f.startsWith(p + "/")));
+  if (myRootAreas.length > 0 && chamGoc) {
+    if (!touched.some((f) => f === "HANDOFF.md")) thieu.push("HANDOFF.md (gốc repo)");
+    else if (coDongMoi("HANDOFF.md") === false) chiSuaChoCu.push("HANDOFF.md (gốc repo)");
+  }
+
+  if (thieu.length) {
+    return { ok: false, msg: "Đã sửa nhưng chưa ghi Log vào: " + thieu.join(", ") + ". Phiên sau sẽ mù." };
+  }
+  if (chiSuaChoCu.length) {
+    return { ok: false, msg: "Có chạm " + chiSuaChoCu.join(", ") + " nhưng KHÔNG thêm dòng nào — Log là thứ chỉ được THÊM. Sửa dòng cũ không phải là ghi Log." };
+  }
+  const coViec = myPackages.length > 0 || (myRootAreas.length > 0 && chamGoc);
+  return { ok: true, msg: coViec ? "Đã ghi Log." : "Không có gì phải ghi." };
 });
 
 /* ---- 6. Test ------------------------------------------------------------ */
@@ -397,7 +504,25 @@ check("Test xanh", () => {
       msg: `REPO CHƯA CÓ SUITE GỐC: \`package.json\` không khai \`scripts.test\`, nên cổng KHÔNG kiểm được một dòng code nào của bạn. Đây là "chưa kiểm", không phải "đã đạt" — thêm suite rồi khai \`scripts.test\` thì cổng mới có răng.`
     };
   }
-  if (!suites.length && !rootSuite) return { ok: true, msg: "Không package nào của bạn có suite bị ảnh hưởng." };
+  /* KHÔNG CÓ SUITE NÀO CHẠY ≠ ĐÃ KIỂM XONG.
+   *
+   * Bản cũ trả XANH ở đây bất kể chuyện gì đã xảy ra trong phiên. Ca đo được ở repo NAV ngày
+   * 03/09: **trả quyền xong là mục "Test xanh" tự chuyển từ ĐỎ sang XANH** — cùng một cây làm
+   * việc, suite không đổi một chữ. Vì trả quyền làm `myRootAreas` rỗng, nhánh `skipped` phía
+   * trên không vào, và rơi thẳng xuống dòng này.
+   *
+   * Phân biệt hai chuyện khác hẳn nhau, và bản cũ gộp chúng làm một:
+   *   - phiên KHÔNG đổi gì  → đúng là không có gì phải kiểm. XANH thật.
+   *   - phiên CÓ đổi mà không suite nào chạy → CHƯA KIỂM. Phải là `BỎ`, và mã thoát 2. */
+  if (!suites.length && !rootSuite) {
+    const coThayDoi = sessionChanges.length > 0;
+    if (!coThayDoi) return { ok: true, msg: "Phiên này không đổi file nào — không có gì phải kiểm." };
+    return {
+      ok: true,
+      skipped: true,
+      msg: `Phiên này đổi ${sessionChanges.length} file nhưng KHÔNG suite nào chạy. Đây là "chưa kiểm", không phải "đã đạt". Nhận vùng mình đang sửa (\`claim.mjs --take\`), và khai \`scripts.test\` trong package.json.`
+    };
+  }
   const lines = [];
   if (rootSuite) {
     try {

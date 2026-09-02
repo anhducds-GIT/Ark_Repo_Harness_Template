@@ -1,3 +1,12 @@
+
+/* CONG CO BA TRANG THAI, KHONG PHAI HAI (tu 03/09):
+ *   0 = xanh toan bo · 1 = co muc DO · 2 = khong muc nao do nhung co muc KHONG KIEM DUOC.
+ * Fixture nay chay `--quick`, tuc co tinh khong chay suite — nen no LUON o trang thai 2.
+ * Doi `status === 0` o day la doi cong noi doi. Dieu that su can ghim la: KHONG MUC NAO DO. */
+function khongCoDo(result, thongDiep) {
+  assert.notEqual(result.status, 1, thongDiep + String.fromCharCode(10) + result.out);
+  assert.ok(!result.out.includes("[ĐỎ"), thongDiep + String.fromCharCode(10) + result.out);
+}
 /* PHÉP THỬ REPO RỖNG — tiêu chí nghiệm thu của bộ trích template.
  *
  * Dựng một repo git **trống hoàn toàn**, thả bộ khung vào, làm đúng những gì README bảo làm,
@@ -16,7 +25,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -289,8 +298,12 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
   withGateRepo({ declared: ["evidence/new.txt"] }, ({ tempRoot, runGate }) => {
     mkdirSync(join(tempRoot, "evidence"), { recursive: true });
     writeFileSync(join(tempRoot, "evidence", "new.txt"), "them moi\n", "utf8");
+    // Ghi Log — vi tu 03/09 cong doi MOI phien cham vung goc phai them mot dong vao HANDOFF.md.
+    // Truoc do luat nay chi ap cho package, nen repo khong co package con thi khong bao gio bi
+    // cuong che. Fixture cu khong ghi Log; do la fixture thieu thuc te, khong phai cong qua chat.
+    appendFileSync(join(tempRoot, "HANDOFF.md"), "- them evidence moi" + String.fromCharCode(10), "utf8");
     const result = runGate();
-    assert.equal(result.status, 0, "them evidence moi da khai phai duoc phep:\n" + result.out);
+    khongCoDo(result, "them evidence moi da khai phai duoc phep:\n");
     assert.match(result.out, /\[XANH\] Vùng bằng chứng không bị sửa/,
       "doi chung A1 phai di qua nhanh XANH cua chinh gate evidence");
   });
@@ -310,8 +323,9 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
   withGateRepo({ area: "records/", declared: ["records/new.txt"] }, ({ tempRoot, runGate }) => {
     mkdirSync(join(tempRoot, "records"), { recursive: true });
     writeFileSync(join(tempRoot, "records", "new.txt"), "them moi\n", "utf8");
+    appendFileSync(join(tempRoot, "HANDOFF.md"), "- ghi Log phien nay" + String.fromCharCode(10), "utf8");
     const result = runGate();
-    assert.equal(result.status, 0, "them records moi da khai phai duoc phep:\n" + result.out);
+    khongCoDo(result, "them records moi da khai phai duoc phep:\n");
     assert.match(result.out, /\[XANH\] Vùng bằng chứng không bị sửa/,
       "doi chung A2 phai di qua nhanh XANH cua chinh gate append-only");
   });
@@ -327,8 +341,9 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
 
   withGateRepo({ declared: ["scripts/cong-cu-la.mjs"] }, ({ tempRoot, runGate }) => {
     writeFileSync(join(tempRoot, "scripts", "cong-cu-la.mjs"), "export {};\n", "utf8");
+    appendFileSync(join(tempRoot, "HANDOFF.md"), "- ghi Log phien nay" + String.fromCharCode(10), "utf8");
     const result = runGate();
-    assert.equal(result.status, 0, "A3: khai dung duong dan trong Muc 6 thi file moi phai duoc chap nhan:\n" + result.out);
+    khongCoDo(result, "A3: khai dung duong dan trong Muc 6 thi file moi phai duoc chap nhan:\n");
     assert.match(result.out, /\[XANH\] File mới đã khai vào Bản đồ file/,
       "doi chung A3 phai di qua nhanh XANH cua chinh gate ban do");
   });

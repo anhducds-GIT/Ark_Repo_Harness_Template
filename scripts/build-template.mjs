@@ -335,7 +335,7 @@ function phanLuatChung(text) {
    là bản đồ địa phương của từng repo. Khác regex từ vựng hữu hạn, phép so này bắt MỌI thay đổi:
    thêm một luật nghề dùng từ chưa từng biết, đổi lời một luật cũ, hoặc làm mất một luật chung.
    Khi Đức duyệt đổi luật chung thật, người sửa phải cập nhật dấu vân tay cùng fixture tương ứng. */
-const COMMON_LAW_SHA256 = "4cddf2fc0f418a5d616bab80fef0c4050162439fe07b85abf7441d82c2d05fd1";
+const COMMON_LAW_SHA256 = "9b6637c18f5723ef01762e8f9abc2e4853f37691675554ec22dabfd2e0f2cd12";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

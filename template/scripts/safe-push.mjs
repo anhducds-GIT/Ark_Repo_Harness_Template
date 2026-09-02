@@ -209,10 +209,37 @@ if (blocked.length && carry) {
   console.log(`\n--carry: Đức đã duyệt cho đẩy kèm việc của ${[...new Set(blocked.flatMap((r) => r.foreign.map((f) => f.owner)))].join(", ")}.`);
 }
 
+/* Phép kiểm nhánh phải chạy TRƯỚC cửa `--dry-run`. Đặt nó sau thì lần chạy thử báo "sẽ đẩy
+   được", rồi lần chạy thật mới từ chối — mà `--dry-run` tồn tại đúng để nói trước chuyện đó. */
+const nhanhHienTai = gitQuiet("rev-parse", "--abbrev-ref", "HEAD").trim();
+if (nhanhHienTai !== "main") {
+  console.error(`\nTU_CHOI: bạn đang ở nhánh "${nhanhHienTai}", không phải "main".`);
+  console.error("Công cụ này vừa soi `origin/main..HEAD`, nhưng đẩy lên `main` từ một nhánh khác là một");
+  console.error("quyết định HỢP NHẤT, không phải một cú đẩy — và luật bắt phải hỏi Đức trước.");
+  console.error("Cách xử lý: chuyển sang `main` rồi chạy lại, hoặc hỏi Đức về việc hợp nhất nhánh này.\n");
+  process.exit(1);
+}
+
 if (dryRun) { console.log("\n--dry-run: dừng ở đây, chưa đẩy gì.\n"); process.exit(0); }
 
+/* ĐẨY ĐÚNG CÁI VỪA SOI. Đây là lỗ nguy hiểm nhất từng tìm thấy trong công cụ này.
+ *
+ * Mọi phép soi phía trên chạy trên `origin/main..HEAD`. Câu đẩy cũ là `git push origin main` —
+ * và `main` ở đó là NHÁNH main TRÊN MÁY, không phải `HEAD`. Đứng ở một nhánh tính năng thì hai
+ * thứ đó là hai lịch sử khác nhau: công cụ soi nhánh của bạn, rồi đẩy nhánh main trên máy —
+ * tức đẩy đúng thứ chưa ai soi, có thể gồm commit của phiên khác.
+ *
+ * Nói cách khác: công cụ sinh ra để chặn "đẩy kèm việc người khác" lại có thể tự làm đúng việc
+ * đó. Audit độc lập bắt được 03/09; repo NAV cũng đang ở đúng hình dạng này (nhánh main trên máy
+ * đã rẽ khỏi origin/main từ trước).
+ *
+ * Hai lớp chữa:
+ *   1. Đứng ngoài `main` thì TỪ CHỐI. Đưa một nhánh khác lên `main` là một quyết định hợp nhất,
+ *      và luật mục 2 nói rõ merge vào `main` phải hỏi Đức. Công cụ này không tự quyết thay.
+ *   2. Kể cả khi đang ở `main`, đẩy bằng `HEAD:main` — nói thẳng nguồn và đích, để không còn
+ *      khoảng cách nào giữa thứ được soi và thứ được đẩy. */
 console.log("\nĐang đẩy...");
-try { console.log(git("push", "origin", "main").trim() || "Xong."); }
+try { console.log(git("push", "origin", "HEAD:main").trim() || "Xong."); }
 catch (error) { console.error(`Push thất bại: ${String(error.stdout || error.stderr || error.message).trim()}`); process.exit(1); }
 // Đừng đóng cứng `_root`: sau A2 gốc repo có BỐN khoá, nên câu cũ dặn sai tên vùng — và đây là
 // chữ operator, tức luật vàng 5. Kể đúng vùng vừa đẩy, và nêu luôn lệnh trả quyền (đừng dặn sửa

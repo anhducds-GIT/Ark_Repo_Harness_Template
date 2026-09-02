@@ -499,12 +499,50 @@ export function unitDirsUnder(areaPath, units = DEFAULT_UNITS, listDirs) {
 
 /* Đọc từ CÂY LÀM VIỆC. Chỉ dành cho cổng đóng phiên và safe-push — hai chỗ buộc phải thấy
    cả bản sửa dở. Bộ sinh KHÔNG dùng hàm này: nó đọc từ HEAD qua deps của chính nó. */
+/* GÕ SAI MỘT CHỮ KHÔNG ĐƯỢC PHÉP IM LẶNG.
+ *
+ * Cấu hình này chỉ fail-closed ở lỗi CÚ PHÁP. Gõ sai TÊN TRƯỜNG thì vẫn parse ngon lành, và
+ * hậu quả không hiện ra ở đâu cả:
+ *
+ *   `units.root_dri`  → `root_dir` thiếu → lùi mặc định `"workers"` → quét sai thư mục, bảng
+ *                       vẫn sinh, cổng vẫn xanh, chỉ là đang nói về một repo khác.
+ *   `mutabilty`       → vùng bằng chứng KHÔNG CÒN được bảo vệ chỉ-thêm. Không dòng nào báo.
+ *
+ * Đúng là kiểu hỏng mà cả lớp cấu hình này sinh ra để chặn: repo tưởng đang được canh, thật ra
+ * không. Nên: trường lạ = NÉM. Thà chặn một cấu hình hợp lệ mà lạ, còn hơn im lặng bỏ canh.
+ * Trường bắt đầu bằng `_` được miễn — bản hạt giống dùng `_doc`, `_ten_doc` để chú thích. */
+const KHOA_UNITS = new Set(["root_dir", "marker", "depth", "ten"]);
+const KHOA_AREA = new Set(["steward", "ownership_mode", "claim_prefix", "mutability", "note"]);
+
+export function kiemKhoaLa(parsed) {
+  const loi = [];
+  const soi = (obj, hopLe, ten) => {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) return;
+    for (const k of Object.keys(obj)) {
+      if (k.startsWith("_")) continue;                 // `_doc`, `_ten_doc`: chú thích cho người
+      if (!hopLe.has(k)) loi.push(`${ten}.${k} — không phải trường hợp lệ. Hợp lệ: ${[...hopLe].join(", ")}`);
+    }
+  };
+  soi(parsed?.units, KHOA_UNITS, "units");
+  const areas = parsed?.areas;
+  if (areas && typeof areas === "object" && !Array.isArray(areas)) {
+    for (const [key, value] of Object.entries(areas)) soi(value, KHOA_AREA, `areas["${key}"]`);
+  }
+  return loi;
+}
+
 export function readStructureFromDisk(root) {
   const file = path.join(root, STRUCTURE_FILE);
   if (!fs.existsSync(file)) return null;
+  let parsed;
   try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
+    parsed = JSON.parse(fs.readFileSync(file, "utf8"));
   } catch (error) {
     throw new Error(`CAU_TRUC_HONG: ${STRUCTURE_FILE} không phải JSON đọc được (${error.message}). Sửa file đó rồi chạy lại.`);
   }
+  const loi = kiemKhoaLa(parsed);
+  if (loi.length) {
+    throw new Error(`CAU_TRUC_HONG: ${STRUCTURE_FILE} có trường không nhận ra — nhiều khả năng là gõ sai, và gõ sai ở đây làm MẤT lớp bảo vệ mà không báo gì:\n  ${loi.join("\n  ")}`);
+  }
+  return parsed;
 }

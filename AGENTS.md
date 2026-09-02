@@ -61,7 +61,7 @@ flowchart TD
 
 **Hai file được MIỄN, và lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác
 hành chính — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt
-MỌI phiên ghi Log — nhưng **chỉ miễn khi chỉ thêm dòng**; sửa dòng cũ là viết lại lịch sử của
+MỌI phiên ghi Log — nhưng **chỉ miễn khi chỉ thêm dòng**; sửa HAY XOÁ dòng cũ là viết lại lịch sử của
 phiên khác).
 
 Đây không phải hình thức: ngày 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một
