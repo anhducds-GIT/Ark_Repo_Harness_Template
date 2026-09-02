@@ -1,14 +1,18 @@
 {
-  "name": "repo-harness",
+  "name": "ark-repo-harness",
   "version": "0.1.0-unproven",
   "private": true,
   "type": "module",
-  "description": "Bộ khung repo: cổng vào máy đọc, cổng kiểm cấu trúc, cổng đóng phiên, đẩy an toàn.",
+  "description": "Bộ khung repo dùng lại được: luật, cổng kiểm, bộ sinh trang, và công cụ đưa repo khác lên chuẩn.",
   "scripts": {
     "dashboard": "node scripts/build-dashboard.mjs",
     "bootstrap": "node scripts/check-bootstrap.mjs",
     "gate": "node scripts/session-check.mjs",
     "push": "node scripts/safe-push.mjs",
-    "test": "node tests/harness-smoke.mjs"
+    "template": "node scripts/build-template.mjs",
+    "template:overview": "node scripts/build-template-overview.mjs",
+    "assess": "node scripts/assess.mjs",
+    "init": "node scripts/init-repo.mjs",
+    "test": "node scripts/build-template.mjs --check && node tests/harness-smoke.mjs && node tests/template-null-repo.mjs && node tests/assess-smoke.mjs && node tests/init-repo-smoke.mjs && node tests/template-overview-smoke.mjs"
   }
 }
