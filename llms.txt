@@ -1,0 +1,28 @@
+# Ark Repo Harness
+
+> 1/1 trên 1 đơn vị đã khai trạng thái. Mọi con số trong repo này là máy đếm, không gõ tay.
+
+> **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
+
+Trang được sinh tại commit `2626294` (2026-09-03).
+
+## Việc ưu tiên #1
+
+- **_root** — Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu
+
+## Đọc theo thứ tự này
+
+- [AGENTS.md](AGENTS.md): hiến pháp repo — luật chung, đọc trước tiên
+- [DASHBOARD.md](DASHBOARD.md): bảng trạng thái máy sinh: có extension gì, cái nào sống, việc đang mở
+- [HANDOFF.md](HANDOFF.md): phiên gần nhất ở gốc repo làm gì, còn gì mở
+- [repo-map.json](repo-map.json): bản đồ máy đọc — hệ điều phối cấp cao chỉ cần đọc file này
+
+## Từng extension
+
+- [repo-harness](STATUS.md): idea — Repo vừa khởi tạo từ bộ khung
+
+## Luật bắt buộc trước khi sửa gì
+
+- Một package chỉ MỘT phiên AI được ghi: xem `.agents/claims.json`, chủ không phải bạn thì chỉ đọc.
+- Đóng phiên phải xanh cổng: `node scripts/session-check.mjs --as <tên-phiên>`.
+- Push bằng `node scripts/safe-push.mjs --as <tên-phiên>`, không bao giờ `git push` trần.

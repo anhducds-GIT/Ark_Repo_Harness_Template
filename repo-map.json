@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-03",
+  "generated_commit": "2626294",
+  "profile": "P1",
+  "entry_point": "llms.txt",
+  "law_files": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "top_level": [
+    {
+      "path": "docs/",
+      "owner_declared": true
+    },
+    {
+      "path": "scripts/",
+      "owner_declared": true
+    },
+    {
+      "path": "tests/",
+      "owner_declared": true
+    }
+  ],
+  "units": [
+    {
+      "id": "repo-goc",
+      "path": ".",
+      "lifecycle": "idea",
+      "status_md": "STATUS.md",
+      "owner": "chua-khai",
+      "next_step": "Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu",
+      "human_action": null,
+      "priority_rank": 1,
+      "superseded_by": null,
+      "last_verified": null,
+      "last_verified_commit": null,
+      "open_item": "Repo vừa khởi tạo từ bộ khung; chưa khai gì thêm"
+    }
+  ],
+  "active_work": [
+    {
+      "id": "_root",
+      "unit": "_root",
+      "title": "Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu",
+      "rank": 1,
+      "claim": null
+    }
+  ],
+  "health": {
+    "units_without_status": 0,
+    "dead_links": 0,
+    "undeclared_dirs": 0,
+    "draft_debt": 0
+  }
+}
