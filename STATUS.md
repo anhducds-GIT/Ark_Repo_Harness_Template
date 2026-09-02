@@ -1,30 +1,26 @@
 ---
 schema: extension-status/v2
-id: repo-goc
-name: Đổi thành tên repo của bạn
-lifecycle: idea
-owner: chua-khai
+id: ark-repo-harness
+name: Ark Repo Harness
+lifecycle: building
+owner: claude-template-finish
 priority_rank: 1
-next_step: "Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu"
+next_step: "Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh"
 version_source: package.json
-current_focus: "Repo vừa khởi tạo từ bộ khung; chưa khai gì thêm"
+current_focus: "Bịt các lỗ audit tìm ra, và viết sổ tay cho AI để không trôi cách làm"
+human_action: "Chỉ giúp một repo đang sống, không phải extension, càng nhỏ càng tốt — để thử lửa"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---
 
-# Trạng thái — gốc repo
+# Trạng thái — Ark Repo Harness
 
-> **Đây là file KHAI BẰNG TAY.** Bảng điều hành đọc phần đầu file này; đừng gõ tay số nào mà
-> máy đo được. Khuôn đầy đủ và luật: `STATUS.template.md`.
+> **File KHAI BẰNG TAY.** Bảng đọc phần đầu file này. Đừng gõ số nào mà máy đo được.
 
-Repo vừa được khởi tạo từ bộ khung, chưa có việc thật nào.
+Đây là **nhà riêng của bộ khung**. Nó tự dựng bằng chính bộ khung của mình, và tự sinh lại được
+bản trích trong `template/`.
 
-**Ba việc đầu tiên, theo đúng thứ tự:**
+**Đang ở đâu:** bộ khung dùng được, nhưng **chưa từng chạy trên một repo thật khác nghề**. Nhãn
+`unproven` vẫn đúng.
 
-1. Sửa `.repo-structure.json` — khối `units` (đơn vị của bạn nằm đâu) và `areas` (mỗi thư mục
-   top-level một dòng).
-2. Chạy `npm run dashboard` để sinh cổng vào máy đọc. **Trước bước này, phép kiểm điều hướng
-   sẽ báo vàng vì chưa có gì để đi từ đó** — đúng, không phải lỗi.
-3. Chạy `npm run bootstrap` để biết repo đang nợ những gì.
-
-Sửa xong ba bước trên thì thay toàn bộ nội dung file này bằng trạng thái thật.
+**Việc kế:** xem [ROADMAP-V1.md](docs/ROADMAP-V1.md) — bốn khối A→D.

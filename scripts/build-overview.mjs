@@ -19,6 +19,7 @@
  * BẢN RA KHÔNG COMMIT: nó để publish và tự in ngày sinh.
  */
 
+import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -75,6 +76,37 @@ export function tachNhatKy(text) {
 /* ---- trang ----------------------------------------------------------------- */
 
 const CSS = `
+
+/* Banner "trang có thể đã cũ" — đỏ, chiếm trọn dòng đầu, chỉ hiện khi quá 7 ngày.
+   Trang là file tĩnh đem publish, nên nó PHẢI tự biết mình bao nhiêu tuổi ở lúc XEM,
+   không phải lúc sinh. Ngày sinh thì luôn hiện, kể cả khi còn mới. */
+.cu{display:none;background:#FBE3E0;color:#8C3A34;border:1px solid #E7B8B2;border-radius:9px;
+  padding:11px 16px;margin:0 0 16px;font-weight:600;font-size:14px;text-align:center}
+.cu[data-hien="1"]{display:block}
+:root:not([data-theme="light"]) .cu{background:#3A1D1A;color:#E8A29A;border-color:#5C302A}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .cu{background:#FBE3E0;color:#8C3A34;border-color:#E7B8B2}}
+
+.nn{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
+  background:var(--vien);border:1px solid var(--vien);border-radius:11px;overflow:hidden;margin:0 0 16px}
+.nn .m{background:var(--mat);padding:15px 17px;display:flex;flex-direction:column;gap:5px}
+.nn .m.viec{background:var(--vang-nen)}
+.nn .nhan{font-family:var(--mono);font-size:10.2px;letter-spacing:.11em;text-transform:uppercase;color:var(--mo)}
+.nn .m.viec .nhan{color:var(--vang)}
+.nn .gt{font-size:15px;font-weight:600;line-height:1.35;color:var(--chu)}
+.nn .gt.to{font-family:var(--disp);font-size:21px;font-weight:800;letter-spacing:-.02em}
+
+.vong{display:flex;align-items:center;gap:0;margin:6px 0 2px;overflow-x:auto;padding:6px 0}
+.vong .b{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1;min-width:82px}
+.vong .cham{width:15px;height:15px;border-radius:50%;background:var(--vien2);border:3px solid var(--mat)}
+.vong .b.qua .cham{background:var(--xanh)}
+.vong .b.nay .cham{background:var(--mat);border-color:var(--nhan);box-shadow:0 0 0 4px var(--nhan-nen)}
+.vong .ten{font-family:var(--mono);font-size:10.4px;letter-spacing:.08em;text-transform:uppercase;color:var(--mo);white-space:nowrap}
+.vong .b.nay .ten{color:var(--nhan);font-weight:600}
+.vong .noi{height:2px;background:var(--vien);flex:1;margin-bottom:19px;min-width:14px}
+.vong .noi.qua{background:var(--xanh)}
+
+.den{width:18px;height:18px;border-radius:50%;display:inline-block;vertical-align:-3px}
+.den.xanh{background:var(--xanh)} .den.vang{background:var(--vang)} .den.do{background:var(--do)}
 :root{
   --nen:#F7F5F0; --mat:#FFFFFF; --mat2:#EFEBE3; --vien:#DED8CC; --vien2:#C6BDAC;
   --chu:#1C1A16; --chu2:#4E483E; --mo:#7C7466;
@@ -192,6 +224,20 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
 
 const JS = `
 (function(){
+  // Trang là file tĩnh đem publish — nó phải tự biết mình bao nhiêu tuổi ở lúc XEM, không phải
+  // lúc sinh. Bảy ngày là mốc: quá đó thì mọi con số ở đây đáng ngờ, và người xem phải biết
+  // điều đó TRƯỚC khi đọc, không phải sau.
+  try {
+    var el = document.querySelector('.cu');
+    if (el && el.dataset.sinh) {
+      var ngay = Math.floor((Date.now() - new Date(el.dataset.sinh).getTime()) / 86400000);
+      if (ngay > 7) {
+        el.dataset.hien = '1';
+        el.textContent = 'TRANG NÀY CÓ THỂ ĐÃ CŨ — sinh ngày ' + el.dataset.sinh + ', ' + ngay + ' ngày trước. Sinh lại trước khi tin số.';
+      }
+    }
+  } catch (e) {}
+
   var nut = [].slice.call(document.querySelectorAll('nav.tabs button'));
   var mucs = [].slice.call(document.querySelectorAll('section.tab'));
   function chon(id, luu){
@@ -219,24 +265,78 @@ function mucLuc(muc) {
     muc.map((m) => `<li><a href="#${m.id}">${esc(m.ten)}</a></li>`).join("")}</ul></div>`;
 }
 
+/* NOW/NEXT — bốn ô, đọc từ frontmatter của STATUS.md. Ô cuối là **việc cần NGƯỜI làm**, tô khác
+   màu, vì đó là thứ duy nhất trên trang mà AI không tự làm được. Chủ dự án mở trang ra chỉ cần
+   nhìn đúng ô đó. */
+function khoiNowNext(st) {
+  if (!st || !Object.keys(st).length) return "";
+  const o = (nhan, gt, to, lop) => gt
+    ? `<div class="m ${lop || ""}"><span class="nhan">${esc(nhan)}</span><span class="gt${to ? " to" : ""}">${esc(String(gt).replace(/^"|"$/g, ""))}</span></div>`
+    : "";
+  return `<div class="nn">
+    ${o("đang ở đâu", VONG_DOI[st.lifecycle]?.ten || st.lifecycle, true)}
+    ${o("đang làm gì", st.current_focus)}
+    ${o("kế tiếp", st.next_step)}
+    ${o("cần bạn làm", st.human_action, false, "viec")}
+  </div>`;
+}
+
+const VONG_DOI = {
+  idea: { ten: "Ý TƯỞNG", i: 0 },
+  building: { ten: "ĐANG DỰNG", i: 1 },
+  proven: { ten: "ĐÃ CHỨNG MINH", i: 2 },
+  paused: { ten: "TẠM DỪNG", i: 3 },
+  retired: { ten: "ĐÃ NGHỈ", i: 3 }
+};
+
+/* Vòng đời — bốn chặng, chấm sáng ở chặng hiện tại. Cố ý KHÔNG hiện phần trăm: một dự án không
+   chạy được đo bằng phần trăm, và một con số như thế chỉ tạo cảm giác chính xác giả. */
+function khoiVongDoi(st) {
+  const nay = VONG_DOI[st?.lifecycle]?.i;
+  if (nay === undefined) return "";
+  const chang = [["Ý tưởng", 0], ["Đang dựng", 1], ["Đã chứng minh", 2], ["Dừng / nghỉ", 3]];
+  return `<div class="the"><h2>Vòng đời</h2><div class="vong">${
+    chang.map(([ten, i], k) => {
+      const lop = i < nay ? "qua" : (i === nay ? "nay" : "");
+      const noi = k < chang.length - 1 ? `<div class="noi${i < nay ? " qua" : ""}"></div>` : "";
+      return `<div class="b ${lop}"><div class="cham"></div><div class="ten">${esc(ten)}</div></div>${noi}`;
+    }).join("")}</div></div>`;
+}
+
+/* Sức khoẻ — ba con số đếm và MỘT đèn. Đèn xanh chỉ khi cả ba bằng 0. Không phần trăm, không
+   lời máy tự khen: một dòng "đạt 94%" là thứ không ai hành động được. */
+function khoiSucKhoe(sk) {
+  const tong = sk.reduce((a, b) => a + b.so, 0);
+  const den = tong === 0 ? "xanh" : (tong <= 3 ? "vang" : "do");
+  return `<div class="the"><h2>Sức khoẻ</h2>
+    <div class="luoi">
+      ${sk.map((s) => `<div class="o ${s.so === 0 ? "ok" : "canh"}"><b>${s.so}</b><span>${esc(s.nhan)}</span></div>`).join("")}
+      <div class="o"><b><span class="den ${den}"></span></b><span>tổng thể</span></div>
+    </div>
+    <p style="font-size:13.2px;color:var(--mo)">Đèn xanh chỉ khi cả ba đều bằng 0. Không có phần trăm ở đây — một con số như "đạt 94%" thì không ai hành động được.</p>
+  </div>`;
+}
+
+
 export function trang(dl) {
-  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, huongDan } = dl;
+  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, huongDan, st } = dl;
 
   const tabs = [
     ["tong-quan", "Tổng quan"],
-    ["kien-truc", "Kiến trúc"],
-    ["tinh-nang", "Tính năng"],
-    ["workflow", "Workflow"],
-    ["protocol", "Protocol"],
-    ["huong-dan", "Hướng dẫn"],
+    ["lam-duoc-gi", "Làm được gì"],
+    ["cach-van-hanh", "Cách vận hành"],
+    ["so-tay", "Sổ tay"],
+    ["bao-tri", "Bảo trì"],
+    ["kien-truc", "Bên trong"],
     ["tra-cuu", "Tra cứu"],
     ["nhat-ky", "Nhật ký"]
   ].filter(([id]) => {
-    if (id === "workflow") return workflows.length > 0;
-    if (id === "protocol") return protocols.length > 0 || adrs.length > 0;
+    if (id === "lam-duoc-gi") return Boolean(dl.tinhNang);
+    if (id === "cach-van-hanh") return workflows.length > 0;
+    if (id === "so-tay") return Boolean(dl.soTay) || protocols.length > 0;
+    if (id === "bao-tri") return Boolean(dl.baoTri);
     if (id === "tra-cuu") return Boolean(legend);
     if (id === "nhat-ky") return nhatKy.length > 0;
-    if (id === "huong-dan") return Boolean(huongDan);
     return true;
   });
 
@@ -272,16 +372,16 @@ export function trang(dl) {
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>${CSS}</style>
 <div class="wrap">
+  <div class="cu" data-sinh="${esc(ngay)}"></div>
   <header>
     <div class="nhan-hang">
       <span class="chip">v${esc(ban)}</span>
       <span>sinh ngày ${esc(ngay)}</span>
-      <span class="chip canh">chưa migrate repo thật nào</span>
     </div>
     <h1>${esc(ten)}</h1>
     <p style="color:var(--chu2);font-size:16.5px">
-      Một bộ khung repo dùng lại được: luật, gate, generator, và công cụ đưa repo khác lên chuẩn.
-      Trang này <strong>sinh từ chính repo</strong> — không gõ tay, nên không thể nói khác thực tế.
+      Bộ khung để một repo tự trông coi lấy mình: có cửa kiểm chặn việc dở dang, có luật cho AI
+      đọc, và có lịch bảo trì. Sau khi dựng xong, <strong>AI là người ở lại trông nhà</strong>.
     </p>
   </header>
 
@@ -290,83 +390,99 @@ export function trang(dl) {
   </nav>
 
   <section class="tab" id="tab-tong-quan" hidden>
-    <div class="luoi">${oSo}</div>
+    ${khoiNowNext(st)}
+    ${khoiVongDoi(st)}
+    ${khoiSucKhoe(so)}
     <div class="the">
-      <h2>Nó làm được gì mà một repo trống không làm được</h2>
-      <h3>Chặn việc dở dang</h3>
-      <p>Session gate chạy suite, đối chiếu artifact với lịch sử git, và kiểm ai được ghi vùng nào.
-      Đỏ thì chưa xong — không có đường vòng, và không được nới gate cho nó xanh.</p>
-      <h3>Nhiều AI, một repo</h3>
-      <p>Một area, một claim, một lúc. Công cụ push từ chối cuốn theo commit của phiên khác, và mỗi
-      commit mang lane của phiên đã làm ra nó.</p>
-      <h3>Bảng không nói dối</h3>
-      <p>Artifact sinh hoàn toàn từ lịch sử git. Gate đối chiếu lại mỗi phiên, nên một trang cũ
-      không thể lặng lẽ cũ.</p>
-    </div>
-    <div class="the">
-      <h2>Bắt đầu trong hai lệnh</h2>
-      ${md("```bash" + NL + "node scripts/init-repo.mjs <thư-mục> --ten \"Tên repo\"   # repo mới" + NL + "node scripts/assess.mjs <thư-mục>                       # repo đang sống" + NL + "```")}
-      <blockquote>Repo đang có việc thì <strong>đo trước, đừng thả bừa</strong>. Kiểm thì rẻ, chuyển thì đắt.</blockquote>
+      <h2>Ba việc nó làm mà một repo trống không làm được</h2>
+      <div class="cols">
+        <div>
+          <h3>Chặn việc dở dang</h3>
+          <p>Trước khi ai đó được phép nói "xong", một cửa kiểm chạy toàn bộ bài kiểm tra và đối
+          chiếu mọi trang tự sinh với lịch sử thật. Đỏ thì chưa xong.</p>
+        </div>
+        <div>
+          <h3>Không cho hai người giẫm chân</h3>
+          <p>Repo chia vùng, mỗi vùng một chủ tại một thời điểm. Lệnh đẩy từ chối cuốn theo việc
+          của người khác.</p>
+        </div>
+        <div>
+          <h3>Bảng không nói dối</h3>
+          <p>Mọi con số sinh từ lịch sử thật, không gõ tay. Trang cũ quá bảy ngày thì tự treo cờ
+          đỏ ở đầu — bạn đang thấy chỗ đó ở trên cùng.</p>
+        </div>
+      </div>
     </div>
   </section>
+
+  ${dl.tinhNang ? `<section class="tab" id="tab-lam-duoc-gi" hidden>
+    <div class="the">${md(dl.tinhNang)}</div>
+  </section>` : ""}
+
+  ${workflows.length ? `<section class="tab" id="tab-cach-van-hanh" hidden>
+    ${mucLuc(workflows.map((w) => ({ id: `wf-${slug(w.file)}`, ten: w.fm.ten || w.tieuDe })))}
+    ${workflows.map((w) => {
+      const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
+      const iMer = than2.findIndex((l) => l.trim().startsWith("```mermaid"));
+      const jMer = iMer >= 0 ? than2.findIndex((l, k) => k > iMer && l.trim().startsWith("```")) : -1;
+      const luuDo = iMer >= 0 ? than2.slice(iMer, jMer + 1).join(NL) : "";
+      const conLai = iMer >= 0 ? [...than2.slice(0, iMer), ...than2.slice(jMer + 1)].join(NL) : than2.join(NL);
+      return `<div class="the" id="wf-${slug(w.file)}">
+        <h2>${esc(w.fm.ten || w.tieuDe)}</h2>
+        <div class="nhan-hang">
+          ${w.fm.ai_chay ? `<span class="chip">ai chạy: ${esc(w.fm.ai_chay)}</span>` : ""}
+          ${w.fm.mat ? `<span class="chip">mất: ${esc(w.fm.mat)}</span>` : ""}
+        </div>
+        ${md(luuDo)}
+        <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
+      </div>`;
+    }).join("")}
+  </section>` : ""}
+
+  ${(dl.soTay || protocols.length) ? `<section class="tab" id="tab-so-tay" hidden>
+    ${dl.soTay ? `<div class="the">${md(dl.soTay)}</div>` : ""}
+    ${protocols.length ? `<div class="the"><h2>Quy trình đầy đủ</h2>
+      ${protocols.map((p2) => `<details><summary>${esc(p2.tieuDe)}</summary>${md(p2.than.split(NL).filter((l) => !l.startsWith("# ")).join(NL))}</details>`).join("")}
+    </div>` : ""}
+  </section>` : ""}
+
+  ${dl.baoTri ? `<section class="tab" id="tab-bao-tri" hidden>
+    <div class="the">${md(dl.baoTri)}</div>
+  </section>` : ""}
 
   <section class="tab" id="tab-kien-truc" hidden>
     <div class="the">
       <h2>Bốn tầng, và chúng được đối xử khác nhau</h2>
-      ${md(["```mermaid", "flowchart LR", '  L["LAW<br/>luật · vai · kiến trúc"] --> S["STATE<br/>trạng thái · bàn giao"]',
-        '  S --> G["GENERATED<br/>bảng · bản đồ máy đọc"]', '  E["EVIDENCE<br/>bằng chứng · quyết định"]',
+      ${md(["```mermaid", "flowchart LR", '  L["LUẬT<br/>người viết<br/>đổi vài tháng một lần"] --> S["TRẠNG THÁI<br/>người viết<br/>đổi mỗi phiên"]',
+        '  S --> G["MÁY SINH<br/>máy viết<br/>không sửa tay"]', '  E["BẰNG CHỨNG<br/>bất biến<br/>chỉ thêm"]',
         "  L -.- E", "```"].join(NL))}
-      ${md(["| Tầng | Ai ghi | Đổi khi nào | Luật |", "|---|---|---|---|",
-        "| **LAW** | người | vài tháng | sửa thì phải nêu lý do |",
-        "| **STATE** | người | mỗi phiên | chỉ thêm dòng vào HANDOFF |",
-        "| **GENERATED** | **máy** | mỗi lần sinh | **không sửa tay**, sửa là mất ở lần sinh sau |",
-        "| **EVIDENCE** | bất biến | không bao giờ | **chỉ thêm**, không sửa, không xoá |"].join(NL))}
+      <p>Sửa nhầm tầng là kiểu hỏng im lặng: sửa tay một trang máy sinh thì mất trắng ở lần sinh
+      sau, và không ai hiểu vì sao chữ mình vừa viết biến mất.</p>
     </div>
     <div class="the">
-      <h2>Cái gì đi theo bản trích, cái gì ở lại repo nhà</h2>
-      <p>Câu hỏi duy nhất để phân loại: <em>repo đích có cần thứ này để TỰ SỐNG không?</em>
-      Repo đích cần <strong>sống theo</strong> chuẩn, không cần <strong>phát hành</strong> chuẩn.</p>
-      ${md(["| Ở repo nhà | Đi theo bản trích |", "|---|---|",
-        "| `build-template` — nguồn của chuẩn | 5 công cụ vận hành |",
-        "| `assess` — đo repo khác | luật ba tầng + bản mẫu |",
-        "| `init-repo` — dựng repo mới | suite seed |",
-        "| protocol kiểm & migrate | cấu hình hình dạng repo |"].join(NL))}
-    </div>
-  </section>
-
-  <section class="tab" id="tab-tinh-nang" hidden>
-    ${mucLuc([{ id: "tn-lenh", ten: "Lệnh chạy được" }, { id: "tn-bando", ten: "Khi bạn sắp… mở file nào" }])}
-    <div class="the" id="tn-lenh">
       <h2>Lệnh chạy được</h2>
-      <p>Đọc thẳng từ <code>package.json</code>, nên danh sách này không bao giờ cũ hơn thực tế.</p>
+      <p>Dành cho ai gõ lệnh. Người không gõ lệnh thì xem tab <strong>Làm được gì</strong> —
+      cùng một thứ, kể bằng tiếng người.</p>
       <div class="tw"><table><thead><tr><th>Lệnh</th><th>Chạy gì</th></tr></thead><tbody>
       ${lenh.map(([k, v]) => `<tr><td><code>npm run ${esc(k)}</code></td><td><code>${esc(v)}</code></td></tr>`).join("")}
       </tbody></table></div>
     </div>
-    <div class="the" id="tn-bando">
-      <h2>Khi bạn sắp… thì mở file nào</h2>
-      <p>Đây là bản đồ điều hướng của repo, đọc từ mục 6 của <code>AGENTS.md</code> — cùng một bảng
-      mà mọi phiên AI đọc lúc mở phiên.</p>
+    ${adrs.length ? `<div class="the"><h2>Quyết định đã chốt</h2>
+      <p>Mỗi quyết định một file, <strong>không sửa lại</strong>. Đổi ý thì viết quyết định mới
+      thay thế cái cũ, để sau này còn đọc được vì sao lúc đó chọn thế.</p>
+      <div class="tw"><table><thead><tr><th>Quyết định</th><th>Trạng thái</th><th>Ngày</th></tr></thead><tbody>
+      ${adrs.map((a) => `<tr><td>${esc(a.tieuDe)}</td><td>${esc(a.fm.status || "—")}</td><td>${esc(a.fm.date || "—")}</td></tr>`).join("")}
+      </tbody></table></div></div>` : ""}
+    <div class="the"><h2>Khi bạn sắp… thì mở file nào</h2>
       <div class="tw"><table><thead><tr><th>Khi bạn sắp…</th><th>Mở cái gì</th></tr></thead><tbody>
       ${banDo.map((r) => `<tr><td>${md(r[0]).replace(/^<p>|<\/p>$/g, "")}</td><td>${md(r.slice(1).join(" · ")).replace(/^<p>|<\/p>$/g, "")}</td></tr>`).join("")}
       </tbody></table></div>
     </div>
   </section>
 
-  ${workflows.length ? `<section class="tab" id="tab-workflow" hidden>
-    ${mucLuc(workflows.map((w) => ({ id: `wf-${slug(w.file)}`, ten: w.fm.ten || w.tieuDe })))}
-    ${tabWorkflow}
-  </section>` : ""}
-
-  ${(protocols.length || adrs.length) ? `<section class="tab" id="tab-protocol" hidden>${tabProtocol}</section>` : ""}
-
-  ${huongDan ? `<section class="tab" id="tab-huong-dan" hidden><div class="the">${md(huongDan)}</div></section>` : ""}
-
   ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><div class="the">${md(legend)}</div></section>` : ""}
 
   ${nhatKy.length ? `<section class="tab" id="tab-nhat-ky" hidden>
-    <div class="the"><h2>Nhật ký</h2>
-    <p>Bản mới nhất mở sẵn. Bấm để xem các bản cũ.</p></div>
     ${nhatKy.map((k, idx) => `<details${idx === 0 ? " open" : ""}>
       <summary><strong>v${esc(k.ban)}</strong><span class="ngay">${esc(k.ngay)}</span><span class="tt">${esc(k.tomTat)}</span></summary>
       ${md(k.than)}
@@ -397,8 +513,38 @@ export function gomDuLieu() {
   const protocols = docTaiLieu("docs/protocols");
   const adrs = docTaiLieu("docs/adr");
   const legendRaw = doc("docs/LEGEND.md");
+  const st = tachFrontmatter(doc("STATUS.md") || "").fm;
+  const tinhNangRaw = doc("docs/TINH-NANG.md");
+  const soTayRaw = doc("docs/SO-TAY-AGENT.md");
+  const baoTriRaw = doc("docs/BAO-TRI-DINH-KY.md");
   const huongDanRaw = doc("docs/HUONG-DAN.md");
-  const soTest = (doc("package.json") ? Object.keys(pkg.scripts || {}).filter((k) => k.startsWith("test")).length : 0);
+  // Tài liệu quá hạn: mỗi file khai `ttl_days`, so với lần commit gần nhất của chính nó. Không
+  // đo được (chưa commit, không có git) thì KHÔNG tính là nợ — thà bỏ sót còn hơn báo động sai.
+  const taiLieuQuaHan = [];
+  for (const thuMuc of ["docs", "docs/workflows", "docs/protocols", "docs/briefs"]) {
+    for (const f of liet(thuMuc)) {
+      const fm = tachFrontmatter(doc(`${thuMuc}/${f}`) || "").fm;
+      const ttl = Number(fm.ttl_days);
+      if (!Number.isFinite(ttl) || ttl <= 0) continue;
+      let sua = null;
+      try {
+        const ra = execSync(`git log -1 --format=%cI -- "${thuMuc}/${f}"`, { cwd: ROOT, encoding: "utf8" }).trim();
+        sua = ra ? new Date(ra) : null;
+      } catch (_) { sua = null; }
+      if (!sua) continue;
+      if ((Date.now() - sua.getTime()) / 86400000 > ttl) taiLieuQuaHan.push(`${thuMuc}/${f}`);
+    }
+  }
+  let canhBaoVang = 0;
+  try {
+    const ra = execSync("node scripts/check-bootstrap.mjs", { cwd: ROOT, encoding: "utf8" });
+    const m = (ra.split(NL).find((l) => l.startsWith("TỔNG:")) || "").match(/([0-9]+)\s*chỗ\s*VÀNG/);
+    canhBaoVang = m ? Number(m[1]) : 0;
+  } catch (e) {
+    const ra = String(e.stdout || "");
+    const m = (ra.split(NL).find((l) => l.startsWith("TỔNG:")) || "").match(/([0-9]+)\s*chỗ\s*VÀNG/);
+    canhBaoVang = m ? Number(m[1]) : 0;
+  }
   return {
     ten: tenNguoi || pkg.name || "Repo",
     ban: pkg.version || "0.0.0",
@@ -407,14 +553,17 @@ export function gomDuLieu() {
     banDo: docBanDo(doc("AGENTS.md")),
     workflows, protocols, adrs, nhatKy,
     legend: legendRaw ? tachFrontmatter(legendRaw).than : null,
+    st,
+    tinhNang: tinhNangRaw ? tachFrontmatter(tinhNangRaw).than : null,
+    soTay: soTayRaw ? tachFrontmatter(soTayRaw).than : null,
+    baoTri: baoTriRaw ? tachFrontmatter(baoTriRaw).than : null,
     huongDan: huongDanRaw ? tachFrontmatter(huongDanRaw).than : null,
+    // BA CON SỐ ĐẾM NỢ, không đếm tài sản. Đếm tài sản ("3 workflow, 9 lệnh") chỉ làm người
+    // xem thấy nhiều mà không biết có phải lo không. Đèn xanh chỉ khi cả ba bằng 0.
     so: [
-      { so: workflows.length, nhan: "workflow có lưu đồ", mau: "ok" },
-      { so: protocols.length, nhan: "protocol", mau: "ok" },
-      { so: adrs.length, nhan: "quyết định đã chốt", mau: "ok" },
-      { so: Object.keys(pkg.scripts || {}).length, nhan: "lệnh chạy được", mau: "ok" },
-      { so: soTest, nhan: "nhóm test", mau: "ok" },
-      { so: 0, nhan: "repo khác nghề đã thử", mau: "thieu" }
+      { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn" },
+      { so: canhBaoVang, nhan: "cảnh báo cấu trúc tồn" },
+      { so: 1, nhan: "việc lớn chưa chứng minh" }
     ]
   };
 }

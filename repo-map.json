@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "732772a",
+  "generated_commit": "70f046c",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
