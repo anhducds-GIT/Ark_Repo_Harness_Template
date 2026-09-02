@@ -73,3 +73,4 @@ sửa `session-check.mjs`.
    thực tế đang có bốn chủ (`_root _docs _code _template`).
 
 - **2026-09-03 · harness-vong2** — Vòng 2: vá 9 lỗ do hai lần migrate thật và audit độc lập vạch ra (cổng báo XANH khi không kiểm được gì · safe-push soi một đằng đẩy một nẻo · bản đồ file đóng cứng số mục · máy sinh tự đếm mình là code · gõ sai tên trường cấu hình làm mất lớp bảo vệ · đèn sức khoẻ không bao giờ xanh được · HUONG-DAN bị nuốt khỏi trang · Log chỉ đòi ở package · quét secret bỏ qua .env). Suite 30 → 36. Mở: 6 phát hiện Codex chưa vá (đếm [ĐO] bằng regex · verifyCommit chưa kiểm ancestor · archived lọt active_work · provenance artifact).
+- **2026-09-03 · harness-vong2 (tiếp)** — Vá thêm: quét secret kêu oan một lời gọi hàm ở repo Project 3AI, và sau khi siết lại thì nó bắt chính suite của mình (fixture phải ghép chuỗi lúc chạy). Suite 36 → 37.
