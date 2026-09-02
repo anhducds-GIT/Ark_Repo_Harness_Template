@@ -88,13 +88,17 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
 
   git("init", "-q", "-b", "main");
   git("add", "-A");
-  git("commit", "-q", "-m", "khoi tao tu bo khung");
+  // Nhãn lane ngay từ commit đầu: safe-push quy thuộc theo nhãn, và commit không nhãn thì nó
+  // phải lùi về quy theo VÙNG — cách sai được cả hai chiều. Đo được 03/09 ở chính cú push đầu
+  // tiên của repo nhà: 2/5 commit không nhãn, và cả hai đều do lệnh này tạo ra.
+  const lane = `${NL}${NL}Lane: init-repo`;
+  git("commit", "-q", "-m", `khoi tao tu bo khung${lane}`);
 
   // THỨ TỰ QUAN TRỌNG: bộ sinh đọc hoàn toàn từ HEAD, nên phải commit nguồn TRƯỚC rồi mới sinh.
   // Sinh trước là dựng lại từ một HEAD chưa có gì — đúng lỗi đã làm hỏng một lượt thử thật.
   at(process.execPath, [path.join(root, "scripts", "build-dashboard.mjs")]);
   git("add", "-A");
-  git("commit", "-q", "-m", "sinh trang lan dau");
+  git("commit", "-q", "-m", `sinh trang lan dau${lane}`);
 
   let bootstrap = "";
   let sach = true;

@@ -68,14 +68,28 @@ try {
   console.error(`\n⚠ KHONG_FETCH_DUOC: \`git fetch origin main\` thất bại → ${detail}`);
   console.error(`  Vẫn đi tiếp, nhưng mốc so sánh là bản origin/main CŨ trên máy. Nếu push bị từ chối vì không tiến thẳng thì đó là lý do.\n`);
 }
-if (!gitQuiet("rev-parse", "--verify", "origin/main").trim()) {
-  console.error(`\nKHONG_CO_ORIGIN_MAIN: không phân giải được \`origin/main\`.`);
-  console.error(`Không có mốc để so thì không đếm được commit nào chưa đẩy — và im lặng ở đây là báo "xong" cho một cú đẩy CHƯA HỀ XẢY RA.`);
-  console.error(`Kiểm: \`git remote -v\` và \`git branch -r\`. Repo mới thì chạy \`git fetch origin\` một lần.\n`);
+/* HAI CA khác hẳn nhau, cùng có hình dạng "không phân giải được origin/main":
+ *   a) remote CHƯA CÓ nhánh main -> CÚ ĐẨY ĐẦU TIÊN của một repo mới. Hợp lệ, và MỌI repo
+ *      dựng từ harness đều đi qua đúng ca này. Chặn nó là chặn chính việc harness sinh ra
+ *      để làm. Đo được 03/09: repo nhà của harness không đẩy nổi lần đầu.
+ *   b) remote CÓ nhánh main mà máy không có -> máy đang lệch, chưa fetch bao giờ. PHẢI chặn.
+ * Phân biệt bằng cách HỎI THẲNG REMOTE, không suy từ trạng thái máy — vì chính trạng thái
+ * máy là thứ đang bị nghi. */
+const remoteCoMain = gitQuiet("ls-remote", "--heads", "origin", "main").trim() !== "";
+const coRefTrenMay = gitQuiet("rev-parse", "--verify", "origin/main").trim() !== "";
+const lanDau = !coRefTrenMay && !remoteCoMain;
+
+if (!coRefTrenMay && remoteCoMain) {
+  console.error(String.fromCharCode(10) + " KHONG_CO_ORIGIN_MAIN: remote CÓ nhánh main, nhưng bản sao trên máy này thì không.");
+  console.error("Máy đang lệch với remote. Đếm \"chưa đẩy\" bằng một mốc không tồn tại là báo xong cho một cú đẩy CHƯA HỀ XẢY RA.");
+  console.error("Chạy `git fetch origin` một lần rồi thử lại." + String.fromCharCode(10));
   process.exit(1);
 }
 
-const pending = gitQuiet("log", "--format=%H%x1f%s%x1f%an", "origin/main..HEAD").split("\n").filter(Boolean)
+// Lần đầu thì mốc so là toàn bộ lịch sử — không có origin/main để trừ đi.
+const phamVi = lanDau ? "HEAD" : "origin/main..HEAD";
+if (lanDau) console.log(String.fromCharCode(10) + "LẦN ĐẦU: remote chưa có nhánh main. Sắp tạo nó bằng toàn bộ lịch sử repo này.");
+const pending = gitQuiet("log", "--format=%H%x1f%s%x1f%an", phamVi).split("\n").filter(Boolean)
   .map((line) => { const [sha, subject, author] = line.split("\x1f"); return { sha, subject, author }; });
 
 if (!pending.length) {
