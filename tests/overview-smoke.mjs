@@ -6,7 +6,7 @@
  */
 
 import assert from "node:assert/strict";
-import { gomDuLieu, trang } from "../scripts/build-overview.mjs";
+import { gomDuLieu, noChuaChungMinh, trang } from "../scripts/build-overview.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -53,7 +53,15 @@ const html = trang(dl);
   const mu = trang({ ...dl, so: [{ so: 0, nhan: "a" }, { so: null, nhan: "b" }, { so: 0, nhan: "c" }] });
   assert.ok(!/class="den xanh"/.test(mu), "co phep do khong chay duoc thi den KHONG duoc xanh");
   assert.match(mu, /<b>\?<\/b>/, "phep do khong chay duoc phai hien dau ?, khong duoc hien so 0");
-  ok(`đèn: khớp dữ liệu · xanh được khi sạch · không-đo-được thì hiện "?" chứ không thành 0`);
+  // CON SỐ PHẢI ĐƯỢC ĐO, KHÔNG ĐƯỢC GÕ TAY. Ba ca trên chỉ kiểm phần VẼ, nên một hằng số nằm ở
+  // phần ĐO vẫn sống sót — đã chứng minh bằng một lượt thử phá: đóng cứng lại số 1 mà không
+  // phép kiểm nào đỏ. Nên phải gọi thẳng vào phép đo.
+  assert.equal(noChuaChungMinh("proven"), 0, "da chung minh thi phai la 0 — neu khong den khong bao gio xanh noi");
+  assert.equal(noChuaChungMinh("retired"), 0, "da nghi cung khong con la viec chua chung minh");
+  assert.equal(noChuaChungMinh("building"), 1, "dang dung thi van la mot viec chua chung minh");
+  assert.equal(noChuaChungMinh("idea"), 1);
+  assert.equal(noChuaChungMinh(undefined), null, "khong khai lifecycle = KHONG DO DUOC, khong phai 0");
+  ok(`đèn: khớp dữ liệu · xanh được khi sạch · "?" khi không đo được · số được ĐO chứ không gõ tay`);
 }
 
 /* ---- 3b. Tài liệu viết riêng cho chủ dự án phải LÊN TRANG ---------------- */

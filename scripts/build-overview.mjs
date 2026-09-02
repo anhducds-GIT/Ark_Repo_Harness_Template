@@ -281,6 +281,17 @@ function khoiNowNext(st) {
   </div>`;
 }
 
+/* Tách thành hàm RIÊNG và XUẤT RA để phép kiểm gọi thẳng được.
+ *
+ * Nó từng nằm inline trong `gomDuLieu()`, và `gomDuLieu()` chỉ chạy được trên đĩa thật — nên
+ * phép kiểm không với tới, và một hằng số `1` nằm đó sống sót qua cả một vòng đột biến. Thử phá
+ * mà không đỏ nghĩa là phép kiểm chưa từng canh chỗ đó; chỗ nào không gọi được thì không kiểm
+ * được. Đây là lý do nó ở đây chứ không phải trong thân hàm kia. */
+export function noChuaChungMinh(lifecycle) {
+  if (!lifecycle) return null;                                  // không khai = không đo được
+  return new Set(["proven", "retired"]).has(lifecycle) ? 0 : 1;
+}
+
 const VONG_DOI = {
   idea: { ten: "Ý TƯỞNG", i: 0 },
   building: { ten: "ĐANG DỰNG", i: 1 },
@@ -580,8 +591,7 @@ export function gomDuLieu() {
    *
    * Nguồn thật: `lifecycle` trong `STATUS.md`, đúng trường mà khối Vòng đời phía trên đã dùng.
    * Một nguồn, hai chỗ đọc — thay vì hai con số tự sống. */
-  const daChungMinh = new Set(["proven", "retired"]);
-  const viecChuaChungMinh = st?.lifecycle ? (daChungMinh.has(st.lifecycle) ? 0 : 1) : null;
+  const viecChuaChungMinh = noChuaChungMinh(st?.lifecycle);
   return {
     ten: tenNguoi || pkg.name || "Repo",
     ban: pkg.version || "0.0.0",
