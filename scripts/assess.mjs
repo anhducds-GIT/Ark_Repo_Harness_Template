@@ -69,6 +69,30 @@ export function coLenhTest(root) {
   }
 }
 
+/* CẤU HÌNH CÓ ĐỌC ĐƯỢC KHÔNG — hỏi riêng, vì so nội dung không trả lời được câu này.
+ *
+ * Audit độc lập bắt được 03/09, và nó là đúng kiểu hỏng tệ nhất của một bộ đo: repo có
+ * `.repo-structure.json` chỉ gồm một dấu `{` vẫn được chấm MỨC 3, CHI PHÍ 0/0/0 — giấy khám sức
+ * khoẻ hoàn hảo — trong khi structure gate của chính repo đó thoát mã 2 và không chạy nổi.
+ *
+ * Vì sao lọt: phép so cũ chỉ hỏi "file có không" và "có khác bản chuẩn không". Một file hỏng cú
+ * pháp thì CÓ, và KHÁC — tức là "LỆCH", tức là chuyện bình thường ở tầng luật. Không ai hỏi nó
+ * có PARSE được không.
+ *
+ * Một bộ đo luôn trả lời dễ chịu thì vô hại về kỹ thuật và tai hại về quyết định: nó khiến người
+ * ta lên lịch cho một việc rẻ hơn sự thật. */
+export const CAU_HINH_MAY_DOC = [".repo-structure.json", ".agents/claims.json", "package.json"];
+
+export function cauHinhDocDuoc(root) {
+  const hong = [];
+  for (const rel of CAU_HINH_MAY_DOC) {
+    const raw = docNeuCo(root, rel);
+    if (raw === null) continue;             // thiếu file là việc của phép đo THIẾU, không phải ở đây
+    try { JSON.parse(raw); } catch (e) { hong.push({ file: rel, loi: String(e.message).split(String.fromCharCode(10))[0] }); }
+  }
+  return hong;
+}
+
 /* Đọc một file của repo đích. Trả null nếu không có — KHÔNG ném, vì "không có" chính là kết quả
    đo, không phải lỗi. */
 function docNeuCo(root, rel) {
@@ -116,7 +140,17 @@ export function chiPhi(dong) {
  * Mức không phải điểm số — nó trả lời "bước kế tiếp là gì". Một repo mức 1 và một repo mức 3
  * cần hai việc hoàn toàn khác nhau, và trộn chúng vào một thang phần trăm là mất đúng thông tin
  * đó. */
-export function mucDo(dong) {
+export function mucDo(dong, hongCauHinh = []) {
+  // Cấu hình không parse được thì repo KHÔNG dùng được — mức 0, bất kể có đủ file hay không.
+  // Xếp nó vào mức 0 chứ không phải một cờ phụ, vì "đủ file mà chạy không nổi" là trạng thái
+  // tệ hơn "thiếu file": thiếu thì biết mà thả vào, còn hỏng thì trông y như đã xong.
+  if (hongCauHinh.length) {
+    return {
+      muc: 0,
+      ten: "cấu hình hỏng — repo chưa chạy được",
+      ke: `Sửa cú pháp JSON trước đã: ${hongCauHinh.map((h) => h.file).join(", ")}. Mọi phép đo khác chưa có nghĩa.`
+    };
+  }
   const co = (rel) => dong.find((d) => d.file === rel)?.trangThai !== "THIẾU";
   // CHỈ `scripts/` — không tính `tests/`. Bản đầu gộp cả hai vào "bộ máy đầy đủ", nên một repo
   // có đủ năm công cụ mà thiếu suite bị chấm mức 1 ("chưa có bộ máy") thay vì mức 2 ("có bộ
@@ -141,10 +175,11 @@ export function mucDo(dong) {
 
 function inBaoCao(root, dong, json) {
   const cp = chiPhi(dong);
-  const m = mucDo(dong);
+  const hong = cauHinhDocDuoc(root);
+  const m = mucDo(dong, hong);
   const lenhTest = coLenhTest(root);
   if (json) {
-    console.log(JSON.stringify({ repo: root, muc: m.muc, ten_muc: m.ten, viec_ke: m.ke, chi_phi: cp, co_lenh_test: lenhTest, files: dong }, null, 2));
+    console.log(JSON.stringify({ repo: root, muc: m.muc, ten_muc: m.ten, viec_ke: m.ke, chi_phi: cp, co_lenh_test: lenhTest, cau_hinh_hong: hong, files: dong }, null, 2));
     return;
   }
   const NL = String.fromCharCode(10);

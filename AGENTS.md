@@ -154,6 +154,11 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | Viết đề bài cho một phiên AI | [docs/_TEMPLATE-brief.md](docs/_TEMPLATE-brief.md) |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy `npm run bootstrap` |
+| **Tra một thuật ngữ** (gate · claim · lane · fail-closed…) | [docs/LEGEND.md](docs/LEGEND.md) — thuật ngữ giữ tiếng Anh, giải nghĩa tiếng Việt |
+| **Mới vào, chưa biết bắt đầu từ đâu** | [docs/HUONG-DAN.md](docs/HUONG-DAN.md) — hai phần: cho người, và cho phiên AI |
+| **Xem các bước của một việc, có lưu đồ** | [docs/workflows/](docs/workflows/01-dung-repo-moi.md) — [dựng repo mới](docs/workflows/01-dung-repo-moi.md) · [migrate](docs/workflows/02-dua-repo-cu-len-chuan.md) · [một phiên làm việc](docs/workflows/03-mot-phien-lam-viec.md) |
+| **Biết bản này vừa đổi gì so với bản trước** | [CHANGELOG.md](CHANGELOG.md) — chỉ thêm, không sửa khối cũ |
+| **Sinh bảng cho người xem** (8 tab, có lưu đồ và legend) | `npm run overview <file-ra.html>` — layout dùng chung cho mọi repo, để không phải nghĩ lại mỗi lần |
 | **Đo một repo khác cách bộ khung bao xa** | `npm run assess <đường-dẫn-repo>` · quy trình đọc kết quả: [docs/protocols/KIEM-MOT-REPO.md](docs/protocols/KIEM-MOT-REPO.md) |
 | **Dựng một repo mới từ bộ khung** | `npm run init <thư-mục> -- --ten "Tên repo"` |
 | **Đưa một repo đang sống lên chuẩn** | [docs/protocols/CHUYEN-REPO-LEN-CHUAN.md](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md) — **chưa từng chạy thật**, vài bước sẽ sai |

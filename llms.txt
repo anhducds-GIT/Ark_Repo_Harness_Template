@@ -4,7 +4,7 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `e1b97a9` (2026-09-03).
+Trang được sinh tại commit `8824b85` (2026-09-03).
 
 ## Việc ưu tiên #1
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `e1b97a9` (2026-09-03).
 
 ## Từng extension
 
-- [repo-harness](STATUS.md): idea — Repo vừa khởi tạo từ bộ khung
+- [ark-repo-harness](STATUS.md): idea — Repo vừa khởi tạo từ bộ khung
 
 ## Luật bắt buộc trước khi sửa gì
 

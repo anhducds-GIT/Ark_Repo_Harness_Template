@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "e1b97a9",
+  "generated_commit": "8824b85",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -16,6 +16,10 @@
     {
       "path": "scripts/",
       "owner_declared": true
+    },
+    {
+      "path": "template/",
+      "owner_declared": false
     },
     {
       "path": "tests/",
@@ -50,7 +54,7 @@
   "health": {
     "units_without_status": 0,
     "dead_links": 0,
-    "undeclared_dirs": 0,
+    "undeclared_dirs": 1,
     "draft_debt": 0
   }
 }

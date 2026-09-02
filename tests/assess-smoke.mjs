@@ -16,7 +16,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildTemplateFiles } from "../scripts/build-template.mjs";
-import { chiPhi, coLenhTest, danhGia, mucDo, tangCuaFile, TANG, TUY_CHON } from "../scripts/assess.mjs";
+import { cauHinhDocDuoc, chiPhi, coLenhTest, danhGia, mucDo, tangCuaFile, TANG, TUY_CHON } from "../scripts/assess.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const chuan = buildTemplateFiles();
@@ -137,6 +137,36 @@ function dungRepo(files) {
     } finally { rmSync(root2, { recursive: true, force: true }); }
     ok(`file tuỳ chọn (${TUY_CHON.size}) không sinh nợ, file bắt buộc thì có`);
   } finally { rmSync(root, { recursive: true, force: true }); }
+}
+
+/* ---- 6b. Cấu hình HỎNG CÚ PHÁP phải bị chấm là repo chưa chạy được ------- */
+{
+  // Audit độc lập bắt được 03/09. Repo có `.repo-structure.json` chỉ gồm một dấu `{` vẫn được
+  // chấm MỨC 3, CHI PHÍ 0/0/0 — trong khi structure gate của chính nó thoát mã 2 và không chạy
+  // nổi. Lọt vì phép so cũ chỉ hỏi "có file không" và "có khác bản chuẩn không": file hỏng thì
+  // CÓ, và KHÁC — tức "LỆCH", tức chuyện bình thường ở tầng luật. Không ai hỏi nó PARSE được không.
+  for (const hong of [".repo-structure.json", "package.json", ".agents/claims.json"]) {
+    const root = dungRepo(chuan);
+    try {
+      writeFileSync(join(root, ...hong.split("/")), "{", "utf8");
+      const loi = cauHinhDocDuoc(root);
+      assert.equal(loi.length, 1, `${hong} hong cu phap thi phai bao dung mot loi, dang bao ${loi.length}`);
+      assert.equal(loi[0].file, hong, "phai chi dung file hong");
+      assert.equal(mucDo(danhGia(root, chuan), loi).muc, 0,
+        `${hong} hong thi repo CHUA CHAY DUOC — phai la muc 0, khong duoc cham la du bo`);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  }
+
+  // ĐỐI CHỨNG: repo lành phải KHÔNG bị báo hỏng. Thiếu vế này thì một hàm luôn trả "có lỗi"
+  // cũng qua được ba ca trên, và mọi repo trên đời đều bị chấm mức 0.
+  {
+    const root = dungRepo(chuan);
+    try {
+      assert.deepEqual(cauHinhDocDuoc(root), [], "repo lanh khong duoc bao cau hinh hong");
+      assert.equal(mucDo(danhGia(root, chuan), []).muc, 3, "repo lanh van phai la muc 3");
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  }
+  ok("cấu hình hỏng cú pháp → mức 0 (3 file), repo lành → mức 3");
 }
 
 /* ---- 7. Trên chính repo này: phải đạt mức cao nhất ----------------------- */

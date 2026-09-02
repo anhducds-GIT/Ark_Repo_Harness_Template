@@ -42,6 +42,12 @@
       "mutability": "append-only",
       "ownership_mode": "root",
       "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá"
+    },
+    "template/": {
+      "steward": "_root",
+      "mutability": "rw",
+      "ownership_mode": "root",
+      "note": "bản trích do build-template.mjs sinh — SINH TỰ ĐỘNG, sửa tay là mất ở lần sinh sau"
     }
   },
   "generators": [
