@@ -143,17 +143,10 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và m�
 
 Ba AI có thể cùng lúc trong repo, nhưng **khác package** (mục 1).
 
-**Cửa vào của từng AI** — cách file này đến được tay bạn:
-
-| AI | Cách nạp | Đức phải làm gì |
-|---|---|---|
-| Claude | Tự đọc `CLAUDE.md` gốc → trỏ sang file này | Không phải làm gì |
-| Codex | Tự đọc `AGENTS.md` gốc | Không phải làm gì |
-| Antigravity | Dán **một câu mở màn**: *"Đọc AGENTS.md ở gốc repo trước khi làm gì."* | Dán 1 dòng mỗi phiên |
-
-Antigravity đã được thử live 26/08: nó tự lần ra `.agents/claims.json` và tự kết luận "package
-có chủ rồi nên tôi chỉ được đọc". Luật dùng được — nhưng chưa chứng minh được nó **tự** nạp lúc
-mở phiên, nên câu mở màn là bắt buộc.
+**Cửa vào của từng AI:** Claude tự đọc `CLAUDE.md` gốc → trỏ sang file này. Codex tự đọc
+`AGENTS.md` gốc. Antigravity thì Đức phải dán **một câu mở màn** mỗi phiên: *"Đọc AGENTS.md ở
+gốc repo trước khi làm gì."* — thử live 26/08 cho thấy nó đọc và tuân luật, nhưng chưa chứng
+minh được nó **tự** nạp lúc mở phiên.
 
 ## 6. Sổ tay mở khi cần — Tầng 2
 
