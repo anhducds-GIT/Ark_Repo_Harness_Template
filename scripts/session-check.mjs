@@ -401,14 +401,64 @@ check("File mới đã khai vào Bản đồ file", () => {
 });
 
 /* ---- 5. HANDOFF phải được ghi ------------------------------------------- */
+/* VÙNG GỐC REPO CŨNG PHẢI GHI LOG — trước đây chỉ package mới phải.
+ *
+ * Bản cũ duyệt đúng `myPackages`. Repo nào KHÔNG có package con — như chính repo bộ khung này —
+ * thì phép kiểm luôn trả "Không có gì phải ghi", kể cả khi phiên vừa viết lại nửa bộ máy. Tức
+ * luật "phiên sau phải biết phiên trước làm gì" chưa từng được cưỡng chế ở đúng nơi việc nặng
+ * nhất diễn ra. Audit độc lập bắt được 03/09.
+ *
+ * Và "đã chạm file" chưa đủ: sửa một khoảng trắng trong dòng Log CŨ cũng tính là đã ghi. Log là
+ * thứ CHỈ ĐƯỢC THÊM, nên bằng chứng đúng phải là CÓ DÒNG MỚI. Đo bằng `--numstat`; đo không
+ * được thì hạ về phép cũ và nói rõ là chỉ đo được tới đó — chứ không im lặng coi như đạt. */
+const laHandoff = (f) => /(^|\/)HANDOFF\.md$/i.test(f);
+const coDongMoi = (rel) => {
+  // Cộng cả phần đã commit chưa push lẫn phần còn trong cây làm việc. Thiếu vế nào cũng sai:
+  // ghi Log rồi commit thì cây làm việc sạch; ghi mà chưa commit thì diff với remote lại rỗng.
+  let them = 0;
+  let doDuoc = false;
+  for (const args of [
+    originMainResolves ? ["diff", "--numstat", "origin/main", "--", rel] : null,
+    ["diff", "--numstat", "HEAD", "--", rel]
+  ]) {
+    if (!args) continue;
+    const ra = git(...args);
+    if (!ra) continue;
+    for (const dong of ra.split("\n").filter(Boolean)) {
+      const n = Number(dong.split("\t")[0]);
+      if (Number.isFinite(n)) { them += n; doDuoc = true; }
+    }
+  }
+  return doDuoc ? them > 0 : null;   // null = không đo được, không phải "không có"
+};
+
 check("HANDOFF đã ghi Log phiên này", () => {
-  const missing = myPackages.filter((pkg) => {
-    const codeChanged = touched.some((f) => f.startsWith(`${pkg}/`) && !/HANDOFF\.md$/.test(f));
-    if (!codeChanged) return false;
-    return !touched.some((f) => f.startsWith(`${pkg}/`) && /HANDOFF\.md$/.test(f));
-  });
-  if (missing.length) return { ok: false, msg: `Đã sửa nhưng chưa ghi Log vào HANDOFF.md: ${missing.join(", ")}. Phiên sau sẽ mù.` };
-  return { ok: true, msg: myPackages.length ? "Đã ghi Log." : "Không có gì phải ghi." };
+  const thieu = [];
+  const chiSuaChoCu = [];
+
+  for (const pkg of myPackages) {
+    const codeChanged = touched.some((f) => f.startsWith(pkg + "/") && !laHandoff(f));
+    if (!codeChanged) continue;
+    const file = pkg + "/HANDOFF.md";
+    if (!touched.some((f) => f.startsWith(pkg + "/") && laHandoff(f))) { thieu.push(file); continue; }
+    if (coDongMoi(file) === false) chiSuaChoCu.push(file);
+  }
+
+  // Vùng gốc: một file bất kỳ ngoài package, thuộc vùng mình đang giữ.
+  const chamGoc = touched.some((f) => !laHandoff(f) && !myPackages.some((p) => f.startsWith(p + "/")));
+  if (myRootAreas.length > 0 && chamGoc) {
+    if (!touched.some((f) => f === "HANDOFF.md")) thieu.push("HANDOFF.md (gốc repo)");
+    else if (coDongMoi("HANDOFF.md") === false) chiSuaChoCu.push("HANDOFF.md (gốc repo)");
+  }
+
+  if (thieu.length) {
+    return { ok: false, msg: "Đã sửa nhưng chưa ghi Log vào: " + thieu.join(", ") + ". Phiên sau sẽ mù." };
+  }
+  if (chiSuaChoCu.length) {
+    return { ok: false, msg: "Có chạm " + chiSuaChoCu.join(", ") + " nhưng KHÔNG thêm dòng nào — Log là thứ chỉ được THÊM. Sửa dòng cũ không phải là ghi Log." };
+  }
+  const coViec = myPackages.length > 0 || (myRootAreas.length > 0 && chamGoc);
+  return { ok: true, msg: coViec ? "Đã ghi Log." : "Không có gì phải ghi." };
 });
 
 /* ---- 6. Test ------------------------------------------------------------ */
