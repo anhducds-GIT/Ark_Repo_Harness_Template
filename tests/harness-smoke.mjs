@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 
 import { claimPrefixesFrom, ownershipKeys, readStructureFromDisk, unitsFrom } from "../scripts/repo-structure.mjs";
 import { grandfatheredNote } from "../scripts/check-bootstrap.mjs";
+import { isBehaviourFile } from "../scripts/build-dashboard.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 let passed = 0;
@@ -211,6 +212,26 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     assert.equal(grandfatheredNote(gia([], [])).hinhDangLa, null, "mang rong la HOP LE, khong duoc keu");
   }
   ok("mien tru vinh vien: doc duoc ca hai hinh dang, hinh dang la thi keu len");
+}
+
+/* ---- 6. Sản phẩm của bộ sinh không được đếm là "code đã đổi" ------------- */
+{
+  // Vòng lặp không điểm dừng: sinh lại → `repo-map.json` đổi → cột "code đã đổi sau kiểm chứng"
+  // bật CÓ → phải kiểm chứng lại → ghi mốc mới → sinh lại → … Đo thật ở repo NAV ngày 03/09:
+  // KHÔNG → CÓ (1) → CÓ (2) → CÓ (3). Repo nhà không bắt được vì `STATUS.md` của chính nó khai
+  // `lifecycle: building` và không có `last_verified_commit` — bộ khung chưa từng tự đi qua con
+  // đường nó bán cho người khác.
+  for (const f of ["repo-map.json", "llms.txt", "DASHBOARD.md"]) {
+    assert.equal(isBehaviourFile(f), false, `${f} la san pham cua bo sinh, khong duoc dem la code doi`);
+  }
+  // ĐỐI CHỨNG DƯƠNG: code thật vẫn phải được đếm, kẻo bản vá này biến phép đo thành luôn-false.
+  for (const f of ["scripts/x.mjs", "app/main.js", "src/a.json", "page/index.html"]) {
+    assert.equal(isBehaviourFile(f), true, `${f} la code that, PHAI duoc dem`);
+  }
+  // Vùng bằng chứng vẫn không tính, và tài liệu cũng không.
+  assert.equal(isBehaviourFile("evidence/run-1/a.json"), false);
+  assert.equal(isBehaviourFile("docs/x.md"), false);
+  ok("san pham may sinh khong bi dem la code doi (va code that thi van bi dem)");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

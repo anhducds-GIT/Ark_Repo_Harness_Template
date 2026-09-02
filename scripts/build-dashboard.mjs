@@ -393,8 +393,23 @@ function parseChangedCommits(output) {
 // Một file "đổi hành vi" = đuôi thuộc BEHAVIOUR_EXTENSIONS và KHÔNG nằm trong vùng bằng
 // chứng. Lọc `.md` và vùng bằng chứng ra, nếu không cờ sẽ kêu oan ngay ngày đầu: chính
 // commit thêm STATUS.md/HANDOFF đã "chạm package".
-function isBehaviourFile(file) {
+/* SẢN PHẨM CỦA CHÍNH BỘ SINH KHÔNG PHẢI "CODE ĐÃ ĐỔI".
+ *
+ * `repo-map.json` mang đuôi `.json`, nên nó lọt vào BEHAVIOUR_EXTENSIONS và được đếm là hành vi
+ * đổi. Nhưng nó là thứ bộ sinh này VIẾT RA. Hậu quả là một vòng lặp không có điểm dừng:
+ *
+ *   sinh lại → repo-map.json đổi → "code đã đổi sau kiểm chứng: CÓ" → phải kiểm chứng lại →
+ *   ghi mốc mới → sinh lại → …
+ *
+ * Đo thật ở repo NAV ngày 03/09: `KHÔNG → CÓ (1) → CÓ (2) → CÓ (3)`, không bao giờ về 0. Repo
+ * nhà KHÔNG bắt được vì `STATUS.md` của chính nó khai `lifecycle: building` và không có
+ * `last_verified_commit` — tức là bộ khung chưa từng tự đi qua con đường mà nó bán cho người khác.
+ * Bài học: thứ gì repo nhà không dùng thì repo nhà không kiểm được. */
+const MAY_SINH = new Set([LLMS_FILE, REPO_MAP_FILE, DASHBOARD_FILE]);
+
+export function isBehaviourFile(file) {
   const normalized = String(file).replaceAll("\\", "/");
+  if (MAY_SINH.has(normalized)) return false;
   return !EVIDENCE_ZONE.test(normalized) && BEHAVIOUR_EXTENSIONS.has(path.posix.extname(normalized).toLowerCase());
 }
 
