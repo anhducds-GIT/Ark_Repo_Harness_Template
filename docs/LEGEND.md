@@ -15,6 +15,13 @@ ttl_days: 365
 
 | Từ | Nghĩa trong repo này | Vì sao không dịch |
 |---|---|---|
+| **commit** | Chốt một mẻ thay đổi vào lịch sử. **Chưa commit = chưa tồn tại với máy** | Từ chuẩn của git |
+| **HEAD** | Bản chụp mới nhất **đã commit**. Bộ sinh đọc HEAD, nên chưa commit thì nó không thấy | Từ chuẩn của git, dịch ra thì tra cứu mất |
+| **SHA** | Mã của một commit (bảy hoặc bốn mươi ký tự). Đóng băng một SHA = "kiểm đúng bản này, đừng kiểm bản đang đổi" | |
+| **drift** | Trôi cách làm: một việc làm mười lần bởi mười phiên sẽ ra mười kiểu | Không có từ Việt gọn tương đương |
+| **frontmatter** | Khối khai báo ở **đầu** file, nằm giữa hai dòng `---`. Máy đọc khối đó | |
+| **ttl_days** | Hạn dùng của một tài liệu, tính bằng ngày. Quá hạn thì phải gia hạn hoặc lưu trữ | |
+| **bootstrap** | Cổng kiểm hình dạng repo (`check-bootstrap.mjs`), các phép kiểm đánh số `B1…B15`. `bootstrap.blocking` = danh sách phép kiểm mà đỏ thì chặn | |
 | **harness** | Bộ khung: luật + gate + generator + công cụ, thả vào repo nào cũng chạy | "bộ khung" mơ hồ; harness là từ chuẩn cho lớp hạ tầng quanh code |
 | **gate** | Cửa chặn tự động. Đỏ thì việc chưa xong, không có đường vòng | Dịch "cổng kiểm" thì lẫn với mọi loại kiểm tra khác |
 | **session gate** | Gate chạy lúc đóng phiên: test · quyền · artifact tươi · cấu trúc | |
@@ -35,7 +42,6 @@ ttl_days: 365
 | **annex** | Phụ lục nghề: luật chỉ đúng với một loại repo, bật khi cần | |
 | **assess** | Đo một repo cách chuẩn bao xa, trước khi quyết định migrate | |
 | **migrate** | Đưa một repo **đang sống** lên chuẩn (khác với dựng mới) | |
-| **idempotent** | Chạy một lần hay mười lần cho cùng kết quả | |
 | **ADR** | Architecture Decision Record — mỗi quyết định một file, không sửa lại | Tên chuẩn ngành, có tài liệu ở ngoài |
 | **HANDOFF** | Bàn giao giữa các phiên. Chỉ thêm dòng, không sửa dòng cũ | |
-| **P1…P5** | Hồ sơ repo: P1 nhiều gói · P2 ứng dụng đơn · P3 tài liệu · P4 hạ tầng · P5 điều phối | |
+| **P1…P5** | Hồ sơ repo, khai ở trường `profile` trong `.repo-structure.json`: P1 nhiều gói · P2 ứng dụng đơn · P3 tài liệu · P4 hạ tầng · P5 điều phối | |

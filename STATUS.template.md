@@ -95,8 +95,8 @@ này, việc chờ Đức nằm **lẫn** trong câu đó, nên bảng phải đ
 
 Máy chỉ cấm bốn nhóm **machine-owned**: số lệnh Bridge · số file test · version viết tay ·
 số món còn nợ parity. Không viết các số đó vào STATUS, kể cả trong phần thân cho Đức đọc.
-Trỏ sang [`DASHBOARD.md`](DASHBOARD.md) cho số Bridge, file test và version; trỏ sang
-[`FEATURE-PARITY.md`](FEATURE-PARITY.md) cho số món nợ giữa hai nhánh.
+Trỏ sang [`DASHBOARD.md`](DASHBOARD.md) cho số Bridge, file test và version; số món nợ giữa hai
+nhánh thì trỏ sang bảng so tính năng của repo bạn, nếu repo bạn có.
 
 Các số là **lời khai hoặc thông tin operator cần** vẫn được phép và nên giữ: ngày kiểm chứng;
 SHA 7 hoặc 40 ký tự; mã việc như `B-17`; kết quả kiểm như `3/3`, `18/18`; giới hạn vận hành

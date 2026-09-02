@@ -15,6 +15,15 @@ ttl_days: 365
 
 ## Ba nhịp
 
+```mermaid
+flowchart LR
+    A["MỖI PHIÊN<br/>tự động, không ai phải nhớ<br/>6 phép quét, đỏ thì chặn"]
+    B["MỖI TUẦN<br/>AI mở phiên đầu tuần làm<br/>cảnh báo vàng · link chết · tài liệu quá hạn<br/>quyền mồ côi · commit chưa đẩy"]
+    C["MỖI THÁNG<br/>soát lại luật<br/>luật nào chưa chặn được gì?<br/>luật nào bị vi phạm nhiều lần?"]
+    A --> B --> C
+    C -.-> A
+```
+
 ### Mỗi phiên — quét nhanh, tự động, không ai phải nhớ
 
 Cửa kiểm đã làm sẵn khi đóng phiên:
@@ -38,7 +47,9 @@ Ai mở phiên đầu tiên trong tuần thì làm, ghi một dòng vào `HANDOF
 - [ ] **Cảnh báo vàng tồn quá hai tuần → phải xử.** Sửa, hoặc ghi rõ vì sao chấp nhận và hạn
       chấp nhận tới bao giờ. **Không được để im lặng** — đó là cách một cửa kiểm chết
 - [ ] Liên kết chết trong tài liệu → sửa hoặc gỡ
-- [ ] Tài liệu quá hạn `ttl_days` → gia hạn có lý do, hoặc chuyển vào kho lưu
+- [ ] **Tài liệu quá hạn.** Mỗi tài liệu tự khai hạn dùng (`ttl_days`, tính bằng ngày) ở đầu
+      file. Quá hạn thì hoặc gia hạn kèm lý do, hoặc chuyển vào thư mục lưu trữ. Để nguyên là
+      để một tài liệu hết đúng nằm im trông như còn đúng
 - [ ] Bảng quyền: có vùng nào bị giữ quá một ngày không? Phiên giữ nó còn sống không? **Quyền
       mồ côi chặn mọi người khác, và bảng quyền không tự biết ai còn sống**
 - [ ] Có commit nào chưa đẩy nằm quá một ngày không? Việc chưa đẩy là việc **vô hình** với mọi
@@ -69,26 +80,25 @@ chính thứ đang canh mọi thứ khác — và nó luôn được biện minh
 
 ## Việc nào cần người, việc nào không
 
-| AI tự làm | Phải hỏi chủ dự án |
-|---|---|
-| Quét, sửa liên kết chết, gia hạn tài liệu | Xoá file, sửa dữ liệu gốc |
-| Viết lại tài liệu lạc hậu | Đẩy kèm việc của phiên khác |
-| Thêm phép kiểm | Giành vùng của phiên đang làm |
-| Ghi nợ vào sổ | Đổi luật an toàn |
-| Đẩy việc **của chính mình** khi cửa xanh | Gửi bất cứ gì ra ngoài |
+Danh sách việc **phải hỏi Đức** nằm ở
+[AGENTS.md mục 2 — Sáu việc PHẢI hỏi Đức trước](../AGENTS.md#2-sáu-việc-phải-hỏi-đức-trước).
+**Một bản duy nhất, đừng chép lại ở đây.**
 
-> Nguyên tắc phía sau bảng này: **AI tự do trong phạm vi làm cho repo tốt lên và lùi lại được.
-> Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì phải hỏi.**
+Trong lịch bảo trì này, AI **tự làm hết** những việc sau mà không cần hỏi ai: quét và sửa liên
+kết chết · gia hạn tài liệu quá hạn · viết lại tài liệu lạc hậu · thêm phép kiểm · ghi nợ vào
+sổ · đẩy việc **của chính mình** khi cửa kiểm xanh.
 
 ## Nếu bạn là chủ dự án và một tháng nữa mới quay lại
 
 Ba lệnh, không cần đọc code:
 
 ```bash
-npm run gate -- --as khach      # repo có lành không
-npm run bootstrap               # nợ cấu trúc còn bao nhiêu
-npm run overview bang.html      # mở file đó ra xem
+npm run gate -- --as duc          # repo có lành không
+npm run bootstrap                 # nợ cấu trúc còn bao nhiêu
+npm run overview -- bang.html     # rồi mở bang.html bằng trình duyệt
 ```
+
+*(Đừng commit file HTML đó — nó là ảnh chụp một lúc, không phải tài liệu.)*
 
 Nếu cả ba đều sạch mà bạn vẫn thấy repo im ắng bất thường, hãy đọc `HANDOFF.md` từ dưới lên —
 **im ắng thường có nghĩa là không ai làm gì, chứ không phải mọi thứ đều ổn.**

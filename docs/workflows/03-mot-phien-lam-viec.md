@@ -17,7 +17,7 @@ flowchart TD
     C -- trống --> E["Làm việc — một việc một lúc"]
     E --> F["Mỗi fix một test ghim<br/>+ mutation test"]
     F --> G["git add TỪNG FILE<br/>không -A, không -u"]
-    G --> H["commit nguồn<br/>+ trailer Lane:"]
+    G --> H["commit nguồn — dòng CUỐI của<br/>lời commit là: Lane: tên-phiên"]
     H --> I["chạy generator<br/>giờ HEAD đã có dữ liệu mới"]
     I --> J["commit artifact riêng"]
     J --> K["session gate"]

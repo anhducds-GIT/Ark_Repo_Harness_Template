@@ -33,7 +33,7 @@ ttl_days: 365
 - [ ] Đọc `AGENTS.md` — hiến pháp, một trang
 - [ ] Đọc mục 6 của nó — bản đồ "sắp làm X thì mở file nào"
 - [ ] Đọc **phần cuối** `HANDOFF.md` — phiên trước làm tới đâu
-- [ ] Nhận vùng mình sắp sửa: `npm run claim -- --take <vùng> --as <tên-phiên>`
+- [ ] Nhận vùng mình sắp sửa: `node scripts/claim.mjs --take <vùng> --as <tên-phiên>`
 - [ ] **Vùng có chủ khác → chỉ đọc.** Muốn giành thì hỏi chủ dự án, không tự lấy
 - [ ] Chạy cửa kiểm **trước khi làm gì**: `npm run gate -- --as <tên-phiên>`
 - [ ] Đỏ sẵn từ trước → **dừng và báo nguyên văn**. Đừng tự sửa cho nó xanh
@@ -42,24 +42,21 @@ ttl_days: 365
 
 ## 2. Đóng phiên {#2}
 
-**Thứ tự này không đổi được.** Ba chỗ dưới đây đã trả giá thật.
+**Thứ tự này không đổi được, và nó có lưu đồ.** Làm theo
+[workflows/03 — một phiên làm việc](workflows/03-mot-phien-lam-viec.md). Quy trình đóng phiên
+chỉ được vẽ ở **một chỗ**; đừng chép nó về đây.
 
-- [ ] `git add` **từng file**. Không `-A`, không `-u` — cả hai đều cuốn theo việc chưa commit của
-      phiên khác, và chúng chỉ khác nhau một chữ cái
-- [ ] Đọc lại `git status --short`: có file của ai khác lọt vào không?
-- [ ] Commit nguồn, dòng cuối là `Lane: <tên-phiên>`
-- [ ] **Rồi mới** chạy bộ sinh trang — nó đọc hoàn toàn từ lịch sử đã commit, nên chạy trước là
-      dựng lại từ một quá khứ cũ, và trang vẫn sinh ra đẹp
-- [ ] Commit trang sinh ra bằng **một commit riêng**
-- [ ] `npm run gate -- --as <tên-phiên>` → **phải XANH TOÀN BỘ**
-- [ ] `npm run push -- --as <tên-phiên>`
-- [ ] Kiểm bằng máy chủ, **đừng tin `git status`**:
-      `git ls-remote origin refs/heads/main` rồi `git merge-base --is-ancestor <sha> <sha-remote>`
-- [ ] Ghi một dòng vào `HANDOFF.md`: làm gì · kết quả bằng số · còn gì mở
-- [ ] **Chỉ sau khi push mới** trả vùng: `npm run claim -- --release <vùng> --as <tên-phiên>`
+Dưới đây chỉ là **lệnh chính xác**, để khỏi phải nhớ. Thứ tự thì xem lưu đồ:
 
-> Trả vùng trước khi push thì commit của bạn thành "việc không chủ", và cửa kiểm của phiên sau
-> báo đỏ oan.
+| Bước trong lưu đồ | Lệnh |
+|---|---|
+| commit nguồn | `git add` **từng file** — không `-A`, không `-u`. Rồi commit, dòng cuối là `Lane: <tên-phiên>` |
+| session gate | `npm run gate -- --as <tên-phiên>` |
+| safe-push | `npm run push -- --as <tên-phiên>` |
+| trả vùng — **sau** khi push | `node scripts/claim.mjs --release <vùng> --as <tên-phiên>` |
+
+> **`Lane:` là gì.** Dòng cuối cùng của lời commit phải là `Lane: <tên-phiên>` — đó là chữ ký
+> để sau này biết commit này của phiên nào.
 
 ## 3. Sửa một lỗi {#3}
 

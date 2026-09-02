@@ -24,9 +24,8 @@ node scripts/safe-push.mjs --as <tên-phiên-của-bạn>
 ```
 
 Lý do: nhiều phiên AI dùng chung một thư mục git, nên `git push` của bạn **cuốn theo commit của
-mọi phiên khác**. Ngày 26/08 chuyện này đã xảy ra thật — một phiên push và kéo theo 2 commit chưa
-được Đức duyệt của phiên khác. `safe-push` liệt kê rõ sắp đẩy gì của ai, và từ chối nếu bạn đang
-cuốn theo việc người khác. Push được tự làm khi đủ điều kiện ở mục 2 — không cần hỏi từng lần.
+mọi phiên khác** — đã xảy ra thật 26/08. `safe-push` liệt kê rõ sắp đẩy gì của ai, và từ chối
+nếu bạn đang cuốn theo việc người khác.
 
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
@@ -42,56 +41,77 @@ node scripts/claim.mjs --release <khoá> --as <tên-phiên>
 
 Sửa tay là đọc-sửa-ghi, và ngày 02/09 đã có một quyền **bị ghi đè im lặng** vì thế: hai phiên
 cùng đọc thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
-Lệnh này **từ chối** nhận vùng đã có chủ khác, **từ chối** trả quyền hộ người khác, và ghi rồi
-đọc lại để kiểm.
 
 - Vùng đang có chủ, mà chủ không phải bạn → **chỉ được đọc, tuyệt đối không sửa**.
 - Vùng trống chủ → nhận rồi làm.
 - Muốn giành vùng người khác đang giữ → **hỏi Đức**, không tự lấy.
 
-**Gốc repo chia làm NHIỀU khoá** (từ 02/09) — trước đó một khoá `_root` che cả bảy thư mục gốc,
-nên hai việc không hề chồng nhau vẫn chặn nhau:
+**Gốc repo chia làm NHIỀU khoá.** Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng
+phiên sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của
+`.repo-structure.json`.
 
-| Khoá | Che gì |
-|---|---|
-| `_docs` | `docs/` |
-| `_code` | `scripts/` + `tests/` |
-| `_template` | `template/` |
-| `_root` | phần còn lại và các file ở tầng ngoài cùng |
-
-Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng phiên sẽ nói tên khoá còn thiếu.
-Ai chia vùng thì khai `steward` trong khối `areas` của `.repo-structure.json`.
+```mermaid
+flowchart TD
+    R["Gốc repo"] --> D["docs/ → khoá _docs"]
+    R --> C1["scripts/ → khoá _code"]
+    R --> C2["tests/ → khoá _code"]
+    R --> T["template/ → khoá _template"]
+    R --> O["mọi thứ còn lại → khoá _root"]
+```
 
 **Hai file được MIỄN, và lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác
 hành chính — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt
-MỌI phiên ghi Log — nhưng **chỉ miễn khi chỉ thêm dòng**; sửa hay xoá dòng cũ là viết lại lịch
-sử của phiên khác).
+MỌI phiên ghi Log — nhưng **chỉ miễn khi chỉ thêm dòng**; sửa dòng cũ là viết lại lịch sử của
+phiên khác).
 
-Đây không phải hình thức. Ngày 25–26/08 đã suýt hỏng vì hai phiên AI cùng làm trên một repo, và
-ngày 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một khoá duy nhất là điểm nghẽn
-thật, không phải lý thuyết.
+Đây không phải hình thức: ngày 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một
+khoá duy nhất là điểm nghẽn thật, không phải lý thuyết.
 
-## 2. Những việc PHẢI hỏi Đức trước
+## 2. Sáu việc PHẢI hỏi Đức trước
 
-1. Đổi luật an toàn của repo (thử lại · dừng khẩn · quy trách nhiệm · lưu trạng thái · làm-đúng-một-lần)
-2. Bất cứ việc nào **phụ lục nghề** của repo bạn liệt kê — xem `docs/ANNEX-*.md`
+> **Đây là BẢN DUY NHẤT của danh sách này trong cả repo.** File khác chỉ được trỏ sang đây,
+> tuyệt đối không chép lại — ba bản chép tay đã từng nói ba kiểu khác nhau.
 
-Ngoài ra, luật gốc của Đức: không gửi gì ra ngoài, không xoá file, không sửa dữ liệu gốc,
-không tạo automation tự chạy — nếu chưa hỏi.
+| # | Việc | Vì sao không lùi lại được |
+|---|---|---|
+| 1 | Xoá file, hoặc sửa dữ liệu gốc | Mất là mất, không dựng lại được |
+| 2 | Đẩy kèm commit của phiên khác (`--carry`) | Công bố việc chưa ai duyệt |
+| 3 | Giành vùng một phiên khác đang giữ | Người kia mất việc mà không biết |
+| 4 | Gửi bất cứ gì ra ngoài (mail, tin nhắn, đăng công khai) | Ra rồi thì không rút về được |
+| 5 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
+| 6 | Đổi luật an toàn của repo | Đổi luật là đổi thứ đang canh mọi thứ khác |
 
-**Commit và push được tự làm** — Đức chốt 2026-08-26, áp cho MỌI AI — nhưng chỉ khi đủ
-cả ba điều kiện:
+Ngoài sáu việc này, AI tự làm. Nguyên tắc phía sau: **AI tự do trong phạm vi làm repo tốt lên
+và lùi lại được. Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.**
 
-1. việc đã hoàn tất trọn vẹn (việc dở dang thì KHÔNG push);
-2. cổng kiểm `session-check.mjs` XANH TOÀN BỘ (và với code: đã qua audit độc lập);
-3. đẩy bằng `safe-push.mjs`, không bao giờ `git push` trần.
+```mermaid
+flowchart TD
+    A["AI sắp làm một việc"] --> B{Việc này lùi lại được không?}
+    B -- không --> H["HỎI ĐỨC"]
+    B -- có --> C{Có chạm tới việc người khác không?}
+    C -- có --> H
+    C -- không --> D{Có gửi gì ra ngoài repo không?}
+    D -- có --> H
+    D -- không --> E["TỰ LÀM"]
+```
 
-Lý do Đức đổi luật: Đức không đọc được code local; GPT audit qua GitHub connector, nên
-commit chưa push là **vô hình** với vòng kiểm tra chéo. Push sớm = được audit sớm.
+**Về mục 6 — "luật an toàn" cụ thể là năm luật này:**
 
-Hai ngoại lệ vẫn phải hỏi: (a) safe-push từ chối vì sắp cuốn theo commit của phiên khác —
-đẩy hộ việc người khác không nằm trong luật này; (b) force-push, sửa lịch sử, merge nhánh
-vào `main`.
+- *thử lại* — hỏng thì thử mấy lần rồi bỏ
+- *dừng khẩn* — gặp chuyện gì thì dừng hẳn, không đi tiếp
+- *quy trách nhiệm* — mỗi việc ghi rõ ai / phiên nào làm
+- *lưu trạng thái* — làm dở thì nhớ tới đâu để lần sau chạy tiếp
+- *làm đúng một lần* — một việc không được chạy hai lần thành hai kết quả
+
+**Repo bạn có phụ lục nghề (`docs/ANNEX-*.md`)?** Thì mọi việc phụ lục đó liệt kê cũng phải
+hỏi. Phụ lục chỉ được **thêm** vào sáu việc trên, không được bớt.
+
+**Commit và push được tự làm** — Đức chốt 2026-08-26, áp cho MỌI AI — nhưng chỉ khi đủ cả ba:
+(1) việc đã hoàn tất trọn vẹn; (2) cổng kiểm XANH TOÀN BỘ, và với code thì đã qua audit độc lập;
+(3) đẩy bằng `safe-push.mjs`. Lý do đổi luật: Đức không đọc code trên máy, GPT audit qua GitHub —
+nên commit chưa push là **vô hình** với vòng kiểm tra chéo. Push sớm = được audit sớm.
+
+Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và mục 2 hàng 2 ở trên.
 
 ## 3. Năm luật vàng
 
@@ -131,19 +151,15 @@ Ba AI có thể cùng lúc trong repo, nhưng **khác package** (mục 1).
 | Codex | Tự đọc `AGENTS.md` gốc | Không phải làm gì |
 | Antigravity | Dán **một câu mở màn**: *"Đọc AGENTS.md ở gốc repo trước khi làm gì."* | Dán 1 dòng mỗi phiên |
 
-Antigravity đã được thử live 26/08: nó đọc file này, tự lần ra `.agents/claims.json`, và tự
-kết luận "package có chủ rồi nên tôi chỉ được đọc" — dù không ai hỏi câu đó. Luật dùng được.
-Nhưng chưa chứng minh được nó **tự** nạp lúc mở phiên, nên câu mở màn là bắt buộc: 3 giây,
-miễn nhiễm với mọi thay đổi phiên bản, và nếu nó vốn tự nạp thì câu đó chỉ thừa vô hại.
+Antigravity đã được thử live 26/08: nó tự lần ra `.agents/claims.json` và tự kết luận "package
+có chủ rồi nên tôi chỉ được đọc". Luật dùng được — nhưng chưa chứng minh được nó **tự** nạp lúc
+mở phiên, nên câu mở màn là bắt buộc.
 
 ## 6. Sổ tay mở khi cần — Tầng 2
 
-> **Bảng này là BẢN ĐỒ RIÊNG CỦA REPO BẠN.** Bộ khung điền sẵn các dòng cho chính những file
-> nó mang theo — vừa để repo mới xanh ngay, vừa làm mẫu cho định dạng. **Thêm dòng của bạn vào
-> đây; đừng xoá cái đang đúng.**
-
-Luật chung nằm ở các mục trên. Chi tiết kỹ thuật thì nằm ở các file mà bảng dưới trỏ tới —
-không đọc trước, tới việc nào thì mở sổ tay đó.
+> **Bảng này là BẢN ĐỒ RIÊNG CỦA REPO BẠN.** Bộ khung điền sẵn dòng cho những file nó mang
+> theo. **Thêm dòng của bạn vào đây; đừng xoá cái đang đúng.** Không đọc trước cả bảng — tới
+> việc nào thì mở sổ tay đó.
 
 | Khi bạn sắp… | Mở file |
 |---|---|
@@ -163,22 +179,21 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | **Mới vào, chưa biết bắt đầu từ đâu** | [docs/HUONG-DAN.md](docs/HUONG-DAN.md) — hai phần: cho người, và cho phiên AI |
 | **Xem các bước của một việc, có lưu đồ** | [docs/workflows/](docs/workflows/01-dung-repo-moi.md) — [dựng repo mới](docs/workflows/01-dung-repo-moi.md) · [migrate](docs/workflows/02-dua-repo-cu-len-chuan.md) · [một phiên làm việc](docs/workflows/03-mot-phien-lam-viec.md) |
 | **Biết bản này vừa đổi gì so với bản trước** | [CHANGELOG.md](CHANGELOG.md) — chỉ thêm, không sửa khối cũ |
-| **Sinh bảng cho người xem** (8 tab, có lưu đồ và legend) | `npm run overview <file-ra.html>` — layout dùng chung cho mọi repo, để không phải nghĩ lại mỗi lần |
-| **Đo một repo khác cách bộ khung bao xa** | `npm run assess <đường-dẫn-repo>` · quy trình đọc kết quả: [docs/protocols/KIEM-MOT-REPO.md](docs/protocols/KIEM-MOT-REPO.md) |
-| **Dựng một repo mới từ bộ khung** | `npm run init <thư-mục> -- --ten "Tên repo"` |
+| **Sinh một trang có hình cho người xem** — cũng là cách cho người khác xem bộ khung là gì | `npm run overview -- <file-ra.html>` rồi mở file HTML đó bằng trình duyệt. Đừng commit file HTML: nó là ảnh chụp một lúc, không phải tài liệu |
+| **Đo một repo khác cách bộ khung bao xa** | `npm run assess -- <đường-dẫn-repo>` · quy trình đọc kết quả: [docs/protocols/KIEM-MOT-REPO.md](docs/protocols/KIEM-MOT-REPO.md) |
+| **Dựng một repo mới từ bộ khung** | `npm run init -- <thư-mục> --ten "Tên repo"` |
 | **Đưa một repo đang sống lên chuẩn** | [docs/protocols/CHUYEN-REPO-LEN-CHUAN.md](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md) — **chưa từng chạy thật**, vài bước sẽ sai |
 | **Sinh lại bản trích trong `template/`** | `npm run template` · chỉ kiểm không ghi: `npm run template -- --check` |
-| **Cho người khác xem bộ khung là gì** | `npm run template:overview <file-ra.html>` |
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
-| Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống, chạy bằng `npm test` |
+| Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — các khối hạt giống, chạy bằng `npm test` |
 
-**Vì sao phải là liên kết chứ không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
-liên kết từ cổng vào máy đọc. File không ai trỏ tới thì máy coi là không tới được — và một bản
-mẫu không ai tới được thì đúng là sẽ không ai dùng. Đo thật lúc dựng bộ khung này: để bảng rỗng
-thì **4 file** rơi ra ngoài bản đồ, kể cả chính `README.md`.
+**Phải là liên kết bấm được, không phải chữ thường.** Máy kiểm xem mỗi file có được file nào
+trỏ tới không; **file không ai trỏ tới thì coi như không có**. Đo thật lúc dựng bộ khung: để
+bảng rỗng thì 4 file rơi ra ngoài bản đồ, kể cả chính `README.md`.
 
-**Luật vàng số 4 áp ở đây:** thêm file hoặc thư mục mới thì phải khai một dòng vào bảng này.
-Không khai = không tồn tại. Cổng đóng phiên có phép kiểm này.
+**Thêm file hoặc thư mục mới thì phải khai một dòng vào bảng này.** Không khai = không tồn tại,
+và cổng đóng phiên bắt.
+
 ## 7. Đóng phiên — ghi lại 3 thứ
 
 1. Một dòng Log vào `HANDOFF.md` của package: làm gì, kết quả số, còn gì mở.

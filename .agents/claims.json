@@ -3,17 +3,17 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
-      "ai": null,
-      "claimed_at": null,
-      "task": null,
+      "owner": "sua-tai-lieu",
+      "ai": "Claude",
+      "claimed_at": "2026-09-02",
+      "task": "Viet lai README.md goc cho repo nha, sua AGENTS/CHANGELOG/STATUS",
       "released_at": null
     },
     "_docs": {
-      "owner": null,
-      "ai": null,
-      "claimed_at": null,
-      "task": null,
+      "owner": "sua-tai-lieu",
+      "ai": "Claude",
+      "claimed_at": "2026-09-02",
+      "task": "Sua tai lieu theo bao cao soi: gop danh sach hoi Duc, sua lenh sai, luu do",
       "released_at": null
     },
     "_code": {
