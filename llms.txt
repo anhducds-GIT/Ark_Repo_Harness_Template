@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `70f046c` (2026-09-03).
+Trang được sinh tại commit `746c875` (2026-09-03).
 
 ## Việc ưu tiên #1
 
-- **_root** — Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu
+- **_root** — Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `70f046c` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): idea — Repo vừa khởi tạo từ bộ khung
+- [ark-repo-harness](STATUS.md): building — Bịt các lỗ audit tìm ra, và viết sổ tay cho AI để không trôi cách làm
 
 ## Luật bắt buộc trước khi sửa gì
 

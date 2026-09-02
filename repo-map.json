@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "70f046c",
+  "generated_commit": "746c875",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -28,25 +28,25 @@
   ],
   "units": [
     {
-      "id": "repo-goc",
+      "id": "ark-repo-harness",
       "path": ".",
-      "lifecycle": "idea",
+      "lifecycle": "building",
       "status_md": "STATUS.md",
-      "owner": "chua-khai",
-      "next_step": "Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu",
-      "human_action": null,
+      "owner": "claude-template-finish",
+      "next_step": "Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh",
+      "human_action": "Chỉ giúp một repo đang sống, không phải extension, càng nhỏ càng tốt — để thử lửa",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": null,
       "last_verified_commit": null,
-      "open_item": "Repo vừa khởi tạo từ bộ khung; chưa khai gì thêm"
+      "open_item": "Bịt các lỗ audit tìm ra, và viết sổ tay cho AI để không trôi cách làm"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Sửa .repo-structure.json cho khớp repo này, rồi chạy cổng kiểm cấu trúc lần đầu",
+      "title": "Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh",
       "rank": 1,
       "claim": null
     }
