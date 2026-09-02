@@ -10,7 +10,7 @@
  */
 
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -177,6 +177,56 @@ function dungRepo(files) {
   assert.equal(m.muc, 3, `repo sinh ra bo khung phai dat muc 3, dang ra ${m.muc} (${m.ten})`);
   assert.equal(coLenhTest(ROOT), true, "repo goc phai khai scripts.test");
   ok("repo sinh ra bộ khung tự đạt chuẩn của chính nó");
+}
+
+/* ---- 8. Có file nhưng ĐỌC KHÔNG NỔI ≠ thiếu file ------------------------- */
+{
+  // Ca thật: một thư mục chiếm chỗ cái tên. Bản đầu gộp mọi lỗi đọc thành `null` = "THIẾU", nên
+  // phép đo khuyên "thả file vào là xong" — và việc thả file THẤT BẠI, vì cái tên đã bị chiếm.
+  // Lời khuyên sai còn tệ hơn không có lời khuyên: người ta làm theo rồi mới biết.
+  const root = dungRepo(chuan);
+  try {
+    rmSync(join(root, ".repo-structure.json"), { force: true });
+    mkdirSync(join(root, ".repo-structure.json"), { recursive: true });
+
+    const dong = danhGia(root, chuan);
+    const d = dong.find((x) => x.file === ".repo-structure.json");
+    assert.equal(d.trangThai, "HỎNG", "thu muc chiem cho ten file phai la HONG, khong duoc keu la THIEU");
+    assert.match(d.loi ?? "", /EISDIR|EPERM|EACCES/, "phai giu lai ma loi that de nguoi doc biet duong xu");
+
+    const loi = cauHinhDocDuoc(root);
+    assert.equal(loi.length, 1, "cau hinh doc khong noi cung phai bi ke la cau hinh hong");
+    assert.equal(mucDo(dong, []).muc, 0, "co file doc khong noi thi moi con so phia sau la doan — phai la muc 0");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+
+  // ĐỐI CHỨNG DƯƠNG: repo lành không được dính HỎNG, kẻo một hàm luôn trả HỎNG cũng qua ca trên.
+  {
+    const root2 = dungRepo(chuan);
+    try {
+      assert.equal(danhGia(root2, chuan).filter((x) => x.trangThai === "HỎNG").length, 0,
+        "repo lanh khong duoc co dong nao HONG");
+    } finally { rmSync(root2, { recursive: true, force: true }); }
+  }
+  ok("thư mục chiếm chỗ tên file → HỎNG + mức 0, không phải THIẾU");
+}
+
+/* ---- 9. Sai hoa thường không được tính là có ----------------------------- */
+{
+  // Windows và macOS không phân biệt hoa thường, Linux thì có. Nên `readFileSync("HANDOFF.md")`
+  // vẫn đọc được file tên `handoff.md`, và phép đo báo "khớp". Cùng repo, cùng lệnh: xanh trên
+  // máy Đức, đỏ trên CI Linux. Đo được thật trên repo NAV ngày 03/09.
+  //
+  // Phép kiểm này CHẶT trên Windows/macOS (trước khi vá thì nó đỏ) và LỎNG trên Linux (ở đó
+  // đổi tên là file biến mất thật, nên nó xanh sẵn). Ghi ra đây để phiên sau đừng tưởng nó
+  // đang canh gì trên CI.
+  const root = dungRepo(chuan);
+  try {
+    renameSync(join(root, "HANDOFF.md"), join(root, "handoff.md"));
+    const d = danhGia(root, chuan).find((x) => x.file === "HANDOFF.md");
+    assert.equal(d.trangThai, "THIẾU",
+      "file ten sai hoa thuong KHONG duoc cham la co — Linux se bao thieu");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("tên sai hoa thường → THIẾU (máy này không phân biệt, máy Linux thì có)");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

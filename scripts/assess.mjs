@@ -86,33 +86,89 @@ export const CAU_HINH_MAY_DOC = [".repo-structure.json", ".agents/claims.json", 
 export function cauHinhDocDuoc(root) {
   const hong = [];
   for (const rel of CAU_HINH_MAY_DOC) {
-    const raw = docNeuCo(root, rel);
-    if (raw === null) continue;             // thiếu file là việc của phép đo THIẾU, không phải ở đây
-    try { JSON.parse(raw); } catch (e) { hong.push({ file: rel, loi: String(e.message).split(String.fromCharCode(10))[0] }); }
+    const kq = docChiTiet(root, rel);
+    if (kq.trangThai === "KHONG") continue;  // thiếu file là việc của phép đo THIẾU, không phải ở đây
+    if (kq.trangThai === "HONG") { hong.push({ file: rel, loi: kq.loi }); continue; }
+    try { JSON.parse(kq.noiDung); } catch (e) { hong.push({ file: rel, loi: String(e.message).split(String.fromCharCode(10))[0] }); }
   }
   return hong;
 }
 
-/* Đọc một file của repo đích. Trả null nếu không có — KHÔNG ném, vì "không có" chính là kết quả
-   đo, không phải lỗi. */
-function docNeuCo(root, rel) {
-  try {
-    return fs.readFileSync(path.join(root, ...rel.split("/")), "utf8");
-  } catch (_) {
-    return null;
+/* HOA THƯỜNG CÓ PHÂN BIỆT KHÔNG — hỏi bằng thư mục cha, đừng hỏi hệ thống file.
+ *
+ * Windows và macOS mặc định KHÔNG phân biệt hoa thường; Linux thì có. Nên `readFileSync` cho
+ * `HANDOFF.md` vẫn đọc được file tên `handoff.md`, và phép đo báo "có". Cùng một repo, cùng một
+ * lệnh, chạy trên máy Đức thì xanh, chạy trên CI Linux thì đỏ — mà không ai đổi gì.
+ *
+ * Đo được thật ngày 03/09 trên repo NAV: `git ls-files` trả `handoff.md`, `existsSync('HANDOFF.md')`
+ * trả `true`. Đây là kiểu hỏng tệ nhất của một bộ đo cầm tay đi kiểm repo khác: nó **đúng ở nơi
+ * bạn đứng và sai ở nơi bạn sắp giao hàng**.
+ *
+ * Cách chữa: soi từng đoạn đường dẫn trong danh sách thư mục cha. `readdirSync` trả tên THẬT
+ * trên đĩa, không qua lớp đối chiếu mờ hoa thường của hệ điều hành. */
+function tenKhopHoaThuong(root, rel) {
+  let cha = root;
+  for (const doan of rel.split("/")) {
+    let ds;
+    try { ds = fs.readdirSync(cha); } catch (_) { return false; }
+    if (!ds.includes(doan)) return false;
+    cha = path.join(cha, doan);
   }
+  return true;
+}
+
+/* Đọc một file của repo đích, và PHÂN BIỆT BA KẾT QUẢ, không phải hai.
+ *
+ * Bản đầu gộp mọi lỗi thành `null` = "không có". Nghe hợp lý, nhưng nó nói dối ở đúng ca đáng
+ * lo nhất: `.repo-structure.json` tồn tại dưới dạng **thư mục** cũng cho `null`, nên phép đo bảo
+ * "thiếu — thả file vào là xong". Người làm theo, và việc thả file **thất bại** vì cái tên đã bị
+ * một thư mục chiếm chỗ; không dòng nào giải thích vì sao. Cùng lối đó: không đủ quyền đọc
+ * (EACCES/EPERM) cũng bị kể là "thiếu".
+ *
+ *   CO    — đọc được, có nội dung
+ *   KHONG — thật sự không có (ENOENT/ENOTDIR), hoặc có nhưng SAI HOA THƯỜNG
+ *   HONG  — có gì đó ở tên này nhưng đọc không nổi. Đây là việc của người, không phải việc chép
+ */
+function docChiTiet(root, rel) {
+  const duong = path.join(root, ...rel.split("/"));
+  let raw;
+  try {
+    raw = fs.readFileSync(duong, "utf8");
+  } catch (e) {
+    const ma = e?.code;
+    if (ma === "ENOENT" || ma === "ENOTDIR") return { trangThai: "KHONG" };
+    return { trangThai: "HONG", ma: ma || "UNKNOWN", loi: String(e?.message ?? e).split(String.fromCharCode(10))[0] };
+  }
+  // Đọc được rồi mới soi hoa thường: đảo thứ tự thì tốn một lượt readdir cho mọi file vắng mặt.
+  if (!tenKhopHoaThuong(root, rel)) return { trangThai: "KHONG", saiHoaThuong: true };
+  return { trangThai: "CO", noiDung: raw };
+}
+
+/* Giữ lại cho những chỗ chỉ cần "có nội dung hay không". Ca HONG trả null ở đây là CỐ Ý — nơi
+   duy nhất được phép quyết ca đó là `danhGia` và `cauHinhDocDuoc`, để nó không lọt êm hai lần. */
+function docNeuCo(root, rel) {
+  const kq = docChiTiet(root, rel);
+  return kq.trangThai === "CO" ? kq.noiDung : null;
 }
 
 export function danhGia(root, chuan) {
   const dong = [];
   for (const [rel, mongDoi] of chuan) {
-    const thuc = docNeuCo(root, rel);
+    const kq = docChiTiet(root, rel);
     const tang = tangCuaFile(rel);
     let trangThai;
-    if (thuc === null) trangThai = "THIẾU";
-    else if (eol(thuc) === eol(mongDoi)) trangThai = "KHỚP";
+    if (kq.trangThai === "HONG") trangThai = "HỎNG";
+    else if (kq.trangThai === "KHONG") trangThai = "THIẾU";
+    else if (eol(kq.noiDung) === eol(mongDoi)) trangThai = "KHỚP";
     else trangThai = "LỆCH";
-    dong.push({ file: rel, tang, trangThai, tuyChon: TUY_CHON.has(rel) });
+    dong.push({
+      file: rel,
+      tang,
+      trangThai,
+      tuyChon: TUY_CHON.has(rel),
+      ...(kq.saiHoaThuong ? { saiHoaThuong: true } : {}),
+      ...(kq.trangThai === "HONG" ? { loi: kq.loi } : {})
+    });
   }
   return dong;
 }
@@ -141,6 +197,17 @@ export function chiPhi(dong) {
  * cần hai việc hoàn toàn khác nhau, và trộn chúng vào một thang phần trăm là mất đúng thông tin
  * đó. */
 export function mucDo(dong, hongCauHinh = []) {
+  // Có file ĐỌC KHÔNG NỔI thì mọi con số phía sau đều là đoán. Xếp mức 0 cùng chỗ với cấu hình
+  // hỏng, vì hậu quả giống hệt nhau: repo trông như sắp xong mà không chạy được, và lời khuyên
+  // "thả file vào" sẽ thất bại im lặng — cái tên đã bị chiếm chỗ.
+  const docKhongNoi = dong.filter((d) => d.trangThai === "HỎNG");
+  if (docKhongNoi.length) {
+    return {
+      muc: 0,
+      ten: "có file đọc không nổi — chưa đo được",
+      ke: `Xử tay trước đã: ${docKhongNoi.map((d) => `${d.file} (${d.loi})`).join(", ")}. Thả file đè lên sẽ KHÔNG chạy.`
+    };
+  }
   // Cấu hình không parse được thì repo KHÔNG dùng được — mức 0, bất kể có đủ file hay không.
   // Xếp nó vào mức 0 chứ không phải một cờ phụ, vì "đủ file mà chạy không nổi" là trạng thái
   // tệ hơn "thiếu file": thiếu thì biết mà thả vào, còn hỏng thì trông y như đã xong.
@@ -198,6 +265,18 @@ function inBaoCao(root, dong, json) {
   else if (!lenhTest) console.log(`  ⚠ package.json KHÔNG khai \`scripts.test\` — cổng sẽ báo xanh mà không chạy một dòng test nào.${NL}`);
   else console.log(`  ✓ package.json có khai \`scripts.test\` — cổng chạy được suite của repo.${NL}`);
 
+  const docKhongNoi = dong.filter((d) => d.trangThai === "HỎNG");
+  if (docKhongNoi.length) {
+    console.log("  ĐỌC KHÔNG NỔI — phải xử tay, thả file đè lên sẽ không chạy:");
+    for (const d of docKhongNoi) console.log(`    ${d.file}  —  ${d.loi}`);
+    console.log("");
+  }
+  const saiHoa = dong.filter((d) => d.saiHoaThuong);
+  if (saiHoa.length) {
+    console.log("  SAI HOA THƯỜNG — máy này không phân biệt nên trông như đã có, máy Linux sẽ báo thiếu:");
+    for (const d of saiHoa) console.log(`    ${d.file}  —  đổi tên file trên đĩa cho khớp đúng chữ hoa chữ thường`);
+    console.log("");
+  }
   if (thieu.length) {
     console.log("  THIẾU:");
     for (const d of thieu) console.log(`    [${d.tang}] ${d.file}${d.tuyChon ? "   (tuỳ chọn — không tính là nợ)" : ""}`);
@@ -222,8 +301,18 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     process.exit(2);
   }
   const root = path.resolve(target);
-  if (!fs.existsSync(root)) {
-    console.error(`Không thấy thư mục: ${root}`);
+  // Phải là THƯ MỤC, và phải nói thẳng khi không phải. `existsSync` trả true cho cả file, nên
+  // bản đầu nhận một file rồi in ra một báo cáo đầy đủ: "mức 0 — chưa có gì, thả bộ khung vào".
+  // Nghe như một repo trắng, thật ra là gõ nhầm đường dẫn — và người đọc mất cả phiên mới biết.
+  let dang;
+  try { dang = fs.statSync(root); } catch (_) { dang = null; }
+  if (!dang) {
+    console.error(`Không thấy: ${root}`);
+    process.exit(2);
+  }
+  if (!dang.isDirectory()) {
+    console.error(`TỪ CHỐI — đây là một file, không phải thư mục repo: ${root}`);
+    console.error("Chỉ vào thư mục GỐC của repo (chỗ có .git), đừng chỉ vào một file bên trong nó.");
     process.exit(2);
   }
   inBaoCao(root, danhGia(root, buildTemplateFiles()), json);
