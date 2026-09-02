@@ -357,16 +357,20 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
       const k = ds.findIndex((l) => l.includes("Không có secret"));
       return k < 0 ? "(khong thay phep kiem secret)" : ds.slice(k, k + 2).join("\n");
     };
+    // GHÉP CHUỖI LÚC CHẠY, đừng viết thẳng vào mã nguồn. Bộ quét đọc MỌI file được track — kể cả
+    // chính file này — nên một fixture viết thẳng sẽ làm cổng báo đỏ trên chính suite của nó.
+    // Gặp thật ngay lần chạy đầu sau khi mở rộng bộ quét.
+    const bi = "Qz7Rm2Vp9Ks4" + "Wt6Yb1Nc3Hd5Jf";
     const dat = (ten, noiDung) => { writeFileSync(join(fx, ten), noiDung, "utf8"); at("add", ten); };
     const go = (ten) => { at("rm", "-q", "-f", ten); };
 
     // (a) `.env` — đuôi mà bản cũ KHÔNG BAO GIỜ mở ra
-    dat(".env", "OPENAI_API_KEY=Qz7Rm2Vp9Ks4Wt6Yb1Nc3Hd5Jf8\n");
+    dat(".env", "OPENAI_API_" + "KEY=" + bi + "8" + String.fromCharCode(10));
     assert.match(dongSecret(), /ĐỎ/, "secret trong .env phai bi bat — day la doi duoc bo qua hoan toan o ban cu");
     go(".env");
 
     // (b) giá trị có nháy trong mã nguồn
-    dat("a.js", 'const x = { api_key: "Qz7Rm2Vp9Ks4Wt6Yb1Nc3Hd5Jf" };\n');
+    dat("a.js", "const x = { api_" + "key: " + JSON.stringify(bi) + " };" + String.fromCharCode(10));
     assert.match(dongSecret(), /ĐỎ/, "secret co nhay trong ma nguon phai bi bat");
     go("a.js");
 
@@ -377,7 +381,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     go("b.py");
 
     // (d) KHÔNG KÊU OAN — fixture tự khai mình là đồ giả
-    dat("c.mjs", 'const t = { token: "test-one-session-token-value" };\n');
+    dat("c.mjs", "const t = { to" + "ken: " + JSON.stringify("test-one-session-token-value") + " };" + String.fromCharCode(10));
     assert.match(dongSecret(), /XANH/, "fixture co chu 'test' khong phai secret that");
     go("c.mjs");
 
