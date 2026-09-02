@@ -71,3 +71,5 @@ sửa `session-check.mjs`.
    `manifest.json`"). Sửa nó sẽ làm `template/` lệch thêm, nên để lại cho phiên giữ `_template`.
 3. **`.repo-structure.json` chú thích lạc hậu:** `_areas_doc2` viết "HAI CHỦ, CỐ Ý" trong khi
    thực tế đang có bốn chủ (`_root _docs _code _template`).
+
+- **2026-09-03 · harness-vong2** — Vòng 2: vá 9 lỗ do hai lần migrate thật và audit độc lập vạch ra (cổng báo XANH khi không kiểm được gì · safe-push soi một đằng đẩy một nẻo · bản đồ file đóng cứng số mục · máy sinh tự đếm mình là code · gõ sai tên trường cấu hình làm mất lớp bảo vệ · đèn sức khoẻ không bao giờ xanh được · HUONG-DAN bị nuốt khỏi trang · Log chỉ đòi ở package · quét secret bỏ qua .env). Suite 30 → 36. Mở: 6 phát hiện Codex chưa vá (đếm [ĐO] bằng regex · verifyCommit chưa kiểm ancestor · archived lọt active_work · provenance artifact).
