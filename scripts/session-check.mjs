@@ -279,7 +279,7 @@ check("Vùng bằng chứng không bị sửa", () => {
  * đây là fixture, biến mẫu, hoặc chỗ trống chờ điền. */
 const DAU_HANG_GIA = [
   "test", "example", "sample", "dummy", "fake", "placeholder", "your-", "your_",
-  "changeme", "change-me", "redacted", "xxxxx", "abcdef", "<", "${", "{{", "...", "…"
+  "changeme", "change-me", "redacted", "xxxxx", "<", "${", "{{", "...", "…"
 ];
 function laHangGia(doan) {
   const thap = doan.toLowerCase();
@@ -305,7 +305,19 @@ check("Không có secret lọt vào repo", () => {
     /"token"\s*:\s*"[A-Za-z0-9_\-]{20,}"/,
     /Bearer\s+[A-Za-z0-9_\-]{24,}/,
     // Dạng KEY=value / key: value — dạng phổ biến nhất trong .env, .yaml, .ini, .toml
-    /(?:api[_-]?key|secret|token|password|passwd|access[_-]?key|private[_-]?key|client[_-]?secret)\s*[:=]\s*["']?[A-Za-z0-9_\-\/+]{20,}/i,
+    // GIÁ TRỊ PHẢI TRÔNG NHƯ MỘT GIÁ TRỊ, KHÔNG PHẢI MỘT CÁI TÊN.
+    //
+    // Bản đầu chấp nhận giá trị không có nháy, nên dòng này bị kêu là secret ở repo Project 3AI:
+    //     api_key = _paperclip_env_value(PAPERCLIP_API_KEY_ENV)
+    // Đó là một lời gọi hàm, hoàn toàn vô hại — `_paperclip_env_value` vừa đủ 20 ký tự nên lọt.
+    //
+    // Vì sao phải sửa ngay chứ không phải "báo thừa cho chắc": một cổng hay báo nhầm sẽ bị tắt,
+    // hoặc tệ hơn — bị lướt qua theo thói quen. Lúc đó nó không còn canh gì nữa mà vẫn hiện lên
+    // màn hình y như đang canh.
+    //   (a) có nháy — cách một secret thật gần như luôn xuất hiện trong mã nguồn
+    new RegExp("(?:api[_-]?key|secret|token|password|passwd|access[_-]?key|private[_-]?key|client[_-]?secret)\\s*[:=]\\s*[\"'][A-Za-z0-9_\\-\\/+=]{20,}[\"']", "i"),
+    //   (b) kiểu file .env — KEY=value trọn một dòng, không dấu cách, không ngoặc
+    new RegExp("^[A-Z0-9_]*(?:API_?KEY|SECRET|TOKEN|PASSWORD|ACCESS_?KEY)\\s*=\\s*[A-Za-z0-9_\\-\\/+=]{20,}\\s*$", "mi"),
     /-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----/,
     /\bsk-[A-Za-z0-9]{20,}/,          // OpenAI
     /\bghp_[A-Za-z0-9]{30,}/,          // GitHub personal token

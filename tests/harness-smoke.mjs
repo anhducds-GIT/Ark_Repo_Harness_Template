@@ -325,4 +325,68 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   } finally { rmSync(fx, { recursive: true, force: true }); }
 }
 
+/* ---- 8. Quét secret: đọc mọi loại file, và không kêu oan ---------------- */
+{
+  // Bản đầu chỉ đọc `.js .mjs .json .md .ps1 .cmd`. Tức `.env`, `.yaml`, `.py` — đúng những nơi
+  // secret hay nằm nhất — KHÔNG BAO GIỜ được mở ra. Tệ hơn: câu kết in "Quét N file được track,
+  // sạch" với N là TỔNG số file track, trong khi nó chỉ đọc một phần. Lỗ thì vá được; một con số
+  // nói dối trong báo cáo thì làm người đọc thôi không kiểm nữa.
+  //
+  // Nhưng mở rộng ra rồi thì phải KHÔNG KÊU OAN, kẻo cổng bị tắt. Cả hai chiều đều đã hỏng thật
+  // trong cùng một ngày, nên cả hai đều phải có ca ở đây.
+  const fx = mkdtempSync(join(tmpdir(), "harness-secret-"));
+  try {
+    const at = (...a) => execFileSync("git", a, { cwd: fx, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(fx, "scripts"), { recursive: true });
+    mkdirSync(join(fx, ".agents"), { recursive: true });
+    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
+    copyFileSync(join(ROOT, "AGENTS.md"), join(fx, "AGENTS.md"));
+    writeFileSync(join(fx, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    writeFileSync(join(fx, "HANDOFF.md"), "# HANDOFF\n", "utf8");
+    writeFileSync(join(fx, "package.json"), JSON.stringify({ name: "fx", type: "module", scripts: { test: "node -e 0" } }), "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "nen");
+
+    const dongSecret = () => {
+      const r = spawnSync(process.execPath, [join(fx, "scripts", "session-check.mjs"), "--as", "thu"], { cwd: fx, encoding: "utf8" });
+      const ds = (String(r.stdout || "") + String(r.stderr || "")).split("\n");
+      const k = ds.findIndex((l) => l.includes("Không có secret"));
+      return k < 0 ? "(khong thay phep kiem secret)" : ds.slice(k, k + 2).join("\n");
+    };
+    const dat = (ten, noiDung) => { writeFileSync(join(fx, ten), noiDung, "utf8"); at("add", ten); };
+    const go = (ten) => { at("rm", "-q", "-f", ten); };
+
+    // (a) `.env` — đuôi mà bản cũ KHÔNG BAO GIỜ mở ra
+    dat(".env", "OPENAI_API_KEY=Qz7Rm2Vp9Ks4Wt6Yb1Nc3Hd5Jf8\n");
+    assert.match(dongSecret(), /ĐỎ/, "secret trong .env phai bi bat — day la doi duoc bo qua hoan toan o ban cu");
+    go(".env");
+
+    // (b) giá trị có nháy trong mã nguồn
+    dat("a.js", 'const x = { api_key: "Qz7Rm2Vp9Ks4Wt6Yb1Nc3Hd5Jf" };\n');
+    assert.match(dongSecret(), /ĐỎ/, "secret co nhay trong ma nguon phai bi bat");
+    go("a.js");
+
+    // (c) KHÔNG KÊU OAN — một lời gọi hàm. Ca thật ở repo Project 3AI: `_paperclip_env_value`
+    //     vừa đủ 20 ký tự nên lot qua bản đầu, và cổng báo đỏ cho một dòng hoàn toàn vô hại.
+    dat("b.py", "api_key = _paperclip_env_value(PAPERCLIP_API_KEY_ENV)\n");
+    assert.match(dongSecret(), /XANH/, "loi goi ham KHONG phai secret — keu oan thi cong se bi tat");
+    go("b.py");
+
+    // (d) KHÔNG KÊU OAN — fixture tự khai mình là đồ giả
+    dat("c.mjs", 'const t = { token: "test-one-session-token-value" };\n');
+    assert.match(dongSecret(), /XANH/, "fixture co chu 'test' khong phai secret that");
+    go("c.mjs");
+
+    // (e) ĐỐI CHỨNG: repo sạch thì phải XANH, và phải nói ĐÃ ĐỌC THẬT bao nhiêu file
+    const sach = dongSecret();
+    assert.match(sach, /XANH/, "repo sach phai XANH");
+    assert.match(sach, /Đọc thật/, "phai bao so file DOC THAT, khong duoc bao tong so file track");
+    ok("quet secret: doc ca .env · bat gia tri co nhay · khong keu oan loi goi ham va fixture");
+  } finally { rmSync(fx, { recursive: true, force: true }); }
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
