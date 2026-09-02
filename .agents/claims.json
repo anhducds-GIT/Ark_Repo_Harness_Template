@@ -17,17 +17,17 @@
       "released_at": null
     },
     "_code": {
-      "owner": null,
-      "ai": null,
+      "owner": "harness-vong2",
+      "ai": "Claude",
       "claimed_at": "2026-09-02",
-      "task": "Khoi A: bon lo xanh-ma-khong-chan",
-      "released_at": "2026-09-02"
+      "task": "vong 2: va lo cong bao xanh ma khong kiem gi",
+      "released_at": null
     },
     "_template": {
-      "owner": null,
-      "ai": null,
-      "claimed_at": null,
-      "task": null,
+      "owner": "harness-vong2",
+      "ai": "Claude",
+      "claimed_at": "2026-09-02",
+      "task": "sinh lai ban trich",
       "released_at": null
     }
   }

@@ -271,17 +271,45 @@ check("Không có secret lọt vào repo", () => {
   const tracked = git("ls-files").split("\n").filter(Boolean);
   const badName = tracked.filter((f) => /pairing.*\.json$/i.test(f));
   if (badName.length) return { ok: false, msg: `File pairing bị track: ${badName.join(", ")}. Gỡ khỏi git và cho vào .gitignore.` };
-  const patterns = [/"token"\s*:\s*"[A-Za-z0-9_\-]{20,}"/, /Bearer\s+[A-Za-z0-9_\-]{24,}/];
+  /* QUÉT THEO DANH SÁCH LOẠI TRỪ, KHÔNG THEO DANH SÁCH CHO PHÉP.
+   *
+   * Bản cũ chỉ đọc `.js .mjs .json .md .ps1 .cmd`. Nghĩa là `.env`, `.yaml`, `.yml`, `.toml`,
+   * `.py`, `.sh`, `.ini`, `.txt` — đúng những nơi secret hay nằm nhất — **không bao giờ được
+   * đọc**. Và câu kết in ra "Quét N file được track, sạch" với N là TỔNG số file track, trong
+   * khi nó chỉ đọc một phần. Lỗ hổng thì còn vá được; một con số nói dối trong báo cáo thì làm
+   * người đọc thôi không kiểm nữa.
+   *
+   * Danh sách cho phép luôn lạc hậu sau đuôi file tiếp theo mà repo thêm vào. Danh sách loại
+   * trừ thì không: thứ gì không đọc được sẽ được KỂ RA là không đọc được, chứ không biến mất. */
+  const patterns = [
+    /"token"\s*:\s*"[A-Za-z0-9_\-]{20,}"/,
+    /Bearer\s+[A-Za-z0-9_\-]{24,}/,
+    // Dạng KEY=value / key: value — dạng phổ biến nhất trong .env, .yaml, .ini, .toml
+    /(?:api[_-]?key|secret|token|password|passwd|access[_-]?key|private[_-]?key|client[_-]?secret)\s*[:=]\s*["']?[A-Za-z0-9_\-\/+]{20,}/i,
+    /-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----/,
+    /\bsk-[A-Za-z0-9]{20,}/,          // OpenAI
+    /\bghp_[A-Za-z0-9]{30,}/,          // GitHub personal token
+    /\bAKIA[0-9A-Z]{16}\b/             // AWS access key id
+  ];
   const suspects = [];
+  let daDoc = 0;
+  const khongDocDuoc = [];
   for (const file of tracked) {
-    if (!/\.(js|mjs|json|md|ps1|cmd)$/i.test(file)) continue;
     const full = path.join(ROOT, file);
-    let text; try { text = fs.readFileSync(full, "utf8"); } catch { continue; }
-    if (text.length > 2_000_000) continue;
+    let buf;
+    try { buf = fs.readFileSync(full); } catch { khongDocDuoc.push(file); continue; }
+    if (buf.length > 2_000_000) { khongDocDuoc.push(`${file} (quá lớn)`); continue; }
+    // Nhị phân thì bỏ, nhưng PHẢI kể ra. Dấu hiệu: có byte 0 trong 8KB đầu.
+    if (buf.subarray(0, 8192).includes(0)) { khongDocDuoc.push(`${file} (nhị phân)`); continue; }
+    daDoc += 1;
+    const text = buf.toString("utf8");
     if (patterns.some((p) => p.test(text))) suspects.push(file);
   }
   if (suspects.length) return { ok: false, msg: `Nghi có token thật trong: ${suspects.join(", ")}. Kiểm tra bằng mắt trước khi commit.` };
-  return { ok: true, msg: `Quét ${tracked.length} file được track, sạch.` };
+  const duoi = khongDocDuoc.length
+    ? ` · ${khongDocDuoc.length} file KHÔNG đọc được (${khongDocDuoc.slice(0, 3).join(", ")}${khongDocDuoc.length > 3 ? ", …" : ""}) — không kiểm được, không phải đã sạch`
+    : "";
+  return { ok: true, msg: `Đọc thật ${daDoc}/${tracked.length} file được track, sạch${duoi}.` };
 });
 
 /* ---- 4. File mới phải khai vào Bản đồ file ------------------------------ */
@@ -629,6 +657,35 @@ for (const r of results) {
   console.log(`  [${mark}] ${r.name}`);
   console.log(`         ${r.msg}`);
 }
+/* BA TRẠNG THÁI, KHÔNG PHẢI HAI. Đây là chỗ cổng từng nói dối.
+ *
+ * Bản cũ chỉ đếm `!ok`. Mục `BỎ` mang `ok: true`, nên một lượt chạy KHÔNG KIỂM ĐƯỢC GÌ vẫn kết
+ * thúc bằng đúng câu "XANH TOÀN BỘ — được phép báo xong" và thoát 0. Ba ca có thật cùng dẫn tới
+ * đó: chạy `--quick`; repo chưa khai `scripts.test`; không phân giải được `origin/main` (nhánh
+ * tên khác, hoặc chưa `git fetch`) nên mọi commit chưa push biến khỏi tầm nhìn.
+ *
+ * Vì sao KHÔNG chuyển `BỎ` thành ĐỎ: một repo vừa dựng chưa có test là chuyện thật và hợp lệ —
+ * đỏ ở đó là khoá repo ngay phiên đầu. Nhưng "chưa kiểm được" cũng KHÔNG phải "đã đạt". Nên nó
+ * là trạng thái thứ ba, có mã thoát riêng:
+ *
+ *   0 — XANH TOÀN BỘ            mọi phép kiểm đã chạy và đạt
+ *   1 — CHƯA XONG               có mục đỏ
+ *   2 — CHƯA ĐỦ BẰNG CHỨNG      không mục nào đỏ, nhưng có mục không kiểm được
+ *
+ * Cả ca `BỎ` đều tự sửa được, và quy trình migrate đã dặn đúng cách sửa — nên mã 2 không khoá
+ * repo nào, nó chỉ không cho nói dối. */
 const failed = results.filter((r) => !r.ok);
-console.log(failed.length ? `\nCHƯA XONG — ${failed.length} mục đỏ, sửa rồi chạy lại.\n` : `\nXANH TOÀN BỘ — được phép báo xong.\n`);
-process.exit(failed.length ? 1 : 0);
+const boQua = results.filter((r) => r.ok && r.skipped);
+if (failed.length) {
+  console.log(`\nCHƯA XONG — ${failed.length} mục đỏ, sửa rồi chạy lại.\n`);
+  process.exit(1);
+}
+if (boQua.length) {
+  console.log(`\nCHƯA ĐỦ BẰNG CHỨNG — ${boQua.length} mục KHÔNG KIỂM ĐƯỢC (không mục nào đỏ).`);
+  console.log("KHÔNG được báo xong: cổng chưa nhìn thấy thứ nó phải canh. Từng mục:");
+  for (const r of boQua) console.log(`  · ${r.name}`);
+  console.log("");
+  process.exit(2);
+}
+console.log(`\nXANH TOÀN BỘ — được phép báo xong.\n`);
+process.exit(0);
