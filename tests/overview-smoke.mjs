@@ -37,11 +37,34 @@ const html = trang(dl);
 /* ---- 3. Đèn sức khoẻ chỉ XANH khi cả ba con số bằng 0 ------------------- */
 {
   // Đây là chỗ một bảng dễ nói dối nhất: tô xanh cho đẹp. Kiểm bằng chính dữ liệu đang có.
-  const tong = dl.so.reduce((a, b) => a + b.so, 0);
+  const tong = dl.so.reduce((a, b) => a + (b.so ?? 0), 0);
   const xanh = /class="den xanh"/.test(html);
   assert.equal(xanh, tong === 0, `tong no = ${tong} thi den ${tong === 0 ? "phai" : "KHONG duoc"} xanh`);
   assert.equal(dl.so.length, 3, "dung ba con so, khong hon — them nua la bat nguoi xem doc bang");
-  ok(`đèn khớp dữ liệu: tổng nợ ${tong}, đèn ${xanh ? "xanh" : "không xanh"}`);
+
+  // ĐỐI CHỨNG DƯƠNG — đèn PHẢI xanh được. Trước đây một trong ba số bị đóng cứng bằng 1, nên
+  // đèn không bao giờ xanh nổi dù repo sạch hết, trong khi ngay dưới nó trang vẫn viết "Đèn
+  // xanh chỉ khi cả ba bằng 0". Không có ca này thì một hằng số như thế sống mãi mà không ai
+  // biết: phép kiểm cũ chỉ so đèn với tổng, và tổng thì không bao giờ bằng 0.
+  const sach = trang({ ...dl, so: dl.so.map((s) => ({ ...s, so: 0 })) });
+  assert.match(sach, /class="den xanh"/, "ca ba so bang 0 thi den PHAI xanh — khong duoc co hang so chan duong");
+
+  // KHÔNG ĐO ĐƯỢC ≠ SẠCH. `null` phải hiện ra dấu ?, và đèn không được xanh.
+  const mu = trang({ ...dl, so: [{ so: 0, nhan: "a" }, { so: null, nhan: "b" }, { so: 0, nhan: "c" }] });
+  assert.ok(!/class="den xanh"/.test(mu), "co phep do khong chay duoc thi den KHONG duoc xanh");
+  assert.match(mu, /<b>\?<\/b>/, "phep do khong chay duoc phai hien dau ?, khong duoc hien so 0");
+  ok(`đèn: khớp dữ liệu · xanh được khi sạch · không-đo-được thì hiện "?" chứ không thành 0`);
+}
+
+/* ---- 3b. Tài liệu viết riêng cho chủ dự án phải LÊN TRANG ---------------- */
+{
+  // `docs/HUONG-DAN.md` từng được đọc vào rồi không in ra tab nào: file duy nhất viết thẳng cho
+  // Đức bị nuốt mất khỏi trang của Đức. Không ai thấy, vì trang vẫn đầy đủ và đẹp.
+  assert.ok(dl.huongDan, "repo nay co docs/HUONG-DAN.md — neu khong thi phep kiem duoi vo nghia");
+  assert.match(html, /id="huong-dan"/, "HUONG-DAN.md phai duoc in ra trang, khong duoc doc roi bo di");
+  const khong = trang({ ...dl, huongDan: null });
+  assert.ok(!/id="huong-dan"/.test(khong), "khong co file thi khong duoc dung khoi rong");
+  ok("hướng dẫn cho chủ dự án được in ra trang, không bị nuốt");
 }
 
 /* ---- 4. Tab đầu KHÔNG được nói bằng tiếng máy --------------------------- */

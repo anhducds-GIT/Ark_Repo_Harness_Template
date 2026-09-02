@@ -150,10 +150,26 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   const run = spawnSync(process.execPath, [join(ROOT, "scripts", "check-bootstrap.mjs")], { cwd: ROOT, encoding: "utf8" });
   const out = String(run.stdout || "") + String(run.stderr || "");
   const summary = out.split("\n").find((l) => l.startsWith("TỔNG:")) ?? "";
-  const m = summary.match(/([0-9]+)[^0-9]*chỗ[^0-9]*ĐỎ/);
-  assert.ok(m, `khong doc duoc so cho DO tu dong tong ket: "${summary}"`);
-  assert.equal(Number(m[1]), 0, `cong kiem cau truc con cho DO: "${summary}"`);
-  ok("cong kiem cau truc: 0 cho DO tren chinh repo nay");
+
+  // ĐỌC MÃ THOÁT, ĐỪNG ĐẾM TỔNG SỐ ĐỎ.
+  //
+  // Bản đầu đòi tổng số ĐỎ bằng 0. Nhưng quy trình migrate dặn để `bootstrap.blocking` RỖNG ở
+  // repo mới — CHÍNH VÌ repo cũ chắc chắn đỏ vài chỗ, và bật chặn khi đang đỏ là tự khoá repo ở
+  // phiên đầu tiên. Hai câu đó đá nhau: `check-bootstrap` thoát 0 (không phép kiểm CHẶN nào đỏ)
+  // trong khi suite này thoát 1. Hai cửa đo cùng một thứ, trả hai kết quả, và **repo vừa migrate
+  // không bao giờ xanh được**. Đo thật trên repo "Project 3 AI Agent Unify" ngày 03/09:
+  // `check-bootstrap` exit 0 · `TỔNG: 63 chỗ ĐỎ (B10)` · suite này exit 1.
+  //
+  // Mã thoát mới là hợp đồng của cổng: nó đã biết phép kiểm nào đang CHẶN ở repo NÀY. Suite thì
+  // không, và không nên đoán hộ.
+  assert.equal(run.status, 0,
+    `cong kiem cau truc thoat khac 0 — co phep kiem thuoc nhom CHAN dang do: "${summary}"`);
+
+  // Nhưng đừng tin mã thoát một cách mù quáng: một `check-bootstrap` rỗng cũng thoát 0. Đòi có
+  // dòng tổng kết đọc được, để "thoát 0" phải kèm bằng chứng là nó đã thật sự chạy.
+  assert.ok(summary, "thoat 0 nhung KHONG co dong TONG: — cong nay chua chay gi, khong duoc tin");
+  assert.match(summary, /chỗ[^0-9]*ĐỎ/, `dong tong ket khong doc duoc: "${summary}"`);
+  ok("cong kiem cau truc: nhom CHAN dat het, va co bang chung da chay that");
 }
 
 /* ---- 5. Danh sách miễn trừ phải ĐƯỢC ĐỌC, dù khai kiểu nào ---------------- */

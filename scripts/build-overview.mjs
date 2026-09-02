@@ -305,15 +305,24 @@ function khoiVongDoi(st) {
 
 /* Sức khoẻ — ba con số đếm và MỘT đèn. Đèn xanh chỉ khi cả ba bằng 0. Không phần trăm, không
    lời máy tự khen: một dòng "đạt 94%" là thứ không ai hành động được. */
+/* PHÉP ĐO HỎNG PHẢI HIỆN RA LÀ HỎNG, KHÔNG ĐƯỢC THÀNH SỐ 0.
+ *
+ * `so: null` nghĩa là KHÔNG ĐO ĐƯỢC (git không chạy, cổng cấu trúc chết giữa chừng). Bản đầu
+ * biến mọi ca đó thành `0` — tức là thành "sạch". Một trang tự khen mình sạch vì nó không đo
+ * được gì là thứ nguy hiểm nhất ở đây: người xem trang này KHÔNG mở repo ra kiểm lại. */
 function khoiSucKhoe(sk) {
-  const tong = sk.reduce((a, b) => a + b.so, 0);
-  const den = tong === 0 ? "xanh" : (tong <= 3 ? "vang" : "do");
+  const coHong = sk.some((s) => s.so === null);
+  const tong = sk.reduce((a, b) => a + (b.so ?? 0), 0);
+  const den = coHong ? "do" : (tong === 0 ? "xanh" : (tong <= 3 ? "vang" : "do"));
   return `<div class="the"><h2>Sức khoẻ</h2>
     <div class="luoi">
-      ${sk.map((s) => `<div class="o ${s.so === 0 ? "ok" : "canh"}"><b>${s.so}</b><span>${esc(s.nhan)}</span></div>`).join("")}
+      ${sk.map((s) => {
+        if (s.so === null) return `<div class="o canh"><b>?</b><span>${esc(s.nhan)} — không đo được</span></div>`;
+        return `<div class="o ${s.so === 0 ? "ok" : "canh"}"><b>${s.so}</b><span>${esc(s.nhan)}</span></div>`;
+      }).join("")}
       <div class="o"><b><span class="den ${den}"></span></b><span>tổng thể</span></div>
     </div>
-    <p style="font-size:13.2px;color:var(--mo)">Đèn xanh chỉ khi cả ba đều bằng 0. Không có phần trăm ở đây — một con số như "đạt 94%" thì không ai hành động được.</p>
+    <p style="font-size:13.2px;color:var(--mo)">Đèn xanh chỉ khi cả ba đều bằng 0. Dấu <b>?</b> nghĩa là phép đo không chạy được — đó không phải điểm 0, và đèn không xanh. Không có phần trăm ở đây — một con số như "đạt 94%" thì không ai hành động được.</p>
   </div>`;
 }
 
@@ -332,7 +341,7 @@ export function trang(dl) {
     ["nhat-ky", "Nhật ký"]
   ].filter(([id]) => {
     if (id === "lam-duoc-gi") return Boolean(dl.tinhNang);
-    if (id === "cach-van-hanh") return workflows.length > 0;
+    if (id === "cach-van-hanh") return workflows.length > 0 || Boolean(huongDan);
     if (id === "so-tay") return Boolean(dl.soTay) || protocols.length > 0;
     if (id === "bao-tri") return Boolean(dl.baoTri);
     if (id === "tra-cuu") return Boolean(legend);
@@ -419,7 +428,8 @@ export function trang(dl) {
     <div class="the">${md(dl.tinhNang)}</div>
   </section>` : ""}
 
-  ${workflows.length ? `<section class="tab" id="tab-cach-van-hanh" hidden>
+  ${(workflows.length || huongDan) ? `<section class="tab" id="tab-cach-van-hanh" hidden>
+    ${huongDan ? `<div class="the" id="huong-dan">${md(huongDan)}</div>` : ""}
     ${mucLuc(workflows.map((w) => ({ id: `wf-${slug(w.file)}`, ten: w.fm.ten || w.tieuDe })))}
     ${workflows.map((w) => {
       const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
@@ -506,8 +516,20 @@ export function gomDuLieu() {
   // Tên NGƯỜI ĐỌC lấy từ `.repo-structure.json`, không lấy `package.json.name`. Cái sau là tên
   // gói npm — chữ thường, gạch nối — và in nó lên đầu một trang cho người xem thì vừa xấu vừa
   // sai đối tượng. Không khai thì lùi về tên gói, còn hơn để trống.
+  // FAIL-CLOSED. Bản đầu nuốt lỗi parse rồi lùi về tên gói npm, nên một `.repo-structure.json`
+  // hỏng cú pháp vẫn sinh ra một trang trông hoàn toàn bình thường — trong khi cổng kiểm của
+  // chính repo đó đang chết. Trang là thứ Đức nhìn; nó không được đẹp hơn sự thật.
   let tenNguoi = null;
-  try { tenNguoi = JSON.parse(doc(".repo-structure.json") || "{}")?.repo?.name || null; } catch (_) { tenNguoi = null; }
+  const cauHinhRaw = doc(".repo-structure.json");
+  if (cauHinhRaw !== null) {
+    let j;
+    try {
+      j = JSON.parse(cauHinhRaw);
+    } catch (e) {
+      throw new Error(`.repo-structure.json hỏng cú pháp (${String(e.message).split(NL)[0]}) — KHÔNG sinh trang. Một trang dựng từ cấu hình hỏng sẽ trông bình thường trong khi repo đang hỏng.`);
+    }
+    tenNguoi = j?.repo?.name || null;
+  }
   const nhatKy = tachNhatKy(doc("CHANGELOG.md"));
   const workflows = docTaiLieu("docs/workflows");
   const protocols = docTaiLieu("docs/protocols");
@@ -535,20 +557,43 @@ export function gomDuLieu() {
       if ((Date.now() - sua.getTime()) / 86400000 > ttl) taiLieuQuaHan.push(`${thuMuc}/${f}`);
     }
   }
-  let canhBaoVang = 0;
-  try {
-    const ra = execSync("node scripts/check-bootstrap.mjs", { cwd: ROOT, encoding: "utf8" });
+  // `null` = KHÔNG ĐO ĐƯỢC, và nó khác hẳn 0. Cổng cấu trúc thoát khác 0 là chuyện BÌNH THƯỜNG
+  // (có phép kiểm thuộc nhóm CHẶN đang đỏ) và nó vẫn in dòng TỔNG — nên vẫn đọc được. Chỉ khi
+  // KHÔNG có dòng TỔNG mới là không đo được: script chết trước khi in, hoặc node/git không chạy.
+  let canhBaoVang = null;
+  {
+    let ra = "";
+    try {
+      ra = execSync("node scripts/check-bootstrap.mjs", { cwd: ROOT, encoding: "utf8" });
+    } catch (e) {
+      ra = String(e.stdout || "");
+    }
     const m = (ra.split(NL).find((l) => l.startsWith("TỔNG:")) || "").match(/([0-9]+)\s*chỗ\s*VÀNG/);
-    canhBaoVang = m ? Number(m[1]) : 0;
-  } catch (e) {
-    const ra = String(e.stdout || "");
-    const m = (ra.split(NL).find((l) => l.startsWith("TỔNG:")) || "").match(/([0-9]+)\s*chỗ\s*VÀNG/);
-    canhBaoVang = m ? Number(m[1]) : 0;
+    canhBaoVang = m ? Number(m[1]) : null;
   }
+
+  /* "Việc lớn chưa chứng minh" — ĐỌC TỪ STATUS, ĐỪNG GÕ TAY.
+   *
+   * Bản đầu đóng cứng số `1`. Nghĩa là đèn sức khoẻ **không bao giờ xanh được**, kể cả khi repo
+   * đã sạch hết mọi thứ khác — trong khi ngay dưới nó trang lại viết "Đèn xanh chỉ khi cả ba
+   * bằng 0". Trang tự mâu thuẫn với chính nó, và con số đó không bao giờ đổi dù việc có xong.
+   *
+   * Nguồn thật: `lifecycle` trong `STATUS.md`, đúng trường mà khối Vòng đời phía trên đã dùng.
+   * Một nguồn, hai chỗ đọc — thay vì hai con số tự sống. */
+  const daChungMinh = new Set(["proven", "retired"]);
+  const viecChuaChungMinh = st?.lifecycle ? (daChungMinh.has(st.lifecycle) ? 0 : 1) : null;
   return {
     ten: tenNguoi || pkg.name || "Repo",
     ban: pkg.version || "0.0.0",
-    ngay: new Date().toISOString().slice(0, 10),
+    // Ngày THEO ĐỒNG HỒ CỦA NGƯỜI XEM, không theo UTC. Sinh trang lúc 00:30 giờ Việt Nam thì
+    // `toISOString()` vẫn trả ngày HÔM QUA — và banner "trang này bao nhiêu ngày tuổi" đếm sai
+    // ngay từ giây đầu tiên. Sai một ngày thì nhỏ, nhưng nó nằm đúng ở con số Đức dùng để quyết
+    // định có tin trang này hay không.
+    ngay: (() => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    })(),
     lenh: Object.entries(pkg.scripts || {}),
     banDo: docBanDo(doc("AGENTS.md")),
     workflows, protocols, adrs, nhatKy,
@@ -563,7 +608,7 @@ export function gomDuLieu() {
     so: [
       { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn" },
       { so: canhBaoVang, nhan: "cảnh báo cấu trúc tồn" },
-      { so: 1, nhan: "việc lớn chưa chứng minh" }
+      { so: viecChuaChungMinh, nhan: "việc lớn chưa chứng minh" }
     ]
   };
 }
