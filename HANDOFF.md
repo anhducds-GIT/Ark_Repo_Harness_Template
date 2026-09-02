@@ -40,3 +40,34 @@ cái repo làm mọi thứ đúng nhất**. Nay nó tự nhận biết: repo cò
 2. **Repo cũ vẫn còn bản sao** của `template/` và 4 công cụ. Xoá bên đó cần chủ dự án duyệt —
    chưa làm. Tới lúc đó thì **có hai bản**, và đó đúng là thứ ADR-0002 nói phải tránh.
 3. **Chưa từng migrate một repo thật khác nghề.** Nhãn `0.1.0-unproven` vẫn đúng.
+
+---
+
+## 2026-09-03 · phiên `sua-tai-lieu` — sửa tài liệu theo báo cáo soi
+
+**Làm gì:** chỉ sửa file `.md`. Gộp **ba bản mâu thuẫn** của danh sách "việc phải hỏi Đức" thành
+một bản duy nhất ở `AGENTS.md` mục 2 (`HUONG-DAN.md` và `BAO-TRI-DINH-KY.md` nay chỉ trỏ sang).
+Viết lại `README.md` gốc cho repo nhà — trước đó nó là bản sao từng byte của `template/README.md`,
+tức README của gói phát hành. Sửa hai lệnh trong tài liệu chạy ra lỗi (`npm run claim`,
+`npm run template:overview`). Thêm mục "Trước khi bắt đầu — 30 giây" vào `HUONG-DAN.md`. Thêm 6
+lưu đồ. Bỏ trùng lặp quy trình đóng phiên (giữ một bản ở `workflows/03`).
+
+**Số:** liên kết chết trong tài liệu **2 → 0** · cổng cấu trúc **0 đỏ · 9 vàng (B6)**, y như
+trước khi sửa · `AGENTS.md` 197 dòng (giới hạn 200).
+
+**Lệnh đã chạy thử:** `node --version` (v24.18.0) · `git --version` (2.54.0) · `node
+scripts/claim.mjs --list/--take/--release` · `npm run bootstrap` · `npm run assess` (cả hai dạng,
+có và không có `--`) · `npm run overview` (cả hai dạng) · `npm run init -- --help` ·
+`npm run template -- --check` · `npm run claim` và `npm run template:overview` (đều báo
+`Missing script`, đúng như báo cáo). **Không** chạy `npm run gate` — phiên `harness-vong2` đang
+sửa `session-check.mjs`.
+
+**CÒN MỞ — cần phiên giữ `_code` và `_template` xử:**
+1. **`npm run template -- --check` ném `TRICH_HONG`** vì sửa `AGENTS.md` mục 0–5 làm đổi dấu vân
+   tay luật chung. Vân tay mới: `5fd62e98c32489e7efd24c286e62cf882b2fe4254f00891f66aad03cf20295ed`.
+   Guard tự nói chỉ được cập nhật `COMMON_LAW_SHA256` **khi chủ repo đã duyệt đổi luật chung** —
+   nên đây là việc phải hỏi Đức, không tự làm.
+2. **`STATUS.template.md` vẫn là khuôn của repo Chrome Extension** (bảo đặt file "cạnh
+   `manifest.json`"). Sửa nó sẽ làm `template/` lệch thêm, nên để lại cho phiên giữ `_template`.
+3. **`.repo-structure.json` chú thích lạc hậu:** `_areas_doc2` viết "HAI CHỦ, CỐ Ý" trong khi
+   thực tế đang có bốn chủ (`_root _docs _code _template`).
