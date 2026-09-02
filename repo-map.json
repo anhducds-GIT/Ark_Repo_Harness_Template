@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "b8ad67f",
+  "generated_commit": "d8a9f05",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -32,21 +32,21 @@
       "path": ".",
       "lifecycle": "building",
       "status_md": "STATUS.md",
-      "owner": "claude-template-finish",
-      "next_step": "Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh",
-      "human_action": "Chỉ giúp một repo đang sống, không phải extension, càng nhỏ càng tốt — để thử lửa",
+      "owner": "harness-vong2",
+      "next_step": "Đóng nốt cổng kiểm ở hai repo vừa migrate, rồi mới bỏ được nhãn chưa-chứng-minh",
+      "human_action": "Repo NAV có bộ test cũ đỏ sẵn từ trước khi migrate — quy trình cấm tôi tự dọn nợ cũ. Anh nói một câu: dọn hay để nguyên",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": null,
       "last_verified_commit": null,
-      "open_item": "Bịt các lỗ audit tìm ra, và viết sổ tay cho AI để không trôi cách làm"
+      "open_item": "Vá các lỗ mà hai lần migrate thật và audit độc lập vạch ra — cổng từng báo xanh khi không kiểm được gì"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh",
+      "title": "Đóng nốt cổng kiểm ở hai repo vừa migrate, rồi mới bỏ được nhãn chưa-chứng-minh",
       "rank": 1,
       "claim": null
     }

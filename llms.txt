@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `b8ad67f` (2026-09-03).
+Trang được sinh tại commit `d8a9f05` (2026-09-03).
 
 ## Việc ưu tiên #1
 
-- **_root** — Chạy thử trên một repo thật khác nghề — đó là thứ duy nhất gỡ được nhãn chưa-chứng-minh
+- **_root** — Đóng nốt cổng kiểm ở hai repo vừa migrate, rồi mới bỏ được nhãn chưa-chứng-minh
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `b8ad67f` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): building — Bịt các lỗ audit tìm ra, và viết sổ tay cho AI để không trôi cách làm
+- [ark-repo-harness](STATUS.md): building — Vá các lỗ mà hai lần migrate thật và audit độc lập vạch ra — cổng từng báo xanh khi không kiểm được gì
 
 ## Luật bắt buộc trước khi sửa gì
 
