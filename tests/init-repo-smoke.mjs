@@ -69,7 +69,15 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     assert.notEqual(run.status, 0, "thu muc co noi dung thi phai TU CHOI, khong duoc ghi de");
     assert.match(String(run.stderr), /TU_CHOI/, "phai noi ro vi sao tu choi");
     assert.equal(readFileSync(join(banRon, "viec-cua-toi.txt"), "utf8"), "dung xoa", "file cu phai con NGUYEN VEN");
-    ok("từ chối thư mục đang có nội dung, và không chạm vào file có sẵn");
+    // Và ĐÍCH LÀ MỘT FILE cũng phải là một câu TU_CHOI nói được, không phải một vệt stack Node.
+    // Bản đầu hỏi `existsSync` (true cho cả file) rồi `readdirSync` (ném ENOTDIR). Người gõ nhầm
+    // một đường dẫn nhận về ENOTDIR và không biết mình vừa làm sai cái gì.
+    const motFile = join(banRon, "viec-cua-toi.txt");
+    const runFile = spawnSync(process.execPath, [join(ROOT, "scripts", "init-repo.mjs"), motFile, "--ten", "X"], { encoding: "utf8" });
+    assert.notEqual(runFile.status, 0, "dich la mot FILE thi phai tu choi");
+    assert.match(String(runFile.stderr), /TU_CHOI/, "phai la cau TU_CHOI, khong duoc la stack Node");
+    assert.doesNotMatch(String(runFile.stderr), /ENOTDIR|at Object\./, "khong duoc de lo stack Node ra man hinh");
+    ok("từ chối thư mục đang có nội dung và đích-là-file, không chạm vào file có sẵn");
   } finally { rmSync(banRon, { recursive: true, force: true }); }
 }
 

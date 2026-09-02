@@ -21,6 +21,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { claimPrefixesFrom, ownershipKeys, readStructureFromDisk, unitsFrom } from "../scripts/repo-structure.mjs";
+import { grandfatheredNote } from "../scripts/check-bootstrap.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 let passed = 0;
@@ -153,6 +154,47 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   assert.ok(m, `khong doc duoc so cho DO tu dong tong ket: "${summary}"`);
   assert.equal(Number(m[1]), 0, `cong kiem cau truc con cho DO: "${summary}"`);
   ok("cong kiem cau truc: 0 cho DO tren chinh repo nay");
+}
+
+/* ---- 5. Danh sách miễn trừ phải ĐƯỢC ĐỌC, dù khai kiểu nào ---------------- */
+{
+  // Bản hạt giống khai `"grandfathered": []` (một MẢNG). Bản đọc cũ hỏi `block.paths`, mà mảng
+  // thì không có `.paths` — nên nó luôn đếm 0 và phép kiểm ngược KHÔNG BAO GIỜ CHẠY. Không ném,
+  // không đỏ, không thiếu dòng nào trên màn hình: một phép kiểm đứng đó mà không kiểm gì.
+  const gia = (grandfathered, tracked) => ({
+    fileExists: () => true,
+    readFile: () => JSON.stringify({ grandfathered }),
+    git: { trackedPaths: () => tracked }
+  });
+
+  // (a) hình dạng MẢNG — hình dạng bản hạt giống thật sự dùng
+  {
+    const n = grandfatheredNote(gia(["cu/a.md", "cu/b.md"], ["cu/a.md"]));
+    assert.equal(n.declared, 2, "khai kieu MANG phai duoc dem, dang dem 0 = phep kiem chet");
+    assert.deepEqual(n.gone, ["cu/b.md"], "duong dan da bien mat khoi HEAD phai bi keu ten");
+  }
+
+  // (b) hình dạng KHỐI CÓ `paths` — hình dạng bản đọc cũ mong đợi. Vẫn phải chạy.
+  {
+    const n = grandfatheredNote(gia({ paths: ["cu/a.md"] }, []));
+    assert.equal(n.declared, 1, "khai kieu KHOI cung phai duoc dem");
+    assert.deepEqual(n.gone, ["cu/a.md"]);
+  }
+
+  // (c) hình dạng LẠ — phải KÊU LÊN, không im lặng nhận 0. Im lặng chấp nhận mọi thứ chính là
+  //     cách lỗi này sinh ra lần đầu.
+  {
+    const n = grandfatheredNote(gia("cu/a.md", []));
+    assert.equal(n.declared, 0);
+    assert.ok(n.hinhDangLa, "hinh dang la thi phai bao, khong duoc im lang tra 0");
+  }
+
+  // (d) ĐỐI CHỨNG DƯƠNG: không khai gì thì không có ghi chú, và không được kêu hình dạng lạ.
+  {
+    assert.equal(grandfatheredNote(gia(undefined, [])), null, "khong khai thi khong co ghi chu");
+    assert.equal(grandfatheredNote(gia([], [])).hinhDangLa, null, "mang rong la HOP LE, khong duoc keu");
+  }
+  ok("mien tru vinh vien: doc duoc ca hai hinh dang, hinh dang la thi keu len");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

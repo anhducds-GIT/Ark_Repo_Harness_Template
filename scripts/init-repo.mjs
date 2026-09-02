@@ -50,9 +50,34 @@ export function chuanBiFiles(chuan, { ten, giuPhuLucNghe }) {
   return ra;
 }
 
+/* Ba câu trả lời, không phải hai — vì "đích là một FILE" không giống "đích đang có việc".
+ *
+ * Bản đầu hỏi `existsSync` rồi `readdirSync`. `existsSync` trả true cho cả file, nên chỉ vào một
+ * file làm `readdirSync` ném ENOTDIR và người dùng nhận một vệt stack Node thay vì một câu nói
+ * được. Cùng lối đó với thư mục không đủ quyền đọc (EACCES/EPERM): ném thô.
+ *
+ * Fail-closed: mọi ca không chắc chắn đều trả "KHÔNG DÙNG ĐƯỢC". Lệnh này tạo repo mới; đoán sai
+ * theo hướng dễ dãi là ghi đè việc của người khác, và không lùi lại được. */
+export function trangThaiDich(dich) {
+  let dang;
+  try {
+    dang = fs.statSync(dich);
+  } catch (e) {
+    if (e?.code === "ENOENT") return { dungDuoc: true, ly: "chưa tồn tại" };
+    return { dungDuoc: false, ly: `không xem được: ${String(e?.message ?? e).split(NL)[0]}` };
+  }
+  if (!dang.isDirectory()) return { dungDuoc: false, ly: "đây là một FILE, không phải thư mục" };
+  try {
+    return fs.readdirSync(dich).length === 0
+      ? { dungDuoc: true, ly: "thư mục trống" }
+      : { dungDuoc: false, ly: "thư mục đang có nội dung" };
+  } catch (e) {
+    return { dungDuoc: false, ly: `không đọc được thư mục: ${String(e?.message ?? e).split(NL)[0]}` };
+  }
+}
+
 function thuMucTrong(dich) {
-  if (!fs.existsSync(dich)) return true;
-  return fs.readdirSync(dich).length === 0;
+  return trangThaiDich(dich).dungDuoc;
 }
 
 /* ---- chạy ------------------------------------------------------------------ */
@@ -74,8 +99,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     process.exit(2);
   }
   const root = path.resolve(dich);
-  if (!thuMucTrong(root)) {
-    console.error(`${NL}TU_CHOI: "${root}" đã có nội dung.`);
+  const tt = trangThaiDich(root);
+  if (!tt.dungDuoc) {
+    console.error(`${NL}TU_CHOI: "${root}" — ${tt.ly}.`);
     console.error("Lệnh này TẠO một repo mới nên nó không bao giờ ghi đè — chạy nhầm chỗ thì không lùi được.");
     console.error("Muốn đưa một repo ĐANG CÓ lên chuẩn thì đo trước: node scripts/assess.mjs <đường-dẫn>");
     process.exit(1);

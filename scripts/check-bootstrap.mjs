@@ -682,14 +682,34 @@ export function blockingFailures(checks) {
    của phiên S7) — nên nó được in ra như một ghi chú, không phải một phép kiểm giả. Nhưng một
    danh sách miễn trừ để mục nát cũng là nợ, nên ở đây có kiểm: đường dẫn nào đã biến mất
    khỏi HEAD thì phải nói ra. */
+/* HAI HÌNH DẠNG, VÀ BẢN HẠT GIỐNG DÙNG HÌNH DẠNG MÀ BẢN ĐỌC KHÔNG HIỂU.
+ *
+ * Bản hạt giống khai `"grandfathered": []` — một MẢNG. Bản đọc hỏi `block.paths`. Trên một mảng,
+ * `.paths` là `undefined`, nên `declared` luôn rỗng và phép kiểm ngược KHÔNG BAO GIỜ CHẠY. Một
+ * repo khai 30 đường dẫn miễn trừ vẫn được báo "0 đường dẫn", và danh sách cứ thế mục.
+ *
+ * Đây là kiểu hỏng khó thấy nhất: không ném, không đỏ, không thiếu dòng nào trên màn hình — chỉ
+ * là một phép kiểm đứng đó mà không kiểm gì. Audit độc lập bắt được 03/09.
+ *
+ * Chữa bằng cách nhận CẢ HAI hình dạng, và **kêu lên khi gặp hình dạng thứ ba** — im lặng chấp
+ * nhận mọi thứ chính là cách lỗi này sinh ra lần đầu. */
 export function grandfatheredNote(deps) {
   if (!deps.fileExists(".repo-structure.json")) return null;
   const block = JSON.parse(deps.readFile(".repo-structure.json")).grandfathered;
-  if (!block) return null;
-  const declared = Array.isArray(block.paths) ? block.paths : [];
+  if (block === undefined || block === null) return null;
+
+  let declared;
+  let hinhDangLa = null;
+  if (Array.isArray(block)) declared = block;
+  else if (Array.isArray(block?.paths)) declared = block.paths;
+  else {
+    declared = [];
+    hinhDangLa = Array.isArray(block) ? "mảng" : typeof block;
+  }
+
   const tracked = new Set(deps.git.trackedPaths());
   const gone = declared.filter((relPath) => !tracked.has(relPath));
-  return { declared: declared.length, gone };
+  return { declared: declared.length, gone, hinhDangLa };
 }
 
 export function renderChecks(checks, { showLimit = DEFAULT_SHOW, extras = null } = {}) {
@@ -736,7 +756,11 @@ export function renderChecks(checks, { showLimit = DEFAULT_SHOW, extras = null }
     lines.push(`NGOÀI 14 PHÉP KIỂM: ${extras.drift} chỗ trong STATUS đang gõ tay một con số MÁY SỞ HỮU. Chạy: node scripts/build-dashboard.mjs để xem nguyên văn.`);
   }
   if (extras?.grandfathered) {
-    const { declared, gone } = extras.grandfathered;
+    const { declared, gone, hinhDangLa } = extras.grandfathered;
+    if (hinhDangLa) {
+      lines.push(`  ✗ Khối "grandfathered" đang là ${hinhDangLa} — không đọc được. Phải là một MẢNG đường dẫn, hoặc một khối có trường "paths" là mảng.`);
+      lines.push("        → sửa hình dạng, kẻo phép kiểm đứng đó mà không kiểm gì.");
+    }
     // KHÔNG nói "phiên S7 sẽ dùng" nữa: S7 đã chạy và cố ý KHÔNG dùng khối này. Phép kiểm tên
     // đường dẫn chưa tồn tại trong B1…B15, nên nói nó "sắp được dùng" là hứa hộ một phiên
     // không có thật. Nói đúng cái nó đang làm: kiểm ngược, chống danh sách miễn trừ mục nát.
