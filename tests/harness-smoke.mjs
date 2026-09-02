@@ -87,6 +87,20 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
       assert.doesNotMatch(c1.out, /Không có gì để push/, "co commit cho ma bao khong co gi la fail-open");
       assert.match(c1.out, /hai/, "phai liet ke commit dang cho");
       assert.doesNotMatch(c1.out, /mot/, "chi liet ke phan CHUA day, khong ke lai lich su cu");
+    
+      // (d) DUNG NGOAI `main` -> phai TU CHOI. Day la lo nguy hiem nhat tung tim thay o cong cu
+      // nay: moi phep soi chay tren `origin/main..HEAD`, con cau day cu la `git push origin main`
+      // — tuc nhanh main TREN MAY. Dung o nhanh khac thi hai thu do la hai lich su khac nhau:
+      // soi mot dang, day mot neo. Cong cu sinh ra de chan "day kem viec nguoi khac" lai co the
+      // tu lam dung viec do. Audit doc lap bat duoc 03/09.
+      at("checkout", "-q", "-b", "nhanh-khac");
+      writeFileSync(join(temp, "c.txt"), "rieng", "utf8");
+      at("add", "-A"); at("commit", "-q", "-m", "ba");
+      const d1 = chay();
+      assert.match(d1.out, /TU_CHOI/, "dung ngoai main thi phai TU CHOI, khong duoc am tham day nhanh main tren may");
+      assert.match(d1.out, /nhanh-khac/, "phai noi ro dang dung o nhanh nao");
+      assert.notEqual(d1.status, 0, "tu choi thi ma thoat phai khac 0");
+      at("checkout", "-q", "main");
     } finally { rmSync(bare, { recursive: true, force: true }); }
 
     ok("đẩy an toàn: lần đầu · bằng nhau · đi trước — cả ba nói đúng, không ca nào im lặng");
