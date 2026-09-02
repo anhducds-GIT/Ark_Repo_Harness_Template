@@ -48,7 +48,9 @@ const check = (name, fn) => {
 
 /* ---- những gì đã thay đổi trong phiên này ------------------------------- */
 // "Phiên này" = mọi thứ chưa có trên origin/main: commit chưa push + working tree.
-const porcelain = git("status", "--porcelain").split("\n").filter(Boolean);
+// `--untracked-files=all` bắt Git liệt kê FILE thật. Mặc định Git co cả thư mục mới thành
+// `?? evidence/`, khiến phép bản đồ không thể biết đường dẫn file nào cần được khai.
+const porcelain = git("status", "--porcelain", "--untracked-files=all").split("\n").filter(Boolean);
 const workingChanges = porcelain.map((line) => ({ code: line.slice(0, 2).trim(), file: line.slice(3).replace(/^"|"$/g, "") }));
 const unpushed = git("diff", "--name-only", "origin/main...HEAD").split("\n").filter(Boolean);
 const touched = [...new Set([...workingChanges.map((c) => c.file), ...unpushed])];
@@ -76,6 +78,21 @@ const touched = [...new Set([...workingChanges.map((c) => c.file), ...unpushed])
 // nạp — mọi phiên, mọi lệnh, không riêng ca nào. Đo được 03/09: `session-check.mjs --as`
 // bất kỳ đều chết ở dòng đầu tiên dùng nó.
 const originMainResolves = git("rev-parse", "--verify", "origin/main").trim() !== "";
+
+// Trạng thái của CẢ PHIÊN, không chỉ cây làm việc. `git status` không thấy file đã commit;
+// so thẳng origin/main → working tree thì thấy cả commit chưa push, staged và unstaged.
+// `--no-renames` cố ý tách rename thành xoá file cũ + thêm file mới: trong vùng append-only,
+// đổi tên file cũ vẫn là xoá bằng chứng cũ và phải bị chặn.
+const parseNameStatus = (text) => String(text ?? "").split("\n").filter(Boolean).map((line) => {
+  const [code, ...parts] = line.split("\t");
+  return { code, file: parts.join("\t").replace(/^"|"$/g, "") };
+});
+const comparedChanges = originMainResolves
+  ? parseNameStatus(git("diff", "--name-status", "--no-renames", "origin/main"))
+  : [];
+const sessionChanges = originMainResolves
+  ? [...comparedChanges, ...workingChanges.filter((c) => c.code === "??")]
+  : workingChanges;
 
 const workingFiles = new Set(workingChanges.map((c) => c.file));
 const nhanCuaFile = new Map();                       // file -> tập nhãn đã chạm nó (null = không nhãn)
@@ -237,9 +254,14 @@ check("Phạm vi trách nhiệm", () => {
 
 /* ---- 2. Vùng bằng chứng ------------------------------------------------- */
 check("Vùng bằng chứng không bị sửa", () => {
-  const protectedRe = /(^|\/)(pilot-[^/]*|Pilot-[^/]*|Batch-[^/]*|evidence)\//i;
-  // Thêm mới (A/??) thì được; Sửa (M) hoặc Xoá (D) thì không.
-  const violations = workingChanges.filter((c) => mine(c.file) && protectedRe.test(c.file) && /[MDR]/.test(c.code));
+  // Nguồn sự thật là `.repo-structure.json`, không phải tên thư mục mà code đoán. Một repo
+  // khai `records/` append-only thì `records/` phải được bảo vệ y như `evidence/`.
+  const appendOnlyPrefixes = Object.entries(structure?.areas ?? {})
+    .filter(([key, area]) => !key.startsWith("_") && area?.mutability === "append-only")
+    .map(([key]) => key.replaceAll("\\", "/"));
+  const inAppendOnlyArea = (file) => appendOnlyPrefixes.some((prefix) => file.startsWith(prefix));
+  // Thêm mới (A/??) thì được; sửa, xoá hoặc đổi tên file đã có thì không.
+  const violations = sessionChanges.filter((c) => mine(c.file) && inAppendOnlyArea(c.file) && /[MDR]/.test(c.code));
   if (violations.length) return { ok: false, msg: `Sửa/xoá bằng chứng vận hành: ${violations.map((v) => v.file).join(", ")}. Chỉ được THÊM mới.` };
   return { ok: true, msg: "Bằng chứng cũ nguyên vẹn." };
 });
@@ -264,8 +286,20 @@ check("Không có secret lọt vào repo", () => {
 
 /* ---- 4. File mới phải khai vào Bản đồ file ------------------------------ */
 check("File mới đã khai vào Bản đồ file", () => {
-  const added = workingChanges.filter((c) => /^(A|\?\?)/.test(c.code)).map((c) => c.file).filter(mine);
+  const added = sessionChanges.filter((c) => /^(A|\?\?)/.test(c.code)).map((c) => c.file).filter(mine);
   const undeclared = [];
+  const mapSection = (text) => {
+    const lines = String(text ?? "").replaceAll("\r", "").split("\n");
+    const start = lines.findIndex((line) => /^## 6\./.test(line));
+    const end = lines.findIndex((line, index) => index > start && /^## 7\./.test(line));
+    return start >= 0 && end > start ? lines.slice(start, end).join("\n") : "";
+  };
+  const mentionsExactPath = (text, relPath) => {
+    const escaped = relPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Chấp nhận link Markdown, inline-code hoặc lệnh có chứa đúng đường dẫn. Hai biên cấm
+    // `scripts/` tự nhận vơ mọi file con chỉ vì cùng tiền tố.
+    return new RegExp(`(^|[\\s(\\[{\"'\\x60|])${escaped}(?=$|[\\s)\\]}\"'\\x60|,.:;])`, "m").test(text);
+  };
   for (const file of added) {
     // Thư mục đơn vị lấy theo hình dạng đã khai, không đóng cứng `workers/<gói>/<phiên-bản>`.
     const pkgDir = unitDirOf(file, unitShape);
@@ -276,10 +310,9 @@ check("File mới đã khai vào Bản đồ file", () => {
     const agentsPath = path.join(ROOT, base, "AGENTS.md");
     if (!fs.existsSync(agentsPath)) continue;
     const rest = pkgDir ? file.slice(pkgDir.length + 1) : file;
-    const topLevel = rest.split("/")[0];
-    if (!topLevel || topLevel === "AGENTS.md") continue;
-    const map = fs.readFileSync(agentsPath, "utf8");
-    if (!map.includes(topLevel)) undeclared.push(base ? `${base}/${topLevel}` : topLevel);
+    if (!rest || rest === "AGENTS.md") continue;
+    const map = mapSection(fs.readFileSync(agentsPath, "utf8"));
+    if (!mentionsExactPath(map, rest)) undeclared.push(file);
   }
   const unique = [...new Set(undeclared)];
   if (unique.length) return { ok: false, msg: `Chưa khai vào Bản đồ file của package: ${unique.join(", ")}. Không khai = không tồn tại (luật gốc).` };

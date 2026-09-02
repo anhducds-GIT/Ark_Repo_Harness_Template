@@ -19,6 +19,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -330,9 +331,12 @@ function phanLuatChung(text) {
   return text.slice(0, dau) + text.slice(cuoi);
 }
 
-/* Dùng để phân biệt "luật đã ở dạng chung" với "luật đã bị đổi lời". Hai ca đó trông giống hệt
-   nhau từ phía bảng NGHE — cả hai đều khớp 0 lần — nhưng một cái vô hại và một cái là mất luật. */
-const NGHE_TU_VUNG = /selector|dom_probe|innerHTML|outerHTML|insertAdjacentHTML|Bridge|pilot-|Pilot-|Batch-|trang thật/;
+/* Dấu vân tay của TOÀN BỘ phần luật chung sau khi đã tách luật-nghề. Mục 6 cố ý không tính vì đó
+   là bản đồ địa phương của từng repo. Khác regex từ vựng hữu hạn, phép so này bắt MỌI thay đổi:
+   thêm một luật nghề dùng từ chưa từng biết, đổi lời một luật cũ, hoặc làm mất một luật chung.
+   Khi Đức duyệt đổi luật chung thật, người sửa phải cập nhật dấu vân tay cùng fixture tương ứng. */
+const COMMON_LAW_SHA256 = "4cddf2fc0f418a5d616bab80fef0c4050162439fe07b85abf7441d82c2d05fd1";
+const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
   // Chuẩn hoá xuống dòng TRƯỚC khi so. AGENTS.md trên máy Windows là CRLF, còn các đoạn thay ở
@@ -350,16 +354,12 @@ export function stripNghe(text) {
   // nghề thì đó là ca thứ hai, và phải ném.
   const soKhop = NGHE.filter(([from]) => out.split(from).length === 2).length;
   if (soKhop === 0) {
-    // Soi ĐÚNG PHẠM VI mình chịu trách nhiệm. Mục 6 là bản đồ địa phương và sẽ bị cắt ở bước
-    // sau, nên từ vựng nghề trong đó KHÔNG phải việc của hàm này. Bản đầu soi cả file và báo
-    // động nhầm 4 dòng — tất cả đều nằm gọn trong mục 6. Phép kiểm bắt được ngay lần chạy đầu.
-    const chung = phanLuatChung(out);
-    if (NGHE_TU_VUNG.test(chung)) {
+    if (commonLawHash(out) !== COMMON_LAW_SHA256) {
       throw new Error(
-        "TRICH_HONG: không phép thay luật-nghề nào khớp, NHƯNG luật vẫn còn từ vựng nghề " +
-        `(${chung.split(String.fromCharCode(10)).filter((d) => NGHE_TU_VUNG.test(d)).length} dòng). ` +
-        "Nghĩa là AGENTS.md đã đổi lời và bảng NGHE trượt hết — sửa bảng cho khớp. " +
-        "Bỏ qua là để luật của một nghề lọt vào bộ khung của mọi repo khác."
+        "TRICH_HONG: không phép thay luật-nghề nào khớp, nhưng toàn bộ phần luật chung không " +
+        "khớp dấu vân tay đã duyệt. Có luật bị đổi/mất hoặc luật nghề mới vừa lọt vào — " +
+        "cập nhật bảng NGHE; chỉ cập nhật COMMON_LAW_SHA256 khi chủ repo đã duyệt đổi luật chung." +
+        `${String.fromCharCode(10)}Vân tay hiện tại: ${commonLawHash(out)}`
       );
     }
     return out;   // luật đã ở dạng chung — không có gì để tách
@@ -382,6 +382,13 @@ export function stripNghe(text) {
       );
     }
     out = parts.join(to);
+  }
+  if (commonLawHash(out) !== COMMON_LAW_SHA256) {
+    throw new Error(
+      "TRICH_HONG: tách đủ các luật-nghề đã biết nhưng phần luật chung sau tách vẫn khác dấu " +
+      "vân tay đã duyệt. Có thay đổi ngoài bảng NGHE; dừng để không phát tán luật sai nghề." +
+      `${String.fromCharCode(10)}Vân tay hiện tại: ${commonLawHash(out)}`
+    );
   }
   return out;
 }

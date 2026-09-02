@@ -15,7 +15,7 @@
  */
 
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -26,6 +26,71 @@ let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 
 const files = buildTemplateFiles();
+
+/* Dựng repo thật có origin/main để các fixture của cổng đo được cả commit chưa push. Mỗi ca
+   dùng một repo + bare remote riêng; không mượn trạng thái Git của repo đang chạy suite. */
+function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, body) {
+  const tempRoot = mkdtempSync(join(tmpdir(), "khoi-a-gate-"));
+  const bare = mkdtempSync(join(tmpdir(), "khoi-a-bare-"));
+  const label = "khoi-a-fixture";
+  try {
+    const fixture = new Map(files);
+    const structure = JSON.parse(fixture.get(".repo-structure.json"));
+    if (!structure.areas[area]) {
+      structure.areas[area] = {
+        steward: "_root", mutability: "append-only", ownership_mode: "root", note: "fixture"
+      };
+    }
+    fixture.set(".repo-structure.json", JSON.stringify(structure, null, 2) + "\n");
+
+    const claims = JSON.parse(fixture.get(".agents/claims.json"));
+    claims.claims._root.owner = label;
+    claims.claims._root.task = "fixture Khoi A";
+    fixture.set(".agents/claims.json", JSON.stringify(claims, null, 2) + "\n");
+
+    if (declared.length) {
+      const rows = declared.map((rel) => `| Fixture Khoi A | \`${rel}\` |`).join("\n");
+      fixture.set("AGENTS.md", fixture.get("AGENTS.md").replace("\n## 7.", `\n${rows}\n\n## 7.`));
+    }
+    for (const [rel, content] of fixture) {
+      const abs = join(tempRoot, ...rel.split("/"));
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, content, "utf8");
+    }
+    if (oldFile) {
+      const abs = join(tempRoot, ...oldFile.split("/"));
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, "ban goc\n", "utf8");
+    }
+
+    const gitAt = (...args) => execFileSync("git", ["-c", "core.quotepath=false", ...args], { cwd: tempRoot, encoding: "utf8" });
+    gitAt("init", "-q", "-b", "main");
+    gitAt("config", "user.name", "Khoi A Fixture");
+    gitAt("config", "user.email", "khoi-a@example.invalid");
+    gitAt("config", "core.autocrlf", "false");
+    gitAt("add", ".");
+    gitAt("commit", "-q", "-m", "baseline fixture");
+    execFileSync(process.execPath, [join(tempRoot, "scripts", "build-dashboard.mjs")], { cwd: tempRoot, encoding: "utf8" });
+    gitAt("add", "DASHBOARD.md", "llms.txt", "repo-map.json");
+    gitAt("commit", "-q", "-m", "baseline generated artifacts");
+    execFileSync("git", ["init", "-q", "--bare", "-b", "main", bare], { encoding: "utf8" });
+    gitAt("remote", "add", "origin", bare);
+    gitAt("push", "-q", "-u", "origin", "main");
+
+    const runGate = () => {
+      const result = spawnSync(process.execPath,
+        [join(tempRoot, "scripts", "session-check.mjs"), "--as", label, "--quick"],
+        { cwd: tempRoot, encoding: "utf8" });
+      return { status: result.status, out: String(result.stdout || "") + String(result.stderr || "") };
+    };
+    body({ tempRoot, gitAt, runGate, label });
+  } finally {
+    assert.ok(tempRoot.startsWith(join(tmpdir(), "khoi-a-gate-")), "chi don repo fixture Khoi A");
+    assert.ok(bare.startsWith(join(tmpdir(), "khoi-a-bare-")), "chi don bare fixture Khoi A");
+    rmSync(tempRoot, { recursive: true, force: true });
+    rmSync(bare, { recursive: true, force: true });
+  }
+}
 
 /* ---- 1. Không mang tên riêng của repo gốc -------------------------------- */
 {
@@ -195,7 +260,80 @@ const files = buildTemplateFiles();
   const doiLoi = daChung + String.fromCharCode(10) + "- Khong bao gio gan `.innerHTML` cho node nao." + String.fromCharCode(10);
   assert.throws(() => stripNghe(doiLoi), /TRICH_HONG/,
     "con tu vung nghe ma khong phep thay nao khop thi phai NEM");
-  ok("tách luật-nghề: tách được · tách lại là không-làm-gì · đổi lời thì ném");
+
+  // A4: dựng đúng ca mà regex hữu hạn cũ KHÔNG THỂ thấy — một luật nghề mới không chứa bất kỳ
+  // từ nào trong danh sách selector/Bridge/pilot/DOM. Dấu vân tay toàn phần vẫn phải bắt nó.
+  const ngheNgoaiTuVung = daChung + String.fromCharCode(10)
+    + "- Moi ban ve ket cau phai duoc kien truc su ky xac nhan." + String.fromCharCode(10);
+  assert.throws(() => stripNghe(ngheNgoaiTuVung), /TRICH_HONG/,
+    "luat nghe dung tu NGOAI danh sach van phai NEM, khong duoc lot sang moi repo");
+  ok("tách luật-nghề: tách được · tách lại không đổi · mọi luật lạ ngoài Mục 6 đều bị chặn");
+}
+
+/* ---- 2e. Khối A: ba fixture Git thật cho cổng đóng phiên ------------------- */
+{
+  // A1 — file evidence cũ bị sửa rồi COMMIT. `git status` lúc này sạch; chỉ phép so với
+  // origin/main mới dựng nổi ca hỏng đã xác nhận trong roadmap.
+  withGateRepo({ oldFile: "evidence/old.txt" }, ({ tempRoot, gitAt, runGate, label }) => {
+    writeFileSync(join(tempRoot, "evidence", "old.txt"), "da bi sua va commit\n", "utf8");
+    gitAt("add", "evidence/old.txt");
+    gitAt("commit", "-q", "-m", `pha evidence da commit\n\nLane: ${label}`);
+    const result = runGate();
+    assert.notEqual(result.status, 0, "A1: sua evidence da commit phai lam cong DO");
+    assert.match(result.out, /Sửa\/xoá bằng chứng vận hành: evidence\/old\.txt/,
+      "A1: cong phai chi dung file evidence cu da commit");
+  });
+
+  // Đối chứng: thêm file mới trong cùng vùng append-only là hợp lệ. Khai chính đường dẫn trong
+  // bản đồ từ baseline để phép A3 không che kết quả của phép evidence.
+  withGateRepo({ declared: ["evidence/new.txt"] }, ({ tempRoot, runGate }) => {
+    mkdirSync(join(tempRoot, "evidence"), { recursive: true });
+    writeFileSync(join(tempRoot, "evidence", "new.txt"), "them moi\n", "utf8");
+    const result = runGate();
+    assert.equal(result.status, 0, "them evidence moi da khai phai duoc phep:\n" + result.out);
+    assert.match(result.out, /\[XANH\] Vùng bằng chứng không bị sửa/,
+      "doi chung A1 phai di qua nhanh XANH cua chinh gate evidence");
+  });
+
+  // A2 — tên `records/` không có trong regex cũ. Chỉ cấu hình mutability mới nói đây là vùng
+  // append-only; sửa file cũ rồi commit phải bị bắt y như evidence/.
+  withGateRepo({ area: "records/", oldFile: "records/old.txt" }, ({ tempRoot, gitAt, runGate, label }) => {
+    writeFileSync(join(tempRoot, "records", "old.txt"), "da bi sua va commit\n", "utf8");
+    gitAt("add", "records/old.txt");
+    gitAt("commit", "-q", "-m", `pha records da commit\n\nLane: ${label}`);
+    const result = runGate();
+    assert.notEqual(result.status, 0, "A2: records append-only bi sua phai lam cong DO");
+    assert.match(result.out, /Sửa\/xoá bằng chứng vận hành: records\/old\.txt/,
+      "A2: cong phai doc records tu mutability trong cau hinh");
+  });
+
+  withGateRepo({ area: "records/", declared: ["records/new.txt"] }, ({ tempRoot, runGate }) => {
+    mkdirSync(join(tempRoot, "records"), { recursive: true });
+    writeFileSync(join(tempRoot, "records", "new.txt"), "them moi\n", "utf8");
+    const result = runGate();
+    assert.equal(result.status, 0, "them records moi da khai phai duoc phep:\n" + result.out);
+    assert.match(result.out, /\[XANH\] Vùng bằng chứng không bị sửa/,
+      "doi chung A2 phai di qua nhanh XANH cua chinh gate append-only");
+  });
+
+  // A3 — AGENTS có nhiều chữ `scripts/`, nhưng không có đường dẫn file lạ này trong Mục 6.
+  withGateRepo({}, ({ tempRoot, runGate }) => {
+    writeFileSync(join(tempRoot, "scripts", "cong-cu-la.mjs"), "export {};\n", "utf8");
+    const result = runGate();
+    assert.notEqual(result.status, 0, "A3: file moi chua khai duong dan phai lam cong DO");
+    assert.match(result.out, /Chưa khai vào Bản đồ file[^\n]*scripts\/cong-cu-la\.mjs/,
+      "A3: phai bao DUNG duong dan, khong duoc chap nhan moi ten thu muc scripts");
+  });
+
+  withGateRepo({ declared: ["scripts/cong-cu-la.mjs"] }, ({ tempRoot, runGate }) => {
+    writeFileSync(join(tempRoot, "scripts", "cong-cu-la.mjs"), "export {};\n", "utf8");
+    const result = runGate();
+    assert.equal(result.status, 0, "A3: khai dung duong dan trong Muc 6 thi file moi phai duoc chap nhan:\n" + result.out);
+    assert.match(result.out, /\[XANH\] File mới đã khai vào Bản đồ file/,
+      "doi chung A3 phai di qua nhanh XANH cua chinh gate ban do");
+  });
+
+  ok("Khối A gate: commit evidence · mutability records · đường dẫn thật — đều có ca hỏng và đối chứng");
 }
 
 /* ---- 3. Repo rỗng + bộ khung → cổng kiểm KHÔNG có chỗ đỏ ------------------ */
