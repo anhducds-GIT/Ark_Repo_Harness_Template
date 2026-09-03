@@ -122,4 +122,31 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   } finally { rmSync(dirname(dich), { recursive: true, force: true }); }
 }
 
+/* ---- Máy chưa khai danh tính git: dừng SỚM, không dựng nửa chừng ---------- */
+{
+  // Lệnh này tự commit hai lần. Máy sạch chưa khai `user.name`/`user.email` thì git từ chối ở
+  // đúng commit đầu — SAU KHI đã ghi cả bộ khung ra đĩa. Người dùng nhận một repo dở dang và
+  // một thông báo của git không nhắc gì tới bộ khung.
+  //
+  // Không máy phát triển nào bắt được ca này: máy nào cũng đã khai danh tính từ lâu. CI trên
+  // GitHub bắt được ngay lượt chạy đầu tiên — và người dùng thật thì đúng là đang ngồi trên
+  // một máy sạch như thế.
+  const cha = mkdtempSync(join(tmpdir(), "init-vodanh-"));
+  const dich = join(cha, "repo-moi");
+  try {
+    const run = spawnSync(process.execPath, [join(ROOT, "scripts", "init-repo.mjs"), dich, "--ten", "Thu"], {
+      cwd: cha,
+      encoding: "utf8",
+      // Cắt git khỏi mọi cấu hình sẵn có — đây là cách dựng lại "máy sạch" mà không đụng vào máy thật.
+      env: { ...process.env, GIT_CONFIG_GLOBAL: join(cha, "khong-co-that"), GIT_CONFIG_SYSTEM: join(cha, "khong-co-that"),
+             GIT_AUTHOR_NAME: "", GIT_AUTHOR_EMAIL: "", GIT_COMMITTER_NAME: "", GIT_COMMITTER_EMAIL: "" }
+    });
+    assert.notEqual(run.status, 0, "chua khai danh tinh git thi phai DUNG");
+    assert.match(String(run.stderr), /THIEU_DANH_TINH_GIT/, "phai noi ro thieu gi, khong de git tu noi");
+    assert.match(String(run.stderr), /git config --global user\.name/, "phai chi luon lenh de sua");
+    assert.ok(!existsSync(dich), "dung SOM nghia la KHONG duoc ghi mot file nao ra dia");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("máy chưa khai danh tính git → dừng sớm, chưa ghi file nào, và nói rõ cách sửa");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

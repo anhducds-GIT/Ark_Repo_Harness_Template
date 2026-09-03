@@ -14,6 +14,7 @@
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -105,6 +106,33 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     console.error("Lệnh này TẠO một repo mới nên nó không bao giờ ghi đè — chạy nhầm chỗ thì không lùi được.");
     console.error("Muốn đưa một repo ĐANG CÓ lên chuẩn thì đo trước: node scripts/assess.mjs <đường-dẫn>");
     process.exit(1);
+  }
+
+  /* HỎI GIT XEM NÓ BIẾT BẠN LÀ AI — TRƯỚC KHI GHI FILE NÀO.
+   *
+   * Lệnh này tự commit hai lần. Máy chưa khai `user.name` / `user.email` thì git từ chối ở ĐÚNG
+   * commit đầu, tức là sau khi đã ghi cả bộ khung ra đĩa: repo dựng nửa chừng, thoát khác 0, và
+   * lời giải thích duy nhất là thông báo của git — không nhắc gì tới bộ khung, nên người dùng
+   * không biết chuyện gì vừa hỏng hay dọn thế nào.
+   *
+   * Bắt được nhờ CI, không phải nhờ máy ai: mọi máy phát triển đều đã khai danh tính từ lâu, nên
+   * cái bẫy này vô hình ở địa phương. Máy sạch mới thấy — và người dùng thật thì đúng là đang
+   * ngồi trên một máy sạch.
+   *
+   * KHÔNG tự đặt danh tính hộ. Commit mang tên do máy bịa là gán việc cho một người không có
+   * thật, và cả bộ khung này dựa vào chuyện quy đúng ai làm gì. */
+  for (const truong of ["user.name", "user.email"]) {
+    let co = "";
+    // Hỏi từ một thư mục TRUNG LẬP. Chạy trong repo hiện tại thì git trả lời bằng cấu hình
+    // local của repo đó — mà repo mới sắp dựng không thừa kế nó, nên câu trả lời sẽ đúng cho
+    // chỗ này và sai cho chỗ kia.
+    try { co = execFileSync("git", ["config", "--get", truong], { cwd: os.tmpdir(), encoding: "utf8" }).trim(); } catch { /* chưa khai */ }
+    if (co) continue;
+    console.error(`${NL}THIEU_DANH_TINH_GIT: git chưa biết \`${truong}\` của bạn, mà lệnh này phải commit.`);
+    console.error("Chưa ghi file nào — khai xong chạy lại là xong:");
+    console.error(`  git config --global user.name "Tên bạn"`);
+    console.error(`  git config --global user.email "email@cua.ban"${NL}`);
+    process.exit(2);
   }
 
   const files = chuanBiFiles(buildTemplateFiles(), { ten, giuPhuLucNghe });

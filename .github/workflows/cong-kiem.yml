@@ -36,6 +36,14 @@ jobs:
 
       # Bộ khung không có dependency. Không `npm ci` — không có gì để cài, và một bước cài
       # thừa chỉ tạo thêm một chỗ để hỏng.
+      # `init-repo.mjs` commit thật, nên máy chạy phải có danh tính git — cái runner này là một
+      # người dùng thật của bộ khung, không phải ngoại lệ. Nó KHÔNG che lỗi: `init-repo` nay dừng
+      # sớm và nói rõ khi thiếu, và có một phép kiểm dựng lại đúng ca máy sạch đó.
+      - name: Danh tính git cho runner
+        run: |
+          git config --global user.name "cong-kiem"
+          git config --global user.email "cong-kiem@ark.invalid"
+
       - name: Bộ phép kiểm
         run: npm test
 

@@ -175,3 +175,13 @@ sửa `session-check.mjs`.
    trong Settings của GitHub, quyền của Đức), và phép kiểm secret chưa chạy trên CI — bật Secret
    scanning + Push protection của GitHub thì tốt hơn regex của mình, vì nó chặn ngay lúc push.
 
+ - **2026-09-03 · `harness-vong2` · CI ĐỎ NGAY LƯỢT ĐẦU, VÀ ĐÓ LÀ LỖI THẬT** — `init-repo.mjs`
+   tự commit hai lần, nên trên máy chưa khai `user.name`/`user.email` git từ chối ở đúng commit
+   đầu — **sau khi** đã ghi cả bộ khung ra đĩa: repo dựng nửa chừng, thông báo duy nhất là của
+   git và không nhắc gì tới bộ khung. Không máy phát triển nào bắt được (máy nào cũng khai danh
+   tính từ lâu), mà người dùng thật thì đúng là ngồi trên máy sạch. Nay dừng sớm với
+   `THIEU_DANH_TINH_GIT`, chỉ luôn hai lệnh sửa, **chưa ghi file nào**. Phép kiểm dựng lại máy
+   sạch bằng `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` trỏ vào chỗ không tồn tại. v1.2.2, suite 62.
+   Bài học: CI không kiểm giỏi hơn cổng đóng phiên — nó chỉ chạy ở **một chỗ khác**, và chỗ khác
+   đó là chỗ duy nhất giống máy người dùng.
+

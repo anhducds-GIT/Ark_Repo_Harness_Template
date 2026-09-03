@@ -3,6 +3,24 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.2 — 2026-09-03 — CI vừa bật đã bắt được một cái bẫy vô hình ở địa phương
+
+Lượt chạy CI đầu tiên **đỏ ngay**, và nó đỏ vì một lỗi thật, không phải vì cấu hình CI:
+`init-repo.mjs` tự commit hai lần, nên trên một máy chưa khai `user.name` / `user.email`
+git từ chối ở đúng commit đầu — **sau khi** đã ghi cả bộ khung ra đĩa. Người dùng nhận một
+repo dựng nửa chừng và một thông báo của git không nhắc gì tới bộ khung.
+
+Không máy phát triển nào bắt được ca này: máy nào cũng đã khai danh tính từ lâu, nên cái bẫy
+vô hình ở địa phương. **Mà người dùng thật thì đúng là đang ngồi trên một máy sạch** — tức là
+đúng đối tượng của lệnh này lại là đúng người gặp lỗi.
+
+Nay `init-repo` hỏi git trước khi ghi file nào: thiếu thì `THIEU_DANH_TINH_GIT`, chỉ luôn hai
+lệnh để sửa, và **không ghi một file nào**. Không tự đặt danh tính hộ — commit mang tên do máy
+bịa là gán việc cho một người không có thật. Phép kiểm dựng lại đúng máy sạch bằng
+`GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` trỏ vào chỗ không tồn tại.
+
+Đây là lý do CI đáng có: nó không kiểm giỏi hơn cổng đóng phiên, nó chỉ chạy ở **một chỗ khác**.
+
 ## 1.2.1 — 2026-09-03 — Ba cửa v1.2 mở toang, và một lệnh tự quên
 
 Audit độc lập vòng sau đọc lại chính bốn cửa vừa dựng, và **ba cái không đóng**. Cả ba đều
