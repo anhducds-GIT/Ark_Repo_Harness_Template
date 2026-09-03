@@ -4,7 +4,7 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `7fbb179` (2026-09-03).
+Trang được sinh tại commit `ac6db6c` (2026-09-03).
 
 ## Việc ưu tiên #1
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `7fbb179` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.2.5: sổ phát hành thôi tự làm chứng cho chính nó — mọi bản đã phát đối chiếu với HEAD
+- [ark-repo-harness](STATUS.md): active — v1.2.6: nhân chứng của sổ phát hành là lịch sử git, không phải HEAD
 
 ## Luật bắt buộc trước khi sửa gì
 
