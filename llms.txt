@@ -4,7 +4,7 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `b89bfb0` (2026-09-03).
+Trang được sinh tại commit `7e18515` (2026-09-03).
 
 ## Việc ưu tiên #1
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `b89bfb0` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.2.1: ba cửa của v1.2 chỉ nói mà không chặn, nay chặn thật
+- [ark-repo-harness](STATUS.md): active — v1.2.2: CI vừa bật đã bắt được một cái bẫy chỉ hiện ra trên máy sạch
 
 ## Luật bắt buộc trước khi sửa gì
 

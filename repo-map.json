@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "b89bfb0",
+  "generated_commit": "7e18515",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -39,7 +39,7 @@
       "superseded_by": null,
       "last_verified": "2026-09-03",
       "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
-      "open_item": "v1.2.1: ba cửa của v1.2 chỉ nói mà không chặn, nay chặn thật; và có CI trên GitHub"
+      "open_item": "v1.2.2: CI vừa bật đã bắt được một cái bẫy chỉ hiện ra trên máy sạch"
     }
   ],
   "active_work": [
