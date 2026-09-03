@@ -3,6 +3,37 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.7 — 2026-09-03 — Lỗ thứ tư cùng một hình dạng, trong chính vòng đọc nhân chứng
+
+v1.2.6 đi tìm nhân chứng bằng cách duyệt lịch sử và giữ giá trị đầu tiên của mỗi khoá. Bên
+trong vòng duyệt ấy:
+
+```js
+try { ban = JSON.parse(git("show", `${sha}:${SO_PHAT_HANH}`)).ban ?? {}; } catch { continue; }
+```
+
+Một commit nhân chứng đọc không nổi thì **bị bỏ qua im lặng**, và một commit **muộn hơn** được
+nhận làm "lần đầu". Tức là nhân chứng bị thay mà kết quả vẫn `NGUYÊN VẸN` — đúng cái mà cả cơ
+chế này sinh ra để chặn.
+
+Đây là lần thứ **tư** trong một ngày cùng một hình dạng: `catch` rồi trả một giá trị "trống".
+v1.2.1 (sổ ghim) → v1.2.5 (sổ phát hành) → v1.2.6 (git hỏng) → v1.2.7 (từng commit nhân chứng).
+
+Chỗ khó là hai lý do **khác hẳn nhau** rơi vào cùng một `catch`:
+
+| Ở commit đó | Nghĩa | Phải làm |
+|---|---|---|
+| file **chưa có** (hoặc commit đó **xoá** nó) | hợp lệ — `git log -- <file>` kể cả commit xoá | bỏ qua |
+| file **có** mà đọc không nổi / sai schema | KHÔNG BIẾT | dừng, nêu đúng commit nào |
+
+`git cat-file -e` trả lời đúng câu đầu, nên tách được. Có đối chứng dương: một lịch sử sạch có
+commit xoá rồi tạo lại vẫn phải `NGUYÊN VẸN` — không thì một lần lỡ tay xoá là khoá vĩnh viễn
+cả bộ khung.
+
+**Fixture của tôi cũng suýt xanh vì lý do sai.** Lượt đầu tôi nhét hai kiểu hỏng vào cùng một
+lịch sử, mà vòng duyệt dừng ở commit hỏng ĐẦU TIÊN nên không bao giờ tới kiểu thứ hai — đột
+biến "bỏ phép kiểm schema" vẫn xanh. Nay mỗi kiểu một kho riêng. Suite 73.
+
 ## 1.2.6 — 2026-09-03 — Nhân chứng phải là lịch sử, không phải HEAD
 
 v1.2.5 cho sổ phát hành một nhân chứng: bản sổ nằm trong `HEAD`. Audit độc lập chỉ ngay chỗ

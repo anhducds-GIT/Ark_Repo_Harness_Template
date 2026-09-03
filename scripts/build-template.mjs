@@ -794,8 +794,27 @@ export function soVoiLichSu(root = ROOT) {
    * được trong cùng một thao tác — muốn đổi phải viết lại lịch sử, và viết lại lịch sử thì thấy. */
   const nhanChung = new Map();
   for (const sha of commits) {
+    /* HAI LÝ DO KHÁC HẲN NHAU, và gộp chúng là lỗ thứ tư cùng một hình dạng.
+     *
+     * Commit trong danh sách này là commit CHẠM tới file — kể cả commit XOÁ nó. Ở commit xoá thì
+     * file không tồn tại, và bỏ qua là đúng. Nhưng "đọc không nổi" cũng rơi vào cùng một `catch`,
+     * và bỏ qua ca đó thì một commit MUỘN HƠN được nhận làm "lần đầu" — tức nhân chứng bị thay
+     * mà kết quả vẫn NGUYÊN VẸN. Chính cái mà cả cơ chế này sinh ra để chặn.
+     *
+     * `cat-file -e` trả lời đúng một câu: đường dẫn đó CÓ tồn tại ở commit này không. Có mà đọc
+     * không nổi thì là KHÔNG BIẾT, và không biết thì dừng. */
+    try { git("cat-file", "-e", `${sha}:${SO_PHAT_HANH}`); }
+    catch { continue; }                       // file chưa có (hoặc đã bị xoá) ở commit này — bỏ qua hợp lệ
+
     let ban;
-    try { ban = JSON.parse(git("show", `${sha}:${SO_PHAT_HANH}`)).ban ?? {}; } catch { continue; }
+    try {
+      const j = JSON.parse(git("show", `${sha}:${SO_PHAT_HANH}`));
+      if (!j || typeof j.ban !== "object" || j.ban === null || Array.isArray(j.ban)) throw new Error("thiếu khối `ban` dạng object");
+      ban = j.ban;
+    } catch (e) {
+      return { trangThai: "HONG", doi: [],
+        loi: `nhân chứng ở commit ${sha.slice(0, 7)} có nhưng đọc không nổi — ${String(e.message).split(String.fromCharCode(10))[0]}` };
+    }
     for (const [v, d] of Object.entries(ban)) if (!nhanChung.has(v)) nhanChung.set(v, { bam: d, sha });
   }
 

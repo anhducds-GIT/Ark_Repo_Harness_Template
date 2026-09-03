@@ -257,3 +257,15 @@ sửa `session-check.mjs`.
    và `kiemSoPhatHanh` nuốt mất trạng thái HỎNG nên cổng kiểm không bao giờ thấy — tức phép kiểm
    kia chỉ là một hàm đẹp không ai hỏi. Đã thêm cả hai. Suite 72.
 
+ - **2026-09-03 · `harness-vong2` · v1.2.7 WITNESS-READ-FAILCLOSED** — Trong chính vòng đọc nhân
+   chứng của v1.2.6 còn `catch { continue }`: một commit nhân chứng đọc không nổi thì bị bỏ qua
+   im lặng, và một commit **muộn hơn** thành "lần đầu" — nhân chứng bị thay mà vẫn báo NGUYÊN VẸN.
+   **Lần thứ TƯ trong một ngày cùng một hình dạng** (`catch` → giá trị "trống"): v1.2.1 sổ ghim →
+   v1.2.5 sổ phát hành → v1.2.6 git hỏng → v1.2.7 từng commit nhân chứng.
+   Tách bằng `git cat-file -e`: file chưa có (hoặc commit đó xoá nó) → bỏ qua hợp lệ; file có mà
+   đọc không nổi → dừng, nêu đúng commit. Có **đối chứng dương**: lịch sử sạch có commit xoá rồi
+   tạo lại vẫn phải NGUYÊN VẸN — không thì một lần lỡ tay xoá là khoá vĩnh viễn cả bộ khung.
+   **Fixture suýt xanh vì lý do sai:** lượt đầu tôi nhét hai kiểu hỏng vào cùng một lịch sử, mà
+   vòng duyệt dừng ở commit hỏng ĐẦU TIÊN nên không bao giờ tới kiểu thứ hai — đột biến "bỏ phép
+   kiểm schema" vẫn xanh. Nay mỗi kiểu một kho riêng, đột biến bắt được cả hai. Suite 73.
+

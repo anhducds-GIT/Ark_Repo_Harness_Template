@@ -531,5 +531,86 @@ const dungRepo = (ghiSoGhim) => {
   } finally { rmSync(cha, { recursive: true, force: true }); }
 }
 
+/* ---- 19. Nhan chung DOC KHONG NOI ≠ nhan chung CHUA CO ------------------ */
+{
+  // Lo thu tu cung mot hinh dang. Vong doc lich su co `catch { continue }`: mot commit nhan chung
+  // parse loi thi bi BO QUA IM LANG, va mot commit MUON HON duoc nhan lam "lan dau". Tuc nhan
+  // chung bi thay ma ket qua van NGUYEN VEN — dung cai ma ca co che nay sinh ra de chan.
+  //
+  // Hai ly do khac han nhau: commit XOA file (bo qua dung) va commit co file ma doc khong noi
+  // (KHONG BIET). `cat-file -e` tach duoc hai ca do.
+  const cha = mkdtempSync(join(tmpdir(), "witness-doc-"));
+  try {
+    const git = (...a) => spawnSync("git", a, { cwd: cha, encoding: "utf8" });
+    const so = join(cha, "RELEASE-LEDGER.json");
+    git("init", "-q", "-b", "main");
+    git("config", "user.name", "fixture");
+    git("config", "user.email", "fixture@thu.invalid");
+
+    // Hai kieu hong khac nhau, va ca hai deu phai chan: JSON cut, va JSON LANH ma SAI SCHEMA.
+    // Kieu thu hai am hiem hon: `JSON.parse` di qua binh thuong, chi toi luc duyet `ban` moi vo.
+    //
+    // MOI KIEU MOT KHO RIENG. Nhet ca hai vao mot lich su thi vong doc dung o commit hong DAU
+    // TIEN va khong bao gio toi kieu thu hai — phep kiem se xanh vi khong chay toi, chu khong
+    // phai vi dung. (Da dinh dung bay do o luot dau: dot bien "bo phep kiem schema" van xanh.)
+    for (const hong of ["{ day la json cut", JSON.stringify({ _doc: "khong co khoi ban" })]) {
+      const rieng = mkdtempSync(join(tmpdir(), "witness-kieu-"));
+      try {
+        const g = (...a) => spawnSync("git", a, { cwd: rieng, encoding: "utf8" });
+        const f = join(rieng, "RELEASE-LEDGER.json");
+        g("init", "-q", "-b", "main");
+        g("config", "user.name", "fixture");
+        g("config", "user.email", "fixture@thu.invalid");
+        writeFileSync(f, hong, "utf8");
+        g("add", "-A"); g("commit", "-q", "-m", "so hong");
+        writeFileSync(f, JSON.stringify({ ban: { "0.9.0": "w".repeat(16) } }, null, 2), "utf8");
+        g("add", "-A"); g("commit", "-q", "-m", "so lanh");
+        const k = soVoiLichSu(rieng);
+        assert.equal(k.trangThai, "HONG", `nhan chung kieu "${hong.slice(0, 24)}" phai bi bat`);
+        assert.match(String(k.loi), /đọc không nổi/, "phai noi ro doc khong noi");
+      } finally { rmSync(rieng, { recursive: true, force: true }); }
+    }
+
+    // Commit 1 cua kho chinh: so HONG — day la NHAN CHUNG DAU TIEN, va no doc khong noi.
+    writeFileSync(so, "{ day la json cut", "utf8");
+    git("add", "-A"); git("commit", "-q", "-m", "so hong");
+    // Commit 2: so lanh lan, mang mot gia tri KHAC.
+    writeFileSync(so, JSON.stringify({ ban: { "1.0.0": "z".repeat(16) } }, null, 2), "utf8");
+    git("add", "-A"); git("commit", "-q", "-m", "so lanh");
+
+    const kq = soVoiLichSu(cha);
+    assert.equal(kq.trangThai, "HONG",
+      "nhan chung doc khong noi thi phai la HONG — bo qua no la de mot commit muon hon lam 'lan dau'");
+    assert.match(String(kq.loi), /đọc không nổi/, "phai noi ro commit nao, va vi sao");
+    assert.match(String(kq.loi), /^.*[0-9a-f]{7}/, "phai chi ra commit cu the de nguoi ta di xem");
+
+    // DOI CHUNG: commit XOA file thi bo qua LA DUNG — khong duoc lan sang HONG, neu khong thi
+    // mot lan xoa roi tao lai la khoa vinh vien ca bo khung.
+    rmSync(so); git("add", "-A"); git("commit", "-q", "-m", "xoa so");
+    writeFileSync(so, JSON.stringify({ ban: { "1.0.0": "z".repeat(16) } }, null, 2), "utf8");
+    git("add", "-A"); git("commit", "-q", "-m", "tao lai so");
+    const kq2 = soVoiLichSu(cha);
+    assert.equal(kq2.trangThai, "HONG", "commit hong o dau lich su van con do, van phai HONG");
+
+    // Va tren mot lich su SACH co commit xoa, thi commit xoa phai duoc bo qua binh thuong.
+    const cha2 = mkdtempSync(join(tmpdir(), "witness-xoa-"));
+    try {
+      const g2 = (...a) => spawnSync("git", a, { cwd: cha2, encoding: "utf8" });
+      const so2 = join(cha2, "RELEASE-LEDGER.json");
+      g2("init", "-q", "-b", "main");
+      g2("config", "user.name", "fixture");
+      g2("config", "user.email", "fixture@thu.invalid");
+      writeFileSync(so2, JSON.stringify({ ban: { "1.0.0": "y".repeat(16) } }, null, 2), "utf8");
+      g2("add", "-A"); g2("commit", "-q", "-m", "phat 1.0.0");
+      rmSync(so2); g2("add", "-A"); g2("commit", "-q", "-m", "lo tay xoa");
+      writeFileSync(so2, JSON.stringify({ ban: { "1.0.0": "y".repeat(16) } }, null, 2), "utf8");
+      g2("add", "-A"); g2("commit", "-q", "-m", "khoi phuc");
+      assert.equal(soVoiLichSu(cha2).trangThai, "NGUYEN_VEN",
+        "commit XOA file phai duoc bo qua binh thuong — khong thi mot lan xoa la khoa vinh vien");
+    } finally { rmSync(cha2, { recursive: true, force: true }); }
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("nhân chứng đọc không nổi → HỎNG; còn commit XOÁ file thì bỏ qua bình thường");
+}
+
 console.log(`
 ${passed} passed, 0 failed, ${passed} total`);
