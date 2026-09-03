@@ -16,7 +16,7 @@
  *
  * Dùng:
  *   node scripts/claim.mjs --list
- *   node scripts/claim.mjs --take <khoá> --as <phiên> --task "một câu"
+ *   node scripts/claim.mjs --take <khoá> --as <phiên> --task "một câu" [--ai Codex]
  *   node scripts/claim.mjs --release <khoá> --as <phiên> [--task "một câu"]
  *
  * Mã thoát:  0 xong · 2 dùng sai · 3 TỪ CHỐI (đã có chủ khác / không phải chủ) · 4 bị ghi đè
@@ -45,7 +45,7 @@ export function readClaims(file = CLAIMS_FILE) {
 }
 
 /* Quyết định THUẦN — tách khỏi việc đọc/ghi để kiểm được mọi nhánh mà không cần đĩa. */
-export function decide(claims, { action, key, as, today }) {
+export function decide(claims, { action, key, as, today, ai }) {
   if (!Object.prototype.hasOwnProperty.call(claims, key)) {
     return {
       code: EXIT.MISUSE,
@@ -66,7 +66,11 @@ export function decide(claims, { action, key, as, today }) {
       };
     }
     // Đã là của mình rồi thì không phải lỗi — chạy lại lệnh cùng nội dung phải an toàn.
-    return { code: EXIT.OK, already: owner === as, next: { ...cur, owner: as, ai: "Claude", claimed_at: today, released_at: null } };
+    // TRƯỜNG `ai` KHÔNG ĐƯỢC ĐÓNG CỨNG LÀ "Claude". Bảng quyền này là của cả ba AI — Codex và
+    // Antigravity cũng nhận vùng bằng đúng lệnh này, và trước đây mọi lượt nhận đều bị ghi là
+    // "Claude". Một bảng ghi sai ai đang giữ thì nó không còn là bảng quyền, nó là chuyện kể.
+    // Không khai thì để null: thiếu thông tin còn hơn thông tin sai.
+    return { code: EXIT.OK, already: owner === as, next: { ...cur, owner: as, ai: ai ?? null, claimed_at: today, released_at: null } };
   }
 
   if (action === "release") {
@@ -160,7 +164,7 @@ function main() {
   process.on("exit", nhaKhoa);
 
   const today = new Date().toISOString().slice(0, 10);
-  const verdict = decide(parsed.claims, { action, key, as, today });
+  const verdict = decide(parsed.claims, { action, key, as, today, ai: flag("ai") });
   if (verdict.code !== EXIT.OK) { console.error(verdict.message); process.exit(verdict.code); }
 
   parsed.claims[key] = typeof task === "string" ? { ...verdict.next, task } : verdict.next;
