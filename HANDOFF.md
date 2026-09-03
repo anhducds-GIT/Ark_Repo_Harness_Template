@@ -245,3 +245,15 @@ sửa `session-check.mjs`.
    Cũng sửa: repo canonical đã đổi tên thành `Ark_Repo_Harness_Template`; trường `source` trong
    sổ ghim và `git remote` ở máy này còn trỏ tên cũ (đang sống nhờ redirect của GitHub). Suite 69.
 
+ - **2026-09-03 · `harness-vong2` · v1.2.6 HISTORY-WITNESS** — Nhân chứng của v1.2.5 là `HEAD`, mà
+   **trên CI `HEAD` chính là commit đang kiểm**. Nên commit nào sửa một dòng cũ thì cả hai vế đều
+   mang giá trị đã sửa — phép so **so một thứ với chính nó**. Fixture 14 cũng xanh vô nghĩa vì nó
+   chỉ dựng ca sửa-mà-chưa-commit. Nay nhân chứng là **giá trị lần đầu một khoá xuất hiện trong
+   lịch sử**: nằm ở một commit đã qua, muốn đổi phải viết lại lịch sử.
+   Hai chỗ fail-open đi kèm, **cùng một hình dạng đã diệt hai lần trước**: `git show` lỗi → "chưa
+   có lịch sử" → đi tiếp; và **kho git nông** (mặc định của nhiều CI) cho nhân chứng cụt mà vẫn
+   báo NGUYÊN VẸN — tệ hơn không có. Cả hai nay dừng.
+   Bốn đột biến, cả bốn bị bắt. **Hai cái lượt fixture đầu của tôi bỏ lọt**: không có ca kho nông,
+   và `kiemSoPhatHanh` nuốt mất trạng thái HỎNG nên cổng kiểm không bao giờ thấy — tức phép kiểm
+   kia chỉ là một hàm đẹp không ai hỏi. Đã thêm cả hai. Suite 72.
+

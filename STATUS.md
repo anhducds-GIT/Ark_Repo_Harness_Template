@@ -11,7 +11,7 @@ owner: harness-vong2
 priority_rank: 1
 next_step: "Phân loại 63 phát hiện B10 ở repo 3AI — chưa chắc là 63 vi phạm — rồi mới bật mã chặn ở đó"
 version_source: package.json
-current_focus: "v1.2.5: sổ phát hành thôi tự làm chứng cho chính nó — mọi bản đã phát đối chiếu với HEAD"
+current_focus: "v1.2.6: nhân chứng của sổ phát hành là lịch sử git, không phải HEAD"
 human_action: "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge"
 ref_readme: README.md
 ref_handoff: HANDOFF.md

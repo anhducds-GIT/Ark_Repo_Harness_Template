@@ -767,23 +767,48 @@ export function docSoPhatHanh(root = ROOT) {
  * đó bạn vẫn đang viết bản phát ấy. Và ai cố ý thì vẫn sửa được cả hai rồi commit đè; cái này
  * không chặn gian lận có chủ đích, nó chặn chuyện "sửa cho xong" và bắt gian lận phải để lại
  * một vết trong lịch sử. */
-export function soVoiHEAD(root = ROOT) {
-  let raw;
+export function soVoiLichSu(root = ROOT) {
+  const git = (...a) => execFileSync("git", a, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+
+  /* Clone nông thì lịch sử bị cắt, nên "chưa từng thấy khoá này" không còn phân biệt được với
+     "commit ghi nó nằm ngoài phần đã tải". Nhân chứng cụt là nhân chứng sai — nói KHÔNG BIẾT. */
+  let commits;
   try {
-    raw = execFileSync("git", ["show", `HEAD:${SO_PHAT_HANH}`],
-      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
-  } catch { return { trangThai: "CHUA_CO_TRONG_HEAD", doi: [] }; }
-  let cu;
-  try { cu = JSON.parse(raw).ban ?? {}; } catch { return { trangThai: "CHUA_CO_TRONG_HEAD", doi: [] }; }
+    if (git("rev-parse", "--is-shallow-repository").trim() === "true") {
+      return { trangThai: "HONG", doi: [], loi: "kho git NÔNG (shallow) — lịch sử bị cắt nên không đủ làm nhân chứng" };
+    }
+    commits = git("log", "--reverse", "--format=%H", "--", SO_PHAT_HANH).split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean);
+  } catch (e) {
+    /* Git hỏng KHÔNG được hoá thành "chưa có lịch sử". Đó đúng là kiểu fail-open mà cả v1.2.1
+       lẫn v1.2.5 sinh ra để diệt, và nó sẽ diệt luôn chính phép kiểm này. */
+    return { trangThai: "HONG", doi: [], loi: `không đọc được lịch sử git: ${String(e.message).split(String.fromCharCode(10))[0]}` };
+  }
+
+  /* NHÂN CHỨNG LÀ LẦN ĐẦU MỘT KHOÁ XUẤT HIỆN, không phải HEAD.
+   *
+   * Bản v1.2.5 so với `HEAD:` — mà trên CI, HEAD CHÍNH LÀ commit đang kiểm. Commit nào sửa dòng
+   * `1.2.4` thì cả file hiện tại lẫn `HEAD:` đều mang giá trị đã sửa, và phép so thành ra so một
+   * thứ với chính nó. Nó chỉ bắt được ca sửa-mà-chưa-commit.
+   *
+   * Giá trị đầu tiên của một khoá thì nằm ở một commit trong quá khứ, và commit đó không sửa kèm
+   * được trong cùng một thao tác — muốn đổi phải viết lại lịch sử, và viết lại lịch sử thì thấy. */
+  const nhanChung = new Map();
+  for (const sha of commits) {
+    let ban;
+    try { ban = JSON.parse(git("show", `${sha}:${SO_PHAT_HANH}`)).ban ?? {}; } catch { continue; }
+    for (const [v, d] of Object.entries(ban)) if (!nhanChung.has(v)) nhanChung.set(v, { bam: d, sha });
+  }
+
   const nay = docSoPhatHanh(root);
   if (nay.trangThai !== "CO") return { trangThai: nay.trangThai, doi: [], loi: nay.loi };
+
   const doi = [];
-  for (const [ban, bamCu] of Object.entries(cu)) {
+  for (const [ban, { bam: bamGoc, sha }] of nhanChung) {
     const bamNay = nay.ban[ban];
-    if (bamNay === undefined) doi.push({ ban, cu: bamCu, nay: "(đã bị xoá)" });
-    else if (bamNay !== bamCu) doi.push({ ban, cu: bamCu, nay: bamNay });
+    if (bamNay === undefined) doi.push({ ban, cu: bamGoc, nay: "(đã bị xoá)", sha: sha.slice(0, 7) });
+    else if (bamNay !== bamGoc) doi.push({ ban, cu: bamGoc, nay: bamNay, sha: sha.slice(0, 7) });
   }
-  return { trangThai: doi.length ? "DA_SUA" : "NGUYEN_VEN", doi };
+  return { trangThai: doi.length ? "DA_SUA" : "NGUYEN_VEN", doi, soNhanChung: nhanChung.size };
 }
 
 /* Bốn câu trả lời. "Chưa ghi" KHÔNG giống "ghi rồi và khớp", không giống "ghi rồi mà lệch", và
@@ -793,9 +818,13 @@ export function kiemSoPhatHanh(chuan, root = ROOT) {
   const dangCo = bamBanTrich(chuan);
   if (doc.trangThai === "HONG") return { trangThai: "SO_HONG", version: TEMPLATE_VERSION, dangCo, loi: doc.loi };
 
-  const lichSu = soVoiHEAD(root);
+  const lichSu = soVoiLichSu(root);
   if (lichSu.trangThai === "DA_SUA") {
     return { trangThai: "SUA_LICH_SU", version: TEMPLATE_VERSION, dangCo, doi: lichSu.doi };
+  }
+  // Không đọc được nhân chứng thì KHÔNG BIẾT, và không biết thì không được đi tiếp.
+  if (lichSu.trangThai === "HONG") {
+    return { trangThai: "NHAN_CHUNG_HONG", version: TEMPLATE_VERSION, dangCo, loi: lichSu.loi };
   }
 
   const daGhi = doc.ban[TEMPLATE_VERSION] ?? null;
@@ -833,9 +862,14 @@ export function loiSoPhatHanh(kq) {
     d.push("Đây KHÔNG phải 'chưa ghi'. Coi nó là chưa ghi thì làm hỏng sổ trở thành cách vượt qua");
     d.push("chính nó: sửa nguồn, xoá sổ, chạy lại, và cùng một số phiên bản mang dấu vân tay mới.");
     d.push(`Khôi phục từ git: \`git checkout -- ${SO_PHAT_HANH}\`.`);
+  } else if (kq.trangThai === "NHAN_CHUNG_HONG") {
+    d.push(`SO_PHAT_HANH_NHAN_CHUNG_HONG: không đối chiếu được sổ với lịch sử — ${kq.loi}`);
+    d.push("Sổ chỉ có nghĩa khi có một nhân chứng không sửa kèm được. Mất nhân chứng thì đây là");
+    d.push("KHÔNG BIẾT, không phải 'chưa có lịch sử' — và không biết thì không được đi tiếp.");
+    d.push("Clone đủ sâu (`fetch-depth: 0` trên CI) rồi chạy lại.");
   } else if (kq.trangThai === "SUA_LICH_SU") {
-    d.push(`SO_PHAT_HANH_SUA_LICH_SU: ${kq.doi.length} bản đã phát bị đổi so với HEAD —`);
-    for (const x of kq.doi) d.push(`  ${x.ban}: ${x.cu} → ${x.nay}`);
+    d.push(`SO_PHAT_HANH_SUA_LICH_SU: ${kq.doi.length} bản đã phát bị đổi so với lần đầu được ghi —`);
+    for (const x of kq.doi) d.push(`  ${x.ban}: ${x.cu} → ${x.nay}   (ghi lần đầu ở ${x.sha})`);
     d.push("Sổ này CHỈ THÊM. Sửa một dòng đã phát là nói dối về một bản đã đi ra ngoài, và nó xoá");
     d.push("luôn khả năng đối chiếu — sổ tự làm chứng cho chính nó thì nó không chứng gì cả.");
     d.push(`Khôi phục: \`git checkout -- ${SO_PHAT_HANH}\`, rồi tăng "version" nếu bạn đang muốn phát bản mới.`);

@@ -3,6 +3,32 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.6 — 2026-09-03 — Nhân chứng phải là lịch sử, không phải HEAD
+
+v1.2.5 cho sổ phát hành một nhân chứng: bản sổ nằm trong `HEAD`. Audit độc lập chỉ ngay chỗ
+hỏng, và nó hỏng đúng ở nơi cơ chế này cần chạy nhất — **trên CI, `HEAD` chính là commit đang
+kiểm.** Nên một commit sửa dòng `1.2.4` thì cả file hiện tại lẫn `HEAD:` đều mang giá trị đã
+sửa, và phép so thành ra **so một thứ với chính nó**. Nó chỉ bắt được ca sửa-mà-chưa-commit —
+đúng cái ca fixture 14 dựng, nên fixture cũng xanh một cách vô nghĩa.
+
+Nhân chứng thật là **giá trị lần đầu một khoá xuất hiện trong lịch sử**. Nó nằm ở một commit đã
+qua, không sửa kèm được trong cùng một thao tác; muốn đổi thì phải viết lại lịch sử, và viết lại
+lịch sử thì nhìn thấy được.
+
+Hai chỗ fail-open đi kèm, cùng một hình dạng đã diệt hai lần trước:
+
+- `git show` lỗi vì bất kỳ lý do gì → `catch` → "chưa có lịch sử" → **đi tiếp**. Nay là
+  `NHAN_CHUNG_HONG`, dừng. Mất nhân chứng là **KHÔNG BIẾT**, không phải "không sao".
+- **Kho git nông** (`clone --depth 1`, mặc định của nhiều CI) → lịch sử bị cắt → "chưa từng thấy
+  khoá này" không còn phân biệt được với "commit ghi nó nằm ngoài phần đã tải". Nhân chứng cụt là
+  nhân chứng **sai** — tệ hơn không có, vì nó vẫn báo NGUYÊN VẸN. Nay cũng dừng.
+
+Bốn phép đột biến ngược, **cả bốn bị bắt** — kể cả hai cái mà lượt fixture đầu của tôi bỏ lọt:
+kho nông không có ca thử, và `kiemSoPhatHanh` nuốt mất trạng thái HỎNG nên cổng kiểm không bao
+giờ thấy. Fixture nay dựng repo git thật, commit ba lần, và kiểm cả ca **sửa rồi COMMIT**.
+
+Suite 72.
+
 ## 1.2.5 — 2026-09-03 — Sổ phát hành thôi tự làm chứng cho chính nó
 
 v1.2.4 dựng sổ phát hành để một số phiên bản trỏ tới đúng một nội dung. Audit độc lập đọc lại

@@ -12,7 +12,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildTemplateFiles } from "../scripts/build-template.mjs";
+import { buildTemplateFiles, kiemSoPhatHanh, loiSoPhatHanh, soVoiLichSu } from "../scripts/build-template.mjs";
 import { docSoGhim, fileMay, soGhimMoi, soSanh } from "../scripts/upgrade.mjs";
 
 let passed = 0;
@@ -435,6 +435,100 @@ const dungRepo = (ghiSoGhim) => {
     assert.equal(readFileSync(motFile, "utf8"), truoc, "tu choi thi template/ phai con NGUYEN");
   } finally { writeFileSync(soPhat, goc, "utf8"); }
   ok("từ chối trước khi ghi — template/ còn nguyên, không để lại trạng thái nửa vời");
+}
+
+/* ---- 16. Nhan chung phai la LICH SU, khong phai HEAD ------------------- */
+{
+  // v1.2.5 so voi `HEAD:RELEASE-LEDGER.json`. Tren CI, HEAD CHINH LA commit dang kiem — nen mot
+  // commit sua dong `1.2.4` thi ca file hien tai lan `HEAD:` deu mang gia tri da sua, va phep so
+  // thanh ra so mot thu voi chinh no. No chi bat duoc ca sua-ma-CHUA-commit.
+  //
+  // Nhan chung that: gia tri LAN DAU mot khoa xuat hien. No nam o mot commit da qua, khong sua
+  // kem duoc trong cung mot thao tac.
+  const cha = mkdtempSync(join(tmpdir(), "witness-"));
+  const so = join(cha, "RELEASE-LEDGER.json");
+  const git = (...a) => spawnSync("git", a, { cwd: cha, encoding: "utf8" });
+  try {
+    git("init", "-q", "-b", "main");
+    git("config", "user.name", "fixture");
+    git("config", "user.email", "fixture@thu.invalid");
+    const ghi = (ban) => writeFileSync(so, JSON.stringify({ _doc: "thu", ban }, null, 2), "utf8");
+
+    ghi({ "1.0.0": "aaaaaaaaaaaaaaaa" });
+    git("add", "-A"); git("commit", "-q", "-m", "phat 1.0.0");
+    assert.equal(soVoiLichSu(cha).trangThai, "NGUYEN_VEN", "vua phat xong thi phai nguyen ven");
+
+    // Them mot ban moi la HOP LE — so nay CHI THEM.
+    ghi({ "1.0.0": "aaaaaaaaaaaaaaaa", "1.1.0": "bbbbbbbbbbbbbbbb" });
+    git("add", "-A"); git("commit", "-q", "-m", "phat 1.1.0");
+    assert.equal(soVoiLichSu(cha).trangThai, "NGUYEN_VEN", "them khoa moi la hop le");
+
+    // VA DAY LA CA v1.2.5 BO LOT: sua mot ban da phat RỒI COMMIT.
+    ghi({ "1.0.0": "cccccccccccccccc", "1.1.0": "bbbbbbbbbbbbbbbb" });
+    git("add", "-A"); git("commit", "-q", "-m", "sua len mot ban da phat");
+    const kq = soVoiLichSu(cha);
+    assert.equal(kq.trangThai, "DA_SUA", "sua mot ban DA PHAT roi COMMIT thi van phai bi bat");
+    assert.equal(kq.doi[0].ban, "1.0.0");
+    assert.equal(kq.doi[0].cu, "aaaaaaaaaaaaaaaa", "phai lay gia tri LAN DAU lam nhan chung");
+
+    // Va xoa han mot ban da phat, cung da commit.
+    ghi({ "1.1.0": "bbbbbbbbbbbbbbbb" });
+    git("add", "-A"); git("commit", "-q", "-m", "xoa mot ban da phat");
+    assert.equal(soVoiLichSu(cha).trangThai, "DA_SUA", "xoa mot ban da phat cung la sua lich su");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("nhân chứng là lần đầu khoá xuất hiện — sửa một bản đã phát rồi COMMIT vẫn bị bắt");
+}
+
+/* ---- 17. Mat nhan chung → KHONG BIET, khong phai "chua co" -------------- */
+{
+  // `catch → CHUA_CO_TRONG_HEAD` la dung kieu fail-open ma v1.2.1 va v1.2.5 sinh ra de diet — va
+  // no se diet luon chinh phep kiem nay. Khong doc duoc lich su thi phai noi KHONG BIET.
+  const cha = mkdtempSync(join(tmpdir(), "witness-hong-"));
+  try {
+    writeFileSync(join(cha, "RELEASE-LEDGER.json"), JSON.stringify({ ban: { "1.0.0": "a".repeat(16) } }), "utf8");
+    const kq = soVoiLichSu(cha);          // KHONG phai kho git
+    assert.equal(kq.trangThai, "HONG", "khong doc duoc lich su thi la HONG, khong duoc lan sang 'chua co'");
+    assert.match(String(kq.loi), /lịch sử git|NÔNG/, "phai noi ro vi sao khong doc duoc");
+
+    // VA PHAI NOI DUOC RA NGOAI. Ham bao HONG ma `kiemSoPhatHanh` nuot mat thi CI — von chi goi
+    // qua duong do — van xanh, va ca phep kiem tren chi la mot ham dep khong ai hoi.
+    const truyen = kiemSoPhatHanh(chuan, cha);
+    assert.equal(truyen.trangThai, "NHAN_CHUNG_HONG", "kiemSoPhatHanh phai truyen HONG ra, khong duoc nuot");
+    assert.ok(loiSoPhatHanh(truyen).join(" ").includes("NHAN_CHUNG_HONG"), "va phai co cau giai thich cho nguoi doc");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("mất nhân chứng → KHÔNG BIẾT (fail-closed), và nói được ra tới cổng kiểm");
+}
+
+/* ---- 18. Kho git NONG cung la mat nhan chung ---------------------------- */
+{
+  // Day dung la cach CI hay lam mac dinh (`actions/checkout` clone nong). Lich su bi cat thi
+  // "chua tung thay khoa nay" khong con phan biet duoc voi "commit ghi no nam ngoai phan da tai".
+  // Nhan chung cut la nhan chung SAI — te hon khong co, vi no van bao NGUYEN VEN.
+  const cha = mkdtempSync(join(tmpdir(), "witness-nong-"));
+  const goc = join(cha, "goc");
+  const nong = join(cha, "nong");
+  try {
+    mkdirSync(goc, { recursive: true });
+    const g = (...a) => spawnSync("git", a, { cwd: goc, encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    g("config", "user.name", "fixture");
+    g("config", "user.email", "fixture@thu.invalid");
+    for (const [v, d] of [["1.0.0", "a"], ["1.1.0", "b"]]) {
+      const truoc = v === "1.0.0" ? {} : { "1.0.0": "a".repeat(16) };
+      writeFileSync(join(goc, "RELEASE-LEDGER.json"),
+        JSON.stringify({ ban: { ...truoc, [v]: d.repeat(16) } }, null, 2), "utf8");
+      g("add", "-A"); g("commit", "-q", "-m", `phat ${v}`);
+    }
+    const c = spawnSync("git", ["clone", "-q", "--depth", "1", `file://${goc.split("\\").join("/")}`, nong],
+      { cwd: cha, encoding: "utf8" });
+    if (c.status !== 0) { ok("(bỏ qua 18: máy này không clone nông được)"); }
+    else {
+      const kq = soVoiLichSu(nong);
+      assert.equal(kq.trangThai, "HONG", "kho NONG thi khong du lich su lam nhan chung — phai la HONG");
+      assert.match(String(kq.loi), /NÔNG/, "phai noi ro la kho nong, de nguoi ta biet sua bang fetch-depth");
+      ok("kho git nông (clone --depth 1) → HỎNG, không được nhận là nguyên vẹn");
+    }
+  } finally { rmSync(cha, { recursive: true, force: true }); }
 }
 
 console.log(`
