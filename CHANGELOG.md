@@ -3,6 +3,32 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.8 — 2026-09-03 — Lỗ thứ năm, ở chính phép dò
+
+v1.2.7 tách "commit xoá file" khỏi "ledger hỏng" bằng `git cat-file -e`. Nhưng `cat-file -e`
+trả khác 0 cho **cả hai** thứ: đường dẫn không có ở commit đó, **và** git / kho object hỏng. Bắt
+chung rồi `continue` là lại gọi ca thứ hai là "commit xoá file" và bỏ qua — đúng cái bất biến
+đang theo đuổi, chỉ dịch xuống một tầng nữa.
+
+`ls-tree` tách được vì nó trả lời bằng **hai kênh khác nhau**: mã thoát nói git có chạy được
+không, output rỗng hay không nói đường dẫn có tồn tại không.
+
+| `ls-tree` | Nghĩa | Làm gì |
+|---|---|---|
+| chạy được, output **rỗng** | đường dẫn không có ở commit này | bỏ qua |
+| chạy được, output **có** | nhân chứng ở đây | đọc và kiểm |
+| **lỗi** | KHÔNG BIẾT | dừng, nêu đúng commit |
+
+Ca "git hỏng **giữa chừng**" không dựng nổi bằng một kho thật — git đã chạy được cho `log` thì
+nó chạy được cho `ls-tree`. Nên `soVoiLichSu` nhận một bộ chạy git **tiêm được**. Không tiêm
+được thì nhánh đó không có cách nào chạy tới, mà nhánh không chạy tới được **chưa bao giờ là
+lớp bảo vệ** — hôm nay đã dính đúng chuyện đó một lần.
+
+Đây là lần thứ **năm** cùng một hình dạng trong một ngày, và nó dịch xuống từng tầng một:
+sổ ghim → sổ phát hành → git hỏng → từng commit nhân chứng → phép dò sự tồn tại.
+
+Suite 74.
+
 ## 1.2.7 — 2026-09-03 — Lỗ thứ tư cùng một hình dạng, trong chính vòng đọc nhân chứng
 
 v1.2.6 đi tìm nhân chứng bằng cách duyệt lịch sử và giữ giá trị đầu tiên của mỗi khoá. Bên

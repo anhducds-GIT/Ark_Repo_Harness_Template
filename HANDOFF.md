@@ -269,3 +269,16 @@ sửa `session-check.mjs`.
    vòng duyệt dừng ở commit hỏng ĐẦU TIÊN nên không bao giờ tới kiểu thứ hai — đột biến "bỏ phép
    kiểm schema" vẫn xanh. Nay mỗi kiểu một kho riêng, đột biến bắt được cả hai. Suite 73.
 
+ - **2026-09-03 · `harness-vong2` · v1.2.8 EXISTENCE-PROBE-FAILCLOSED** — `cat-file -e` của v1.2.7
+   trả khác 0 cho **cả hai** thứ: đường dẫn không có, và git hỏng. Bắt chung rồi `continue` là lại
+   gọi ca thứ hai là "commit xoá file". **Lần thứ NĂM cùng một hình dạng trong một ngày**, và nó
+   dịch xuống từng tầng: sổ ghim → sổ phát hành → git hỏng → từng commit nhân chứng → phép dò.
+   `ls-tree` tách được vì trả lời bằng hai kênh: mã thoát = git chạy được không, output rỗng =
+   đường dẫn có không.
+   Ca "git hỏng GIỮA CHỪNG" không dựng nổi bằng kho thật, nên `soVoiLichSu` nay nhận bộ chạy git
+   **tiêm được**. Nhánh không chạy tới được thì chưa bao giờ là lớp bảo vệ. Suite 74.
+   **Sửa lại một câu tôi nói sai ở phiên trước:** tôi ngụ ý 164 giây là bộ phép kiểm quá to. Không
+   phải — CI Linux chạy trọn bộ trong ~29 giây. Đó là chi phí spawn tiến trình của Windows. Ngân
+   sách 180 giây **không cần nới**, và **không được gộp fixture cho nhanh**: chính lượt v1.2.7 đã
+   chứng minh gộp ca làm nhánh sau không bao giờ chạy tới.
+

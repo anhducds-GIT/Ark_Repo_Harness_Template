@@ -767,8 +767,12 @@ export function docSoPhatHanh(root = ROOT) {
  * đó bạn vẫn đang viết bản phát ấy. Và ai cố ý thì vẫn sửa được cả hai rồi commit đè; cái này
  * không chặn gian lận có chủ đích, nó chặn chuyện "sửa cho xong" và bắt gian lận phải để lại
  * một vết trong lịch sử. */
-export function soVoiLichSu(root = ROOT) {
-  const git = (...a) => execFileSync("git", a, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+/* `chayGit` tiêm được là để phép kiểm dựng nổi ca "git hỏng GIỮA CHỪNG".
+   Không tiêm được thì nhánh đó không có cách nào chạy tới — mà một nhánh không chạy tới được
+   thì nó chưa bao giờ là lớp bảo vệ, nó chỉ là chữ. Đã dính đúng chuyện này một lần hôm nay. */
+export function soVoiLichSu(root = ROOT, chayGit = null) {
+  const git = chayGit
+    ?? ((...a) => execFileSync("git", a, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
 
   /* Clone nông thì lịch sử bị cắt, nên "chưa từng thấy khoá này" không còn phân biệt được với
      "commit ghi nó nằm ngoài phần đã tải". Nhân chứng cụt là nhân chứng sai — nói KHÔNG BIẾT. */
@@ -803,8 +807,21 @@ export function soVoiLichSu(root = ROOT) {
      *
      * `cat-file -e` trả lời đúng một câu: đường dẫn đó CÓ tồn tại ở commit này không. Có mà đọc
      * không nổi thì là KHÔNG BIẾT, và không biết thì dừng. */
-    try { git("cat-file", "-e", `${sha}:${SO_PHAT_HANH}`); }
-    catch { continue; }                       // file chưa có (hoặc đã bị xoá) ở commit này — bỏ qua hợp lệ
+    /* BA TRẠNG THÁI, KHÔNG PHẢI HAI — lần thứ năm, và lần này ở chính phép DÒ.
+     *
+     * `cat-file -e` trả khác 0 cho CẢ HAI: "đường dẫn không có ở commit này" và "git/kho object
+     * hỏng". Bắt chung rồi `continue` là lại gọi ca thứ hai là "commit xoá file" và bỏ qua —
+     * đúng cái bất biến đang theo đuổi, chỉ dịch xuống một tầng nữa.
+     *
+     * `ls-tree` tách được, vì nó phân biệt bằng HAI kênh khác nhau: mã thoát nói git có chạy
+     * được không, còn output rỗng hay không nói đường dẫn có tồn tại không. */
+    let co;
+    try { co = String(git("ls-tree", sha, "--", SO_PHAT_HANH)).trim() !== ""; }
+    catch (e) {
+      return { trangThai: "HONG", doi: [],
+        loi: `không dò được nhân chứng ở commit ${sha.slice(0, 7)} — ${String(e.message).split(String.fromCharCode(10))[0]}` };
+    }
+    if (!co) continue;                        // đường dẫn không có ở commit này (commit xoá nó) — bỏ qua hợp lệ
 
     let ban;
     try {

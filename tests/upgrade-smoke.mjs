@@ -6,7 +6,7 @@
  */
 
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -610,6 +610,47 @@ const dungRepo = (ghiSoGhim) => {
     } finally { rmSync(cha2, { recursive: true, force: true }); }
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("nhân chứng đọc không nổi → HỎNG; còn commit XOÁ file thì bỏ qua bình thường");
+}
+
+/* ---- 20. Phep DO cung phai ba trang thai --------------------------------- */
+{
+  // Lo thu NAM cung mot hinh dang, va lan nay o chinh phep do su ton tai.
+  // `cat-file -e` tra khac 0 cho CA HAI: "duong dan khong co o commit nay" va "git/kho object
+  // hong". Bat chung roi `continue` la lai goi ca thu hai la "commit xoa file" va bo qua.
+  //
+  // Ca "git hong GIUA CHUNG" khong dung noi bang mot kho that: git da chay duoc cho `log` thi no
+  // chay duoc cho `ls-tree`. Nen ham nhan mot bo chay git tiem vao — khong tiem duoc thi nhanh
+  // do khong co cach nao chay toi, ma nhanh khong chay toi duoc thi no chua bao gio la lop bao ve.
+  const cha = mkdtempSync(join(tmpdir(), "witness-do-"));
+  try {
+    const g = (...a) => spawnSync("git", a, { cwd: cha, encoding: "utf8" });
+    const so = join(cha, "RELEASE-LEDGER.json");
+    g("init", "-q", "-b", "main");
+    g("config", "user.name", "fixture");
+    g("config", "user.email", "fixture@thu.invalid");
+    writeFileSync(so, JSON.stringify({ ban: { "1.0.0": "v".repeat(16) } }, null, 2), "utf8");
+    g("add", "-A"); g("commit", "-q", "-m", "phat 1.0.0");
+
+    assert.equal(soVoiLichSu(cha).trangThai, "NGUYEN_VEN", "doi chung: kho lanh phai nguyen ven");
+
+    // Bo chay git that, tru dung lenh `ls-tree` — mo phong kho object hong giua chung.
+    const that = (...a) => execFileSync("git", a, { cwd: cha, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    const hongDo = (...a) => {
+      if (a[0] === "ls-tree") throw new Error("fatal: not a tree object");
+      return that(...a);
+    };
+    const kq = soVoiLichSu(cha, hongDo);
+    assert.equal(kq.trangThai, "HONG",
+      "do khong duoc thi la KHONG BIET — khong duoc goi la 'commit xoa file' roi bo qua");
+    assert.match(String(kq.loi), /không dò được/, "phai noi ro la KHONG DO DUOC, khong phai 'khong co'");
+
+    // DOI CHUNG DUONG: `ls-tree` chay duoc va tra RONG thi dung la khong co — phai bo qua binh
+    // thuong. Khong co ve nay thi mot commit xoa file la khoa vinh vien ca bo khung.
+    const rong = (...a) => (a[0] === "ls-tree" ? "" : that(...a));
+    assert.equal(soVoiLichSu(cha, rong).trangThai, "NGUYEN_VEN",
+      "ls-tree chay duoc ma tra rong = duong dan khong co o commit do — bo qua hop le");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("phép dò ba trạng thái: không có → bỏ qua · dò không được → HỎNG");
 }
 
 console.log(`
