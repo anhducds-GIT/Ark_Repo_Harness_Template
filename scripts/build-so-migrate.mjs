@@ -41,11 +41,13 @@ export function docHoSo(root = ROOT) {
   const ra = [];
   for (const f of ten) {
     const raw = fs.readFileSync(path.join(thuMuc, f), "utf8");
-    const { fm, body } = tachFrontmatter(raw);
+    // `tachFrontmatter` tra ve `than`, khong phai `body`. Destructure sai ten thi `body` la
+    // undefined, roi `body ?? raw` nga ve CA FILE — nen frontmatter bi in lai trong than bai.
+    const { fm, than } = tachFrontmatter(raw);
     // Hồ sơ thiếu `repo` hoặc `ngay` thì KHÔNG bỏ qua im lặng — nó vẫn hiện, và tự khai là
     // thiếu. Bỏ qua im lặng nghĩa là một lần migrate biến mất khỏi lịch sử, đúng thứ sổ này
     // sinh ra để chặn.
-    ra.push({ file: `${THU_MUC}/${f}`, fm: fm ?? {}, body: body ?? raw });
+    ra.push({ file: `${THU_MUC}/${f}`, fm: fm ?? {}, body: than ?? raw });
   }
   // Mới nhất lên đầu: người mở sổ gần như luôn hỏi "lần gần nhất thế nào".
   return ra.sort((a, b) => String(b.fm.ngay ?? "").localeCompare(String(a.fm.ngay ?? "")));

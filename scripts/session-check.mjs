@@ -344,7 +344,13 @@ check("Không có secret lọt vào repo", () => {
   const duoi = khongDocDuoc.length
     ? ` · ${khongDocDuoc.length} file KHÔNG đọc được (${khongDocDuoc.slice(0, 3).join(", ")}${khongDocDuoc.length > 3 ? ", …" : ""}) — không kiểm được, không phải đã sạch`
     : "";
-  return { ok: true, msg: `Đọc thật ${daDoc}/${tracked.length} file được track, sạch${duoi}.` };
+  // File khong doc duoc = CHUA KIEM. Bao [XANH] o day la dung cai benh ca cong nay sinh ra
+  // de chua: badge xanh trong khi mot phan repo chua he duoc soi.
+  return {
+    ok: true,
+    ...(khongDocDuoc.length ? { skipped: true } : {}),
+    msg: `Đọc thật ${daDoc}/${tracked.length} file được track, sạch${duoi}.`
+  };
 });
 
 /* ---- 4. File mới phải khai vào Bản đồ file ------------------------------ */

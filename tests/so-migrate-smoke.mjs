@@ -83,6 +83,12 @@ Xong.
     }
     assert.match(html, /1 → <strong>3<\/strong>/, "phai noi ro muc truoc va muc sau");
     assert.match(html, /den xanh/, "cong xanh thi den phai xanh");
+    // Frontmatter KHONG duoc lot vao than bai. Ban dau destructure `{fm, body}` trong khi
+    // parser tra `{fm, than}`, nen `body` la undefined va `body ?? raw` nga ve CA FILE —
+    // toan bo khoi khai bao bi in lai nhu van xuoi. Khoi 3 cu chi kiem NHAN cua khuon nen
+    // khong thay gi: mot phep kiem chi soi cai khung, khong soi cai trong khung.
+    assert.doesNotMatch(html, /kind:\s*migration/, "frontmatter khong duoc in lai trong than bai");
+    assert.doesNotMatch(html, /ban_khung:\s*9\.9\.9/, "truong khai bao khong duoc lot vao van xuoi");
   } finally { rmSync(root, { recursive: true, force: true }); }
   ok("mọi hồ sơ in ra cùng một khuôn bốn ô");
 }

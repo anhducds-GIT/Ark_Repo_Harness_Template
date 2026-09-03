@@ -580,6 +580,7 @@ export function gomDuLieu() {
   // (có phép kiểm thuộc nhóm CHẶN đang đỏ) và nó vẫn in dòng TỔNG — nên vẫn đọc được. Chỉ khi
   // KHÔNG có dòng TỔNG mới là không đo được: script chết trước khi in, hoặc node/git không chạy.
   let canhBaoVang = null;
+  let choDo = null;
   {
     let ra = "";
     try {
@@ -600,6 +601,8 @@ export function gomDuLieu() {
    * Nguồn thật: `lifecycle` trong `STATUS.md`, đúng trường mà khối Vòng đời phía trên đã dùng.
    * Một nguồn, hai chỗ đọc — thay vì hai con số tự sống. */
   const viecChuaChungMinh = noChuaChungMinh(st?.lifecycle);
+  // `null` (không đọc được) KHÔNG được cộng thành 0 — không đo được thì để null, và đèn không xanh.
+  const noCauTruc = (choDo === null || canhBaoVang === null) ? null : choDo + canhBaoVang;
   return {
     ten: tenNguoi || pkg.name || "Repo",
     ban: pkg.version || "0.0.0",
@@ -623,9 +626,14 @@ export function gomDuLieu() {
     huongDan: huongDanRaw ? tachFrontmatter(huongDanRaw).than : null,
     // BA CON SỐ ĐẾM NỢ, không đếm tài sản. Đếm tài sản ("3 workflow, 9 lệnh") chỉ làm người
     // xem thấy nhiều mà không biết có phải lo không. Đèn xanh chỉ khi cả ba bằng 0.
+    //
+    // Con số cấu trúc GỘP CẢ ĐỎ LẪN VÀNG. Bản đầu chỉ bắt chữ "chỗ VÀNG", nên một repo có
+    // 10 chỗ ĐỎ và 0 chỗ VÀNG hiện ra "0" và đèn có thể XANH — bảng giấu đúng thứ nặng nhất
+    // và giữ lại thứ nhẹ. Không đọc được một trong hai thì để `null`, và `null` không phải 0:
+    // đèn sẽ không xanh. Audit độc lập bắt được 03/09.
     so: [
       { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn" },
-      { so: canhBaoVang, nhan: "cảnh báo cấu trúc tồn" },
+      { so: noCauTruc, nhan: "nợ cấu trúc (đỏ + vàng)" },
       { so: viecChuaChungMinh, nhan: "việc lớn chưa chứng minh" }
     ]
   };

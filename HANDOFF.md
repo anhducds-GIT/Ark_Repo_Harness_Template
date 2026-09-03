@@ -105,3 +105,13 @@ sửa `session-check.mjs`.
    khi push, còn cổng lại ĐÒI có nó TRƯỚC khi xanh (**đã sửa thứ tự**).
    CÒN MỞ, lớn nhất: **chưa có cơ chế ghim phiên bản**. Hôm nay phải chép tay `session-check.mjs`
    sang hai repo BA LẦN vì vá liên tục — đó chính là cách 21 repo biến thành 21 bản khung.
+
+ - **2026-09-03 · `harness-vong2` (audit GPT vòng 2)** — Kiểm 3 tuyên bố về code, **cả 3 đúng**:
+   (a) `build-so-migrate` destructure `{fm, body}` trong khi parser trả `{fm, than}` → `body`
+   undefined → `body ?? raw` ngã về CẢ FILE, nên frontmatter bị in lại như văn xuôi. Lỗi của
+   chính tôi hôm nay, và phép kiểm của tôi **chỉ soi cái khung nên không thấy cái trong khung**.
+   (b) Bảng tổng quan chỉ bắt chữ "chỗ VÀNG", không bắt "chỗ ĐỎ" — repo 10 đỏ / 0 vàng hiện
+   ra "0" và đèn có thể xanh. Bảng giấu đúng thứ nặng nhất.
+   (c) Quét secret trả `ok:true` kèm ghi chú "73 file không đọc được" — badge vẫn XANH.
+   Cả ba **đã vá**; (a) đã ghim + thử phá. Giữ đúng 3 con số theo đặc tả của Đức: gộp đỏ+vàng
+   thành một con số, `null` không cộng thành 0.
