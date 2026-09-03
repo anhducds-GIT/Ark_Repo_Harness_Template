@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `1cff01a` (2026-09-03).
+Trang được sinh tại commit `9d574ae` (2026-09-03).
 
 ## Việc ưu tiên #1
 
-- **_root** — Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo
+- **_root** — Chạy thử một vòng vá thật: sửa bộ khung, upgrade --plan hai repo, xem nó có bắt đúng file cũ không
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `1cff01a` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.0 đã đóng: bảy chỗ hợp đồng lõi đã vá và có fixture phá, đã chạy thật trên hai repo khác nghề
+- [ark-repo-harness](STATUS.md): active — v1.1: ghim phiên bản xong
 
 ## Luật bắt buộc trước khi sửa gì
 

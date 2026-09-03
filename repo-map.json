@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "1cff01a",
+  "generated_commit": "9d574ae",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,20 +33,20 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo",
-      "human_action": "Không có việc nào cần bạn. Muốn mở rộng sang repo thứ ba thì nói — nhưng nên có ghim phiên bản trước",
+      "next_step": "Chạy thử một vòng vá thật: sửa bộ khung, upgrade --plan hai repo, xem nó có bắt đúng file cũ không",
+      "human_action": "Không có việc nào cần bạn",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-03",
       "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
-      "open_item": "v1.0 đã đóng: bảy chỗ hợp đồng lõi đã vá và có fixture phá, đã chạy thật trên hai repo khác nghề"
+      "open_item": "v1.1: ghim phiên bản xong. Vá bộ khung nay đẩy sang repo đã lắp bằng một lệnh, và nó TỪ CHỐI ghi đè file bị sửa tay"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo",
+      "title": "Chạy thử một vòng vá thật: sửa bộ khung, upgrade --plan hai repo, xem nó có bắt đúng file cũ không",
       "rank": 1,
       "claim": null
     }
