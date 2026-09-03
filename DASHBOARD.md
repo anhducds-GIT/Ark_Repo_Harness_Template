@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `494c297` (2026-09-03). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `3fe5df9` (2026-09-03). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
-1. **Việc ưu tiên #1** — **_root** — Chốt hướng versioning: repo đích phải ghim được bản khung nào, và nâng cấp bằng lệnh — không chép tay · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-03 @ `494c297` · [HANDOFF.md](HANDOFF.md)
+1. **Việc ưu tiên #1** — **_root** — Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo · [STATUS](STATUS.md)
+2. **Phiên gần nhất** — 2026-09-03 @ `3fe5df9` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 
@@ -15,7 +15,7 @@ Trang được sinh tại commit `494c297` (2026-09-03). Đây là lúc sinh tra
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 0.3.0 | building | 0 | 7 | CHƯA KHAI KIỂM CHỨNG | KHÔNG ÁP DỤNG (chưa khai mốc commit) | Hai repo thật đã lên chuẩn và đóng được cổng. Audit GPT chỉ đúng chỗ đau: chưa có cơ chế ghim phiên bản nên chép tay sẽ đẻ ra N bản khung | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.0.0 | active | 0 | 7 | 2026-09-03 @ `4550171` — npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề ([bằng chứng](docs/migrations/2026-09-03-nav-platform.md)) | CÓ (1 commit) | v1.0 đã đóng: bảy chỗ hợp đồng lõi đã vá và có fixture phá, đã chạy thật trên hai repo khác nghề | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 

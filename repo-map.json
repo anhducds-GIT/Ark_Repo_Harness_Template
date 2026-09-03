@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "494c297",
+  "generated_commit": "3fe5df9",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -30,23 +30,23 @@
     {
       "id": "ark-repo-harness",
       "path": ".",
-      "lifecycle": "building",
+      "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Chốt hướng versioning: repo đích phải ghim được bản khung nào, và nâng cấp bằng lệnh — không chép tay",
-      "human_action": "Chốt: dừng migrate thêm cho tới khi có ghim phiên bản + lệnh nâng cấp, hay cứ migrate tiếp và chấp nhận vá tay?",
+      "next_step": "Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo",
+      "human_action": "Không có việc nào cần bạn. Muốn mở rộng sang repo thứ ba thì nói — nhưng nên có ghim phiên bản trước",
       "priority_rank": 1,
       "superseded_by": null,
-      "last_verified": null,
-      "last_verified_commit": null,
-      "open_item": "Hai repo thật đã lên chuẩn và đóng được cổng. Audit GPT chỉ đúng chỗ đau: chưa có cơ chế ghim phiên bản nên chép tay sẽ đẻ ra N bản khung"
+      "last_verified": "2026-09-03",
+      "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
+      "open_item": "v1.0 đã đóng: bảy chỗ hợp đồng lõi đã vá và có fixture phá, đã chạy thật trên hai repo khác nghề"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Chốt hướng versioning: repo đích phải ghim được bản khung nào, và nâng cấp bằng lệnh — không chép tay",
+      "title": "Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo",
       "rank": 1,
       "claim": null
     }
