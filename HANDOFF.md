@@ -74,3 +74,13 @@ sửa `session-check.mjs`.
 
 - **2026-09-03 · harness-vong2** — Vòng 2: vá 9 lỗ do hai lần migrate thật và audit độc lập vạch ra (cổng báo XANH khi không kiểm được gì · safe-push soi một đằng đẩy một nẻo · bản đồ file đóng cứng số mục · máy sinh tự đếm mình là code · gõ sai tên trường cấu hình làm mất lớp bảo vệ · đèn sức khoẻ không bao giờ xanh được · HUONG-DAN bị nuốt khỏi trang · Log chỉ đòi ở package · quét secret bỏ qua .env). Suite 30 → 36. Mở: 6 phát hiện Codex chưa vá (đếm [ĐO] bằng regex · verifyCommit chưa kiểm ancestor · archived lọt active_work · provenance artifact).
 - **2026-09-03 · harness-vong2 (tiếp)** — Vá thêm: quét secret kêu oan một lời gọi hàm ở repo Project 3AI, và sau khi siết lại thì nó bắt chính suite của mình (fixture phải ghép chuỗi lúc chạy). Suite 36 → 37.
+ - **2026-09-03 · phiên `harness-vong2`** — Vòng 2: migrate thật hai repo ngoài đời
+   (Project 3AI, NAV chứng khoán) và vá những gì lần migrate đó phơi ra. Vá 6 lỗ, mỗi lỗ một
+   phép kiểm ghim, mỗi phép kiểm đã thử phá: tên file sai hoa thường bị chấm là "có" (Windows
+   không phân biệt, Linux thì có) · thư mục chiếm chỗ tên file bị kể là "thiếu" · phép kiểm
+   miễn trừ đọc sai hình dạng nên chưa bao giờ chạy · `init-repo` ném stack khi đích là file ·
+   cổng báo "mọi thứ đã khai" khi phiên không giữ vùng nào (xanh vì RỖNG).
+   THÊM: `scripts/can-nang.mjs` + mục 8 của luật — đo **cân nặng** bộ khung (đọc bắt buộc ·
+   tài liệu · số phép kiểm · thời gian) và trả lời được "luật nào chưa từng chặn được gì".
+   Suite 30 → 37. Codex vòng 3 trả 16 phát hiện; **4 cái tôi kiểm lại đều là báo nhầm** —
+   12 cái còn lại CHƯA kiểm, là việc mở lớn nhất.

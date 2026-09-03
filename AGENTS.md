@@ -50,14 +50,6 @@ cùng đọc thấy "trống" rồi cùng ghi tên mình, người ghi sau thắ
 phiên sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của
 `.repo-structure.json`.
 
-```mermaid
-flowchart TD
-    R["Gốc repo"] --> D["docs/ → khoá _docs"]
-    R --> C1["scripts/ → khoá _code"]
-    R --> C2["tests/ → khoá _code"]
-    R --> T["template/ → khoá _template"]
-    R --> O["mọi thứ còn lại → khoá _root"]
-```
 
 **Hai file được MIỄN, và lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác
 hành chính — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt
@@ -95,16 +87,12 @@ flowchart TD
     D -- không --> E["TỰ LÀM"]
 ```
 
-**Về mục 6 — "luật an toàn" cụ thể là năm luật này:**
+**"Luật an toàn" ở hàng 6 là năm thứ này:** *thử lại* (hỏng thì thử mấy lần rồi bỏ) · *dừng khẩn*
+(gặp chuyện thì dừng hẳn) · *quy trách nhiệm* (việc nào cũng ghi rõ ai làm) · *lưu trạng thái*
+(làm dở thì nhớ tới đâu) · *làm đúng một lần* (chạy hai lần không được ra hai kết quả).
 
-- *thử lại* — hỏng thì thử mấy lần rồi bỏ
-- *dừng khẩn* — gặp chuyện gì thì dừng hẳn, không đi tiếp
-- *quy trách nhiệm* — mỗi việc ghi rõ ai / phiên nào làm
-- *lưu trạng thái* — làm dở thì nhớ tới đâu để lần sau chạy tiếp
-- *làm đúng một lần* — một việc không được chạy hai lần thành hai kết quả
-
-**Repo bạn có phụ lục nghề (`docs/ANNEX-*.md`)?** Thì mọi việc phụ lục đó liệt kê cũng phải
-hỏi. Phụ lục chỉ được **thêm** vào sáu việc trên, không được bớt.
+Repo có phụ lục nghề (`docs/ANNEX-*.md`) thì việc phụ lục liệt kê cũng phải hỏi — phụ lục chỉ
+được **thêm** vào sáu việc trên, không được bớt.
 
 **Commit và push được tự làm** — Đức chốt 2026-08-26, áp cho MỌI AI — nhưng chỉ khi đủ cả ba:
 (1) việc đã hoàn tất trọn vẹn; (2) cổng kiểm XANH TOÀN BỘ, và với code thì đã qua audit độc lập;
@@ -179,6 +167,7 @@ minh được nó **tự** nạp lúc mở phiên.
 | **Sinh lại bản trích trong `template/`** | `npm run template` · chỉ kiểm không ghi: `npm run template -- --check` |
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — các khối hạt giống, chạy bằng `npm test` |
+| **Biết bộ khung đang nặng bao nhiêu, và luật nào chưa từng chặn được gì** | `scripts/can-nang.mjs` (`npm run can-nang`) — bốn con số có ngân sách; quá thì phải BỚT trước khi nghĩ tới nới. Nhịp tháng, cố ý KHÔNG nằm trong cổng đóng phiên |
 
 **Phải là liên kết bấm được, không phải chữ thường.** Máy kiểm xem mỗi file có được file nào
 trỏ tới không; **file không ai trỏ tới thì coi như không có**. Đo thật lúc dựng bộ khung: để
@@ -195,3 +184,22 @@ và cổng đóng phiên bắt.
    nhắc thêm 1 phép kiểm vào `scripts/session-check.mjs`.
 
 > Luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua. Đó là lý do có cổng kiểm.
+
+## 8. Thêm một luật thì phải bớt một luật
+
+Mỗi luật ở đây đều hợp lý **lúc thêm vào**. Cộng lại thì không: AI mất nửa phiên chỉ để đọc luật,
+luật bắt đầu mâu thuẫn nhau, đóng phiên lâu tới mức người ta bỏ qua cổng. Bộ khung chết vì phình
+chứ hiếm khi chết vì thiếu.
+
+Nên trước khi thêm một luật, một phép kiểm hay một tài liệu, trả lời đủ ba câu:
+
+1. **Đã có chuyện gì xảy ra thật chưa?** Chưa thì đừng thêm — viết vào `BACKLOG` và chờ.
+2. **Nó thay chỗ cái nào?** Không thay được cái nào thì nói rõ vì sao đáng thêm hẳn.
+3. **Dựng nổi ca hỏng cho nó không?** Không dựng nổi thì nó là chữ, không phải luật.
+
+Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu":
+
+```bash
+npm run can-nang
+```
+

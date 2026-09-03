@@ -10,11 +10,11 @@
       "released_at": null
     },
     "_docs": {
-      "owner": null,
-      "ai": null,
+      "owner": "harness-vong2",
+      "ai": "Claude",
       "claimed_at": "2026-09-02",
-      "task": "Sua tai lieu theo bao cao soi: gop danh sach hoi Duc, sua lenh sai, luu do",
-      "released_at": "2026-09-02"
+      "task": "them can-nang + luat mot-vao-mot-ra",
+      "released_at": null
     },
     "_code": {
       "owner": "harness-vong2",

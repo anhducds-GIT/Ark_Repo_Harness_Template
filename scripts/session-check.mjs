@@ -349,7 +349,25 @@ check("Không có secret lọt vào repo", () => {
 
 /* ---- 4. File mới phải khai vào Bản đồ file ------------------------------ */
 check("File mới đã khai vào Bản đồ file", () => {
-  const added = sessionChanges.filter((c) => /^(A|\?\?)/.test(c.code)).map((c) => c.file).filter(mine);
+  // LỌC THEO VÙNG MÌNH GIỮ LÀ ĐÚNG — nhưng lọc còn RỖNG thì KHÔNG phải "đã đạt".
+  //
+  // Ca đo được ở repo Project 3AI ngày 03/09: cùng một cây làm việc, cùng một giây, hai nhãn
+  // phiên khác nhau cho hai câu trả lời khác nhau — `--as migrate-3ai` ra 40 file chưa khai,
+  // `--as mot-nhan-khac` ra "Mọi thứ mới đều đã khai". Vì phiên sau không giữ vùng nào nên bộ
+  // lọc quét sạch danh sách, và cổng báo XANH vì RỖNG.
+  //
+  // Cùng họ với mọi lỗ fail-open đã vá hôm nay, và là họ nguy hiểm nhất: gõ một nhãn phiên khác
+  // là cổng đổi câu trả lời. Nên: lọc hết sạch mà vẫn CÓ file mới thì đó là `BỎ`, kèm câu nói
+  // thẳng vì sao không kiểm được.
+  const themMoi = sessionChanges.filter((c) => /^(A|\?\?)/.test(c.code)).map((c) => c.file);
+  const added = themMoi.filter(mine);
+  if (themMoi.length > 0 && added.length === 0) {
+    return {
+      ok: true,
+      skipped: true,
+      msg: `${themMoi.length} file mới đều thuộc vùng phiên KHÁC đang giữ, nên cổng KHÔNG kiểm được cái nào. Đây là "chưa kiểm", không phải "đã đạt" — chạy lại dưới đúng nhãn phiên đang giữ vùng đó.`
+    };
+  }
   const undeclared = [];
   /* TÌM BẢN ĐỒ BẰNG MỐC, KHÔNG BẰNG SỐ MỤC.
    *
@@ -811,6 +829,32 @@ for (const r of results) {
  *
  * Cả ca `BỎ` đều tự sửa được, và quy trình migrate đã dặn đúng cách sửa — nên mã 2 không khoá
  * repo nào, nó chỉ không cho nói dối. */
+/* GHI MỘT DÒNG MỖI LẦN CHẠY — để trả lời được câu "luật nào chưa từng chặn được gì".
+ *
+ * `docs/BAO-TRI-DINH-KY.md` hỏi câu đó từ đầu, nhưng hỏi suông: không ai trả lời nổi khi không
+ * có gì ghi lại. Một luật chưa từng bắt được gì thì hoặc nó thừa, hoặc nó là phép kiểm rỗng
+ * nghĩa — repo này đã tự bắt được BẢY cái như thế trong ba ngày.
+ *
+ * KHÔNG COMMIT file này, và cố ý: nó là số đo của MÁY NÀY, không phải sự thật chung của repo.
+ * Commit vào thì mỗi phiên lại tạo một thay đổi rác, và cổng "cây làm việc sạch" kêu oan.
+ * Cắt còn 300 dòng cuối để nó không phình vô hạn — chính file đo cân nặng mà béo lên thì hỏng. */
+try {
+  const soGhi = path.join(ROOT, ".agents", "gate-log.jsonl");
+  const dongMoi = JSON.stringify({
+    // Ngày theo đồng hồ MÁY NÀY, không phải UTC. Cùng lỗi đã sửa ở build-overview: sinh lúc
+    // 0h30 giờ Việt Nam thì toISOString() trả ngày HÔM QUA, và sổ ghi lệch ngay dòng đầu.
+    d: (() => { const x = new Date(), z = (n) => String(n).padStart(2, "0");
+                return `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}`; })(),
+    as: asLabel,
+    ten: results.map((r) => r.name),
+    do: results.filter((r) => !r.ok).map((r) => r.name),
+    bo: results.filter((r) => r.ok && r.skipped).map((r) => r.name)
+  });
+  let cu = [];
+  try { cu = fs.readFileSync(soGhi, "utf8").split(String.fromCharCode(10)).filter(Boolean); } catch { cu = []; }
+  fs.writeFileSync(soGhi, [...cu, dongMoi].slice(-300).join(String.fromCharCode(10)) + String.fromCharCode(10), "utf8");
+} catch { /* ghi sổ hỏng KHÔNG được làm hỏng cổng — đây là số đo phụ, không phải phép kiểm */ }
+
 const failed = results.filter((r) => !r.ok);
 const boQua = results.filter((r) => r.ok && r.skipped);
 if (failed.length) {

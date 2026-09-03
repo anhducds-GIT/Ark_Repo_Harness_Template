@@ -106,3 +106,18 @@ sang đây: một quy trình, một hình.
 - `git push` trần — luôn dùng `npm run push`
 - Tin `git status -sb` sau khi push. Hỏi thẳng máy chủ — cách hỏi nằm ở cuối
   [workflows/03](workflows/03-mot-phien-lam-viec.md)
+
+## Repo chia vùng thế nào
+
+Mỗi vùng chỉ một phiên AI được ghi tại một thời điểm. Bản đồ dưới đây là **ảnh chụp của repo
+này** — nguồn thật là khối `areas` trong `.repo-structure.json`, và lệnh `node scripts/claim.mjs
+--list` luôn nói đúng hơn hình vẽ.
+
+```mermaid
+flowchart TD
+    R["Gốc repo"] --> D["docs/ → khoá _docs"]
+    R --> C1["scripts/ → khoá _code"]
+    R --> C2["tests/ → khoá _code"]
+    R --> T["template/ → khoá _template"]
+    R --> O["mọi thứ còn lại → khoá _root"]
+```

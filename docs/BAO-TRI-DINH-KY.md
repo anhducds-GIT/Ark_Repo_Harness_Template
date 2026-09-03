@@ -64,6 +64,10 @@ Ai mở phiên đầu tiên trong tuần thì làm, ghi một dòng vào `HANDOF
 - [ ] Sổ tay có mục nào lạc hậu so với việc đang làm thật không?
 - [ ] Mỗi việc lặp lại đã có mục trong sổ tay chưa? Chưa có thì viết, kẻo lần sau lại tự nghĩ
 - [ ] Nhật ký đã ghi bản mới chưa?
+- [ ] `npm run can-nang` — **cân nặng, chứ không phải độ đúng.** Quá ngân sách thì phải BỚT
+      trước khi nghĩ tới nới. Đọc kỹ danh sách *phép kiểm chưa từng đỏ*: với từng cái, hỏi
+      "dựng nổi ca hỏng cho nó không?". Không dựng nổi thì nó là chữ, không phải luật —
+      và một luật không chặn được gì vẫn tốn chỗ nhớ của mọi phiên sau
 
 ## Ba dấu hiệu repo đang xuống cấp
 
