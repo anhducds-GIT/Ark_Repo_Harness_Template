@@ -233,3 +233,15 @@ sửa `session-check.mjs`.
    `data/ta/**`** đang có thay đổi chưa commit của người khác. Đã `reset` và commit lại bằng
    đường dẫn tường minh. Ở repo dùng chung, `git add -A` là một cái bẫy.
 
+ - **2026-09-03 · `harness-vong2` · v1.2.5 LEDGER-HARDENING** — Audit đọc lại chính sổ phát hành
+   vừa dựng ở v1.2.4 và thấy **nó fail-open**: bắt lỗi rồi trả `{}`, nên "hỏng" và "không có" đổ
+   chung một rổ, và rổ đó thì bộ sinh **tự ghi lại**. Tôi vừa dựng lại đúng cái bẫy `SO_GHIM_HONG`
+   đã vá ở v1.2.1. Đã kiểm bằng tay: xoá sổ → chạy bộ sinh → sổ mọc lại y nguyên, thoát 0.
+   **Bài học ghi vào code:** bất cứ chỗ nào `catch` rồi trả một giá trị "trống" đều là một cửa hậu.
+   Vá: bốn trạng thái (`KHÔNG`/`CÓ`/`HỎNG` + `SUA_LICH_SU`); mọi khoá đã có **trong HEAD** phải y
+   nguyên (sổ thôi tự làm chứng cho chính nó); preflight trước khi ghi `template/`.
+   Sáu đột biến ngược: năm bị bắt. Cái thứ sáu không bắt được vì preflight đã chặn trước — **giữ
+   nguyên và ghi `ponytail:` tại dòng đó**, thay vì viết một phép kiểm giả để tô xanh.
+   Cũng sửa: repo canonical đã đổi tên thành `Ark_Repo_Harness_Template`; trường `source` trong
+   sổ ghim và `git remote` ở máy này còn trỏ tên cũ (đang sống nhờ redirect của GitHub). Suite 69.
+

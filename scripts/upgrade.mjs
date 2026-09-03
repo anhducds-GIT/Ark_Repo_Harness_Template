@@ -25,7 +25,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { bam, bamBanTrich, buildTemplateFiles, fileMay, kiemSoPhatHanh,
-  SO_PHAT_HANH, TEMPLATE_VERSION } from "./build-template.mjs";
+  loiSoPhatHanh, TEMPLATE_VERSION } from "./build-template.mjs";
 
 /* Ba hàm này mô tả BẢN TRÍCH, không mô tả việc nâng cấp, nên nhà của chúng là
    `build-template.mjs`. Giữ lại lối vào cũ ở đây để không bẻ nơi đang gọi. */
@@ -105,7 +105,7 @@ export function soGhimMoi(chuan, cu, giuLai = {}) {
   const z = (n) => String(n).padStart(2, "0");
   return {
     _doc: "Repo này đang dùng bản khung nào, và file máy nào là của bộ khung. SINH TỰ ĐỘNG bởi upgrade.mjs — đừng sửa tay.",
-    source: "https://github.com/anhducds-GIT/Ark_Repo_Harness",
+    source: "https://github.com/anhducds-GIT/Ark_Repo_Harness_Template",
     version: TEMPLATE_VERSION,
     bundle_digest: bamBanTrich(chuan),
     applied_at: `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}`,
@@ -149,12 +149,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   const nguon = kiemSoPhatHanh(chuan);
   if (nguon.trangThai !== "KHOP") {
     console.error(`${NL}NGUON_KHONG_NHAT_QUAN: bộ khung ở đây không phát được.`);
-    console.error(nguon.trangThai === "CHUA_GHI"
-      ? `Bản ${nguon.version} chưa có dòng nào trong ${SO_PHAT_HANH}.`
-      : `Bản ${nguon.version} đã phát với dấu vân tay ${nguon.daGhi}, mà nội dung tầng máy hiện tại là ${nguon.dangCo}.`);
-    console.error("Nội dung tầng máy đã đổi mà số phiên bản chưa tăng — phát đi lúc này là dán");
-    console.error(`một nhãn sai lên repo đích, và không lệnh nào phát hiện được nữa.`);
-    console.error(`Sửa ở repo nhà: tăng "version" trong package.json, rồi \`node scripts/build-template.mjs\`.${NL}`);
+    for (const dong of loiSoPhatHanh(nguon)) console.error(dong);
+    console.error(`Chưa đọc repo đích, chưa ghi gì. Sửa ở repo NHÀ rồi chạy lại.${NL}`);
     process.exit(3);
   }
 

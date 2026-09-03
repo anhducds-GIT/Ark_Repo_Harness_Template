@@ -7,7 +7,7 @@ ttl_days: 30
 # ĐỀ BÀI BRAINSTORM CHO GPT — đưa harness này tới v1.0
 
 > **Cách dùng:** Đức dán trọn file này cho GPT. GPT đọc repo qua GitHub connector.
-> Repo: `https://github.com/anhducds-GIT/Ark_Repo_Harness`
+> Repo: `https://github.com/anhducds-GIT/Ark_Repo_Harness_Template`
 >
 > **Đừng tóm tắt hộ nó.** Và đừng bảo nó "đánh giá xem tốt chưa" — câu đó luôn nhận về lời khen.
 

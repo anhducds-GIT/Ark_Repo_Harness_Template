@@ -334,7 +334,9 @@ const dungRepo = (ghiSoGhim) => {
     writeFileSync(soPhat, JSON.stringify(j, null, 2), "utf8");
     const r = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs"), "--check"], { encoding: "utf8" });
     assert.notEqual(r.status, 0, "so phat hanh lech thi `npm test` phai DO");
-    assert.match(String(r.stdout) + String(r.stderr), /SO_PHAT_HANH_LECH/, "phai goi ten loi");
+    // Hai ma deu dung, va cai nao keu la co nghia: neu ban do DA nam trong HEAD thi phep so lich
+    // su bat truoc va noi SUA_LICH_SU (cu the hon); neu chua thi moi toi phep so nguon ↔ so.
+    assert.match(String(r.stdout) + String(r.stderr), /SO_PHAT_HANH_LECH|SUA_LICH_SU/, "phai goi ten loi");
 
     // Va bo sinh KHONG duoc tu sua dong cu cho xong chuyen — do la noi doi ve mot ban da phat.
     const g = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs")], { encoding: "utf8" });
@@ -343,6 +345,96 @@ const dungRepo = (ghiSoGhim) => {
       "dong cu phai con nguyen — nguoi quyet, khong phai may");
   } finally { writeFileSync(soPhat, goc, "utf8"); }
   ok("sổ phát hành lệch → npm test đỏ, và bộ sinh từ chối tự sửa dòng cũ");
+}
+
+/* ---- 13. So phat hanh HONG / THIEU → DUNG, khong tu ghi lai ------------- */
+{
+  // Ban dau bat moi loi roi tra `{}`, nen "khong co file" va "file hong" do chung mot ro, va ro
+  // do duoc coi la CHUA GHI — ma CHUA GHI thi bo sinh TU GHI DE. Tuc la lam hong so phat hanh la
+  // cach vuot qua chinh no: sua nguon, xoa so, chay lai, va cung mot so phien ban duoc dong lai
+  // voi dau van tay moi. DUNG cai bay SO_GHIM_HONG da va o v1.2.1, dung lai o mot cho moi.
+  const soPhat = join(ROOT, "RELEASE-LEDGER.json");
+  const goc = readFileSync(soPhat, "utf8");
+  const root = dungRepo(true);
+  try {
+    for (const [ten, lamHong] of [
+      ["hỏng", () => writeFileSync(soPhat, "{ day la json cut", "utf8")],
+      ["thiếu khối `ban`", () => writeFileSync(soPhat, JSON.stringify({ _doc: "x" }), "utf8")],
+      // KHONG doc duoc, ma cung KHONG phai "khong ton tai". Chi ENOENT moi la "chua co so";
+      // moi loi doc khac (khong du quyen, duong dan la thu muc, dia hong) la KHONG BIET — va
+      // khong biet thi khong duoc di tiep. Dung thu muc de dung lai ca nay o moi he dieu hanh.
+      ["đọc không được", () => { rmSync(soPhat, { force: true }); mkdirSync(soPhat, { recursive: true }); }]
+    ]) {
+      lamHong();
+      const g = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs")], { encoding: "utf8" });
+      assert.notEqual(g.status, 0, `so ${ten}: bo sinh phai DUNG, khong duoc tu ghi lai`);
+      assert.match(String(g.stdout) + String(g.stderr), /SO_PHAT_HANH_HONG/, "phai goi ten no la HONG");
+      let noiDungSau = "";
+      try { noiDungSau = readFileSync(soPhat, "utf8"); } catch { /* la thu muc */ }
+      assert.equal(noiDungSau.includes(String.fromCharCode(34) + "ban" + String.fromCharCode(34)), false,
+        "KHONG duoc tu dung lai so — do la cach vuot qua chinh no");
+
+      const c = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs"), "--check"], { encoding: "utf8" });
+      assert.notEqual(c.status, 0, `so ${ten}: --check phai DO`);
+
+      const u = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--apply", "--force", root], { encoding: "utf8" });
+      assert.notEqual(u.status, 0, `so ${ten}: upgrade phai DUNG, ke ca --force`);
+      assert.match(String(u.stdout) + String(u.stderr), /NGUON_KHONG_NHAT_QUAN/, "phai noi loi o repo NHA");
+    }
+  } finally {
+    rmSync(soPhat, { recursive: true, force: true });
+    writeFileSync(soPhat, goc, "utf8");
+    rmSync(root, { recursive: true, force: true });
+  }
+  ok("sổ phát hành hỏng / sai schema / đọc không được → dừng ở cả ba đường, KHÔNG tự dựng lại");
+}
+
+/* ---- 14. Sua doi mot ban DA PHAT → DUNG (doi bien theo cap) ------------- */
+{
+  // Ve yeu nhat cua so: no TU LAM CHUNG cho chinh no. Sua nguon roi sua luon dong cua ban hien
+  // tai cho khop thi moi phep so "nguon ↔ so" deu xanh. Vat doi chieu duy nhat khong sua kem
+  // duoc trong cung mot thao tac la ban so DA NAM TRONG HEAD.
+  const soPhat = join(ROOT, "RELEASE-LEDGER.json");
+  const goc = readFileSync(soPhat, "utf8");
+  try {
+    const trongHEAD = spawnSync("git", ["show", "HEAD:RELEASE-LEDGER.json"], { cwd: ROOT, encoding: "utf8" });
+    if (trongHEAD.status !== 0) { ok("(bỏ qua 14: sổ chưa có trong HEAD — chưa có mốc để đối chiếu)"); }
+    else {
+      const cu = JSON.parse(trongHEAD.stdout).ban;
+      const banCu = Object.keys(cu).sort()[0];
+      const j = JSON.parse(goc);
+      j.ban[banCu] = "1".repeat(16);        // doi bien theo cap: sua dong CUA MOT BAN DA PHAT
+      writeFileSync(soPhat, JSON.stringify(j, null, 2), "utf8");
+      for (const lenh of [["build-template.mjs", "--check"], ["build-template.mjs"], ["upgrade.mjs", "--plan", ROOT]]) {
+        const r = spawnSync(process.execPath, [join(ROOT, "scripts", lenh[0]), ...lenh.slice(1)], { encoding: "utf8" });
+        assert.notEqual(r.status, 0, `${lenh.join(" ")}: sua mot ban DA PHAT thi phai DUNG`);
+        assert.match(String(r.stdout) + String(r.stderr), /SUA_LICH_SU/, "phai goi ten no la sua lich su");
+      }
+      // Va xoa han mot dong cu cung phai bi bat, khong chi doi gia tri.
+      const k = JSON.parse(goc); delete k.ban[banCu];
+      writeFileSync(soPhat, JSON.stringify(k, null, 2), "utf8");
+      const r2 = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs"), "--check"], { encoding: "utf8" });
+      assert.notEqual(r2.status, 0, "xoa mot dong da phat cung la sua lich su");
+      ok("sửa (hoặc xoá) một bản ĐÃ PHÁT → dừng — sổ không còn tự làm chứng cho chính nó");
+    }
+  } finally { writeFileSync(soPhat, goc, "utf8"); }
+}
+
+/* ---- 15. Tu choi thi phai tu choi TRUOC khi ghi template/ --------------- */
+{
+  // Ban dau xoa `template/`, ghi lai 22 file, ROI moi tu choi vi so lech. Nen mot lan chay nham
+  // de lai cay lam viec da doi kem ma thoat khac 0 — nguoi dung phai tu doan minh dang o dau.
+  const soPhat = join(ROOT, "RELEASE-LEDGER.json");
+  const goc = readFileSync(soPhat, "utf8");
+  const motFile = join(ROOT, "template", "scripts", "claim.mjs");
+  const truoc = readFileSync(motFile, "utf8");
+  try {
+    writeFileSync(soPhat, "{ hong", "utf8");
+    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs")], { encoding: "utf8" });
+    assert.notEqual(r.status, 0, "so hong thi bo sinh phai DUNG");
+    assert.equal(readFileSync(motFile, "utf8"), truoc, "tu choi thi template/ phai con NGUYEN");
+  } finally { writeFileSync(soPhat, goc, "utf8"); }
+  ok("từ chối trước khi ghi — template/ còn nguyên, không để lại trạng thái nửa vời");
 }
 
 console.log(`

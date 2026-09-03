@@ -17,6 +17,7 @@
  * thái của repo Chrome.
  */
 
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
@@ -733,22 +734,71 @@ export function bamBanTrich(chuan) {
   return bam(fileMay(chuan).sort().map((rel) => `${rel}:${bam(chuan.get(rel))}`).join("|"));
 }
 
+/* BA TRẠNG THÁI, KHÔNG PHẢI HAI — lần thứ hai trong repo này.
+ *
+ * Bản đầu bắt mọi lỗi rồi trả `{}`, nên "không có file" và "file hỏng" đổ chung vào một rổ, rồi
+ * rổ đó được coi là CHƯA GHI — mà CHƯA GHI thì bộ sinh tự ghi đè. Tức là **làm hỏng sổ phát hành
+ * là cách vượt qua chính nó**: sửa nguồn, xoá (hoặc làm hỏng) sổ, chạy bộ sinh, và cùng một số
+ * phiên bản được đóng lại với dấu vân tay mới. Không một lời cảnh báo.
+ *
+ * Đúng cái bẫy `SO_GHIM_HONG` đã vá ở v1.2.1, dựng lại ở một chỗ mới. Ghi ra đây để lần sau
+ * nhìn thấy trước: bất cứ chỗ nào `catch` rồi trả giá trị "trống" đều là một cửa hậu. */
 export function docSoPhatHanh(root = ROOT) {
   const duong = path.join(root, SO_PHAT_HANH);
   let raw;
-  try { raw = fs.readFileSync(duong, "utf8"); } catch { return {}; }
-  try {
-    const j = JSON.parse(raw);
-    return j && typeof j.ban === "object" && j.ban !== null ? j.ban : {};
-  } catch { return {}; }
+  try { raw = fs.readFileSync(duong, "utf8"); }
+  catch (e) { return e?.code === "ENOENT" ? { trangThai: "KHONG", ban: {} } : { trangThai: "HONG", loi: String(e.message).split(String.fromCharCode(10))[0] }; }
+  let j;
+  try { j = JSON.parse(raw); } catch (e) { return { trangThai: "HONG", loi: String(e.message).split(String.fromCharCode(10))[0] }; }
+  if (!j || typeof j.ban !== "object" || j.ban === null || Array.isArray(j.ban)) {
+    return { trangThai: "HONG", loi: "thiếu khối `ban` dạng object" };
+  }
+  return { trangThai: "CO", ban: j.ban };
 }
 
-/* Ba câu trả lời. "Chưa ghi" KHÔNG giống "ghi rồi và khớp", và cũng không giống "ghi rồi mà lệch" —
-   ca cuối là ca duy nhất phải chặn, hai ca đầu chỉ cần ghi thêm. */
+/* CHỈ THÊM, và MÁY phải chứng minh được — không chỉ ghi trong tài liệu.
+ *
+ * Sửa nguồn rồi sửa luôn dòng của bản hiện tại cho khớp thì mọi phép so "nguồn ↔ sổ" đều xanh:
+ * sổ tự làm chứng cho chính nó. Vật đối chiếu duy nhất không sửa kèm được trong cùng một thao
+ * tác là **bản sổ đã nằm trong HEAD**. Nên: mọi khoá HEAD đã có thì phải y nguyên; chỉ được
+ * THÊM khoá mới.
+ *
+ * Biên của nó, nói thẳng: khoá của bản ĐANG soạn chưa vào HEAD nên chưa được canh — đúng, vì lúc
+ * đó bạn vẫn đang viết bản phát ấy. Và ai cố ý thì vẫn sửa được cả hai rồi commit đè; cái này
+ * không chặn gian lận có chủ đích, nó chặn chuyện "sửa cho xong" và bắt gian lận phải để lại
+ * một vết trong lịch sử. */
+export function soVoiHEAD(root = ROOT) {
+  let raw;
+  try {
+    raw = execFileSync("git", ["show", `HEAD:${SO_PHAT_HANH}`],
+      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  } catch { return { trangThai: "CHUA_CO_TRONG_HEAD", doi: [] }; }
+  let cu;
+  try { cu = JSON.parse(raw).ban ?? {}; } catch { return { trangThai: "CHUA_CO_TRONG_HEAD", doi: [] }; }
+  const nay = docSoPhatHanh(root);
+  if (nay.trangThai !== "CO") return { trangThai: nay.trangThai, doi: [], loi: nay.loi };
+  const doi = [];
+  for (const [ban, bamCu] of Object.entries(cu)) {
+    const bamNay = nay.ban[ban];
+    if (bamNay === undefined) doi.push({ ban, cu: bamCu, nay: "(đã bị xoá)" });
+    else if (bamNay !== bamCu) doi.push({ ban, cu: bamCu, nay: bamNay });
+  }
+  return { trangThai: doi.length ? "DA_SUA" : "NGUYEN_VEN", doi };
+}
+
+/* Bốn câu trả lời. "Chưa ghi" KHÔNG giống "ghi rồi và khớp", không giống "ghi rồi mà lệch", và
+   không giống "sổ hỏng" — chỉ ca đầu là được ghi thêm, ba ca sau đều phải dừng. */
 export function kiemSoPhatHanh(chuan, root = ROOT) {
-  const so = docSoPhatHanh(root);
+  const doc = docSoPhatHanh(root);
   const dangCo = bamBanTrich(chuan);
-  const daGhi = so[TEMPLATE_VERSION] ?? null;
+  if (doc.trangThai === "HONG") return { trangThai: "SO_HONG", version: TEMPLATE_VERSION, dangCo, loi: doc.loi };
+
+  const lichSu = soVoiHEAD(root);
+  if (lichSu.trangThai === "DA_SUA") {
+    return { trangThai: "SUA_LICH_SU", version: TEMPLATE_VERSION, dangCo, doi: lichSu.doi };
+  }
+
+  const daGhi = doc.ban[TEMPLATE_VERSION] ?? null;
   if (daGhi === null) return { trangThai: "CHUA_GHI", version: TEMPLATE_VERSION, dangCo };
   return daGhi === dangCo
     ? { trangThai: "KHOP", version: TEMPLATE_VERSION, dangCo }
@@ -757,9 +807,13 @@ export function kiemSoPhatHanh(chuan, root = ROOT) {
 
 function ghiSoPhatHanh(chuan) {
   const kq = kiemSoPhatHanh(chuan);
-  if (kq.trangThai === "KHOP") return kq;
-  if (kq.trangThai === "LECH") return kq;   // KHÔNG tự sửa — người quyết, xem main()
-  const so = docSoPhatHanh();
+  /* Chỉ MỘT trạng thái được ghi thêm. Mọi trạng thái còn lại — khớp rồi, lệch, sổ hỏng, lịch sử
+     bị sửa — đều trả về nguyên trạng; bộ sinh không tự chữa sổ.
+     ponytail: `main()` đã chặn ba ca xấu ở preflight trước khi gọi vào đây, nên dòng này không
+     có phép kiểm riêng — nó không tới được. Giữ vì điều kiện đúng, và vì hàm này sẽ nguy hiểm
+     nếu có ngày ai gọi nó từ chỗ khác. Bỏ preflight thì phải viết phép kiểm cho nó. */
+  if (kq.trangThai !== "CHUA_GHI") return kq;
+  const so = docSoPhatHanh().ban;
   so[TEMPLATE_VERSION] = kq.dangCo;
   const sapXep = Object.fromEntries(Object.keys(so).sort().map((v) => [v, so[v]]));
   fs.writeFileSync(path.join(ROOT, SO_PHAT_HANH), JSON.stringify({
@@ -769,6 +823,33 @@ function ghiSoPhatHanh(chuan) {
   return kq;
 }
 
+
+/* Một chỗ diễn giải cho MỌI trạng thái sổ phát hành — `--check` và lượt sinh phải nói y hệt nhau,
+   nếu không người đọc sẽ tin cái nào nhẹ hơn. */
+export function loiSoPhatHanh(kq) {
+  const d = [];
+  if (kq.trangThai === "SO_HONG") {
+    d.push(`SO_PHAT_HANH_HONG: ${SO_PHAT_HANH} có nhưng đọc không nổi — ${kq.loi}`);
+    d.push("Đây KHÔNG phải 'chưa ghi'. Coi nó là chưa ghi thì làm hỏng sổ trở thành cách vượt qua");
+    d.push("chính nó: sửa nguồn, xoá sổ, chạy lại, và cùng một số phiên bản mang dấu vân tay mới.");
+    d.push(`Khôi phục từ git: \`git checkout -- ${SO_PHAT_HANH}\`.`);
+  } else if (kq.trangThai === "SUA_LICH_SU") {
+    d.push(`SO_PHAT_HANH_SUA_LICH_SU: ${kq.doi.length} bản đã phát bị đổi so với HEAD —`);
+    for (const x of kq.doi) d.push(`  ${x.ban}: ${x.cu} → ${x.nay}`);
+    d.push("Sổ này CHỈ THÊM. Sửa một dòng đã phát là nói dối về một bản đã đi ra ngoài, và nó xoá");
+    d.push("luôn khả năng đối chiếu — sổ tự làm chứng cho chính nó thì nó không chứng gì cả.");
+    d.push(`Khôi phục: \`git checkout -- ${SO_PHAT_HANH}\`, rồi tăng "version" nếu bạn đang muốn phát bản mới.`);
+  } else if (kq.trangThai === "LECH") {
+    d.push(`SO_PHAT_HANH_LECH: bản ${kq.version} đã ghi dấu vân tay ${kq.daGhi}, mà nội dung tầng máy hiện tại là ${kq.dangCo}.`);
+    d.push("Nội dung tầng máy đã đổi mà số phiên bản chưa tăng. Một số trỏ tới hai nội dung thì nó");
+    d.push("không còn là mốc — và `upgrade.mjs` sẽ phát hai thứ khác nhau dưới cùng một nhãn.");
+    d.push(`Sửa: tăng "version" trong package.json, rồi \`node scripts/build-template.mjs\`.`);
+  } else if (kq.trangThai === "CHUA_GHI") {
+    d.push(`SO_PHAT_HANH_THIEU: chưa có dòng nào cho bản ${kq.version} trong ${SO_PHAT_HANH}.`);
+    d.push("Sửa: `node scripts/build-template.mjs` (lượt sinh sẽ ghi thêm dòng đó).");
+  }
+  return d;
+}
 /* ---- chạy ------------------------------------------------------------------ */
 
 // So sánh bỏ qua ký tự xuống dòng kiểu Windows: git có thể checkout CRLF trong khi bộ sinh
@@ -811,17 +892,24 @@ function main() {
     }
     const so = kiemSoPhatHanh(files);
     if (so.trangThai !== "KHOP") {
-      console.error(so.trangThai === "CHUA_GHI"
-        ? `SO_PHAT_HANH_THIEU: chưa có dòng nào cho bản ${so.version} trong ${SO_PHAT_HANH}.`
-        : `SO_PHAT_HANH_LECH: bản ${so.version} đã ghi dấu vân tay ${so.daGhi}, mà nội dung tầng máy hiện tại là ${so.dangCo}.`);
-      console.error("Nội dung tầng máy đã đổi mà số phiên bản chưa tăng. Một số trỏ tới hai nội dung");
-      console.error("thì nó không còn là mốc — và `upgrade.mjs` sẽ phát hai thứ khác nhau dưới cùng một nhãn.");
-      console.error(`Sửa: tăng "version" trong package.json, rồi \`node scripts/build-template.mjs\`.`);
-      console.error(`ĐỪNG sửa tay dòng cũ trong ${SO_PHAT_HANH} — đó là nói dối về một bản đã phát.`);
+      for (const dong of loiSoPhatHanh(so)) console.error(dong);
       process.exit(1);
     }
     console.log(`${OUT}/ khớp bản gốc — ${files.size} file, bản ${so.version} khớp sổ phát hành.`);
     return;
+  }
+
+  /* KIỂM SỔ TRƯỚC KHI GHI MỘT BYTE NÀO.
+   *
+   * Bản đầu xoá `template/`, ghi lại 22 file, RỒI mới từ chối vì sổ lệch. Nên một lần chạy nhầm
+   * để lại cây làm việc đã đổi kèm mã thoát khác 0 — người dùng phải tự đoán mình đang ở trạng
+   * thái nào. Từ chối thì phải từ chối trước, không phải từ chối sau. */
+  const soTruoc = kiemSoPhatHanh(files);
+  if (soTruoc.trangThai !== "KHOP" && soTruoc.trangThai !== "CHUA_GHI") {
+    console.error("");
+    for (const dong of loiSoPhatHanh(soTruoc)) console.error(dong);
+    console.error("Chưa ghi file nào — `template/` còn nguyên.");
+    process.exit(1);
   }
 
   fs.rmSync(path.join(ROOT, OUT), { recursive: true, force: true });
@@ -831,12 +919,6 @@ function main() {
     fs.writeFileSync(abs, text, "utf8");
   }
   const so = ghiSoPhatHanh(files);
-  if (so.trangThai === "LECH") {
-    console.error(`${String.fromCharCode(10)}SO_PHAT_HANH_LECH: bản ${so.version} đã phát với dấu vân tay ${so.daGhi},`);
-    console.error(`mà nội dung tầng máy hiện tại là ${so.dangCo}. KHÔNG tự ghi đè dòng cũ.`);
-    console.error("Tăng \"version\" trong package.json rồi chạy lại — mỗi nội dung một số riêng.");
-    process.exit(1);
-  }
   console.log(`Đã sinh ${OUT}/ — ${files.size} file, bản ${TEMPLATE_VERSION}`
     + `${so.trangThai === "CHUA_GHI" ? ` (đã ghi vào ${SO_PHAT_HANH})` : ""}.`);
 }

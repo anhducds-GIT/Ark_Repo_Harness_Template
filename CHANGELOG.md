@@ -3,6 +3,36 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.5 — 2026-09-03 — Sổ phát hành thôi tự làm chứng cho chính nó
+
+v1.2.4 dựng sổ phát hành để một số phiên bản trỏ tới đúng một nội dung. Audit độc lập đọc lại
+và thấy **chính cái sổ ấy fail-open** — tôi vừa dựng lại đúng cái bẫy đã vá ở v1.2.1, ở một chỗ
+mới.
+
+| Ca | v1.2.4 | v1.2.5 |
+|---|---|---|
+| Sổ **hỏng** hoặc bị **xoá** | bắt lỗi → trả `{}` → coi là "chưa ghi" → **bộ sinh tự dựng lại** | `SO_PHAT_HANH_HONG`, dừng cả ba đường |
+| Sổ **đọc không được** (không phải thiếu) | như trên | phân biệt được: chỉ `ENOENT` mới là "chưa có" |
+| Sửa (hoặc xoá) một **bản đã phát** | đi lọt: sửa nguồn + sửa dòng cho khớp là mọi phép so đều xanh | so với bản sổ **trong HEAD** → `SUA_LICH_SU` |
+| Từ chối vì sổ lệch | xoá `template/`, ghi 22 file, **rồi** mới từ chối | preflight — từ chối trước, `template/` còn nguyên |
+
+Ca thứ nhất là đường vòng thật: **sửa nguồn → xoá sổ → chạy bộ sinh**, và cùng một số phiên bản
+được đóng lại với dấu vân tay mới, không một lời cảnh báo.
+
+Ca thứ ba đáng nói riêng, vì nó là vế yếu nhất của cả cơ chế: **sổ tự làm chứng cho chính nó.**
+Vật đối chiếu duy nhất không sửa kèm được trong cùng một thao tác là bản sổ **đã nằm trong
+HEAD**. Nói rõ biên: khoá của bản đang soạn chưa vào HEAD nên chưa được canh — đúng, vì lúc đó
+bạn vẫn đang viết bản phát ấy; và ai cố ý vẫn sửa được cả hai rồi commit đè. Nó không chặn gian
+lận có chủ đích, nó chặn chuyện "sửa cho xong" và bắt gian lận phải để lại vết trong lịch sử.
+
+Sáu phép đột biến ngược: **năm bị bắt**. Cái thứ sáu — `ghiSoPhatHanh` từ chối mọi trạng thái xấu
+— **không bắt được, và đó là câu trả lời đúng**: preflight đã chặn trước khi tới nó. Đã ghi
+`ponytail:` ngay tại dòng đó thay vì giả vờ nó có phép kiểm.
+
+Sửa luôn: repo canonical đã đổi tên thành **`Ark_Repo_Harness_Template`**, mà trường `source`
+trong mọi sổ ghim còn trỏ tên cũ — nay chỉ còn sống nhờ redirect của GitHub, và redirect đó
+đứt nếu có ai tạo repo mới trùng tên cũ. Suite 69.
+
 ## 1.2.4 — 2026-09-03 — Một số phiên bản trỏ tới đúng một nội dung, và không lùi được nữa
 
 Hai lỗ, cùng một gốc: **bản trích và số phiên bản đều dựng từ nguồn đang sống**, nên không có
