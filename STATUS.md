@@ -11,7 +11,7 @@ owner: harness-vong2
 priority_rank: 1
 next_step: "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub"
 version_source: package.json
-current_focus: "v1.2.2: CI vừa bật đã bắt được một cái bẫy chỉ hiện ra trên máy sạch"
+current_focus: "v1.2.3: cổng cấu trúc trên CI nay chặn thật, không chỉ in màu"
 human_action: "Bật hai nút trong Settings của repo trên GitHub: chặn merge khi CI đỏ, và Secret scanning"
 ref_readme: README.md
 ref_handoff: HANDOFF.md

@@ -10,7 +10,7 @@
  */
 
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, cpSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -21,7 +21,9 @@ import { danhGia, mucDo, cauHinhDocDuoc } from "../scripts/assess.mjs";
 import { buildTemplateFiles } from "../scripts/build-template.mjs";
 import { isBehaviourFile, LIFECYCLES } from "../scripts/build-dashboard.mjs";
 import { VONG_DOI } from "../scripts/build-overview.mjs";
+import { blockingCodes, createBootstrapDeps } from "../scripts/check-bootstrap.mjs";
 
+const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -239,5 +241,56 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   } finally { rmSync(root, { recursive: true, force: true }); }
   ok("F8 · bảng quyền ghi đúng AI, giữ khi chạy lại, và không đoán cho phiên khác");
 }
+
+/* ---- F9. Cong cau truc phai co RANG, khong chi co giong ------------------ */
+{
+  // `check-bootstrap` chi thoat khac 0 khi mot phep kiem nam trong `bootstrap.blocking` bi do.
+  // Danh sach do de RONG o repo nha, nen B1-B15 co the in DO day man hinh ma lenh van thoat 0 —
+  // va CI, von chi doc ma thoat, van xanh. Bat "required status check" tren GitHub KHONG sua
+  // duoc chuyen nay: nut do cuong che mot ket qua, ma ket qua dang la xanh.
+  //
+  // Hai ve, va can ca hai: cau hinh repo nha co bat that khong, va co che co rang that khong.
+  const CHAN = ["B1", "B2", "B3", "B4", "B5", "B7", "B10", "B12"];
+  const dangChan = [...blockingCodes(createBootstrapDeps(ROOT))];
+  assert.deepEqual(dangChan.sort(), [...CHAN].sort(),
+    "repo nha PHAI bat dung tam ma chan — danh sach rong nghia la CI khong the do vi cau truc");
+
+  // Ve hai: dung mot repo that, lam do B3, va xem lenh co thoat khac 0 khong. Khong co ve nay
+  // thi ve tren chi chung minh mot dong JSON, khong chung minh no co tac dung gi.
+  const cha = mkdtempSync(join(tmpdir(), "chan-b3-"));
+  const repo = join(cha, "repo");
+  try {
+    execFileSync(process.execPath, [join(ROOT, "scripts", "init-repo.mjs"), repo, "--ten", "Thu Chan"],
+      { cwd: cha, encoding: "utf8" });
+
+    const capCau = (danhSach) => {
+      const f = join(repo, ".repo-structure.json");
+      const j = JSON.parse(readFileSync(f, "utf8"));
+      j.bootstrap.blocking = danhSach;
+      writeFileSync(f, JSON.stringify(j, null, 2) + NL, "utf8");
+      // PHAI COMMIT. `createBootstrapDeps` doc cau hinh tu HEAD, khong tu cay lam viec — do la
+      // luat "bo sinh doc su that da commit" cua ca bo khung. Sua file roi chay ngay la do lai
+      // ban cu, va phep kiem se xanh vi nhin nham cho.
+      git("add", "-A");
+      git("commit", "-q", "--allow-empty", "-m", "doi danh sach chan" + NL + NL + "Lane: fixture");
+    };
+    const chay = () => spawnSync(process.execPath, [join(repo, "scripts", "check-bootstrap.mjs")],
+      { cwd: repo, encoding: "utf8" }).status;
+    const git = (...a) => execFileSync("git", a, { cwd: repo, encoding: "utf8" });
+
+    // Thu muc top-level khong khai trong `areas` — dung thu B3 canh.
+    mkdirSync(join(repo, "mot-thu-muc-la"), { recursive: true });
+    writeFileSync(join(repo, "mot-thu-muc-la", "gi-do.md"), "# chua khai vao areas" + NL, "utf8");
+    git("add", "-A");
+    git("commit", "-q", "-m", "them thu muc chua khai" + NL + NL + "Lane: fixture");
+
+    capCau([]);
+    assert.equal(chay(), 0, "danh sach chan RONG: B3 do ma lenh van thoat 0 — day la cai bay");
+    capCau(["B3"]);
+    assert.notEqual(chay(), 0, "B3 nam trong danh sach chan ma van thoat 0 thi co che khong co rang");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("F9 · cong cau truc co rang: B3 do lam lenh thoat khac 0 khi duoc khai chan");
+}
+
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

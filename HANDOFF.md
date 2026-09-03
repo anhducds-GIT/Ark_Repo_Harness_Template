@@ -185,3 +185,19 @@ sửa `session-check.mjs`.
    Bài học: CI không kiểm giỏi hơn cổng đóng phiên — nó chỉ chạy ở **một chỗ khác**, và chỗ khác
    đó là chỗ duy nhất giống máy người dùng.
 
+ - **2026-09-03 · `harness-vong2` · CỔNG CẤU TRÚC TRÊN CI CÓ RĂNG (v1.2.3)** — Audit chỉ đúng
+   một chỗ vô hiệu hoá gần hết giá trị của CI: `bootstrap.blocking` **để rỗng**, mà
+   `check-bootstrap` chỉ thoát khác 0 khi một mã trong danh sách đó đỏ. Nên B1–B15 in ĐỎ đầy
+   màn hình mà CI vẫn xanh, và bật "required status check" cũng không sửa được — nút đó cưỡng
+   chế một kết quả, mà kết quả đang là xanh. Đã bật tám mã `B1 B2 B3 B4 B5 B7 B10 B12` (repo
+   đang 0 đỏ nên bật được ngay). **F9** giữ hai vế: cấu hình có bật đủ không, và cơ chế có răng
+   không — dựng repo thật, làm đỏ B3, xem lệnh có thoát khác 0. Đột biến ngược cả hai vế đều bị
+   bắt. Suite 63.
+   Bẫy F9 tự dạy lại: sửa `.repo-structure.json` rồi chạy ngay là **không có tác dụng gì** — bộ
+   kiểm đọc cấu hình từ HEAD. Phải commit trước.
+   **`--plan` thôi nói sai:** câu cuối trước đây chỉ đếm file nên sai cả hai chiều — bảo chạy
+   `--apply` cho ca `CHƯA GHIM` mà apply sẽ từ chối, và bảo "không có gì để nâng cấp" khi nội
+   dung khớp nhưng số ghim ở đích còn cũ (apply lúc đó có việc thật: đóng lại dấu phiên bản).
+   Vòng vá 1.2.2 sang hai repo: nội dung không đổi (bản vá nằm ở `init-repo.mjs`, file **ở lại
+   nhà**), chỉ đóng lại dấu — cả hai nay ghim 1.2.2.
+

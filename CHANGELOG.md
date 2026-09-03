@@ -3,6 +3,28 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.3 — 2026-09-03 — Cổng cấu trúc trên CI có răng, và `--plan` thôi nói sai
+
+Audit độc lập chỉ đúng một chỗ nữa, và nó vô hiệu hoá gần hết giá trị của CI vừa dựng:
+`bootstrap.blocking` ở repo nhà **để rỗng**, mà `check-bootstrap` chỉ thoát khác 0 khi một
+phép kiểm nằm trong danh sách đó bị đỏ. Nên B1–B15 có thể in **ĐỎ đầy màn hình** và CI —
+vốn chỉ đọc mã thoát — **vẫn xanh**. Bật "required status check" trên GitHub cũng không sửa
+được: nút đó cưỡng chế một kết quả, mà kết quả đang là xanh.
+
+Đã bật tám mã `B1 B2 B3 B4 B5 B7 B10 B12`. Repo đang 0 chỗ đỏ nên bật được ngay, không tự
+khoá mình. Phép kiểm mới **F9** giữ hai vế: repo nhà có bật đủ tám mã không, **và** cơ chế có
+răng thật không — nó dựng một repo thật, làm đỏ B3, rồi xem lệnh có thoát khác 0 không.
+Đột biến ngược cả hai vế đều bị bắt.
+
+Một chi tiết F9 tự dạy lại: sửa `.repo-structure.json` rồi chạy ngay thì **không có tác dụng
+gì** — bộ kiểm đọc cấu hình từ HEAD, không từ cây làm việc. Phải commit trước.
+
+**`--plan` thôi nói sai.** Câu cuối của nó trước đây chỉ đếm số file, nên nó sai theo cả hai
+chiều: bảo "chạy lại với `--apply`" cho ca `CHƯA GHIM` mà `--apply` sẽ từ chối, và bảo "không
+có gì để nâng cấp" khi nội dung đã khớp nhưng **số ghim ở đích còn là bản cũ** — lúc đó
+`--apply` có việc thật (đóng lại dấu phiên bản), và bỏ qua thì câu trả lời cho "repo này đang
+dùng bản nào" sai vĩnh viễn. Nay câu cuối được tính từ đúng những điều kiện `--apply` dùng.
+
 ## 1.2.2 — 2026-09-03 — CI vừa bật đã bắt được một cái bẫy vô hình ở địa phương
 
 Lượt chạy CI đầu tiên **đỏ ngay**, và nó đỏ vì một lỗi thật, không phải vì cấu hình CI:

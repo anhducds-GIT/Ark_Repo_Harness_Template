@@ -197,9 +197,25 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     console.log("    Đọc `git diff` ở repo đích trước. Cố ý muốn bỏ thì chạy lại kèm --force.");
   }
 
+  /* CÂU CUỐI CỦA `--plan` PHẢI LÀ ĐIỀU `--apply` SẼ LÀM THẬT.
+   *
+   * Bản đầu chỉ đếm số file rồi kết luận. Nó nói sai theo cả hai chiều:
+   *   - bảo "chạy lại với --apply" cho ca CHƯA GHIM, mà `--apply` sẽ TỪ CHỐI ca đó;
+   *   - bảo "không có gì để nâng cấp" khi nội dung đã khớp nhưng SỐ GHIM ở đích còn là bản cũ —
+   *     `--apply` lúc đó có việc thật (đóng lại dấu phiên bản), và bỏ qua thì câu trả lời cho
+   *     "repo này đang dùng bản nào" sai vĩnh viễn.
+   * Một bản kế hoạch không khớp với việc sẽ làm thì nó không phải bản kế hoạch. */
   if (!apply) {
     const canLam = dem("CŨ").length + dem("THIẾU").length + dem("CHƯA GHIM").length;
-    console.log(`${NL}${canLam ? `Chạy lại với --apply để ghi ${canLam} file.` : "Không có gì để nâng cấp."}${NL}`);
+    const canChot = soGhim && soGhim.version !== TEMPLATE_VERSION;
+    let cau;
+    if (lechNoiDung) cau = "`--apply` sẽ TỪ CHỐI: số phiên bản ở repo nhà không trỏ đúng nội dung. Tăng phiên bản ở nhà trước.";
+    else if (dem("SỬA TAY").length) cau = "`--apply` sẽ TỪ CHỐI vì có file bị sửa tay. Đọc `git diff` ở repo đích, rồi quyết — cố ý bỏ thì thêm `--force`.";
+    else if (dem("CHƯA GHIM").length) cau = "`--apply` sẽ TỪ CHỐI: file đã khác mà repo chưa có sổ ghim, không đủ căn cứ. Đọc `git diff` ở đích, chắc chắn thì thêm `--force`.";
+    else if (canLam) cau = `Chạy lại với --apply để ghi ${canLam} file.`;
+    else if (canChot) cau = `Nội dung đã khớp, không phải ghi file nào — nhưng sổ ghim ở đích còn ghi ${soGhim.version}. Chạy --apply để đóng lại dấu ${TEMPLATE_VERSION}.`;
+    else cau = "Không có gì để nâng cấp.";
+    console.log(`${NL}${cau}${NL}`);
     process.exit(0);
   }
 
