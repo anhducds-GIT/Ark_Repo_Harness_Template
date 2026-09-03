@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "bf75cbe",
+  "generated_commit": "b89bfb0",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,20 +33,20 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Rollback cả lô và sao lưu trước --force — hai việc còn lại của cơ chế nâng cấp",
-      "human_action": "Không có việc nào cần bạn",
+      "next_step": "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub",
+      "human_action": "Bật hai nút trong Settings của repo trên GitHub: chặn merge khi CI đỏ, và Secret scanning",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-03",
       "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
-      "open_item": "v1.2: nâng cấp nay biết dừng trong bảy ca khác nhau, không chỉ ca sửa tay"
+      "open_item": "v1.2.1: ba cửa của v1.2 chỉ nói mà không chặn, nay chặn thật; và có CI trên GitHub"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Rollback cả lô và sao lưu trước --force — hai việc còn lại của cơ chế nâng cấp",
+      "title": "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub",
       "rank": 1,
       "claim": null
     }
