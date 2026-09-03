@@ -83,6 +83,27 @@ export function coLenhTest(root) {
  * ta lên lịch cho một việc rẻ hơn sự thật. */
 export const CAU_HINH_MAY_DOC = [".repo-structure.json", ".agents/claims.json", "package.json"];
 
+import { readStructureFromDisk, unitsFrom, ownershipKeys, claimPrefixesFrom } from "./repo-structure.mjs";
+
+/* CHẠY ĐÚNG VALIDATOR MÀ RUNTIME CHẠY, không chỉ hỏi "JSON có parse được không".
+ *
+ * Đo được 03/09: một `.repo-structure.json` parse được nhưng có `depth: 0` hoặc
+ * `ownership_mode` bậy vẫn được chấm MỨC 3 · CHI PHÍ 0/0/0 — giấy khám sức khoẻ hoàn hảo —
+ * trong khi `unitsFrom()` NÉM ngay trên chính file đó. Bộ đo là thứ người ta dùng để QUYẾT
+ * ĐỊNH có migrate hay không; nói "hoàn hảo" về một repo không chạy nổi là làm hỏng quyết định.
+ *
+ * Cú pháp đúng mà NGHĨA sai thì `JSON.parse` không bao giờ thấy. Chỉ có validator thật mới thấy. */
+export function nghiaCauHinh(root) {
+  let parsed;
+  try { parsed = readStructureFromDisk(root); } catch (e) { return [{ file: ".repo-structure.json", loi: String(e.message).split(String.fromCharCode(10))[0] }]; }
+  if (!parsed) return [];
+  const loi = [];
+  for (const goi of [() => unitsFrom(parsed), () => claimPrefixesFrom(parsed), () => ownershipKeys([], parsed, claimPrefixesFrom(parsed), () => false)]) {
+    try { goi(); } catch (e) { loi.push({ file: ".repo-structure.json", loi: String(e.message).split(String.fromCharCode(10))[0] }); }
+  }
+  return loi;
+}
+
 export function cauHinhDocDuoc(root) {
   const hong = [];
   for (const rel of CAU_HINH_MAY_DOC) {
@@ -91,7 +112,10 @@ export function cauHinhDocDuoc(root) {
     if (kq.trangThai === "HONG") { hong.push({ file: rel, loi: kq.loi }); continue; }
     try { JSON.parse(kq.noiDung); } catch (e) { hong.push({ file: rel, loi: String(e.message).split(String.fromCharCode(10))[0] }); }
   }
-  return hong;
+  // Cú pháp đúng chưa đủ — NGHĨA cũng phải đúng. Nhưng chỉ hỏi nghĩa KHI cú pháp đã sạch:
+  // file hỏng cú pháp thì validator cũng ném đúng lỗi đó, và báo hai lần cùng một nguyên nhân
+  // chỉ làm người đọc tưởng có hai vấn đề.
+  return hong.length ? hong : nghiaCauHinh(root);
 }
 
 /* HOA THƯỜNG CÓ PHÂN BIỆT KHÔNG — hỏi bằng thư mục cha, đừng hỏi hệ thống file.

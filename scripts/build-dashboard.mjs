@@ -13,7 +13,7 @@ const SCHEMA = "extension-status/v2";
 // đề bài và bộ kiểm đánh nhau. Audit Codex vòng 3 bắt được trước khi ai chạy S3.
 // "unclassified" da bi bo tu 2026-09-02 (phien S3): sau khi hai don vi con thieu da khai
 // STATUS, khong con don vi nao dung no. Giu lai la de ngo mot loi thoat cho viec khong khai.
-const LIFECYCLES = new Set(["idea", "building", "active", "paused", "archived", "experimental", "superseded"]);
+export const LIFECYCLES = new Set(["idea", "building", "active", "paused", "archived", "experimental", "superseded"]);
 const REQUIRED = ["schema", "id", "name", "lifecycle", "version_source", "current_focus", "ref_readme", "ref_handoff", "owner"];
 // Bat buoc CO DIEU KIEN. Khong nhet vao REQUIRED duoc vi REQUIRED ap cho MOI STATUS,
 // con hai luat nay chi ap cho mot so lifecycle. Mot ban da nghi huu khong can xep hang
@@ -407,10 +407,31 @@ function parseChangedCommits(output) {
  * Bài học: thứ gì repo nhà không dùng thì repo nhà không kiểm được. */
 const MAY_SINH = new Set([LLMS_FILE, REPO_MAP_FILE, DASHBOARD_FILE]);
 
-export function isBehaviourFile(file) {
+/* NGHỀ NÀO ĐẾM FILE NGHỀ ẤY.
+ *
+ * Danh sách đuôi cứng `.js .mjs .json .html .css` biến bộ khung này thành công cụ đo được đúng
+ * MỘT nghề. Repo Python sửa `src/app.py` cả trăm lần vẫn bị đo là "code không đổi", và bảng vẫn
+ * in ra đẹp — con số sai mà trông như con số đúng. Repo 3AI migrate ngày 03/09 CHÍNH LÀ Python.
+ *
+ * Nên repo tự khai `units.behaviour_globs`. Không khai thì giữ nguyên hành vi cũ: đoán hộ nghề
+ * của người ta còn tệ hơn đếm thiếu, vì lúc đó không ai biết con số dựa trên gì.
+ *
+ * `ponytail: chỉ so đuôi file, không phải glob đầy đủ. Đủ cho "**\/*.py"; cần khớp theo thư mục
+ * thì thay bằng một bộ glob thật.` */
+function duoiTuGlob(globs) {
+  const ra = new Set();
+  for (const g of globs) {
+    const m = String(g).match(/\.([A-Za-z0-9]+)$/);
+    if (m) ra.add(`.${m[1].toLowerCase()}`);
+  }
+  return ra.size ? ra : null;
+}
+
+export function isBehaviourFile(file, opts = {}) {
   const normalized = String(file).replaceAll("\\", "/");
   if (MAY_SINH.has(normalized)) return false;
-  return !EVIDENCE_ZONE.test(normalized) && BEHAVIOUR_EXTENSIONS.has(path.posix.extname(normalized).toLowerCase());
+  const duoi = (Array.isArray(opts.behaviourGlobs) && duoiTuGlob(opts.behaviourGlobs)) || BEHAVIOUR_EXTENSIONS;
+  return !EVIDENCE_ZONE.test(normalized) && duoi.has(path.posix.extname(normalized).toLowerCase());
 }
 
 function changedCommitCount(commits) {

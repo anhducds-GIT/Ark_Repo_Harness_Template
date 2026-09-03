@@ -56,8 +56,8 @@ const html = trang(dl);
   // CON SỐ PHẢI ĐƯỢC ĐO, KHÔNG ĐƯỢC GÕ TAY. Ba ca trên chỉ kiểm phần VẼ, nên một hằng số nằm ở
   // phần ĐO vẫn sống sót — đã chứng minh bằng một lượt thử phá: đóng cứng lại số 1 mà không
   // phép kiểm nào đỏ. Nên phải gọi thẳng vào phép đo.
-  assert.equal(noChuaChungMinh("proven"), 0, "da chung minh thi phai la 0 — neu khong den khong bao gio xanh noi");
-  assert.equal(noChuaChungMinh("retired"), 0, "da nghi cung khong con la viec chua chung minh");
+  assert.equal(noChuaChungMinh("active"), 0, "dang chay thi phai la 0 — neu khong den khong bao gio xanh noi");
+  assert.equal(noChuaChungMinh("archived"), 0, "da nghi cung khong con la viec chua chung minh");
   assert.equal(noChuaChungMinh("building"), 1, "dang dung thi van la mot viec chua chung minh");
   assert.equal(noChuaChungMinh("idea"), 1);
   assert.equal(noChuaChungMinh(undefined), null, "khong khai lifecycle = KHONG DO DUOC, khong phai 0");

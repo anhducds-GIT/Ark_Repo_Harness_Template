@@ -115,3 +115,16 @@ sửa `session-check.mjs`.
    (c) Quét secret trả `ok:true` kèm ghi chú "73 file không đọc được" — badge vẫn XANH.
    Cả ba **đã vá**; (a) đã ghim + thử phá. Giữ đúng 3 con số theo đặc tả của Đức: gộp đỏ+vàng
    thành một con số, `null` không cộng thành 0.
+
+ - **2026-09-03 · `harness-vong2` · CORE-CONTRACT-CORRECTION** — Kiểm nốt 16 tuyên bố
+   còn lại của audit GPT: **15 đúng, 1 không tái hiện được**. Rồi vá theo đúng thứ tự GPT đặt:
+   fixture ĐỎ trước, vá, XANH sau — `tests/core-contract.mjs`, bảy khối.
+   F1 bộ đo dùng đúng validator runtime (trước: cấu hình `unitsFrom` NÉM vẫn được chấm mức 3 ·
+   0/0/0) · F2 đo được code ngoài JS khi repo khai `behaviour_globs` · F3 vòng đời và validator
+   dùng chung một bảng (trước: bảng vẽ hai chặng `proven`/`retired` mà validator TỪ CHỐI, còn
+   bốn giá trị hợp lệ không có chặng nào) · F4 lệnh git hỏng không hoá thành số 0, thêm phép
+   kiểm thứ 11 · F5 quy chủ theo tiền tố dài nhất (trước: đổi thứ tự khai là đổi chủ) ·
+   F6 xoá một ADR đã Accepted bị bắt, và `--follow` để đổi tên không cắt lịch sử ·
+   F7 khoá quyền nguyên tử bằng `mkdir`.
+   **F7 vẫn là phép kiểm YẾU**: nó chỉ dựng được ca tuần tự, không dựng được ca đua thật.
+   Suite 43 → 50. CHƯA làm: version pinning + upgrade — đúng thứ tự GPT đặt, sửa phép đo trước.

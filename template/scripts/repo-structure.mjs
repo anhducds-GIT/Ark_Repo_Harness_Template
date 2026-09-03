@@ -146,20 +146,30 @@ export function stewardOf(relPath, parsed, prefixes = DEFAULT_CLAIM_PREFIXES) {
   if (area !== "_root") return area;                 // vùng chia theo gói, `areaOf` đã trả lời
   const areas = parsed?.areas;
   if (!areas || typeof areas !== "object" || Array.isArray(areas)) return "_root";
+  let dai = -1;
+  let ketQua = "_root";                              // file ở tầng ngoài cùng, không thuộc vùng nào
   for (const [key, value] of Object.entries(areas)) {
     if (key.startsWith("_")) continue;               // khoá chú thích, ví dụ "_doc_"
     if (!key.endsWith("/")) continue;                // chỉ vùng dạng thư mục mới có tiền tố
     if (!relPath.startsWith(key)) continue;
+    // TIỀN TỐ DÀI NHẤT THẮNG, không phải khoá khai trước.
+    //
+    // Bản đầu trả về ngay ở khớp ĐẦU TIÊN theo thứ tự khoá JSON. Khai cả `docs/` lẫn
+    // `docs/internal/` thì chủ của `docs/internal/a.md` đổi theo thứ tự gõ hai dòng — vô hình
+    // với người viết cấu hình, mà lại quyết định ai được ghi file nào. Vùng cụ thể hơn phải
+    // thắng: đó chính là điều người khai `docs/internal/` muốn nói.
+    if (key.length < dai) continue;
     const steward = value?.steward;
-    if (steward === null || steward === undefined) return "_root";
+    if (steward === null || steward === undefined) { dai = key.length; ketQua = "_root"; continue; }
     // Gõ sai tên khoá (ví dụ "root" thiếu gạch dưới) mà im lặng bỏ qua là kiểu hỏng tệ nhất:
     // vùng đó lặng lẽ về `_root`, hai phiên lại choảng nhau, và cổng vẫn xanh.
     if (typeof steward !== "string" || !steward.startsWith("_")) {
       throw new Error(`CAU_TRUC_HONG: areas["${key}"].steward phải là khoá quyền bắt đầu bằng "_" (ví dụ "_root", "_docs"). Đang là: ${JSON.stringify(steward)}`);
     }
-    return steward;
+    dai = key.length;
+    ketQua = steward;
   }
-  return "_root";                                    // file ở tầng ngoài cùng, không thuộc vùng nào
+  return ketQua;
 }
 
 /* "CHỈ THÊM DÒNG?" — quyết định thuần, tách khỏi việc gọi git để kiểm được mọi nhánh.

@@ -121,6 +121,44 @@ function main() {
     process.exit(EXIT.MISUSE);
   }
 
+  /* KHOÁ THẬT, KHÔNG PHẢI ĐỌC-LẠI-KIỂM.
+   *
+   * Đọc → sửa → ghi → đọc lại KHÔNG đóng được cửa sổ đua: A và B cùng đọc thấy trống, A ghi rồi
+   * đọc lại thấy A, B ghi rồi đọc lại thấy B — cả hai cùng thoát 0, cả hai cùng tin mình có
+   * quyền, và người ghi trước mất việc mà không hề biết. Đọc-lại chỉ bắt được ca A đọc SAU khi
+   * B đã ghi; nó bỏ lọt đúng ca hai bên xen kẽ khít nhau.
+   *
+   * `mkdir` là thao tác NGUYÊN TỬ trên mọi hệ điều hành: hai tiến trình cùng gọi thì đúng một
+   * cái thành công. Đó là toàn bộ mẹo ở đây — không cần thư viện khoá.
+   *
+   * `ponytail: khoá cả file bảng quyền, không khoá từng vùng. Đủ cho vài phiên; tách khoá theo
+   * vùng nếu sau này có hàng chục phiên cùng lúc.` */
+  const KHOA = `${CLAIMS_FILE}.lock`;
+  let daKhoa = false;
+  for (let i = 0; i < 50 && !daKhoa; i += 1) {
+    try { fs.mkdirSync(KHOA); daKhoa = true; }
+    catch (e) {
+      if (e?.code !== "EEXIST") throw e;
+      // Khoá mồ côi: tiến trình giữ nó đã chết. Quá 30 giây thì dọn — không dọn thì một lần
+      // Ctrl+C khoá vĩnh viễn bảng quyền của cả repo.
+      try {
+        if (Date.now() - fs.statSync(KHOA).mtimeMs > 30000) { fs.rmSync(KHOA, { recursive: true, force: true }); continue; }
+      } catch { /* khoá vừa được nhả giữa chừng — vòng sau thử lại */ }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+    }
+  }
+  if (!daKhoa) {
+    console.error(`DANG_BI_KHOA: một phiên khác đang ghi bảng quyền (${KHOA}). Thử lại sau vài giây.`);
+    process.exit(EXIT.MISUSE);
+  }
+  // Đọc LẠI SAU KHI có khoá — bản đọc lúc chưa khoá có thể đã cũ.
+  parsed = readClaims();
+
+  // Nhả khoá trên MỌI đường ra, kể cả đường thoát sớm và đường ném. Quên nhả thì lần chạy sau
+  // phải chờ hết 30 giây hạn khoá mồ côi — một cái khoá bỏ quên còn phiền hơn không có khoá.
+  const nhaKhoa = () => { try { fs.rmSync(KHOA, { recursive: true, force: true }); } catch { /* đã nhả rồi */ } };
+  process.on("exit", nhaKhoa);
+
   const today = new Date().toISOString().slice(0, 10);
   const verdict = decide(parsed.claims, { action, key, as, today });
   if (verdict.code !== EXIT.OK) { console.error(verdict.message); process.exit(verdict.code); }

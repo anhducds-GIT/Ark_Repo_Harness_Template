@@ -68,7 +68,12 @@ export function createBootstrapDeps(root = ROOT) {
       lastCommitTimes: () => parseLastCommitTimes(
         git("log", "--name-only", "--no-renames", "--pretty=format:%x01%ct")
       ),
-      fileHistory: (relPath) => git("log", "--reverse", "--format=%H", "--", relPath)
+      // `--follow` để đổi tên không cắt đứt lịch sử: thiếu nó thì đổi tên một ADR đã Accepted
+      // là lịch sử bắt đầu lại từ đầu, và mốc Accepted biến mất cùng với nó.
+      fileHistory: (relPath) => git("log", "--reverse", "--format=%H", "--follow", "--", relPath)
+        .split("\n").map((line) => line.trim()).filter(Boolean),
+      // Đường dẫn từng bị xoá — `trackedPaths` không bao giờ thấy chúng.
+      deletedPaths: () => git("log", "--diff-filter=D", "--name-only", "--format=")
         .split("\n").map((line) => line.trim()).filter(Boolean),
       showAt: (sha, relPath) => { try { return git("show", `${sha}:${relPath}`); } catch { return null; } }
     }
@@ -459,7 +464,11 @@ export function isAdrPath(relPath) {
 export function checkB12(deps) {
   const files = deps.git.trackedPaths().filter(isAdrPath).sort(compareText);
   const title = "ADR đã Accepted bị sửa nội dung";
-  if (!files.length) {
+  // ADR ĐÃ XOÁ phải được tính TRƯỚC lối thoát "chưa có ADR nào". Nếu không thì xoá ADR cuối
+  // cùng làm `files` rỗng, phép kiểm in "KHÔNG ÁP DỤNG", và hành vi tệ nhất lại là hành vi
+  // duy nhất không bị bắt.
+  const daXoa = typeof deps.git.deletedPaths === "function" ? deps.git.deletedPaths().filter(isAdrPath) : [];
+  if (!files.length && !daXoa.length) {
     return skip("B12", RED, title, `KHÔNG ÁP DỤNG — repo chưa có thư mục \`${ADR_DIR}\` nào (gốc repo, hoặc trong package)`);
   }
   const findings = [];
@@ -506,7 +515,30 @@ export function checkB12(deps) {
       ]
     });
   }
-  return report("B12", RED, title, findings, `đã soi ${files.length} ADR`);
+  /* XOÁ CŨNG LÀ SỬA — và là cách sửa triệt để nhất.
+   *
+   * Phần trên chỉ soi ADR CÒN Ở HEAD (`trackedPaths`). Nên xoá hẳn một ADR đã Accepted là
+   * thoát sạch: file biến khỏi tập kiểm, và phép kiểm báo xanh. "Bất biến" mà xoá được thì
+   * không phải bất biến — nó chỉ chặn được người sửa vụng, không chặn được người xoá. */
+  for (const relPath of [...new Set(daXoa)]) {
+    if (files.includes(relPath)) continue;                 // xoá rồi thêm lại — phần trên đã lo
+    const history = deps.git.fileHistory(relPath);
+    const daTungAccepted = history.some((sha) => {
+      const text = deps.git.showAt(sha, relPath);
+      return text !== null && String(parseStatus(text).frontmatter.status ?? "").trim().toLowerCase() === "accepted";
+    });
+    if (!daTungAccepted) continue;                          // ADR chưa Accepted thì xoá được
+    findings.push({
+      tag: "ADR-DELETED",
+      where: relPath,
+      why: "ADR này đã từng ở trạng thái Accepted và nay đã bị XOÁ khỏi HEAD",
+      fix: [
+        `khôi phục: git checkout $(git rev-list -1 HEAD -- "${relPath}")^ -- "${relPath}"`,
+        "muốn bỏ một quyết định thì đặt `status: superseded` và trỏ `superseded_by` sang ADR mới — biên bản không bị xoá, nó bị thay thế"
+      ]
+    });
+  }
+  return report("B12", RED, title, findings, `đã soi ${files.length} ADR còn ở HEAD + ${daXoa.length} đã xoá`);
 }
 
 /* ---- B14 · tài liệu mô tả code đã đổi lâu mà chưa đụng --------------------- */

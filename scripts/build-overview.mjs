@@ -289,15 +289,24 @@ function khoiNowNext(st) {
  * được. Đây là lý do nó ở đây chứ không phải trong thân hàm kia. */
 export function noChuaChungMinh(lifecycle) {
   if (!lifecycle) return null;                                  // không khai = không đo được
-  return new Set(["proven", "retired"]).has(lifecycle) ? 0 : 1;
+  // Dùng CHUNG bảng giá trị với validator (`LIFECYCLES` của build-dashboard). Bản đầu dùng
+  // "proven"/"retired" — hai giá trị mà validator TỪ CHỐI, nên không repo hợp luật nào chạm
+  // tới được; còn bốn giá trị hợp lệ thì không có chặng nào trên vòng đời. Hai bảng, một sự thật.
+  return DA_XONG.has(lifecycle) ? 0 : 1;
 }
 
-const VONG_DOI = {
+/* Bốn chặng, và MỌI giá trị validator chấp nhận đều phải rơi vào một chặng. Phép kiểm
+   `tests/core-contract.mjs` khối F3 cưỡng chế hai chiều: không chặng nào dùng giá trị lạ, và
+   không giá trị hợp lệ nào rơi ra ngoài bảng. */
+export const DA_XONG = new Set(["active", "archived", "superseded"]);
+export const VONG_DOI = {
   idea: { ten: "Ý TƯỞNG", i: 0 },
   building: { ten: "ĐANG DỰNG", i: 1 },
-  proven: { ten: "ĐÃ CHỨNG MINH", i: 2 },
-  paused: { ten: "TẠM DỪNG", i: 3 },
-  retired: { ten: "ĐÃ NGHỈ", i: 3 }
+  experimental: { ten: "THỬ NGHIỆM", i: 1 },
+  active: { ten: "ĐANG CHẠY", i: 2 },
+  paused: { ten: "TẠM DỪNG", i: 2 },
+  archived: { ten: "ĐÃ NGHỈ", i: 3 },
+  superseded: { ten: "ĐÃ THAY THẾ", i: 3 }
 };
 
 /* Vòng đời — bốn chặng, chấm sáng ở chặng hiện tại. Cố ý KHÔNG hiện phần trăm: một dự án không

@@ -12,7 +12,7 @@
     "template": "node scripts/build-template.mjs",
     "assess": "node scripts/assess.mjs",
     "init": "node scripts/init-repo.mjs",
-    "test": "node scripts/build-template.mjs --check && node tests/harness-smoke.mjs && node tests/template-null-repo.mjs && node tests/assess-smoke.mjs && node tests/init-repo-smoke.mjs && node tests/overview-smoke.mjs && node tests/so-migrate-smoke.mjs",
+    "test": "node scripts/build-template.mjs --check && node tests/harness-smoke.mjs && node tests/template-null-repo.mjs && node tests/assess-smoke.mjs && node tests/init-repo-smoke.mjs && node tests/overview-smoke.mjs && node tests/so-migrate-smoke.mjs && node tests/core-contract.mjs",
     "overview": "node scripts/build-overview.mjs",
     "can-nang": "node scripts/can-nang.mjs",
     "so-migrate": "node scripts/build-so-migrate.mjs"

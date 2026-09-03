@@ -38,7 +38,24 @@ if (!args.includes("--as") || !asLabel || asLabel.startsWith("--")) {
 // mục đặt tên tiếng Việt đều bị báo đỏ oan. Gặp thật 26/08 với
 // "Pilot-07-Tạo Ảnh tô màu". Đức là người Việt và đặt tên thư mục bằng tiếng
 // Việt, nên đây không phải trường hợp hiếm.
-const git = (...a) => { try { return execFileSync("git", ["-c", "core.quotepath=false", ...a], { cwd: ROOT, encoding: "utf8" }); } catch { return ""; } };
+/* LỆNH GIT HỎNG KHÔNG ĐƯỢC TRÔNG NHƯ "KHÔNG CÓ DỮ LIỆU".
+ *
+ * Bản đầu là `catch { return "" }` — mọi lỗi thành chuỗi rỗng. Hậu quả không phải cổng chết,
+ * mà cổng MÙ: "0 file được track · 0 thay đổi · 0 file cần test · secret 0/0 sạch", rồi
+ * XANH TOÀN BỘ. Không phải kho git, git không có trong PATH, hay output vượt buffer trên repo
+ * lớn — cả ba đều cho cùng một chuỗi rỗng, và cả ba đều dẫn tới xanh.
+ *
+ * Nay: vẫn trả chuỗi rỗng để chỗ gọi không phải viết lại, NHƯNG ghi lại là đã hỏng. Cuối phiên,
+ * hỏng một lệnh nào là cổng ĐỎ — vì mọi con số phía sau đều là đoán. */
+const gitLoi = [];
+const git = (...a) => {
+  try {
+    return execFileSync("git", ["-c", "core.quotepath=false", ...a], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  } catch (e) {
+    gitLoi.push(`git ${a.slice(0, 2).join(" ")} → ${String(e.message).split(String.fromCharCode(10))[0].slice(0, 80)}`);
+    return "";
+  }
+};
 
 const results = [];
 const check = (name, fn) => {
@@ -826,7 +843,16 @@ check("Nhãn lane trong commit", () => {
 // công cụ đã quy một file về hai vùng khác nhau mà cổng vẫn xanh. Lý do ghi ở HANDOFF.md gốc.
 // 2026-09-02, phiên K2-3: 9 → 10. Thêm "Nhãn lane trong commit", vì quy commit theo chủ HIỆN
 // TẠI của vùng sai cả hai chiều — và chiều nguy hiểm là im lặng đẩy kèm việc người khác.
-const EXPECTED_CHECKS = 10;
+check("Mọi lệnh git đọc được", () => {
+  // Đặt CUỐI cùng, cố ý: tới đây mọi phép kiểm đã chạy xong nên `gitLoi` đã gom đủ.
+  if (!gitLoi.length) return { ok: true, msg: "Không lệnh git nào hỏng." };
+  return {
+    ok: false,
+    msg: `GIT_HONG — ${gitLoi.length} lệnh git thất bại, nên MỌI con số ở trên đều là đoán: ${[...new Set(gitLoi)].slice(0, 3).join(" · ")}. Kiểm xem đây có phải kho git không, và git có trong PATH không.`
+  };
+});
+
+const EXPECTED_CHECKS = 11;
 if (results.length !== EXPECTED_CHECKS) {
   console.error(`\nCỔNG BỊ SỬA: đang có ${results.length} phép kiểm, phải có ${EXPECTED_CHECKS}.`);
   console.error("Ai đó đã bớt (hoặc thêm) phép kiểm mà không cập nhật EXPECTED_CHECKS. Xem lại scripts/session-check.mjs.\n");
