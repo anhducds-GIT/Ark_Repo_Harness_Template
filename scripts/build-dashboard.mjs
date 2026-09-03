@@ -1143,8 +1143,12 @@ export function buildRepoMap(model) {
     // để chốt kiểu mảng, rồi lại chỉ phát ra đúng một mục — hình dạng đúng mà nội dung
     // không sống theo. Audit Codex vòng 3, phát hiện 2. Nay liệt kê MỌI đơn vị có
     // `next_step`, xếp theo hạng, đơn vị chưa xếp hạng nằm cuối.
+    // ĐƠN VỊ ĐÃ NGHỈ THÌ KHÔNG CÒN LÀ VIỆC ĐANG LÀM, dù dòng `next_step` cũ vẫn nằm đó.
+    // `RETIRED_LIFECYCLES` có sẵn từ trước và được dùng ở chỗ khác, nhưng chỗ này quên gọi — nên
+    // một gói khai `archived` mà chưa ai xoá `next_step` vẫn hiện ra như việc đang chạy. Bảng nói
+    // dối theo hướng khó thấy nhất: nó THÊM việc chứ không bớt, nên không ai thấy thiếu cái gì.
     active_work: model.rows
-      .filter((row) => row.nextStep)
+      .filter((row) => row.nextStep && !RETIRED_LIFECYCLES.has(row.lifecycle))
       .sort((a, b) => (a.priorityRank ?? Infinity) - (b.priorityRank ?? Infinity) || compareText(a.key, b.key))
       .map((row) => ({
         id: row.key,

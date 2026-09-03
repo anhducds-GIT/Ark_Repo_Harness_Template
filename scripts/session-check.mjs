@@ -710,7 +710,21 @@ check("Cổng kiểm cấu trúc B1–B14", () => {
   }
   // Chỉ lấy các dòng tổng kết. In cả bản đầy đủ ở đây thì báo cáo cổng dài gấp ba và không ai
   // đọc nữa — chi tiết nằm sau một lệnh, và lệnh đó được in ra ngay dưới đây.
-  return { ok: true, msg: `${tomTat(stdout)} — nhóm CHẶN đạt hết. ${XEM}` };
+  // MÃ THOÁT 0 KHÔNG PHẢI BẰNG CHỨNG. Đây là lỗ nặng nhất còn lại, và nó đã được dựng lại thật:
+  // thay `check-bootstrap.mjs` bằng đúng một dòng `process.exit(0);` thì cổng đóng phiên in ra
+  //     [XANH] Cổng kiểm cấu trúc — không đọc được dòng tổng kết — nhóm CHẶN đạt hết
+  // Tức là toàn bộ bộ kiểm cấu trúc bị vô hiệu hoá, và cổng vẫn tuyên bố nhóm CHẶN đã đạt.
+  //
+  // Một bộ kiểm không nói được nó đã kiểm gì thì phải bị coi là CHƯA KIỂM, không phải ĐÃ ĐẠT.
+  // Dòng `TỔNG:` là bằng chứng tối thiểu: nó chỉ tồn tại khi bộ kiểm thật sự chạy hết.
+  const bangChung = tomTat(stdout);
+  if (!/^TỔNG|·\s*TỔNG/.test(bangChung) && !bangChung.includes("TỔNG")) {
+    return {
+      ok: false,
+      msg: `BOOTSTRAP_KHONG_CO_BANG_CHUNG: scripts/check-bootstrap.mjs thoát 0 nhưng KHÔNG in dòng tổng kết nào. Mã thoát 0 không phải bằng chứng — coi như CHƯA KIỂM. Kiểm xem file đó có bị thay/cắt cụt không. ${XEM}`
+    };
+  }
+  return { ok: true, msg: `${bangChung} — nhóm CHẶN đạt hết. ${XEM}` };
 });
 
 /* ---- 9. Bất biến ba tầng của quyền sở hữu ------------------------------- */
