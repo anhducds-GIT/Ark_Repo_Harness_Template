@@ -9,25 +9,27 @@ muc_truoc: 1
 muc_sau: 3
 chi_phi_truoc: thả 7 · viết 9 · soi 0
 chi_phi_sau: thả 0 · viết 0 · soi 0
-cong_dong_phien: đỏ
-trang_thai: chưa đóng được
+cong_dong_phien: xanh
+trang_thai: đã đóng
 loi_tim_ra: 9
 ---
 
 ## Trạng thái mới nhất
 
-Bộ khung đã lắp xong và **đo được**: mức 1 → **mức 3**, nợ về 0. Nhưng **cổng đóng phiên vẫn
-đỏ một mục**, và nó đỏ vì một lý do nằm ngoài tầm của người migrate.
+**Đã đóng — cổng XANH TOÀN BỘ.** Mức 1 → **mức 3**, nợ về 0.
 
-## Vì sao chưa đóng được
+Đức chốt ngày 03/09: dọn nợ QA. Hoá ra là **hai việc khác hẳn nhau**:
 
-Repo này có một bộ test **đã hỏng từ trước khi bộ khung vào** (thiếu file `app/index.html`).
-Cổng đóng phiên đòi suite xanh. Quy trình lại cấm dọn nợ cũ của repo đích:
+- `calendar-bootstrap` trỏ vào `app/index.html`, nhưng file đã đổi tên thành
+  `app/NAV Dashboard.html` từ commit `d4b3cfb3`. Sửa đường dẫn — đạt ngay.
+- 5 test `R01 V2` **đỏ ngay tại commit sinh ra chúng** (`4841ba92`). Chúng chưa từng bảo vệ
+  điều gì; đó là đặc tả mong muốn commit vào lúc tính năng chưa xong.
 
-> "Việc KHÔNG thuộc quy trình này: **dọn nợ cũ của repo đích**."
+Không xoá (mất ý định), không để đỏ triền miên (người ta thôi đọc suite). Cho vào danh sách
+**miễn trừ CÓ HẠN**: lý do · người chốt · hạn 2026-12-02. Quá hạn là đỏ trở lại; đạt rồi thì
+suite tự báo để xoá khỏi danh sách.
 
-Hai câu đó **mâu thuẫn nhau** ở đúng ca này: một repo đang sống mà suite đỏ sẵn thì không thể
-vừa xanh vừa không dọn nợ. Đây là lỗ hổng của **quy trình**, không phải của repo NAV.
+`npm test` nay xanh: **127/132 PASS + 5 nợ đã khai**.
 
 ## Báo cáo đầy đủ
 
@@ -43,7 +45,6 @@ Bốn lỗi NẶNG đáng nhớ:
 
 ## Câu hỏi mở
 
-- **Cần Đức chốt:** bộ QA cũ của NAV — dọn, hay để nguyên và cho phép cổng đỏ có điều kiện?
-- Quy trình cần một lối thoát cho ca "repo đích đỏ sẵn": ghi nhận nợ nền và cho qua, hay bắt
-  dọn trước khi migrate?
+- ~~Bộ QA cũ: dọn hay để nguyên?~~ **Đức chốt 03/09: dọn. Đã xong.**
 - Repo dùng nhiều nhánh; nhánh `main` trên máy đã rẽ khỏi `origin/main`.
+- Miễn trừ hết hạn **2026-12-02** — tới đó hoặc R01 V2 làm xong, hoặc phải gia hạn có lý do.

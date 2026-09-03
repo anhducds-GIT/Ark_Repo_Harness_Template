@@ -4,7 +4,7 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `8c8ae21` (2026-09-03).
+Trang được sinh tại commit `a12ebd8` (2026-09-03).
 
 ## Việc ưu tiên #1
 
