@@ -167,6 +167,7 @@ minh được nó **tự** nạp lúc mở phiên.
 | **Sinh lại bản trích trong `template/`** | `npm run template` · chỉ kiểm không ghi: `npm run template -- --check` |
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — các khối hạt giống, chạy bằng `npm test` |
+| **Nhìn lại đã từng migrate repo nào, ngày nào, bản nào, còn treo gì** | `scripts/build-so-migrate.mjs` (`npm run so-migrate -- <file.html>`) — đọc `docs/migrations/`. Mỗi lần migrate MỘT hồ sơ, chỉ thêm. Việc này xảy ra thưa nên không ghi là quên sạch |
 | **Biết bộ khung đang nặng bao nhiêu, và luật nào chưa từng chặn được gì** | `scripts/can-nang.mjs` (`npm run can-nang`) — bốn con số có ngân sách; quá thì phải BỚT trước khi nghĩ tới nới. Nhịp tháng, cố ý KHÔNG nằm trong cổng đóng phiên |
 
 **Phải là liên kết bấm được, không phải chữ thường.** Máy kiểm xem mỗi file có được file nào

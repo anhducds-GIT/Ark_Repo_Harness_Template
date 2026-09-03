@@ -84,3 +84,14 @@ sửa `session-check.mjs`.
    tài liệu · số phép kiểm · thời gian) và trả lời được "luật nào chưa từng chặn được gì".
    Suite 30 → 37. Codex vòng 3 trả 16 phát hiện; **4 cái tôi kiểm lại đều là báo nhầm** —
    12 cái còn lại CHƯA kiểm, là việc mở lớn nhất.
+
+ - **2026-09-03 · phiên `harness-vong2` (tiếp)** — Kiểm nốt 16 phát hiện của Codex vòng 3.
+   Kết quả: **2 thật, 14 đã được vá hoặc báo nhầm** — phần lớn vì một phiên khác đang sửa cùng
+   bản báo cáo đó song song, nên mốc đóng băng lạc hậu ngay trong lúc audit chạy.
+   Hai cái thật: (a) `check-bootstrap.mjs` thoát 0 mà không in gì thì cổng vẫn báo XANH — dựng
+   lại được bằng cách thay file đó bằng đúng một dòng `process.exit(0)`; **đã vá + ghim + thử phá**;
+   (b) đơn vị khai `archived` vẫn lọt vào `active_work` của bảng — **đã vá**.
+   Còn MỞ, cố ý chưa vá: phép kiểm bản đồ chỉ hỏi "đường dẫn có được NHẮC không", không hỏi
+   "có một dòng khai không" — siết lại có thể làm đỏ oan repo dùng bản đồ dạng danh sách.
+   THÊM: **sổ migrate** (`scripts/build-so-migrate.mjs` + `docs/migrations/`) — mỗi lần migrate
+   một hồ sơ cùng khuôn, vì việc này xảy ra thưa và không ghi thì quên sạch. Suite 37 → 43.

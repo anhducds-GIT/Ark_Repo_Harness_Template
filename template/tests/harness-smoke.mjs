@@ -393,4 +393,52 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   } finally { rmSync(fx, { recursive: true, force: true }); }
 }
 
+/* ---- 6. Mã thoát 0 KHÔNG phải bằng chứng --------------------------------- */
+{
+  // Lỗ này đã được dựng lại thật ngày 03/09: thay `check-bootstrap.mjs` bằng đúng một dòng
+  // `process.exit(0);` thì cổng đóng phiên in ra
+  //     [XANH] Cổng kiểm cấu trúc — không đọc được dòng tổng kết — nhóm CHẶN đạt hết
+  // Toàn bộ bộ kiểm cấu trúc bị vô hiệu hoá, và cổng vẫn tuyên bố nhóm CHẶN đã đạt.
+  //
+  // Repo tạm KHÔNG khai `scripts.test` — cố ý, để cổng bỏ qua bước chạy suite và phép kiểm này
+  // chạy trong vài giây thay vì vài phút. Ta chỉ đo đúng một dòng: dòng cấu trúc.
+  const temp = mkdtempSync(join(tmpdir(), "harness-bc-"));
+  try {
+    const at = (...a) => execFileSync("git", a, { cwd: temp, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(temp, "scripts"), { recursive: true });
+    mkdirSync(join(temp, ".agents"), { recursive: true });
+    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
+    writeFileSync(join(temp, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    writeFileSync(join(temp, "package.json"), JSON.stringify({ name: "tam", private: true }), "utf8");
+    writeFileSync(join(temp, "AGENTS.md"), "# tam", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "seed");
+
+    const chay = () => {
+      const r = spawnSync(process.execPath, [join(temp, "scripts", "session-check.mjs"), "--as", "thu"],
+        { cwd: temp, encoding: "utf8" });
+      return String(r.stdout || "") + String(r.stderr || "");
+    };
+
+    // (a) BỘ KIỂM BỊ VÔ HIỆU HOÁ — thoát 0, không in gì. Phải bị coi là CHƯA KIỂM.
+    writeFileSync(join(temp, "scripts", "check-bootstrap.mjs"), "process.exit(0);", "utf8");
+    const a = chay();
+    assert.match(a, /BOOTSTRAP_KHONG_CO_BANG_CHUNG/,
+      "bo kiem cau truc thoat 0 ma khong in bang chung thi PHAI do, khong duoc coi la dat");
+
+    // (b) ĐỐI CHỨNG DƯƠNG: bộ kiểm có in dòng tổng kết thì KHÔNG được kêu.
+    //     Thiếu vế này thì một cổng luôn báo lỗi cũng qua được (a).
+    writeFileSync(join(temp, "scripts", "check-bootstrap.mjs"),
+      "console.log('TỔNG: 0 chỗ ĐỎ (không có) · 0 chỗ VÀNG');", "utf8");
+    const b = chay();
+    assert.doesNotMatch(b, /BOOTSTRAP_KHONG_CO_BANG_CHUNG/,
+      "bo kiem co in dong tong ket thi khong duoc keu thieu bang chung");
+  } finally { rmSync(temp, { recursive: true, force: true }); }
+  ok("ma thoat 0 khong phai bang chung: bo kiem cau truc cam thi cong phai DO");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

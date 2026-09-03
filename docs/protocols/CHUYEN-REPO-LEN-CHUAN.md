@@ -70,6 +70,21 @@ node scripts/session-check.mjs --as <nhãn-phiên>
 lại từ một HEAD chưa có gì. Lỗi này đã xảy ra thật, và nó im lặng — trang vẫn sinh ra, chỉ là
 nói về một quá khứ khác.
 
+### 7. Ghi một hồ sơ vào sổ migrate — BƯỚC NÀY KHÔNG ĐƯỢC BỎ
+
+Thêm đúng một file `docs/migrations/<ngày>-<tên-repo>.md` ở **repo nhà của bộ khung**, theo
+khuôn của các hồ sơ đã có: khai `repo` · `ngay` · `ban_khung` · `muc_truoc` · `muc_sau` ·
+`chi_phi_truoc` · `chi_phi_sau` · `cong_dong_phien` · `trang_thai` · `loi_tim_ra`, rồi bốn phần
+thân bài: **trạng thái mới nhất · vì sao chưa đóng được (nếu có) · báo cáo · câu hỏi mở**.
+
+```bash
+npm run so-migrate -- so-migrate.html    # rồi mở file đó bằng trình duyệt
+```
+
+Vì sao bắt buộc: migrate xảy ra **thưa** — vài tuần, có khi vài tháng một lần. Đúng loại việc
+mà cả người lẫn AI đều quên sạch. Không có hồ sơ thì lần sau dò lại từ đầu và vấp đúng chỗ cũ.
+Hồ sơ **chỉ thêm, không sửa cái cũ** — sửa hồ sơ cũ là viết lại lịch sử của lần migrate đó.
+
 ## Bốn cạm bẫy, cả bốn đều đã xảy ra thật
 
 | Bẫy | Hậu quả |
