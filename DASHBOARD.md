@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `d110678` (2026-09-03). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `6ac5a45` (2026-09-03). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
-1. **Việc ưu tiên #1** — **_root** — Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-03 @ `d110678` · [HANDOFF.md](HANDOFF.md)
+1. **Việc ưu tiên #1** — **_root** — Dọn 63 chỗ đỏ B10 ở repo 3AI rồi mới bật tám mã chặn cho cổng cấu trúc ở đó · [STATUS](STATUS.md)
+2. **Phiên gần nhất** — 2026-09-03 @ `6ac5a45` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 
@@ -15,7 +15,7 @@ Trang được sinh tại commit `d110678` (2026-09-03). Đây là lúc sinh tra
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.2.3 | active | 0 | 8 | 2026-09-03 @ `4550171` — npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề ([bằng chứng](docs/migrations/2026-09-03-nav-platform.md)) | CÓ (9 commit) | v1.2.3: cổng cấu trúc trên CI nay chặn thật, không chỉ in màu | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.2.3 | active | 0 | 8 | 2026-09-03 @ `4550171` — npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề ([bằng chứng](docs/migrations/2026-09-03-nav-platform.md)) | CÓ (9 commit) | v1.2.3: cổng cấu trúc nay chặn thật; còn chặn merge thì gói GitHub hiện tại không cho | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 

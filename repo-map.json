@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-03",
-  "generated_commit": "d110678",
+  "generated_commit": "6ac5a45",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,20 +33,20 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub",
-      "human_action": "Bật hai nút trong Settings của repo trên GitHub: chặn merge khi CI đỏ, và Secret scanning",
+      "next_step": "Dọn 63 chỗ đỏ B10 ở repo 3AI rồi mới bật tám mã chặn cho cổng cấu trúc ở đó",
+      "human_action": "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-03",
       "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
-      "open_item": "v1.2.3: cổng cấu trúc trên CI nay chặn thật, không chỉ in màu"
+      "open_item": "v1.2.3: cổng cấu trúc nay chặn thật; còn chặn merge thì gói GitHub hiện tại không cho"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub",
+      "title": "Dọn 63 chỗ đỏ B10 ở repo 3AI rồi mới bật tám mã chặn cho cổng cấu trúc ở đó",
       "rank": 1,
       "claim": null
     }

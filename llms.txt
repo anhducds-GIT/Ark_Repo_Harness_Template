@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `d110678` (2026-09-03).
+Trang được sinh tại commit `6ac5a45` (2026-09-03).
 
 ## Việc ưu tiên #1
 
-- **_root** — Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub
+- **_root** — Dọn 63 chỗ đỏ B10 ở repo 3AI rồi mới bật tám mã chặn cho cổng cấu trúc ở đó
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `d110678` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.2.3: cổng cấu trúc trên CI nay chặn thật, không chỉ in màu
+- [ark-repo-harness](STATUS.md): active — v1.2.3: cổng cấu trúc nay chặn thật
 
 ## Luật bắt buộc trước khi sửa gì
 
