@@ -417,7 +417,24 @@ check("File mới đã khai vào Bản đồ file", () => {
     if (!rest || rest === "AGENTS.md") continue;
     const map = mapSection(fs.readFileSync(agentsPath, "utf8"));
     if (map === null) { thieuBanDo.push(path.join(base, "AGENTS.md").replaceAll("\\", "/")); continue; }
-    if (!mentionsExactPath(map, rest)) undeclared.push(file);
+    // KHAI MỘT THƯ MỤC LÀ ĐÃ KHAI NHỮNG GÌ TRONG NÓ.
+    //
+    // Bản đầu chỉ nhận đúng đường dẫn đầy đủ. Nghe thì chặt, nhưng dùng thật thì hỏng: mỗi hồ sơ
+    // migrate mới, mỗi ADR mới, mỗi workflow mới lại đòi thêm một dòng bản đồ — vĩnh viễn. Bản
+    // đồ phình theo số file thay vì theo số LOẠI việc, và tới lúc nào đó người ta bỏ khai.
+    // Một luật không ai theo nổi thì không phải luật chặt, nó chỉ là luật chết.
+    //
+    // Đây là một chỗ NỚI CÓ CHỦ Ý và có biên: chỉ nhận khi bản đồ khai đúng thư mục cha (kèm
+    // dấu `/`), tức vẫn là một hành vi khai báo tường minh của người viết luật. Không nhận
+    // khai kiểu chung chung, và không nhận thư mục chưa từng được nhắc.
+    const daKhai = mentionsExactPath(map, rest) || (() => {
+      const doan = rest.split("/");
+      for (let i = doan.length - 1; i > 0; i -= 1) {
+        if (mentionsExactPath(map, doan.slice(0, i).join("/") + "/")) return true;
+      }
+      return false;
+    })();
+    if (!daKhai) undeclared.push(file);
   }
   // Không tìm thấy bản đồ là một lỗi RIÊNG, có cách sửa RIÊNG. Gộp nó vào "chưa khai" là bảo
   // người ta đi khai từng file vào một mục không tồn tại.

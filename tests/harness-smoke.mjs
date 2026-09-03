@@ -413,9 +413,17 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
       copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
-    writeFileSync(join(temp, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    // Phiên PHẢI GIỮ vùng, nếu không thì phép kiểm bản đồ tự bỏ qua (BỎ vì rỗng) và cả hai
+    // ca (c)(d) dưới đây xanh mà không kiểm gì — đúng loại phép kiểm rỗng nghĩa mà repo này
+    // đã bắt được bảy lần. Bản đầu của khối này mắc đúng lỗi đó.
+    const giu = (task) => ({ owner: "thu", ai: "Test", claimed_at: "2026-01-01", task, released_at: null });
+    writeFileSync(join(temp, ".agents", "claims.json"),
+      JSON.stringify({ claims: { _root: giu("thu"), _docs: giu("thu"), _code: giu("thu"), _template: giu("thu") } }), "utf8");
     writeFileSync(join(temp, "package.json"), JSON.stringify({ name: "tam", private: true }), "utf8");
-    writeFileSync(join(temp, "AGENTS.md"), "# tam", "utf8");
+    writeFileSync(join(temp, "AGENTS.md"),
+      ["# tam", "", "## 6. Bản đồ file", "",
+       "| Khi bạn sắp… | Mở cái gì |", "|---|---|",
+       "| Xem hồ sơ | `docs/co-khai/` |"].join(String.fromCharCode(10)), "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "seed");
 
     const chay = () => {
@@ -437,6 +445,24 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     const b = chay();
     assert.doesNotMatch(b, /BOOTSTRAP_KHONG_CO_BANG_CHUNG/,
       "bo kiem co in dong tong ket thi khong duoc keu thieu bang chung");
+
+    // (c) KHAI MỘT THƯ MỤC LÀ ĐÃ KHAI NHỮNG GÌ TRONG NÓ.
+    //     Đây là một chỗ NỚI CÓ CHỦ Ý, nên phải có hàng rào: nới thì được, nới thêm thì không.
+    //     Không có nó thì mỗi hồ sơ migrate mới, mỗi ADR mới lại đòi một dòng bản đồ — vĩnh viễn,
+    //     và tới lúc nào đó người ta bỏ khai. Luật không ai theo nổi là luật chết.
+    mkdirSync(join(temp, "docs", "co-khai"), { recursive: true });
+    writeFileSync(join(temp, "docs", "co-khai", "moi.md"), "x", "utf8");
+    const c = chay();
+    assert.doesNotMatch(c, /docs\/co-khai\/moi\.md/,
+      "thu muc DA KHAI trong ban do thi file moi ben trong khong duoc keu la chua khai");
+
+    // (d) HÀNG RÀO: thư mục CHƯA khai thì vẫn phải đỏ. Thiếu vế này thì một bản nới tay
+    //     (nhận mọi đường dẫn) cũng qua được (c), và phép kiểm bản đồ thành đồ trang trí.
+    mkdirSync(join(temp, "docs", "chua-khai"), { recursive: true });
+    writeFileSync(join(temp, "docs", "chua-khai", "moi.md"), "x", "utf8");
+    const d = chay();
+    assert.match(d, /docs\/chua-khai\/moi\.md/,
+      "thu muc CHUA khai thi file moi ben trong PHAI bi keu");
   } finally { rmSync(temp, { recursive: true, force: true }); }
   ok("ma thoat 0 khong phai bang chung: bo kiem cau truc cam thi cong phai DO");
 }
