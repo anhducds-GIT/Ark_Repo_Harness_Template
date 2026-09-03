@@ -65,6 +65,6 @@
   "_grandfathered_doc": "Đường dẫn cũ được miễn trừ vĩnh viễn. Repo mới để RỖNG. Repo cũ đang migrate thì liệt kê ở đây thay vì đổi tên hàng loạt.",
   "bootstrap": {
     "_doc": "Phép kiểm nào ĐÓNG CỔNG khi đỏ. Repo mới nên bắt đầu với danh sách RỖNG, chạy vài phiên cho sạch, rồi mới bật dần. Bật chặn khi đang đỏ là tự khoá repo.",
-    "blocking": []
+    "blocking": ["B1", "B2", "B3", "B4", "B5", "B7", "B10", "B12"]
   }
 }
