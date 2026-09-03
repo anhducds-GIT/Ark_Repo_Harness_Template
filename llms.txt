@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `6ac5a45` (2026-09-03).
+Trang được sinh tại commit `b4ab56f` (2026-09-03).
 
 ## Việc ưu tiên #1
 
-- **_root** — Dọn 63 chỗ đỏ B10 ở repo 3AI rồi mới bật tám mã chặn cho cổng cấu trúc ở đó
+- **_root** — Phân loại 63 phát hiện B10 ở repo 3AI — chưa chắc là 63 vi phạm — rồi mới bật mã chặn ở đó
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `6ac5a45` (2026-09-03).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.2.3: cổng cấu trúc nay chặn thật
+- [ark-repo-harness](STATUS.md): active — v1.2.4: một số phiên bản nay trỏ tới đúng một nội dung, và không lùi bản được nữa
 
 ## Luật bắt buộc trước khi sửa gì
 
