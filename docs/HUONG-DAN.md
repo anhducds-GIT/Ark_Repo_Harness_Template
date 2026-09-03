@@ -8,6 +8,31 @@ ttl_days: 365
 
 Hai người dùng, hai nhu cầu khác nhau. Đọc phần của mình.
 
+## Đọc trang này thế nào — 60 giây
+
+Trang có tám tab, **xếp theo tần suất dùng**, không theo thứ tự viết ra.
+
+| Tab | Mở khi nào | Ai đọc |
+|---|---|---|
+| **Tổng quan** | mỗi lần mở trang — repo đang thế nào, cần bạn làm gì, bắt đầu từ lệnh nào | Đức |
+| **Cách vận hành** | sắp làm một việc và muốn biết các bước | AI · Đức |
+| **Sổ tay** | việc lặp lại — làm theo danh sách kiểm, đừng tự nghĩ lại | AI |
+| **Làm được gì** | mới vào, muốn biết bộ khung này để làm gì | Đức |
+| **Bảo trì** | tới hạn quét, hoặc repo im ắng lâu ngày | AI |
+| **Bên trong** · **Tra cứu** · **Nhật ký** | tra một thứ cụ thể | AI |
+
+Ba quy ước đọc, biết rồi thì không cần hỏi ai:
+
+- **Đèn xanh chỉ khi cả ba số đều 0.** Dấu `?` nghĩa là *không đo được* — đó không phải số 0,
+  và đèn sẽ không xanh.
+- **Ô tô vàng là việc cần bạn**, không phải việc của AI.
+- **Banner đỏ trên cùng** = trang quá bảy ngày tuổi, số trong đó đáng ngờ. Sinh lại rồi hãy tin.
+
+Mục nào gập lại là mục **ít dùng** — bấm vào mới mở. Không gập là thứ dùng hằng ngày.
+
+> Toàn bộ trang **sinh từ file trong repo**, không ai gõ tay. Muốn đổi chữ trên trang thì sửa
+> file nguồn rồi sinh lại — sửa thẳng vào HTML là mất trắng ở lần sinh sau.
+
 ## Trước khi bắt đầu — 30 giây
 
 **Máy bạn cần có:** Node.js và git. Kiểm bằng cách gõ `node -v` rồi `git --version` — ra số là

@@ -3,6 +3,40 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.0.0 — 2026-09-03 — Đóng v1: hợp đồng lõi đã đúng, và đã chạy thật trên hai repo
+
+**Vì sao gọi là 1.0**
+
+Không phải "chạy được" — mà **mọi lớp bảo vệ đã được chứng minh là chặn thật**, bằng fixture
+dựng được ca hỏng rồi thử phá. Và bộ khung đã lắp thật lên hai repo khác nghề: một repo Python
+điều phối AI, một nền tảng chứng khoán Node + dữ liệu EOD thật.
+
+**Sửa — bảy chỗ hợp đồng lõi (`tests/core-contract.mjs`)**
+- Bộ đo từng chấm **mức 3 · 0/0/0** cho cấu hình mà runtime NÉM. Nay gọi đúng validator runtime.
+- Chỉ đo được JavaScript: repo Python bị đo thành "code không đổi". Nay khai `behaviour_globs`.
+- Vòng đời vẽ hai chặng mà validator TỪ CHỐI, còn bốn giá trị hợp lệ không có chặng nào.
+- Lệnh git hỏng hoá thành chuỗi rỗng → "0 file · 0 thay đổi · 0 secret" → XANH. Nay là phép kiểm.
+- Đổi **thứ tự khai** hai vùng lồng nhau là đổi chủ sở hữu. Nay tiền tố dài nhất thắng.
+- **Xoá** một ADR đã Accepted thoát sạch; đổi tên cũng thoát. Nay bắt cả hai.
+- Nhận quyền là đọc-sửa-ghi. Nay khoá nguyên tử bằng `mkdir`.
+
+**Sửa — trang không nói dối**
+- Bảng chỉ đọc "chỗ VÀNG", bỏ "chỗ ĐỎ": repo 10 đỏ / 0 vàng hiện ra 0 và đèn có thể xanh.
+- Sổ migrate in lại nguyên khối khai báo vào thân bài.
+- Quét secret báo XANH dù có file không đọc được.
+- Ghép tên file vào chuỗi shell — bộ khung chạy trên repo người khác, tên file không do mình đặt.
+
+**Đổi**
+- Bản trích lấy phiên bản từ `package.json`, bỏ nhãn `unproven`.
+- Trang xếp lại theo tần suất dùng; mục ít dùng gập lại; thêm "Bắt đầu ở đâu" và "Trang liên quan".
+- `llms.txt` quay lại bản đồ file — nó vẫn được sinh, chỉ là đã rơi khỏi luật và khỏi trang.
+
+**Đã biết, KHÔNG nằm trong 1.0**
+- **Chưa có ghim phiên bản và lệnh nâng cấp.** Vá bộ khung vẫn phải chép tay sang từng repo.
+  Đây là việc lớn nhất còn lại, và cố ý để sau: ghim một bản đo sai chỉ nhân cái sai ra đều hơn.
+- Chưa có CI — `git push` trần vẫn đi vòng qua mọi cổng.
+- Phép kiểm khoá quyền chỉ dựng được ca tuần tự, chưa dựng được ca đua thật.
+
 ## 0.3.0 — 2026-09-03 — AI là chủ nhà: sổ tay, lịch bảo trì, và bảng nói tiếng người
 
 **Thêm**

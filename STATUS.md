@@ -2,13 +2,13 @@
 schema: extension-status/v2
 id: ark-repo-harness
 name: Ark Repo Harness
-lifecycle: building
+lifecycle: active
 owner: harness-vong2
 priority_rank: 1
-next_step: "Chốt hướng versioning: repo đích phải ghim được bản khung nào, và nâng cấp bằng lệnh — không chép tay"
+next_step: "Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo"
 version_source: package.json
-current_focus: "Hai repo thật đã lên chuẩn và đóng được cổng. Audit GPT chỉ đúng chỗ đau: chưa có cơ chế ghim phiên bản nên chép tay sẽ đẻ ra N bản khung"
-human_action: "Chốt: dừng migrate thêm cho tới khi có ghim phiên bản + lệnh nâng cấp, hay cứ migrate tiếp và chấp nhận vá tay?"
+current_focus: "v1.0 đã đóng: bảy chỗ hợp đồng lõi đã vá và có fixture phá, đã chạy thật trên hai repo khác nghề"
+human_action: "Không có việc nào cần bạn. Muốn mở rộng sang repo thứ ba thì nói — nhưng nên có ghim phiên bản trước"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---

@@ -105,6 +105,10 @@ const CSS = `
 .vong .noi{height:2px;background:var(--vien);flex:1;margin-bottom:19px;min-width:14px}
 .vong .noi.qua{background:var(--xanh)}
 
+.batdau pre.code{margin:6px 0 4px}
+.lienquan{margin:6px 0 0;padding-left:20px}
+.lienquan li{margin:5px 0;font-size:14.4px}
+details.the summary{font-family:var(--disp);font-size:clamp(18px,2.2vw,22px);font-weight:700}
 .den{width:18px;height:18px;border-radius:50%;display:inline-block;vertical-align:-3px}
 .den.xanh{background:var(--xanh)} .den.vang{background:var(--vang)} .den.do{background:var(--do)}
 :root{
@@ -347,14 +351,52 @@ function khoiSucKhoe(sk) {
 }
 
 
+/* BẮT ĐẦU Ở ĐÂU — ba câu hỏi, ba lệnh. Đặt NGAY dưới NOW/NEXT vì đây là thứ người mở trang
+   cần nhiều nhất, và trước đây nó nằm tận tab thứ ba. Cuộn để tìm việc hay làm nhất là lỗi bày
+   trang, không phải lỗi người đọc. */
+export function khoiBatDau(dl) {
+  return `<div class="the batdau">
+    <h2>Bắt đầu ở đâu</h2>
+    <div class="cols">
+      <div><h3>Repo này đang thế nào?</h3><pre class="code"><code>npm run gate -- --as duc</code></pre>
+        <p>XANH TOÀN BỘ = xong. ĐỎ = chưa xong, mỗi dòng nói luôn cách sửa.</p></div>
+      <div><h3>Repo kia còn cách chuẩn bao xa?</h3><pre class="code"><code>npm run assess -- &lt;đường-dẫn&gt;</code></pre>
+        <p>Ra mức 0–3 và ba con số chi phí: thả · viết · soi.</p></div>
+      <div><h3>Xem lại trang này</h3><pre class="code"><code>npm run overview -- bang.html</code></pre>
+        <p>Rồi mở <code>bang.html</code> bằng trình duyệt.</p></div>
+    </div>
+    <p style="color:var(--mo);font-size:13.2px;margin-bottom:0">Không cần cài gì thêm — không thư viện ngoài, không gọi mạng, không tài khoản. Chỉ cần Node và git.</p>
+  </div>`;
+}
+
+/* TRANG LIÊN QUAN — đọc thẳng từ bản đồ mục 6, không khai lần thứ hai.
+   Trang vệ tinh (sổ migrate…) trước đây không có đường nào dẫn tới từ trang mẹ, nên coi như
+   không tồn tại với người chỉ mở một link. */
+export function khoiLienQuan(banDo) {
+  const MAU = "https://claude.ai/code/artifact/";
+  const dong = (banDo || []).filter((c) => String(c[1] || "").includes(MAU));
+  if (!dong.length) return "";
+  const item = dong.map((c) => {
+    // Cắt bằng chỉ số, không bằng regex — đường dẫn có dấu `/` nên regex viết trong chuỗi rất
+    // dễ bị nuốt mất dấu thoát, và lúc đó nó im lặng khớp sai.
+    const tu = c[1].indexOf(MAU);
+    const url = c[1].slice(tu).split(/[\s)|<"']/)[0];
+    const ten = String(c[0]).split("**").join("");
+    return `<li><a href="${esc(url)}">${esc(ten)}</a></li>`;
+  }).join("");
+  return `<div class="the"><h2>Trang liên quan</h2><ul class="lienquan">${item}</ul></div>`;
+}
+
 export function trang(dl) {
   const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, huongDan, st } = dl;
 
   const tabs = [
+    // Thứ tự = tần suất dùng, không phải thứ tự viết ra. "Cách vận hành" và "Sổ tay" là hai
+    // tab mở hằng ngày; "Làm được gì" chỉ đọc một lần lúc mới vào.
     ["tong-quan", "Tổng quan"],
-    ["lam-duoc-gi", "Làm được gì"],
     ["cach-van-hanh", "Cách vận hành"],
     ["so-tay", "Sổ tay"],
+    ["lam-duoc-gi", "Làm được gì"],
     ["bao-tri", "Bảo trì"],
     ["kien-truc", "Bên trong"],
     ["tra-cuu", "Tra cứu"],
@@ -420,10 +462,12 @@ export function trang(dl) {
 
   <section class="tab" id="tab-tong-quan" hidden>
     ${khoiNowNext(st)}
+    ${khoiBatDau(dl)}
+    ${khoiLienQuan(dl.banDo)}
     ${khoiVongDoi(st)}
     ${khoiSucKhoe(so)}
-    <div class="the">
-      <h2>Ba việc nó làm mà một repo trống không làm được</h2>
+    <details class="the">
+      <summary>Ba việc nó làm mà một repo trống không làm được</summary>
       <div class="cols">
         <div>
           <h3>Chặn việc dở dang</h3>
@@ -441,7 +485,7 @@ export function trang(dl) {
           đỏ ở đầu — bạn đang thấy chỗ đó ở trên cùng.</p>
         </div>
       </div>
-    </div>
+    </details>
   </section>
 
   ${dl.tinhNang ? `<section class="tab" id="tab-lam-duoc-gi" hidden>
@@ -510,7 +554,7 @@ export function trang(dl) {
     </div>
   </section>
 
-  ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><div class="the">${md(legend)}</div></section>` : ""}
+  ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><details class="the" open><summary>Bảng tra cứu thuật ngữ</summary><div>${md(legend)}</div></section>` : ""}
 
   ${nhatKy.length ? `<section class="tab" id="tab-nhat-ky" hidden>
     ${nhatKy.map((k, idx) => `<details${idx === 0 ? " open" : ""}>

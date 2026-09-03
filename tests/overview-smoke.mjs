@@ -77,10 +77,24 @@ const html = trang(dl);
 
 /* ---- 4. Tab đầu KHÔNG được nói bằng tiếng máy --------------------------- */
 {
-  // Chủ dự án không đọc code. Một tab mở đầu bằng bảng `npm run` là bắt ông ấy học cú pháp
-  // trước khi biết repo đang thế nào. Lệnh có chỗ của nó — ở tab "Bên trong".
-  const dau = html.slice(html.indexOf('id="tab-tong-quan"'), html.indexOf('id="tab-lam-duoc-gi"'));
-  assert.ok(!dau.includes("npm run"), "tab dau khong duoc chua lenh npm");
+  // Chủ dự án không đọc code. Một tab MỞ ĐẦU bằng bảng `npm run` là bắt ông ấy học cú pháp
+  // trước khi biết repo đang thế nào.
+  //
+  // Bản đầu cấm hẳn mọi lệnh ở tab một. Cấm thế là quá tay: Đức sau đó nói ngược lại — việc
+  // hay dùng nhất phải nằm ngay trang đầu, đừng bắt cuộn đi tìm. Luật ĐÚNG không phải "không
+  // có lệnh" mà là "KHÔNG MỞ ĐẦU bằng lệnh": trạng thái nói bằng tiếng người trước, lệnh sau.
+  // Cắt tới <section> KẾ TIẾP, không cắt tới một id cụ thể: thứ tự nút tab đổi được, còn thứ
+  // tự thân bài thì không — cắt theo id là phép kiểm tự vỡ mỗi lần sắp lại tab.
+  const batDau = html.indexOf('id="tab-tong-quan"');
+  const ketThuc = html.indexOf("<section", batDau + 10);
+  const dau = html.slice(batDau, ketThuc < 0 ? html.length : ketThuc);
+  const viTriLenh = dau.indexOf("npm run");
+  const viTriNguoi = dau.indexOf("đang ở đâu");
+  assert.ok(viTriNguoi >= 0, "tab dau phai mo bang trang thai noi tieng nguoi (NOW/NEXT)");
+  if (viTriLenh >= 0) {
+    assert.ok(viTriNguoi < viTriLenh,
+      "trang thai bang tieng nguoi phai dung TRUOC lenh dau tien tren tab mot");
+  }
   assert.ok(!/\.mjs/.test(dau), "tab dau khong duoc chua ten file ma nguon");
   ok("tab đầu nói bằng tiếng người: không lệnh, không tên file mã nguồn");
 }

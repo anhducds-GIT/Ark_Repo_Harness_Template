@@ -663,7 +663,10 @@ function packageJson(version) {
 
 /* ---- dựng danh sách file --------------------------------------------------- */
 
-export const TEMPLATE_VERSION = "0.1.0-unproven";
+// Bản trích ĐI THEO phiên bản repo nhà. Trước đây nó tự nhận "0.1.0-unproven" trong khi repo
+// đã ở 0.3.0 — hai con số cho cùng một thứ, và không ai biết tin cái nào. Nhãn `unproven`
+// cũng hết đúng: bộ khung đã chạy thật trên hai repo khác nghề (Python và Node/chứng khoán).
+export const TEMPLATE_VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
 
 export function buildTemplateFiles() {
   const files = new Map();

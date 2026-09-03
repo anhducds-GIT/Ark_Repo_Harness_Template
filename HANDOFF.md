@@ -128,3 +128,13 @@ sửa `session-check.mjs`.
    F7 khoá quyền nguyên tử bằng `mkdir`.
    **F7 vẫn là phép kiểm YẾU**: nó chỉ dựng được ca tuần tự, không dựng được ca đua thật.
    Suite 43 → 50. CHƯA làm: version pinning + upgrade — đúng thứ tự GPT đặt, sửa phép đo trước.
+
+ - **2026-09-03 · `harness-vong2` · ĐÓNG v1.0** — Năm việc Đức hỏi:
+   (1) `llms.txt` **vẫn còn và vẫn được sinh** — nó chỉ rơi khỏi bản đồ mục 6 và khỏi trang;
+   đã đưa lại. (2) Link trang vệ tinh (sổ migrate) nay đọc thẳng từ bản đồ mục 6 — không khai
+   lần thứ hai. (3) Bản 1.0.0, bỏ nhãn `unproven`, bản trích lấy phiên bản từ `package.json`
+   thay vì tự khai `0.1.0-unproven`. (4) Trang xếp lại theo tần suất: thêm "Bắt đầu ở đâu" và
+   "Trang liên quan" lên tab một, đẩy phần văn xuôi ít đọc vào toggle, đổi thứ tự tab.
+   (5) Thêm mục "Đọc trang này thế nào — 60 giây" vào `HUONG-DAN.md`.
+   Một phép kiểm cũ phải sửa: nó cấm MỌI lệnh ở tab một, trong khi luật đúng là **không MỞ ĐẦU**
+   bằng lệnh. Đã đổi sang kiểm thứ tự thay vì kiểm sự vắng mặt.

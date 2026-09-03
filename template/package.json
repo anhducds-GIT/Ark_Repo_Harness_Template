@@ -1,6 +1,6 @@
 {
   "name": "repo-harness",
-  "version": "0.1.0-unproven",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Bộ khung repo: cổng vào máy đọc, cổng kiểm cấu trúc, cổng đóng phiên, đẩy an toàn.",

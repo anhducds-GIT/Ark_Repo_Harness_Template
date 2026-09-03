@@ -168,6 +168,9 @@ minh được nó **tự** nạp lúc mở phiên.
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | `tests/` — [tests/harness-smoke.mjs](tests/harness-smoke.mjs) là các khối hạt giống; chạy tất cả bằng `npm test` |
 | **Nhìn lại đã từng migrate repo nào, ngày nào, bản nào, còn treo gì** | `scripts/build-so-migrate.mjs` (`npm run so-migrate -- <file.html>`) — đọc `docs/migrations/`. Mỗi lần migrate MỘT hồ sơ, chỉ thêm. Việc này xảy ra thưa nên không ghi là quên sạch |
+| **Nạp hiểu cả repo trong một lần đọc (cho AI mới vào)** | `llms.txt` ở gốc — cổng vào chuẩn llmstxt.org, **MÁY SINH**. Bản đồ máy đọc đi kèm: `repo-map.json`. Bảng cho người: `DASHBOARD.md`. Cả ba sinh lại bằng `node scripts/build-dashboard.mjs`, đừng sửa tay |
+| **Xem bảng trạng thái trực quan (trang mẹ)** | https://claude.ai/code/artifact/78cd4694-6eb0-4389-94e9-b2675c1c4cae — sinh bằng `npm run overview -- <file.html>` |
+| **Nhìn lại đã migrate repo nào, ngày nào (trang vệ tinh)** | https://claude.ai/code/artifact/6807387b-6d45-4f9c-980d-072bdf369b5d — sinh bằng `npm run so-migrate -- <file.html>` |
 | **Bảy chỗ hợp đồng lõi đã từng vỡ, và phép kiểm phá cho từng chỗ** | `tests/core-contract.mjs` — bộ đo nói dối · đo được nghề khác · vòng đời một bảng · git hỏng không hoá số 0 · quy chủ theo tiền tố dài nhất · ADR xoá cũng bị bắt · khoá quyền nguyên tử |
 | **Biết bộ khung đang nặng bao nhiêu, và luật nào chưa từng chặn được gì** | `scripts/can-nang.mjs` (`npm run can-nang`) — bốn con số có ngân sách; quá thì phải BỚT trước khi nghĩ tới nới. Nhịp tháng, cố ý KHÔNG nằm trong cổng đóng phiên |
 
