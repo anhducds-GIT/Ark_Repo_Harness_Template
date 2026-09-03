@@ -20,24 +20,21 @@
  * CHỈ ĐỌC khi `--plan`. Không ghi một byte nào.
  */
 
-import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildTemplateFiles, TEMPLATE_VERSION } from "./build-template.mjs";
+import { bam, bamBanTrich, buildTemplateFiles, fileMay, kiemSoPhatHanh,
+  SO_PHAT_HANH, TEMPLATE_VERSION } from "./build-template.mjs";
+
+/* Ba hàm này mô tả BẢN TRÍCH, không mô tả việc nâng cấp, nên nhà của chúng là
+   `build-template.mjs`. Giữ lại lối vào cũ ở đây để không bẻ nơi đang gọi. */
+export { bamBanTrich, fileMay };
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
 const SO_GHIM = ".ark/harness.lock.json";
 
-/* Chỉ tầng MÁY được nâng cấp tự động. Luật và trạng thái là chữ của repo đó — ghi đè chúng là
-   xoá công của người ta, và đó đúng là thứ quy trình migrate cấm ("thêm vào, đừng thay thế"). */
-export function fileMay(chuan) {
-  return [...chuan.keys()].filter((rel) => rel.startsWith("scripts/") || rel.startsWith("tests/"));
-}
-
-const bam = (text) => createHash("sha256").update(String(text).split(String.fromCharCode(13)).join("")).digest("hex").slice(0, 16);
 
 /* BA TRẠNG THÁI, KHÔNG PHẢI HAI.
  *
@@ -94,13 +91,6 @@ export function soSanh(repo, chuan, soGhim) {
   return ra;
 }
 
-export function bamBanTrich(chuan) {
-  // Một số phiên bản phải trỏ tới ĐÚNG MỘT nội dung. Bản trích dựng thẳng từ cây làm việc, còn
-  // số phiên bản chỉ đọc từ `package.json` — nên nội dung đổi mà số vẫn nguyên là chuyện thường,
-  // và chính phép thử "giả bản vá ở bộ khung" của tôi đã đi qua đúng ca đó.
-  return bam(fileMay(chuan).sort().map((rel) => `${rel}:${bam(chuan.get(rel))}`).join("|"));
-}
-
 /* `giuLai` = file bản khung ĐÃ BỎ nhưng vẫn còn nằm ở repo đích.
  *
  * Không có tham số này thì `ĐÃ BỎ` chỉ kể tên được ĐÚNG MỘT LẦN: sổ ghim mới dựng lại `managed`
@@ -146,6 +136,28 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   }
 
   const chuan = buildTemplateFiles();
+
+  /* CỬA THỨ NHẤT: NGUỒN PHẢI TỰ NHẤT QUÁN — trước khi nhìn repo đích một chút nào.
+   *
+   * Cửa "cùng số bản, khác nội dung" ở dưới CHỈ mở khi repo đích đang ở đúng số bản hiện tại.
+   * Nên một lần sửa file tầng máy mà quên tăng phiên bản là đủ để phát hai nội dung dưới cùng
+   * một nhãn: repo đang ở bản cũ đi lọt (không vào cửa đó) và được đóng dấu bản mới, còn repo
+   * đã ở bản mới thì bị chặn và giữ nội dung cũ. Hai repo, cùng một con số, hai nội dung.
+   *
+   * Sổ phát hành ghi lại "bản này là nội dung nào", nên chỗ này so được. Và nó phải chặn ở ĐÂY,
+   * không phải ở cửa dưới: lỗi nằm ở repo NHÀ, nên nó sai với MỌI repo đích. */
+  const nguon = kiemSoPhatHanh(chuan);
+  if (nguon.trangThai !== "KHOP") {
+    console.error(`${NL}NGUON_KHONG_NHAT_QUAN: bộ khung ở đây không phát được.`);
+    console.error(nguon.trangThai === "CHUA_GHI"
+      ? `Bản ${nguon.version} chưa có dòng nào trong ${SO_PHAT_HANH}.`
+      : `Bản ${nguon.version} đã phát với dấu vân tay ${nguon.daGhi}, mà nội dung tầng máy hiện tại là ${nguon.dangCo}.`);
+    console.error("Nội dung tầng máy đã đổi mà số phiên bản chưa tăng — phát đi lúc này là dán");
+    console.error(`một nhãn sai lên repo đích, và không lệnh nào phát hiện được nữa.`);
+    console.error(`Sửa ở repo nhà: tăng "version" trong package.json, rồi \`node scripts/build-template.mjs\`.${NL}`);
+    process.exit(3);
+  }
+
   const doc = docSoGhim(repo);
 
   // SỔ GHIM HỎNG THÌ DỪNG NGAY, trước cả khi so sánh. Coi nó như "chưa từng ghim" biến việc
@@ -157,6 +169,33 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     process.exit(3);
   }
   const soGhim = doc.trangThai === "CO" ? doc.so : null;
+
+  /* CỬA THỨ HAI: KHÔNG HẠ CẤP.
+   *
+   * Chỗ so sánh chỉ nhìn NỘI DUNG, không nhìn thứ tự phiên bản. Nên chạy bộ khung 1.2.3 lên một
+   * repo đã ghim 1.3.0 thì file của 1.3.0 bị gọi là `CŨ` — sai hẳn nghĩa: nó MỚI HƠN — rồi
+   * `--apply` ghi bản cũ đè lên. Đã dựng lại được ca này ngày 03/09: repo mất nguyên nội dung
+   * 1.3.0 và sổ ghim tụt về 1.2.3, thoát 0, không một lời cảnh báo.
+   *
+   * Đây gần như luôn là chạy nhầm máy (một máy chưa `git pull`), nên mặc định là DỪNG. `--force`
+   * mở được, vì hạ cấp CÓ LÚC là việc cố ý — lùi một bản vá hỏng chẳng hạn. */
+  const soSanhBan = (a, b) => {
+    const p = (v) => String(v).split(".").map((x) => Number.parseInt(x, 10) || 0);
+    const [x, y] = [p(a), p(b)];
+    for (let i = 0; i < 3; i += 1) { if (x[i] !== y[i]) return x[i] - y[i]; }
+    return 0;
+  };
+  const haCap = soGhim && soSanhBan(soGhim.version, TEMPLATE_VERSION) > 0;
+  if (haCap) {
+    console.error(`${NL}HA_CAP: repo đích đang ở bản ${soGhim.version}, MỚI HƠN bản khung ở máy này (${TEMPLATE_VERSION}).`);
+    console.error("Nâng cấp lúc này là ghi bản cũ đè bản mới — và chỗ so sánh sẽ gọi file mới hơn là `CŨ`,");
+    console.error("nên bảng kế hoạch cũng không cứu được bạn.");
+    console.error("Gần như luôn là máy này chưa `git pull` ở repo bộ khung. Kéo về trước.");
+    console.error(`Cố ý muốn lùi (ví dụ lùi một bản vá hỏng) thì chạy lại kèm --force.${NL}`);
+    if (!force) process.exit(3);
+    console.error(`(--force: vẫn hạ cấp theo yêu cầu.)${NL}`);
+  }
+
   const dong = soSanh(repo, chuan, soGhim);
   const dem = (t) => dong.filter((d) => d.trangThai === t);
 

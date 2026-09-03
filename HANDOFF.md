@@ -217,3 +217,19 @@ sửa `session-check.mjs`.
    định của Đức**: (a) nâng lên GitHub Pro; (b) để repo public; (c) chấp nhận CI chỉ **báo** chứ
    không **chặn** — lúc đó `git push` trần vẫn đi qua được mọi cổng, đúng chỗ hở đã ghi từ đầu.
 
+ - **2026-09-03 · `harness-vong2` · v1.2.4 RELEASE-INTEGRITY** — Audit độc lập chỉ hai lỗ, tôi
+   kiểm lại **cả hai đều đúng**, và lỗ hạ cấp thì **dựng lại được nguyên vẹn**: repo ghim 1.3.0 bị
+   bộ khung 1.2.3 ghi đè, sổ tụt về 1.2.3, thoát 0, không cảnh báo. Gốc chung: bản trích và số
+   phiên bản đều dựng từ nguồn đang sống, nên không gì ghi lại "1.2.4 là nội dung nào".
+   Thêm `RELEASE-LEDGER.json` (chỉ thêm) — ba chỗ cùng chặn: `npm test` · bộ sinh từ chối tự sửa
+   dòng cũ · `upgrade.mjs` không phát đi được với MỌI repo đích kể cả `--force`. Thêm `HA_CAP`.
+   Năm đột biến ngược, cả năm bị bắt. Suite 66.
+   Cũng dọn nhà: `bam` · `fileMay` · `bamBanTrich` chuyển sang `build-template.mjs` (chúng mô tả
+   BẢN TRÍCH, không mô tả việc nâng cấp), giữ lối vào cũ ở `upgrade.mjs` để không bẻ nơi gọi.
+   **Đã đồng bộ NAV lên GitHub** (audit đọc qua connector nên commit chưa push là vô hình): nay
+   `blocking` tám mã + sổ ghim 1.2.3. **3AI thì không push được** — nhánh đang 19 commit trước
+   remote, phần lớn là của phiên `migrate-3ai`, và đẩy hộ việc người khác không nằm trong luật.
+   Một lần suýt hỏng, ghi lại để phiên sau tránh: `git add -A` ở NAV cuốn theo **109 file
+   `data/ta/**`** đang có thay đổi chưa commit của người khác. Đã `reset` và commit lại bằng
+   đường dẫn tường minh. Ở repo dùng chung, `git add -A` là một cái bẫy.
+

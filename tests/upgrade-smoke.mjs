@@ -17,6 +17,7 @@ import { docSoGhim, fileMay, soGhimMoi, soSanh } from "../scripts/upgrade.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
+const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const chuan = buildTemplateFiles();
 
@@ -249,6 +250,99 @@ const dungRepo = (ghiSoGhim) => {
       "xoa khoi dia thi phai rung khoi so, khong de lai ten ma");
   } finally { rmSync(root, { recursive: true, force: true }); }
   ok("ĐÃ BỎ sống sót qua --apply, và tự rụng khi file bị xoá thật");
+}
+
+/* ---- 10. Nguon khong nhat quan → DUNG, voi MOI repo dich ---------------- */
+{
+  // Cua "cung ban khac noi dung" CHI mo khi repo dich dang o dung so ban hien tai. Nen mot lan
+  // sua file tang may ma quen tang phien ban la du de phat HAI noi dung duoi CUNG MOT NHAN:
+  // repo o ban cu di lot va duoc dong dau ban moi; repo da o ban moi thi bi chan va giu noi dung
+  // cu. Hai repo, cung mot con so, hai noi dung — dung cai benh ma so phien ban sinh ra de chua.
+  //
+  // Loi nay o repo NHA, nen no sai voi MOI repo dich — phai chan truoc khi nhin dich.
+  const soPhat = join(ROOT, "RELEASE-LEDGER.json");
+  const goc = readFileSync(soPhat, "utf8");
+  const root = dungRepo(true);
+  try {
+    const j = JSON.parse(goc);
+    const ban = Object.keys(j.ban).sort().at(-1);
+    j.ban[ban] = "f".repeat(16);              // so ghi mot dang, nguon dang song mot neo
+    writeFileSync(soPhat, JSON.stringify(j, null, 2), "utf8");
+
+    // Xoa mot file may de --apply THAT SU co viec phai ghi.
+    const mot = fileMay(chuan)[0];
+    rmSync(join(root, mot));
+    for (const co of [["--plan"], ["--apply"], ["--apply", "--force"]]) {
+      const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), ...co, root], { encoding: "utf8" });
+      const noi = String(r.stdout) + String(r.stderr);
+      assert.notEqual(r.status, 0, `${co.join(" ")}: nguon khong nhat quan thi phai DUNG`);
+      assert.match(noi, /NGUON_KHONG_NHAT_QUAN/, "phai goi ten loi, va noi ro loi o repo NHA");
+      assert.throws(() => readFileSync(join(root, mot)), "khong duoc ghi mot byte nao");
+    }
+  } finally {
+    writeFileSync(soPhat, goc, "utf8");
+    rmSync(root, { recursive: true, force: true });
+  }
+  ok("sổ phát hành lệch nguồn → dừng với mọi repo đích, kể cả --force");
+}
+
+/* ---- 11. KHONG duoc ha cap repo dich ------------------------------------ */
+{
+  // Cho so sanh chi nhin NOI DUNG, khong nhin thu tu phien ban. Nen chay bo khung 1.2.3 len mot
+  // repo da ghim 1.3.0 thi file cua 1.3.0 bi goi la `CU` — sai han nghia, no MOI HON — roi
+  // --apply ghi ban cu de len. Da dung lai duoc ca nay that: repo mat noi dung 1.3.0, so ghim
+  // tut ve 1.2.3, thoat 0, khong mot loi canh bao.
+  const root = dungRepo(true);
+  try {
+    const duongSo = join(root, ".ark", "harness.lock.json");
+    const so = JSON.parse(readFileSync(duongSo, "utf8"));
+    so.version = "99.0.0";                     // dich o ban MOI HON han
+    writeFileSync(duongSo, JSON.stringify(so, null, 2), "utf8");
+
+    const mot = fileMay(chuan)[0];
+    const rieng = chuan.get(mot) + NL + "// noi dung rieng cua ban moi hon" + NL;
+    writeFileSync(join(root, mot), rieng, "utf8");
+
+    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--apply", root], { encoding: "utf8" });
+    assert.notEqual(r.status, 0, "dich moi hon thi --apply phai DUNG");
+    assert.match(String(r.stdout) + String(r.stderr), /HA_CAP/, "phai goi ten no la HA CAP");
+    assert.equal(readFileSync(join(root, mot), "utf8"), rieng, "khong duoc ghi ban cu de len ban moi");
+    assert.equal(JSON.parse(readFileSync(duongSo, "utf8")).version, "99.0.0", "so ghim khong duoc tut lui");
+
+    // --force van ha cap duoc: lui mot ban va hong LA viec co that.
+    const r2 = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--apply", "--force", root], { encoding: "utf8" });
+    assert.equal(r2.status, 0, "--force phai ha cap duoc — do la mot viec co that, chi can noi ro");
+    assert.match(String(r2.stdout) + String(r2.stderr), /HA_CAP/, "ha cap co y thi VAN phai noi to");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("repo đích mới hơn → dừng, không ghi đè; --force vẫn lùi được nhưng phải nói to");
+}
+
+/* ---- 12. `npm test` / CI phai bat duoc so phat hanh lech ---------------- */
+{
+  // `upgrade.mjs` chan luc PHAT. Nhung luc do da muon: nguoi van hanh moi biet minh sai khi
+  // dang dung truoc mot repo dich. Cho dung de biet la o repo NHA, ngay khi chay bo phep kiem —
+  // va do cung la cho CI nhin thay. Khong co ve nay thi cua kia chi la mot cai phanh tay.
+  const soPhat = join(ROOT, "RELEASE-LEDGER.json");
+  const goc = readFileSync(soPhat, "utf8");
+  try {
+    const truoc = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs"), "--check"], { encoding: "utf8" });
+    assert.equal(truoc.status, 0, "doi chung: chua dong gi thi --check phai xanh");
+
+    const j = JSON.parse(goc);
+    const ban = Object.keys(j.ban).sort().at(-1);
+    j.ban[ban] = "0".repeat(16);
+    writeFileSync(soPhat, JSON.stringify(j, null, 2), "utf8");
+    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs"), "--check"], { encoding: "utf8" });
+    assert.notEqual(r.status, 0, "so phat hanh lech thi `npm test` phai DO");
+    assert.match(String(r.stdout) + String(r.stderr), /SO_PHAT_HANH_LECH/, "phai goi ten loi");
+
+    // Va bo sinh KHONG duoc tu sua dong cu cho xong chuyen — do la noi doi ve mot ban da phat.
+    const g = spawnSync(process.execPath, [join(ROOT, "scripts", "build-template.mjs")], { encoding: "utf8" });
+    assert.notEqual(g.status, 0, "bo sinh phai TU CHOI, khong duoc tu ghi de dong cu");
+    assert.equal(JSON.parse(readFileSync(soPhat, "utf8")).ban[ban], "0".repeat(16),
+      "dong cu phai con nguyen — nguoi quyet, khong phai may");
+  } finally { writeFileSync(soPhat, goc, "utf8"); }
+  ok("sổ phát hành lệch → npm test đỏ, và bộ sinh từ chối tự sửa dòng cũ");
 }
 
 console.log(`

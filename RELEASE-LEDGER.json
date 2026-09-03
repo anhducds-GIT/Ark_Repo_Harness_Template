@@ -1,0 +1,6 @@
+{
+  "_doc": "Mỗi phiên bản bộ khung ↔ dấu vân tay tầng máy của nó. CHỈ THÊM — sửa một dòng đã có là nói dối về một bản đã phát. Sinh bởi build-template.mjs; kiểm bằng `npm test`.",
+  "ban": {
+    "1.2.4": "b7da7f0a7e13896c"
+  }
+}

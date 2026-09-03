@@ -703,6 +703,72 @@ export function leakedNames(files) {
   return hits;
 }
 
+
+/* ---- SỔ PHÁT HÀNH: một số phiên bản trỏ tới ĐÚNG MỘT nội dung -------------- */
+
+/* Vì sao có khối này (audit độc lập 03/09). `upgrade.mjs` đã có cửa "cùng số bản, khác nội dung",
+ * nhưng cửa đó CHỈ mở khi repo đích đang ở ĐÚNG số bản hiện tại. Nên chỉ cần một lần sửa file
+ * tầng máy mà quên tăng phiên bản là:
+ *   - repo đang ở bản CŨ  → không vào cửa đó → được nâng lên nội dung mới, đóng dấu 1.2.4;
+ *   - repo đã ở 1.2.4      → vào cửa đó       → bị chặn, giữ nội dung cũ, vẫn mang dấu 1.2.4.
+ * Kết quả: hai repo cùng khai 1.2.4, hai nội dung khác nhau — đúng cái bệnh mà số phiên bản
+ * sinh ra để chữa, chỉ dịch đi một bước.
+ *
+ * Gốc rễ: bản trích và `TEMPLATE_VERSION` đều dựng từ NGUỒN ĐANG SỐNG, nên không có gì ghi lại
+ * "1.2.4 là nội dung nào". Sổ này ghi lại, và nó CHỈ THÊM: sửa một dòng đã có là nói dối về một
+ * bản đã phát. Đổi nội dung tầng máy mà không tăng phiên bản → sổ lệch → `npm test` và CI đỏ. */
+export const SO_PHAT_HANH = "RELEASE-LEDGER.json";
+
+const CR = String.fromCharCode(13);
+export const bam = (text) => createHash("sha256")
+  .update(String(text).split(CR).join("")).digest("hex").slice(0, 16);
+
+/* Chỉ tầng MÁY được nâng cấp tự động, nên chỉ tầng máy quyết định danh tính bản phát. Luật và
+   trạng thái là chữ của từng repo — chúng khác nhau ở mọi repo, và không nên làm bản phát khác đi. */
+export function fileMay(chuan) {
+  return [...chuan.keys()].filter((rel) => rel.startsWith("scripts/") || rel.startsWith("tests/"));
+}
+
+export function bamBanTrich(chuan) {
+  return bam(fileMay(chuan).sort().map((rel) => `${rel}:${bam(chuan.get(rel))}`).join("|"));
+}
+
+export function docSoPhatHanh(root = ROOT) {
+  const duong = path.join(root, SO_PHAT_HANH);
+  let raw;
+  try { raw = fs.readFileSync(duong, "utf8"); } catch { return {}; }
+  try {
+    const j = JSON.parse(raw);
+    return j && typeof j.ban === "object" && j.ban !== null ? j.ban : {};
+  } catch { return {}; }
+}
+
+/* Ba câu trả lời. "Chưa ghi" KHÔNG giống "ghi rồi và khớp", và cũng không giống "ghi rồi mà lệch" —
+   ca cuối là ca duy nhất phải chặn, hai ca đầu chỉ cần ghi thêm. */
+export function kiemSoPhatHanh(chuan, root = ROOT) {
+  const so = docSoPhatHanh(root);
+  const dangCo = bamBanTrich(chuan);
+  const daGhi = so[TEMPLATE_VERSION] ?? null;
+  if (daGhi === null) return { trangThai: "CHUA_GHI", version: TEMPLATE_VERSION, dangCo };
+  return daGhi === dangCo
+    ? { trangThai: "KHOP", version: TEMPLATE_VERSION, dangCo }
+    : { trangThai: "LECH", version: TEMPLATE_VERSION, dangCo, daGhi };
+}
+
+function ghiSoPhatHanh(chuan) {
+  const kq = kiemSoPhatHanh(chuan);
+  if (kq.trangThai === "KHOP") return kq;
+  if (kq.trangThai === "LECH") return kq;   // KHÔNG tự sửa — người quyết, xem main()
+  const so = docSoPhatHanh();
+  so[TEMPLATE_VERSION] = kq.dangCo;
+  const sapXep = Object.fromEntries(Object.keys(so).sort().map((v) => [v, so[v]]));
+  fs.writeFileSync(path.join(ROOT, SO_PHAT_HANH), JSON.stringify({
+    _doc: "Mỗi phiên bản bộ khung ↔ dấu vân tay tầng máy của nó. CHỈ THÊM — sửa một dòng đã có là nói dối về một bản đã phát. Sinh bởi build-template.mjs; kiểm bằng `npm test`.",
+    ban: sapXep
+  }, null, 2) + String.fromCharCode(10), "utf8");
+  return kq;
+}
+
 /* ---- chạy ------------------------------------------------------------------ */
 
 // So sánh bỏ qua ký tự xuống dòng kiểu Windows: git có thể checkout CRLF trong khi bộ sinh
@@ -743,7 +809,18 @@ function main() {
       console.error(`Sinh lại: node scripts/build-template.mjs`);
       process.exit(1);
     }
-    console.log(`${OUT}/ khớp bản gốc — ${files.size} file.`);
+    const so = kiemSoPhatHanh(files);
+    if (so.trangThai !== "KHOP") {
+      console.error(so.trangThai === "CHUA_GHI"
+        ? `SO_PHAT_HANH_THIEU: chưa có dòng nào cho bản ${so.version} trong ${SO_PHAT_HANH}.`
+        : `SO_PHAT_HANH_LECH: bản ${so.version} đã ghi dấu vân tay ${so.daGhi}, mà nội dung tầng máy hiện tại là ${so.dangCo}.`);
+      console.error("Nội dung tầng máy đã đổi mà số phiên bản chưa tăng. Một số trỏ tới hai nội dung");
+      console.error("thì nó không còn là mốc — và `upgrade.mjs` sẽ phát hai thứ khác nhau dưới cùng một nhãn.");
+      console.error(`Sửa: tăng "version" trong package.json, rồi \`node scripts/build-template.mjs\`.`);
+      console.error(`ĐỪNG sửa tay dòng cũ trong ${SO_PHAT_HANH} — đó là nói dối về một bản đã phát.`);
+      process.exit(1);
+    }
+    console.log(`${OUT}/ khớp bản gốc — ${files.size} file, bản ${so.version} khớp sổ phát hành.`);
     return;
   }
 
@@ -753,7 +830,15 @@ function main() {
     fs.mkdirSync(path.dirname(abs), { recursive: true });
     fs.writeFileSync(abs, text, "utf8");
   }
-  console.log(`Đã sinh ${OUT}/ — ${files.size} file, bản ${TEMPLATE_VERSION}.`);
+  const so = ghiSoPhatHanh(files);
+  if (so.trangThai === "LECH") {
+    console.error(`${String.fromCharCode(10)}SO_PHAT_HANH_LECH: bản ${so.version} đã phát với dấu vân tay ${so.daGhi},`);
+    console.error(`mà nội dung tầng máy hiện tại là ${so.dangCo}. KHÔNG tự ghi đè dòng cũ.`);
+    console.error("Tăng \"version\" trong package.json rồi chạy lại — mỗi nội dung một số riêng.");
+    process.exit(1);
+  }
+  console.log(`Đã sinh ${OUT}/ — ${files.size} file, bản ${TEMPLATE_VERSION}`
+    + `${so.trangThai === "CHUA_GHI" ? ` (đã ghi vào ${SO_PHAT_HANH})` : ""}.`);
 }
 
 function walk(dir, prefix = "") {

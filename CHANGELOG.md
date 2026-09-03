@@ -3,6 +3,38 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.4 — 2026-09-03 — Một số phiên bản trỏ tới đúng một nội dung, và không lùi được nữa
+
+Hai lỗ, cùng một gốc: **bản trích và số phiên bản đều dựng từ nguồn đang sống**, nên không có
+gì ghi lại "1.2.4 là nội dung nào".
+
+**Lỗ một — cùng một nhãn, hai nội dung.** Cửa "cùng số bản, khác nội dung" của v1.2.1 chỉ mở
+khi repo đích **đang ở đúng số bản hiện tại**. Nên chỉ cần một lần sửa file tầng máy mà quên
+tăng phiên bản là đủ:
+
+| Repo | Vào cửa đó? | Kết cục |
+|---|---|---|
+| đang ở bản **cũ** | không | được nâng lên nội dung mới, **đóng dấu 1.2.4** |
+| đã ở **1.2.4** | có | bị chặn, giữ nội dung cũ, **vẫn mang dấu 1.2.4** |
+
+Hai repo, cùng một con số, hai nội dung — đúng cái bệnh mà số phiên bản sinh ra để chữa, chỉ
+dịch đi một bước.
+
+Nay có **`RELEASE-LEDGER.json`**: mỗi phiên bản ↔ dấu vân tay tầng máy của nó, **chỉ thêm**.
+Sửa nội dung tầng máy mà không tăng phiên bản thì sổ lệch, và ba chỗ cùng chặn: `npm test` đỏ ·
+bộ sinh **từ chối tự sửa dòng cũ** · `upgrade.mjs` không phát đi được, **với mọi repo đích**,
+kể cả `--force` — vì lỗi nằm ở repo **nhà**.
+
+**Lỗ hai — hạ cấp im lặng.** Chỗ so sánh chỉ nhìn nội dung, không nhìn thứ tự phiên bản. Chạy
+bộ khung 1.2.3 lên một repo đã ghim 1.3.0 thì file của 1.3.0 bị gọi là **`CŨ`** — sai hẳn
+nghĩa, nó *mới hơn* — rồi `--apply` ghi bản cũ đè lên. Đã dựng lại được ca này: repo mất nguyên
+nội dung 1.3.0, sổ ghim tụt về 1.2.3, **thoát 0, không một lời cảnh báo**.
+
+Nay `HA_CAP` dừng lại. Gần như luôn là máy chưa `git pull`. `--force` vẫn lùi được — lùi một
+bản vá hỏng là việc có thật — nhưng phải nói to.
+
+Năm phép đột biến ngược, cả năm đều bị bắt. Suite 66.
+
 ## 1.2.3 — 2026-09-03 — Cổng cấu trúc trên CI có răng, và `--plan` thôi nói sai
 
 Audit độc lập chỉ đúng một chỗ nữa, và nó vô hiệu hoá gần hết giá trị của CI vừa dựng:
