@@ -9,10 +9,10 @@ last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate t
 evidence_ref: docs/migrations/2026-09-03-nav-platform.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub"
+next_step: "Dọn 63 chỗ đỏ B10 ở repo 3AI rồi mới bật tám mã chặn cho cổng cấu trúc ở đó"
 version_source: package.json
-current_focus: "v1.2.3: cổng cấu trúc trên CI nay chặn thật, không chỉ in màu"
-human_action: "Bật hai nút trong Settings của repo trên GitHub: chặn merge khi CI đỏ, và Secret scanning"
+current_focus: "v1.2.3: cổng cấu trúc nay chặn thật; còn chặn merge thì gói GitHub hiện tại không cho"
+human_action: "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---

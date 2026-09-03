@@ -201,3 +201,19 @@ sửa `session-check.mjs`.
    Vòng vá 1.2.2 sang hai repo: nội dung không đổi (bản vá nằm ở `init-repo.mjs`, file **ở lại
    nhà**), chỉ đóng lại dấu — cả hai nay ghim 1.2.2.
 
+ - **2026-09-03 · `harness-vong2` · VÒNG VÁ 1.2.3 + CHẶN MERGE THÌ KHÔNG BẬT ĐƯỢC** — Vòng vá qua
+   hai repo: nội dung tầng máy **không đổi** (bản vá 1.2.2/1.2.3 nằm ở `init-repo.mjs` và
+   `upgrade.mjs` — hai file **ở lại nhà**), nên chỉ đóng lại dấu phiên bản. Cả hai nay ghim
+   **1.2.3**. Đó cũng là ca mà `--plan` trước đây nói sai ("không có gì để nâng cấp") và nay nói
+   đúng.
+   **Phát hiện khi soi hai repo:** cả hai cũng để `bootstrap.blocking` RỖNG. NAV đang 0 chỗ đỏ →
+   đã bật đủ tám mã. **3AI có 63 chỗ ĐỎ ở B10** (CLAUDE.md chứa dòng luật không có trong
+   AGENTS.md) — bật vào là tự khoá repo, nên **chưa bật**, và `_root`/`_code` ở đó đang do phiên
+   `migrate-3ai` giữ nên tôi chỉ đọc. Việc còn treo: dọn B10 rồi mới bật.
+   **Hai nút GitHub thì KHÔNG bật được, và không phải vì làm sai.** Codex chạy thật, tôi kiểm lại
+   bằng `gh api` của mình: tài khoản gói **free** + repo **private** → cả `branches/*/protection`
+   lẫn `rulesets` đều trả `403 "Upgrade to GitHub Pro or make this repository public"`, và secret
+   scanning trả `422 "not available for this repository"`. Ba đường ra, **và cả ba đều là quyết
+   định của Đức**: (a) nâng lên GitHub Pro; (b) để repo public; (c) chấp nhận CI chỉ **báo** chứ
+   không **chặn** — lúc đó `git push` trần vẫn đi qua được mọi cổng, đúng chỗ hở đã ghi từ đầu.
+
