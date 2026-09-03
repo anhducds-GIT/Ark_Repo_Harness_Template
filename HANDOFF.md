@@ -151,3 +151,11 @@ sửa `session-check.mjs`.
    mọi lỗi rồi trả `null`, và `null` nghĩa là "chưa từng ghim", mà chưa ghim thì bị ghi đè.
    Ba cái còn lại: chưa-ghim-mà-khác bị ghi đè mặc định · file bản khung đã bỏ thành rác vô chủ ·
    cùng số phiên bản trỏ tới hai nội dung khác nhau (nay có `bundle_digest`).
+
+ - **2026-09-03 · `harness-vong2` · VÒNG VÁ THẬT** — Chạy trọn một vòng qua cả hai repo,
+   không phải vòng giả: vá thật `claim.mjs` (bỏ `ai: "Claude"` đóng cứng — Codex và Antigravity
+   cũng dùng lệnh đó, nên bảng quyền ghi sai chủ ở mọi lượt nhận), bơm 1.2.0, rồi `--plan` →
+   `--apply` → `npm test` → commit ở cả hai repo. Cả hai nay ghim **1.2.0**, plan sạch.
+   Lần đầu chạy KHÔNG bắt được gì, và đó là câu trả lời đúng: v1.2 chỉ sửa `upgrade.mjs`, mà
+   file đó **ở lại nhà** — không nằm trong tầng máy đi theo. Phải có một bản vá vào file
+   PORTABLE thì vòng vá mới có nghĩa.
