@@ -3,6 +3,9 @@ schema: extension-status/v2
 id: ark-repo-harness
 name: Ark Repo Harness
 lifecycle: active
+last_verified: 2026-09-03
+last_verified_commit: 45501714a967d90e9026bdedcf616d50e7996f59
+last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề"
 owner: harness-vong2
 priority_rank: 1
 next_step: "Ghim phiên bản + lệnh nâng cấp — để vá bộ khung không còn phải chép tay sang từng repo"
