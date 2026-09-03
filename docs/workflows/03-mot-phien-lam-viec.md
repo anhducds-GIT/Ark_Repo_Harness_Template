@@ -16,7 +16,8 @@ flowchart TD
     C -- có --> D["CHỈ ĐỌC.<br/>Muốn giành thì hỏi chủ dự án"]
     C -- trống --> E["Làm việc — một việc một lúc"]
     E --> F["Mỗi fix một test ghim<br/>+ mutation test"]
-    F --> G["git add TỪNG FILE<br/>không -A, không -u"]
+    F --> F2["ghi HANDOFF — THÊM một dòng mới<br/>cổng ĐÒI có nó TRƯỚC khi xanh"]
+    F2 --> G["git add TỪNG FILE, gồm cả HANDOFF<br/>không -A, không -u"]
     G --> H["commit nguồn — dòng CUỐI của<br/>lời commit là: Lane: tên-phiên"]
     H --> I["chạy generator<br/>giờ HEAD đã có dữ liệu mới"]
     I --> J["commit artifact riêng"]
@@ -25,8 +26,7 @@ flowchart TD
     L -- không --> M["Sửa. KHÔNG báo xong."]
     L -- có --> N["safe-push"]
     N --> O["Kiểm bằng ls-remote,<br/>KHÔNG tin git status"]
-    O --> P["ghi HANDOFF"]
-    P --> Q["release claim — SAU khi push"]
+    O --> Q["release claim — SAU khi push"]
 ```
 
 ## Bốn chỗ dễ sai nhất, đều đã trả giá

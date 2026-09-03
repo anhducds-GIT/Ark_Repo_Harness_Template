@@ -5,10 +5,10 @@ name: Ark Repo Harness
 lifecycle: building
 owner: harness-vong2
 priority_rank: 1
-next_step: "Đóng nốt cổng kiểm ở hai repo vừa migrate, rồi mới bỏ được nhãn chưa-chứng-minh"
+next_step: "Chốt hướng versioning: repo đích phải ghim được bản khung nào, và nâng cấp bằng lệnh — không chép tay"
 version_source: package.json
-current_focus: "Vá các lỗ mà hai lần migrate thật và audit độc lập vạch ra — cổng từng báo xanh khi không kiểm được gì"
-human_action: "Repo NAV có bộ test cũ đỏ sẵn từ trước khi migrate — quy trình cấm tôi tự dọn nợ cũ. Anh nói một câu: dọn hay để nguyên"
+current_focus: "Hai repo thật đã lên chuẩn và đóng được cổng. Audit GPT chỉ đúng chỗ đau: chưa có cơ chế ghim phiên bản nên chép tay sẽ đẻ ra N bản khung"
+human_action: "Chốt: dừng migrate thêm cho tới khi có ghim phiên bản + lệnh nâng cấp, hay cứ migrate tiếp và chấp nhận vá tay?"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---

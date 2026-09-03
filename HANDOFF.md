@@ -95,3 +95,13 @@ sửa `session-check.mjs`.
    "có một dòng khai không" — siết lại có thể làm đỏ oan repo dùng bản đồ dạng danh sách.
    THÊM: **sổ migrate** (`scripts/build-so-migrate.mjs` + `docs/migrations/`) — mỗi lần migrate
    một hồ sơ cùng khuôn, vì việc này xảy ra thưa và không ghi thì quên sạch. Suite 37 → 43.
+
+ - **2026-09-03 · `harness-vong2` (đóng)** — Đức chốt hai việc: NAV dọn nợ QA (**cổng nay
+   XANH TOÀN BỘ**), 3AI bỏ bộ chuẩn đời cũ (**gỡ 71 file**, khai 22 file bộ khung vào bản đồ,
+   9 XANH 1 BỎ — BỎ vì repo đang ở nhánh tính năng nên không có mốc `origin/main` để so).
+   Audit GPT: kiểm lại 4 tuyên bố **đều đúng** — không có CI nên `git push` đi vòng qua mọi
+   cổng · bản trích tự nhận `0.1.0-unproven` trong khi repo `0.3.0` · `build-overview` ghép tên
+   file vào chuỗi shell (**đã vá** sang `execFileSync`) · lưu đồ đóng phiên bảo ghi HANDOFF SAU
+   khi push, còn cổng lại ĐÒI có nó TRƯỚC khi xanh (**đã sửa thứ tự**).
+   CÒN MỞ, lớn nhất: **chưa có cơ chế ghim phiên bản**. Hôm nay phải chép tay `session-check.mjs`
+   sang hai repo BA LẦN vì vá liên tục — đó chính là cách 21 repo biến thành 21 bản khung.

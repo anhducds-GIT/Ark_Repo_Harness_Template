@@ -19,7 +19,7 @@
  * BẢN RA KHÔNG COMMIT: nó để publish và tự in ngày sinh.
  */
 
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -561,7 +561,15 @@ export function gomDuLieu() {
       if (!Number.isFinite(ttl) || ttl <= 0) continue;
       let sua = null;
       try {
-        const ra = execSync(`git log -1 --format=%cI -- "${thuMuc}/${f}"`, { cwd: ROOT, encoding: "utf8" }).trim();
+        // TÊN FILE ĐI THÀNH THAM SỐ, KHÔNG GHÉP VÀO CHUỖI SHELL.
+        //
+        // Bản đầu nhét `${thuMuc}/${f}` vào một chuỗi rồi đưa cho shell. Một tên file có dấu
+        // nháy là hỏng lệnh; một tên có `$(...)` hoặc dấu chấm phẩy là shell CHẠY thứ nằm trong
+        // đó. Repo này còn cấm cả `.innerHTML` vì lý do y hệt — thì không có cớ gì để ghép chuỗi
+        // ở đây. Và đây không phải mối lo lý thuyết: bộ khung được thiết kế để chạy trên repo
+        // NGƯỜI KHÁC, nơi tên file không do mình đặt. Audit độc lập bắt được 03/09.
+        const ra = execFileSync("git", ["log", "-1", "--format=%cI", "--", `${thuMuc}/${f}`],
+          { cwd: ROOT, encoding: "utf8" }).trim();
         sua = ra ? new Date(ra) : null;
       } catch (_) { sua = null; }
       if (!sua) continue;
