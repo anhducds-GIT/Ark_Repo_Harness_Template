@@ -641,8 +641,13 @@ export function gomDuLieu() {
     } catch (e) {
       ra = String(e.stdout || "");
     }
-    const m = (ra.split(NL).find((l) => l.startsWith("TỔNG:")) || "").match(/([0-9]+)\s*chỗ\s*VÀNG/);
-    canhBaoVang = m ? Number(m[1]) : null;
+    // ĐỌC CẢ ĐỎ LẪN VÀNG. Bản đầu chỉ bắt "chỗ VÀNG", nên một repo có 10 chỗ ĐỎ và 0 chỗ VÀNG
+    // hiện ra "0" và đèn có thể XANH — bảng giấu đúng thứ nặng nhất và giữ lại thứ nhẹ.
+    const dong = ra.split(NL).find((l) => l.startsWith("TỔNG:")) || "";
+    const mv = dong.match(/([0-9]+)\s*chỗ\s*VÀNG/);
+    const mdo = dong.match(/([0-9]+)\s*chỗ\s*ĐỎ/);
+    canhBaoVang = mv ? Number(mv[1]) : null;
+    choDo = mdo ? Number(mdo[1]) : null;
   }
 
   /* "Việc lớn chưa chứng minh" — ĐỌC TỪ STATUS, ĐỪNG GÕ TAY.

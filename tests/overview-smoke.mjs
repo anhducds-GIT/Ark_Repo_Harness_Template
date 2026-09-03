@@ -37,9 +37,14 @@ const html = trang(dl);
 /* ---- 3. Đèn sức khoẻ chỉ XANH khi cả ba con số bằng 0 ------------------- */
 {
   // Đây là chỗ một bảng dễ nói dối nhất: tô xanh cho đẹp. Kiểm bằng chính dữ liệu đang có.
+  // `null` = KHÔNG ĐO ĐƯỢC, và nó KHÔNG phải 0. Bản đầu dùng `?? 0` nên một phép đo hỏng bị
+  // tính thành sạch, rồi phép kiểm đòi đèn xanh trong khi đèn (đúng) không xanh — phép kiểm
+  // quay ra tố cáo chính hành vi đúng.
+  const doDuoc = dl.so.every((b) => typeof b.so === "number");
   const tong = dl.so.reduce((a, b) => a + (b.so ?? 0), 0);
+  const sachThat = doDuoc && tong === 0;
   const xanh = /class="den xanh"/.test(html);
-  assert.equal(xanh, tong === 0, `tong no = ${tong} thi den ${tong === 0 ? "phai" : "KHONG duoc"} xanh`);
+  assert.equal(xanh, sachThat, `${doDuoc ? `tong no = ${tong}` : "co phep do khong chay duoc"} thi den ${sachThat ? "phai" : "KHONG duoc"} xanh`);
   assert.equal(dl.so.length, 3, "dung ba con so, khong hon — them nua la bat nguoi xem doc bang");
 
   // ĐỐI CHỨNG DƯƠNG — đèn PHẢI xanh được. Trước đây một trong ba số bị đóng cứng bằng 1, nên
