@@ -85,6 +85,18 @@ Vì sao bắt buộc: migrate xảy ra **thưa** — vài tuần, có khi vài t
 mà cả người lẫn AI đều quên sạch. Không có hồ sơ thì lần sau dò lại từ đầu và vấp đúng chỗ cũ.
 Hồ sơ **chỉ thêm, không sửa cái cũ** — sửa hồ sơ cũ là viết lại lịch sử của lần migrate đó.
 
+### 8. Ghim phiên bản — để lần vá sau không phải chép tay
+
+```bash
+node scripts/upgrade.mjs --apply <đường-dẫn-repo>
+```
+
+Ghi `.ark/harness.lock.json` vào repo đích: bản khung đang dùng, và dấu vân tay từng file máy.
+Từ đó về sau, vá bộ khung xong chỉ cần `--plan` để xem repo nào cũ, `--apply` để đẩy sang.
+
+**Đừng bỏ bước này.** Không ghim thì lần vá sau lại là chép tay, và chép tay là cách một bộ
+khung biến thành N bộ khung khác nhau — đúng thứ cả chương trình này sinh ra để chữa.
+
 ## Bốn cạm bẫy, cả bốn đều đã xảy ra thật
 
 | Bẫy | Hậu quả |

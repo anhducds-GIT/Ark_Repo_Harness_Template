@@ -138,3 +138,9 @@ sửa `session-check.mjs`.
    (5) Thêm mục "Đọc trang này thế nào — 60 giây" vào `HUONG-DAN.md`.
    Một phép kiểm cũ phải sửa: nó cấm MỌI lệnh ở tab một, trong khi luật đúng là **không MỞ ĐẦU**
    bằng lệnh. Đã đổi sang kiểm thứ tự thay vì kiểm sự vắng mặt.
+
+ - **2026-09-03 · `harness-vong2` · v1.1 GHIM PHIÊN BẢN** — `scripts/upgrade.mjs` +
+   `.ark/harness.lock.json`. Việc đáng giá nhất không phải chép file mà là **biết dừng lại**:
+   sổ ghim tách được ba ca trước đây trông giống hệt nhau (CŨ · SỬA TAY · CHƯA GHIM) — so hai
+   chiều thì cả ba đều "khác". Không có vế SỬA TAY thì `upgrade` chỉ là `cp -r` có nghi thức.
+   Đã ghim cả hai repo thật ở bản 1.0.0. Suite 50 → 54.

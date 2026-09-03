@@ -3,6 +3,34 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.1.0 — 2026-09-03 — Ghim phiên bản: vá một lần, đẩy đi nhiều repo
+
+**Thêm**
+- `scripts/upgrade.mjs` — `--plan` xem trước (chỉ đọc), `--apply` ghi. Sổ ghim
+  `.ark/harness.lock.json` ở repo đích ghi bản khung đang dùng và dấu vân tay từng file máy.
+- `docs/migrations/` giờ có bạn: sổ ghim trả lời "repo này đang chạy bản khung nào".
+
+**Vì sao cần**
+
+Trong đúng một phiên ngày 03/09, `session-check.mjs` phải chép tay sang hai repo **ba lần** vì
+vá liên tục. Với 21 repo, mỗi vòng vá là 63 lần chép tay — và mỗi lần chép là một cơ hội để hai
+bản trôi khỏi nhau. Đó chính là cách một bộ khung biến thành 21 bộ khung khác nhau.
+
+**Điều quan trọng nhất nó làm: BIẾT DỪNG LẠI**
+
+Sổ ghim tách được ba ca mà trước đây trông giống hệt nhau — vì so hai chiều thì cả ba đều "khác":
+
+| | Nghĩa | Nâng cấp |
+|---|---|---|
+| **CŨ** | repo giữ đúng bản đã ghim, bộ khung tiến lên | ghi đè thoải mái |
+| **SỬA TAY** | repo đã lệch khỏi bản đã ghim | **TỪ CHỐI** — đó là việc của người khác |
+| **CHƯA GHIM** | không có sổ ghim, không đủ căn cứ kết luận | báo, không đoán |
+
+Không có vế "SỬA TAY" thì `upgrade` chỉ là `cp -r` có nghi thức: nó xoá bản vá tại chỗ của
+người khác, im lặng, và không ai biết cho tới lúc thứ gì đó hỏng.
+
+**Đã ghim**: Project 3 AI Agent Unify · NAV Platform — cả hai ở `1.0.0`.
+
 ## 1.0.0 — 2026-09-03 — Đóng v1: hợp đồng lõi đã đúng, và đã chạy thật trên hai repo
 
 **Vì sao gọi là 1.0**

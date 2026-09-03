@@ -1,4 +1,4 @@
-# Bộ khung repo — bản 1.0.0
+# Bộ khung repo — bản 1.1.0
 
 Bộ khung để một **phiên AI lạ** vào bất kỳ repo nào cũng hiểu ngay chuyện gì đang xảy ra, không
 phải quét cả cây thư mục và không phải hỏi chủ repo câu nào.
