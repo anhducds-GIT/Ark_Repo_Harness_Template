@@ -20,7 +20,9 @@
  */
 
 import { execSync } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -59,10 +61,22 @@ const liet = (thuMuc) => {
 /* ĐỌC BẮT BUỘC — chỉ tính thứ luật bắt đọc TRƯỚC KHI gõ dòng đầu tiên (mục 0 của AGENTS.md).
    Tài liệu "mở khi cần" KHÔNG tính: nó không tốn gì của phiên không dùng tới. Phân biệt hai loại
    này là điểm mấu chốt — gộp lại thì mọi tài liệu đều thành nợ, và không ai dám viết gì nữa. */
+/* HANDOFF CHỈ TÍNH PHẦN ĐUÔI, và đây là chỗ bản đầu đo SAI.
+ *
+ * Luật (mục 0) bảo đọc "phần cuối" của HANDOFF, không phải cả file. Mà HANDOFF là sổ CHỈ THÊM —
+ * nó dài ra mãi. Đếm cả file nghĩa là ngân sách chắc chắn vỡ, không phải vì hệ thống nặng lên
+ * mà vì lịch sử dài ra. Một cái cân báo động vì thứ không ai phải đọc thì sẽ bị tắt, và lúc đó
+ * nó không còn canh gì nữa.
+ *
+ * Chính cái cân này đã tự báo sai như thế ngay lần chạy thứ hai — 305/300, trong đó phần đuôi
+ * thật sự phải đọc chỉ khoảng một phần ba. */
+export const DUOI_HANDOFF = 40;
+
 export function docBatBuoc() {
+  const dongHandoff = Math.min(dem("HANDOFF.md"), DUOI_HANDOFF);
   return [
     { file: "AGENTS.md", dong: dem("AGENTS.md") },
-    { file: "HANDOFF.md", dong: dem("HANDOFF.md") }
+    { file: `HANDOFF.md (${DUOI_HANDOFF} dòng cuối)`, dong: dongHandoff }
   ];
 }
 
@@ -95,7 +109,7 @@ export function demPhepKiem() {
  *
  * `docs/BAO-TRI-DINH-KY.md` đã hỏi câu này từ đầu, nhưng hỏi suông: không ai trả lời nổi "luật
  * này tháng qua chặn được mấy lần" khi không có gì ghi lại. Nên cổng đóng phiên nay ghi một dòng
- * mỗi lần chạy vào `.agents/gate-log.jsonl` (không commit, mỗi máy một bản).
+ * mỗi lần chạy vào thư mục tạm của máy (KHÔNG nằm trong repo, mỗi máy một bản).
  *
  * Một phép kiểm chưa từng đỏ KHÔNG tự động là đồ thừa — có thể nó đang làm tốt việc răn đe. Nên
  * đây là DANH SÁCH ĐỂ HỎI, không phải danh sách để xoá. Câu hỏi đúng là: *dựng nổi ca hỏng cho
@@ -112,7 +126,11 @@ export function luatChuaTungChan(dongLog) {
 
 export function docLog() {
   try {
-    return fs.readFileSync(path.join(ROOT, ".agents", "gate-log.jsonl"), "utf8")
+    // Cùng chỗ mà cổng ghi: thư mục tạm của MÁY NÀY, khoá theo đường dẫn repo. Sổ cố ý KHÔNG
+    // nằm trong repo — cổng đi theo bản trích sang mọi repo khác, và một file lạ trong repo
+    // đích sẽ bị chính phép kiểm bản đồ của nó bắt. Lý do đầy đủ ở `session-check.mjs`.
+    const khoa = crypto.createHash("sha256").update(ROOT).digest("hex").slice(0, 16);
+    return fs.readFileSync(path.join(os.tmpdir(), "ark-harness-gate-log", khoa + ".jsonl"), "utf8")
       .split(NL).filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } })
       .filter(Boolean);
   } catch { return []; }

@@ -870,7 +870,20 @@ for (const r of results) {
  * Commit vào thì mỗi phiên lại tạo một thay đổi rác, và cổng "cây làm việc sạch" kêu oan.
  * Cắt còn 300 dòng cuối để nó không phình vô hạn — chính file đo cân nặng mà béo lên thì hỏng. */
 try {
-  const soGhi = path.join(ROOT, ".agents", "gate-log.jsonl");
+  // GHI RA NGOÀI REPO, không ghi vào trong.
+  //
+  // Bản đầu ghi `.agents/gate-log.jsonl` trong repo. Ở repo nhà thì thêm một dòng .gitignore là
+  // xong — nhưng cổng này ĐI THEO BẢN TRÍCH sang mọi repo khác, và ở đó nó tạo một file lạ mà
+  // chính phép kiểm bản đồ của nó bắt được. Đo thật ở repo NAV: cổng tự làm mình đỏ.
+  //
+  // Sổ này vốn là số đo CỦA MÁY NÀY, không phải sự thật chung của repo — nên chỗ đúng của nó là
+  // thư mục tạm của máy, khoá theo đường dẫn repo. Không đụng một byte nào trong repo.
+  const os = await import("node:os");
+  const crypto = await import("node:crypto");
+  const khoa = crypto.createHash("sha256").update(ROOT).digest("hex").slice(0, 16);
+  const thuMuc = path.join(os.tmpdir(), "ark-harness-gate-log");
+  fs.mkdirSync(thuMuc, { recursive: true });
+  const soGhi = path.join(thuMuc, khoa + ".jsonl");
   const dongMoi = JSON.stringify({
     // Ngày theo đồng hồ MÁY NÀY, không phải UTC. Cùng lỗi đã sửa ở build-overview: sinh lúc
     // 0h30 giờ Việt Nam thì toISOString() trả ngày HÔM QUA, và sổ ghi lệch ngay dòng đầu.
