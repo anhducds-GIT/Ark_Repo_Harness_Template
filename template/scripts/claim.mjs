@@ -69,8 +69,11 @@ export function decide(claims, { action, key, as, today, ai }) {
     // TRƯỜNG `ai` KHÔNG ĐƯỢC ĐÓNG CỨNG LÀ "Claude". Bảng quyền này là của cả ba AI — Codex và
     // Antigravity cũng nhận vùng bằng đúng lệnh này, và trước đây mọi lượt nhận đều bị ghi là
     // "Claude". Một bảng ghi sai ai đang giữ thì nó không còn là bảng quyền, nó là chuyện kể.
-    // Không khai thì để null: thiếu thông tin còn hơn thông tin sai.
-    return { code: EXIT.OK, already: owner === as, next: { ...cur, owner: as, ai: ai ?? null, claimed_at: today, released_at: null } };
+    // Không khai thì để null: thiếu thông tin còn hơn thông tin sai. NHƯNG nếu đang là quyền của
+    // chính mình và lần trước đã khai rồi thì GIỮ LẠI — chạy lại lệnh để đổi mỗi câu `--task` mà
+    // xoá mất tên AI là biến một lệnh vô hại thành lệnh làm mất dữ liệu.
+    const aiGiu = ai ?? (owner === as ? cur.ai ?? null : null);
+    return { code: EXIT.OK, already: owner === as, next: { ...cur, owner: as, ai: aiGiu, claimed_at: today, released_at: null } };
   }
 
   if (action === "release") {

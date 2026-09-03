@@ -3,6 +3,36 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.1 — 2026-09-03 — Ba cửa v1.2 mở toang, và một lệnh tự quên
+
+Audit độc lập vòng sau đọc lại chính bốn cửa vừa dựng, và **ba cái không đóng**. Cả ba đều
+cùng một hình dạng: thông báo có, hành động không. Một cổng kiểm chỉ nói mà không chặn thì
+nó tệ hơn không có cổng — vì nó làm người ta yên tâm.
+
+| Ca | v1.2 làm gì | v1.2.1 làm gì |
+|---|---|---|
+| Cùng số bản, khác nội dung | in cảnh báo rồi **vẫn nâng cấp và vẫn ghi lại sổ ghim** | thoát 3, **không ghi một byte** — và `--force` KHÔNG mở được |
+| Sổ ghim **không có** `bundle_digest` | cửa trên tự tắt: chỉ so khi digest là chuỗi | `THIEU_DAU_VAN_TAY`, dừng như trên |
+| File `ĐÃ BỎ` | kể tên **đúng một lần**, rồi rơi khỏi sổ sau `--apply` | nhớ tiếp ở khối `retired`, tự rụng khi file bị xoá thật |
+| `claim --take` chạy lại | không khai `--ai` là **xoá tên AI đã biết** | giữ tên cũ khi là quyền của chính mình |
+
+Cửa thứ hai đáng nói riêng: **xoá đúng một dòng trong sổ ghim là tắt được cửa thứ nhất.**
+Đúng cùng một hình dạng đường vòng mà `SO_GHIM_HONG` của v1.2 sinh ra để chặn — chặn được
+một cửa rồi để hở cửa bên cạnh.
+
+Và phép kiểm của v1.2 cho cửa thứ nhất mang đúng tiêu đề "→ DỪNG" nhưng chỉ soi thông báo
+trên `--plan`. Nó xanh trong khi `--apply` vẫn đi tiếp. Nay nó kiểm cả ba: thoát khác 0 ·
+file trên đĩa không đổi · sổ ghim không đổi.
+
+**Thêm CI** (`.github/workflows/cong-kiem.yml`): mọi lớp bảo vệ trước nay chạy trên máy
+người dùng, nên `git push` trần đi qua hết. GitHub chạy thì không ai tắt từ máy mình được.
+Nó kiểm ba sự thật thuộc về repo — bộ phép kiểm · cấu trúc B1–B15 · artifact máy sinh còn
+tươi — chứ không thay cổng đóng phiên, vì cổng đó hỏi những câu chỉ có nghĩa trong một phiên.
+
+**Còn hở, nói thẳng:** đỏ trên CI chưa tự chặn merge (một nút trong Settings của GitHub,
+quyền của Đức), và phép kiểm secret chưa chạy trên CI — bật Secret scanning + Push
+protection của GitHub thì tốt hơn regex của chúng ta, vì nó chặn ngay lúc push.
+
 ## 1.2.0 — 2026-09-03 — Bốn cửa của nâng cấp: biết dừng trong bốn ca nữa
 
 Audit độc lập giữ v1.1 ở trạng thái RC và chỉ đúng bốn chỗ. Cả bốn đã dựng được ca hỏng,

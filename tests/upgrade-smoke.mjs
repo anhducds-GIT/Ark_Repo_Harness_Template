@@ -174,22 +174,81 @@ const dungRepo = (ghiSoGhim) => {
   ok("file bị loại khỏi bản khung hiện ra là ĐÃ BỎ, không thành rác vô chủ");
 }
 
-/* ---- 8. Cùng phiên bản mà khác nội dung → DỪNG --------------------------- */
+/* ---- 8. Cùng phiên bản mà khác nội dung → DỪNG, và không ghi gì ---------- */
 {
   // Bản trích dựng thẳng từ cây làm việc, còn số phiên bản chỉ đọc từ `package.json`. Nên nội
-  // dung đổi mà số vẫn `1.1.0` — và chính phép thử "giả bản vá ở bộ khung" của tôi đã đi qua
+  // dung đổi mà số vẫn nguyên — và chính phép thử "giả bản vá ở bộ khung" của tôi đã đi qua
   // đúng ca này. Một số phiên bản trỏ tới hai nội dung khác nhau thì nó không còn là mốc.
+  //
+  // Bản kiểm ĐẦU chỉ soi thông báo trên `--plan`. Nó xanh trong khi `--apply` vẫn nâng cấp và
+  // vẫn ghi lại sổ ghim — tức là một phép kiểm mang đúng tiêu đề mà không canh gì cả. Nay phải
+  // chứng minh cả ba: thoát khác 0 · file trên đĩa không đổi · sổ ghim không đổi.
+  for (const [ten, lamHong, ma] of [
+    ["dấu vân tay khác", (so) => { so.bundle_digest = "0".repeat(16); }, /CUNG_BAN_KHAC_NOI_DUNG/],
+    // Xoá đúng MỘT dòng trong sổ ghim là tắt được cả cửa này, nếu chỉ so khi digest là chuỗi.
+    ["không có dấu vân tay", (so) => { delete so.bundle_digest; }, /THIEU_DAU_VAN_TAY/]
+  ]) {
+    const root = dungRepo(true);
+    try {
+      const duongSo = join(root, ".ark", "harness.lock.json");
+      const so = JSON.parse(readFileSync(duongSo, "utf8"));
+      assert.ok(so.bundle_digest, "so ghim phai mang dau van tay cua CA BAN TRICH, khong chi so phien ban");
+      lamHong(so);
+      writeFileSync(duongSo, JSON.stringify(so, null, 2), "utf8");
+      const soTruoc = readFileSync(duongSo, "utf8");
+
+      // Xoá một file máy để `--apply` THẬT SỰ có việc phải ghi — không có vế này thì "không ghi
+      // byte nào" đúng một cách rỗng, vì vốn chẳng có gì để ghi.
+      const mot = fileMay(chuan)[0];
+      rmSync(join(root, mot));
+
+      for (const co of [["--plan"], ["--apply"], ["--apply", "--force"]]) {
+        const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), ...co, root], { encoding: "utf8" });
+        const noi = String(r.stdout) + String(r.stderr);
+        assert.match(noi, ma, `${co.join(" ")}: phai goi ten loi (${ten})`);
+        if (co.includes("--apply")) {
+          // `--force` nói về repo ĐÍCH bị sửa tay; nó không nói gì về số phiên bản ở repo NHÀ,
+          // nên nó KHÔNG được mở cửa này.
+          assert.notEqual(r.status, 0, `${co.join(" ")}: phai DUNG, khong duoc nang cap tiep`);
+          assert.throws(() => readFileSync(join(root, mot)), "khong duoc ghi mot byte nao");
+          assert.equal(readFileSync(duongSo, "utf8"), soTruoc, "so ghim phai nguyen ven");
+        }
+      }
+    } finally { rmSync(root, { recursive: true, force: true }); }
+    ok(`cùng phiên bản mà ${ten} → dừng, không ghi gì, --force cũng không mở`);
+  }
+}
+
+/* ---- 9. `ĐÃ BỎ` phải sống sót qua `--apply` ------------------------------ */
+{
+  // Sổ ghim mới dựng lại `managed` THUẦN từ bản khung hiện hành. Nên tên file đã bỏ rơi khỏi sổ
+  // ngay sau lần apply đầu tiên: kể tên đúng một lần rồi im lặng mãi mãi, và file lại thành rác
+  // vô chủ y như trước khi có cửa này.
   const root = dungRepo(true);
   try {
-    const so = JSON.parse(readFileSync(join(root, ".ark", "harness.lock.json"), "utf8"));
-    assert.ok(so.bundle_digest, "so ghim phai mang dau van tay cua CA BAN TRICH, khong chi so phien ban");
-    so.bundle_digest = "0".repeat(16);          // cùng version, khác nội dung
-    writeFileSync(join(root, ".ark", "harness.lock.json"), JSON.stringify(so, null, 2), "utf8");
-    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--plan", root], { encoding: "utf8" });
-    assert.match(String(r.stdout) + String(r.stderr), /CUNG_BAN_KHAC_NOI_DUNG/,
-      "cung so phien ban ma khac noi dung thi phai keu len");
+    const duongSo = join(root, ".ark", "harness.lock.json");
+    const so = JSON.parse(readFileSync(duongSo, "utf8"));
+    const daBo = "scripts/mot-file-khung-cu.mjs";
+    so.managed[daBo] = "deadbeefdeadbeef";
+    writeFileSync(join(root, "scripts", "mot-file-khung-cu.mjs"), "// ban khung cu tung dat o day\n", "utf8");
+
+    const truoc = soSanh(root, chuan, so).find((d) => d.rel === daBo);
+    assert.equal(truoc?.trangThai, "ĐÃ BỎ", "lan dau phai keu ten no");
+
+    // Đúng cái sổ ghim mà `--apply` sẽ viết ra.
+    const soSau = soGhimMoi(chuan, so, { [daBo]: truoc.bamGhim });
+    assert.ok(soSau.retired?.[daBo], "phai nho tiep trong khoi `retired`, khong duoc lan vao `managed`");
+    assert.equal(soSau.managed[daBo], undefined, "`managed` la 'se ghi de' — file da bo khong thuoc ve do");
+
+    const sau = soSanh(root, chuan, soSau).find((d) => d.rel === daBo);
+    assert.equal(sau?.trangThai, "ĐÃ BỎ", "sau apply van phai keu ten no, khong duoc quen");
+
+    // Người xoá file đi thì nó tự rụng khỏi sổ — không để lại tên ma.
+    rmSync(join(root, "scripts", "mot-file-khung-cu.mjs"));
+    assert.equal(soSanh(root, chuan, soSau).find((d) => d.rel === daBo), undefined,
+      "xoa khoi dia thi phai rung khoi so, khong de lai ten ma");
   } finally { rmSync(root, { recursive: true, force: true }); }
-  ok("cùng phiên bản mà khác nội dung → kêu lên, số phiên bản mới là mốc thật");
+  ok("ĐÃ BỎ sống sót qua --apply, và tự rụng khi file bị xoá thật");
 }
 
 console.log(`

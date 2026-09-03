@@ -1,0 +1,56 @@
+# CỔNG KIỂM CHẠY TRÊN GITHUB — cái lưới cuối cùng, sau khi mã đã rời máy.
+#
+# VÌ SAO CÓ FILE NÀY. Mọi lớp bảo vệ của bộ khung này chạy trên máy người dùng, nên tất cả
+# đều đi qua được bằng đúng một lệnh: `git push` trần. `safe-push.mjs` là quy ước, không phải
+# hàng rào — nó chỉ giữ được người đồng ý bị giữ. Ở đây thì khác: GitHub chạy, không ai tắt
+# được từ máy mình, và kết quả hiện ra cho Đức xem mà không cần đọc code.
+#
+# CHỖ NÓ KHÔNG THAY THẾ ĐƯỢC CỔNG ĐÓNG PHIÊN. `session-check.mjs` hỏi những câu chỉ có nghĩa
+# trong một phiên: bạn tên gì, bạn giữ vùng nào, bạn có ghi Log chưa. CI không có phiên, nên
+# nó chỉ kiểm những sự thật thuộc về REPO. Hai cổng canh hai thứ khác nhau — đừng gộp.
+#
+# ĐỎ Ở ĐÂY KHÔNG TỰ CHẶN MERGE. Chặn được hay không là một nút trong Settings → Branches của
+# GitHub, và bật nó là quyền của Đức, không phải của file này.
+
+name: Cổng kiểm
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  cong-kiem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # B12 đọc lịch sử để bắt ADR đã Accepted bị sửa hoặc xoá, và nhãn lane đọc commit
+          # chưa push. Bản clone nông thì hai phép kiểm đó im lặng đi qua — im lặng là dạng
+          # hỏng tệ nhất của một cổng kiểm.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Bộ khung không có dependency. Không `npm ci` — không có gì để cài, và một bước cài
+      # thừa chỉ tạo thêm một chỗ để hỏng.
+      - name: Bộ phép kiểm
+        run: npm test
+
+      - name: Cổng kiểm cấu trúc B1–B15
+        run: node scripts/check-bootstrap.mjs
+
+      - name: Sự thật máy sinh còn tươi
+        run: node scripts/build-dashboard.mjs --check
+
+# CHỖ CÒN HỞ, NÓI THẲNG: phép kiểm secret KHÔNG chạy ở đây.
+#
+# Nó nằm trong `session-check.mjs`, mà cổng đó chạy trọn gói 11 phép kiểm và có một lớp
+# chống sửa (`EXPECTED_CHECKS`) sẽ kêu lên nếu chỉ chạy một phép. Thêm chế độ "chạy riêng
+# một mục" là làm yếu đúng cái lớp chống sửa ấy, nên không làm.
+#
+# Lấp bằng thứ tốt hơn regex của chúng ta: bật Secret scanning + Push protection ở
+# Settings → Code security của GitHub. Nó chặn NGAY LÚC PUSH, không phải sau. Nút đó là
+# quyền của Đức.

@@ -70,11 +70,12 @@ export function soSanh(repo, chuan, soGhim) {
   /* FILE ĐÃ BỊ LOẠI KHỎI BẢN KHUNG cũng phải hiện ra. Bản đầu chỉ duyệt file của bản MỚI, nên
      một file từng nằm trong `managed` mà bản mới đã bỏ sẽ ở lại repo mãi mãi, rồi biến mất khỏi
      sổ ghim lần sau — thành rác vô chủ mà không công cụ nào kể tên. */
-  for (const rel of Object.keys(soGhim?.managed ?? {})) {
+  const daBiet = { ...(soGhim?.managed ?? {}), ...(soGhim?.retired ?? {}) };
+  for (const rel of Object.keys(daBiet)) {
     if (chuan.has(rel)) continue;
     let coTrenDia = true;
     try { fs.readFileSync(path.join(repo, ...rel.split("/"))); } catch { coTrenDia = false; }
-    if (coTrenDia) ra.push({ rel, trangThai: "ĐÃ BỎ" });
+    if (coTrenDia) ra.push({ rel, trangThai: "ĐÃ BỎ", bamGhim: daBiet[rel] ?? null });
   }
   for (const rel of fileMay(chuan)) {
     const moi = chuan.get(rel);
@@ -100,7 +101,14 @@ export function bamBanTrich(chuan) {
   return bam(fileMay(chuan).sort().map((rel) => `${rel}:${bam(chuan.get(rel))}`).join("|"));
 }
 
-export function soGhimMoi(chuan, cu) {
+/* `giuLai` = file bản khung ĐÃ BỎ nhưng vẫn còn nằm ở repo đích.
+ *
+ * Không có tham số này thì `ĐÃ BỎ` chỉ kể tên được ĐÚNG MỘT LẦN: sổ ghim mới dựng lại `managed`
+ * thuần từ bản khung hiện hành, nên ngay sau `--apply` cái tên đó rơi khỏi sổ, và lần xem sau
+ * file lại thành rác vô chủ y như trước khi có cửa này. Nó nằm ở khối `retired` riêng, không lẫn
+ * vào `managed`: `managed` là "bộ khung sẽ ghi đè file này", còn `retired` là "bộ khung từng đặt
+ * file này ở đây, nay không phát nữa — người quyết xoá hay giữ". Xoá khỏi đĩa thì tự rụng khỏi sổ. */
+export function soGhimMoi(chuan, cu, giuLai = {}) {
   const managed = {};
   for (const rel of fileMay(chuan)) managed[rel] = bam(chuan.get(rel));
   const x = new Date();
@@ -112,7 +120,8 @@ export function soGhimMoi(chuan, cu) {
     bundle_digest: bamBanTrich(chuan),
     applied_at: `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}`,
     previous_version: cu?.version ?? null,
-    managed
+    managed,
+    ...(Object.keys(giuLai).length ? { retired: giuLai } : {})
   };
 }
 
@@ -155,14 +164,24 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   console.log(`  bản khung ở đây : ${TEMPLATE_VERSION}`);
   console.log(`  repo đích ghim  : ${soGhim ? soGhim.version : "CHƯA GHIM BAO GIỜ"}`);
 
-  // CÙNG SỐ PHIÊN BẢN MÀ KHÁC NỘI DUNG — một số phiên bản phải trỏ tới đúng một nội dung, nếu
-  // không nó chỉ là một cái nhãn. Ca này có thật: bản trích dựng thẳng từ cây làm việc.
+  /* CÙNG SỐ PHIÊN BẢN MÀ KHÁC NỘI DUNG — một số phiên bản phải trỏ tới đúng một nội dung, nếu
+   * không nó chỉ là một cái nhãn. Ca này có thật: bản trích dựng thẳng từ cây làm việc.
+   *
+   * VÀ THIẾU DẤU VÂN TAY CŨNG PHẢI DỪNG. Bản đầu chỉ so khi `bundle_digest` là chuỗi, nên **xoá
+   * đúng một dòng trong sổ ghim là tắt được cả cửa này** — cùng đúng kiểu đường vòng mà `SO_GHIM_HONG`
+   * sinh ra để chặn. Thiếu căn cứ không phải là "không sao"; nó là KHÔNG BIẾT, mà không biết thì
+   * không được đi tiếp. Sổ ghim của bản khung CŨ thì mang số phiên bản khác, nên nó không rơi vào
+   * đây — nó đi đường nâng cấp bình thường và được ghi lại dấu vân tay mới. */
   const digestMoi = bamBanTrich(chuan);
-  const lechNoiDung = soGhim && soGhim.version === TEMPLATE_VERSION
-    && typeof soGhim.bundle_digest === "string" && soGhim.bundle_digest !== digestMoi;
+  const cungBan = soGhim && soGhim.version === TEMPLATE_VERSION;
+  const digestGhim = typeof soGhim?.bundle_digest === "string" ? soGhim.bundle_digest : null;
+  const lechNoiDung = cungBan && digestGhim !== digestMoi;
   if (lechNoiDung) {
-    console.log(`${NL}  ⚠ CUNG_BAN_KHAC_NOI_DUNG: repo ghim ${soGhim.version} nhưng dấu vân tay bản trích khác`);
-    console.log(`    (${soGhim.bundle_digest} ≠ ${digestMoi}). Bộ khung đã đổi mà số phiên bản chưa tăng.`);
+    const ma = digestGhim === null ? "THIEU_DAU_VAN_TAY" : "CUNG_BAN_KHAC_NOI_DUNG";
+    console.log(`${NL}  ⚠ ${ma}: repo ghim ${soGhim.version}, cùng số với bản khung ở đây, nhưng`);
+    console.log(digestGhim === null
+      ? "    sổ ghim KHÔNG có `bundle_digest` — không có gì để đối chiếu nội dung."
+      : `    dấu vân tay bản trích khác (${digestGhim} ≠ ${digestMoi}).`);
     console.log("    Tăng phiên bản ở repo nhà trước, rồi nâng cấp — đừng để một số trỏ tới hai nội dung.");
   }
   console.log("");
@@ -182,6 +201,20 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     const canLam = dem("CŨ").length + dem("THIẾU").length + dem("CHƯA GHIM").length;
     console.log(`${NL}${canLam ? `Chạy lại với --apply để ghi ${canLam} file.` : "Không có gì để nâng cấp."}${NL}`);
     process.exit(0);
+  }
+
+  /* SỐ PHIÊN BẢN NÓI DỐI THÌ DỪNG — và `--force` KHÔNG mở được cửa này.
+   *
+   * `--force` có nghĩa "tôi biết repo đích bị sửa tay, cứ ghi đè". Nó không nói gì về việc số
+   * phiên bản ở repo NHÀ có trỏ đúng nội dung hay không. Ghi đè lúc này là in một cái nhãn sai
+   * lên repo đích: sổ ghim sẽ ghi 1.3.0 cho một nội dung khác với 1.3.0 mà repo bên cạnh đang
+   * có, và từ đó không lệnh nào phát hiện được nữa. Cách sửa là tăng phiên bản ở nhà, không
+   * phải ép. */
+  if (lechNoiDung) {
+    console.error(`${NL}TU_CHOI: repo đích ghim đúng số ${TEMPLATE_VERSION} mà nội dung không đối chiếu được.`);
+    console.error("Không ghi một byte nào. Tăng phiên bản ở repo bộ khung (package.json) rồi chạy lại.");
+    console.error(`\`--force\` KHÔNG bỏ qua được cửa này — nó nói về repo đích, còn lỗi này ở repo nhà.${NL}`);
+    process.exit(3);
   }
 
   if (suaTay.length && !force) {
@@ -219,11 +252,18 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     fs.renameSync(tam, dest);
     daGhi += 1;
   }
+  // Nhớ tiếp những file ĐÃ BỎ còn nằm trên đĩa, để lần xem sau vẫn kể được tên chúng.
+  const giuLai = {};
+  for (const d of dem("ĐÃ BỎ")) giuLai[d.rel] = d.bamGhim ?? null;
+
   const thuMucSo = path.join(repo, ".ark");
   fs.mkdirSync(thuMucSo, { recursive: true });
   fs.writeFileSync(path.join(thuMucSo, "harness.lock.json"),
-    `${JSON.stringify(soGhimMoi(chuan, soGhim), null, 2)}${NL}`, "utf8");
+    `${JSON.stringify(soGhimMoi(chuan, soGhim, giuLai), null, 2)}${NL}`, "utf8");
 
   console.log(`${NL}Đã ghi ${daGhi} file máy và cập nhật ${SO_GHIM} → ${TEMPLATE_VERSION}.`);
+  if (Object.keys(giuLai).length) {
+    console.log(`${Object.keys(giuLai).length} file ĐÃ BỎ vẫn còn ở repo — ghi vào khối \`retired\` của sổ ghim, chưa xoá.`);
+  }
   console.log(`Bước kế ở repo đích: chạy \`npm test\`, rồi cổng đóng phiên.${NL}`);
 }

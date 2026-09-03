@@ -205,4 +205,39 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok("F7 · vùng đã có chủ thì phiên sau bị từ chối");
 }
 
+/* ---- F8. Bảng quyền phải ghi ĐÚNG AI, và không tự quên ------------------- */
+{
+  // Trường `ai` từng bị đóng cứng là "Claude", nên mọi lượt nhận của Codex và Antigravity đều bị
+  // ghi sai. Bỏ hardcode xong lại lộ ra ca thứ hai: chạy lại lệnh để đổi mỗi câu `--task` mà
+  // không khai `--ai` thì tên AI đã biết bị xoá — một lệnh trông vô hại mà làm mất dữ liệu.
+  const root = khoTam();
+  try {
+    mkdirSync(join(root, "scripts"), { recursive: true });
+    mkdirSync(join(root, ".agents"), { recursive: true });
+    for (const f of ["claim.mjs", "repo-structure.mjs"]) {
+      cpSync(join(ROOT, "scripts", f), join(root, "scripts", f));
+    }
+    cpSync(join(ROOT, ".repo-structure.json"), join(root, ".repo-structure.json"));
+    const bang = join(root, ".agents", "claims.json");
+    writeFileSync(bang, JSON.stringify({ claims: { _root: { owner: null, released_at: null } } }, null, 2), "utf8");
+
+    const chay = (...co) => execFileSync(process.execPath,
+      [join(root, "scripts", "claim.mjs"), ...co], { cwd: root, encoding: "utf8" });
+    const doc = () => JSON.parse(readFileSync(bang, "utf8")).claims._root;
+
+    chay("--take", "_root", "--as", "codex-s1", "--task", "t", "--ai", "Codex");
+    assert.equal(doc().ai, "Codex", "khai --ai Codex thi phai ghi dung Codex, khong phai Claude");
+
+    chay("--take", "_root", "--as", "codex-s1", "--task", "doi cau task thoi");
+    assert.equal(doc().ai, "Codex", "chay lai chinh minh ma khong khai --ai thi PHAI giu ten cu");
+
+    chay("--release", "_root", "--as", "codex-s1");
+    assert.equal(doc().ai, null, "tra quyen thi xoa ten AI — vung trong khong thuoc AI nao");
+
+    chay("--take", "_root", "--as", "phien-khac", "--task", "t");
+    assert.equal(doc().ai, null, "phien khac khong khai thi de trong: thieu thong tin con hon thong tin sai");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("F8 · bảng quyền ghi đúng AI, giữ khi chạy lại, và không đoán cho phiên khác");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
