@@ -144,3 +144,10 @@ sửa `session-check.mjs`.
    sổ ghim tách được ba ca trước đây trông giống hệt nhau (CŨ · SỬA TAY · CHƯA GHIM) — so hai
    chiều thì cả ba đều "khác". Không có vế SỬA TAY thì `upgrade` chỉ là `cp -r` có nghi thức.
    Đã ghim cả hai repo thật ở bản 1.0.0. Suite 50 → 54.
+
+ - **2026-09-03 · `harness-vong2` · v1.2 BỐN CỬA NÂNG CẤP** — Audit giữ v1.1 ở RC, chỉ
+   đúng bốn chỗ; tôi kiểm lại **cả bốn đều đúng** rồi vá, fixture đỏ trước xanh sau (suite 54 → 58).
+   Nặng nhất: **làm hỏng file sổ ghim là đường vòng qua lớp bảo vệ sửa tay** — `docSoGhim` bắt
+   mọi lỗi rồi trả `null`, và `null` nghĩa là "chưa từng ghim", mà chưa ghim thì bị ghi đè.
+   Ba cái còn lại: chưa-ghim-mà-khác bị ghi đè mặc định · file bản khung đã bỏ thành rác vô chủ ·
+   cùng số phiên bản trỏ tới hai nội dung khác nhau (nay có `bundle_digest`).

@@ -3,6 +3,23 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.0 — 2026-09-03 — Bốn cửa của nâng cấp: biết dừng trong bốn ca nữa
+
+Audit độc lập giữ v1.1 ở trạng thái RC và chỉ đúng bốn chỗ. Cả bốn đã dựng được ca hỏng,
+fixture đỏ trước bản vá, xanh sau.
+
+| Ca | Trước | Nay |
+|---|---|---|
+| Sổ ghim **hỏng** | lẫn sang "chưa từng ghim", rồi **bị ghi đè** | `SO_GHIM_HONG`, dừng |
+| **Chưa ghim** mà file đã khác | ghi đè **mặc định** | từ chối, phải `--force` |
+| File bản khung **đã bỏ** | ở lại repo thành rác vô chủ | hiện là `ĐÃ BỎ`, kể tên, không tự xoá |
+| Cùng số bản, **khác nội dung** | im lặng | `CUNG_BAN_KHAC_NOI_DUNG`, có `bundle_digest` |
+
+Cái thứ nhất là đường vòng thật: **làm hỏng file sổ ghim là cách vượt qua lớp bảo vệ sửa tay**.
+Xoá nửa file lock rồi `--apply` là mọi bản vá tại chỗ biến mất một cách hợp lệ.
+
+**Chưa làm, để v1.3:** rollback cả lô, sao lưu trước `--force`, nâng cấp tầng LUẬT/TRẠNG THÁI.
+
 ## 1.1.0 — 2026-09-03 — Ghim phiên bản: vá một lần, đẩy đi nhiều repo
 
 **Thêm**

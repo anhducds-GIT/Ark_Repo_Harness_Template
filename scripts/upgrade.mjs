@@ -39,9 +39,23 @@ export function fileMay(chuan) {
 
 const bam = (text) => createHash("sha256").update(String(text).split(String.fromCharCode(13)).join("")).digest("hex").slice(0, 16);
 
+/* BA TRẠNG THÁI, KHÔNG PHẢI HAI.
+ *
+ * Bản đầu bắt mọi lỗi rồi trả `null`, nên JSON cắt cụt / sai schema / không đọc được đều rơi
+ * vào nhánh "chưa từng ghim" — mà nhánh đó thì ĐƯỢC GHI ĐÈ. Tức là **làm hỏng sổ ghim là cách
+ * vượt qua lớp bảo vệ sửa tay**: xoá nửa file lock rồi chạy `--apply` là mọi bản vá tại chỗ
+ * biến mất hợp lệ. Audit độc lập bắt được 03/09. */
 export function docSoGhim(repo) {
-  try { return JSON.parse(fs.readFileSync(path.join(repo, ...SO_GHIM.split("/")), "utf8")); }
-  catch { return null; }
+  const duong = path.join(repo, ...SO_GHIM.split("/"));
+  let raw;
+  try { raw = fs.readFileSync(duong, "utf8"); }
+  catch (e) { return e?.code === "ENOENT" ? { trangThai: "KHONG" } : { trangThai: "HONG", loi: String(e.message).split(NL)[0] }; }
+  let so;
+  try { so = JSON.parse(raw); } catch (e) { return { trangThai: "HONG", loi: String(e.message).split(NL)[0] }; }
+  if (!so || typeof so.managed !== "object" || so.managed === null || typeof so.version !== "string") {
+    return { trangThai: "HONG", loi: "thiếu trường bắt buộc: version (chuỗi) và managed (khối)" };
+  }
+  return { trangThai: "CO", so };
 }
 
 /* SO BA CHIỀU, không phải hai.
@@ -53,6 +67,15 @@ export function docSoGhim(repo) {
  * Chiều thứ ba là dấu vân tay đã ghi trong sổ ghim lúc lắp. */
 export function soSanh(repo, chuan, soGhim) {
   const ra = [];
+  /* FILE ĐÃ BỊ LOẠI KHỎI BẢN KHUNG cũng phải hiện ra. Bản đầu chỉ duyệt file của bản MỚI, nên
+     một file từng nằm trong `managed` mà bản mới đã bỏ sẽ ở lại repo mãi mãi, rồi biến mất khỏi
+     sổ ghim lần sau — thành rác vô chủ mà không công cụ nào kể tên. */
+  for (const rel of Object.keys(soGhim?.managed ?? {})) {
+    if (chuan.has(rel)) continue;
+    let coTrenDia = true;
+    try { fs.readFileSync(path.join(repo, ...rel.split("/"))); } catch { coTrenDia = false; }
+    if (coTrenDia) ra.push({ rel, trangThai: "ĐÃ BỎ" });
+  }
   for (const rel of fileMay(chuan)) {
     const moi = chuan.get(rel);
     let dangCo = null;
@@ -70,6 +93,13 @@ export function soSanh(repo, chuan, soGhim) {
   return ra;
 }
 
+export function bamBanTrich(chuan) {
+  // Một số phiên bản phải trỏ tới ĐÚNG MỘT nội dung. Bản trích dựng thẳng từ cây làm việc, còn
+  // số phiên bản chỉ đọc từ `package.json` — nên nội dung đổi mà số vẫn nguyên là chuyện thường,
+  // và chính phép thử "giả bản vá ở bộ khung" của tôi đã đi qua đúng ca đó.
+  return bam(fileMay(chuan).sort().map((rel) => `${rel}:${bam(chuan.get(rel))}`).join("|"));
+}
+
 export function soGhimMoi(chuan, cu) {
   const managed = {};
   for (const rel of fileMay(chuan)) managed[rel] = bam(chuan.get(rel));
@@ -79,6 +109,7 @@ export function soGhimMoi(chuan, cu) {
     _doc: "Repo này đang dùng bản khung nào, và file máy nào là của bộ khung. SINH TỰ ĐỘNG bởi upgrade.mjs — đừng sửa tay.",
     source: "https://github.com/anhducds-GIT/Ark_Repo_Harness",
     version: TEMPLATE_VERSION,
+    bundle_digest: bamBanTrich(chuan),
     applied_at: `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}`,
     previous_version: cu?.version ?? null,
     managed
@@ -106,15 +137,36 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   }
 
   const chuan = buildTemplateFiles();
-  const soGhim = docSoGhim(repo);
+  const doc = docSoGhim(repo);
+
+  // SỔ GHIM HỎNG THÌ DỪNG NGAY, trước cả khi so sánh. Coi nó như "chưa từng ghim" biến việc
+  // làm hỏng file lock thành đường vòng qua mọi lớp bảo vệ phía dưới.
+  if (doc.trangThai === "HONG") {
+    console.error(`${NL}SO_GHIM_HONG: ${SO_GHIM} có nhưng đọc không nổi — ${doc.loi}`);
+    console.error("Đây KHÔNG phải 'chưa từng ghim'. Sửa hoặc xoá hẳn file đó rồi chạy lại;");
+    console.error(`xoá thì repo quay về trạng thái chưa ghim, và lần \`--apply\` sau sẽ ghim lại.${NL}`);
+    process.exit(3);
+  }
+  const soGhim = doc.trangThai === "CO" ? doc.so : null;
   const dong = soSanh(repo, chuan, soGhim);
   const dem = (t) => dong.filter((d) => d.trangThai === t);
 
   console.log(`${NL}GHIM PHIÊN BẢN — ${repo}${NL}`);
   console.log(`  bản khung ở đây : ${TEMPLATE_VERSION}`);
   console.log(`  repo đích ghim  : ${soGhim ? soGhim.version : "CHƯA GHIM BAO GIỜ"}`);
+
+  // CÙNG SỐ PHIÊN BẢN MÀ KHÁC NỘI DUNG — một số phiên bản phải trỏ tới đúng một nội dung, nếu
+  // không nó chỉ là một cái nhãn. Ca này có thật: bản trích dựng thẳng từ cây làm việc.
+  const digestMoi = bamBanTrich(chuan);
+  const lechNoiDung = soGhim && soGhim.version === TEMPLATE_VERSION
+    && typeof soGhim.bundle_digest === "string" && soGhim.bundle_digest !== digestMoi;
+  if (lechNoiDung) {
+    console.log(`${NL}  ⚠ CUNG_BAN_KHAC_NOI_DUNG: repo ghim ${soGhim.version} nhưng dấu vân tay bản trích khác`);
+    console.log(`    (${soGhim.bundle_digest} ≠ ${digestMoi}). Bộ khung đã đổi mà số phiên bản chưa tăng.`);
+    console.log("    Tăng phiên bản ở repo nhà trước, rồi nâng cấp — đừng để một số trỏ tới hai nội dung.");
+  }
   console.log("");
-  for (const t of ["SỬA TAY", "CŨ", "THIẾU", "CHƯA GHIM", "ĐÃ MỚI"]) {
+  for (const t of ["ĐÃ BỎ", "SỬA TAY", "CŨ", "THIẾU", "CHƯA GHIM", "ĐÃ MỚI"]) {
     const ds = dem(t);
     if (!ds.length) continue;
     console.log(`  ${t.padEnd(10)} ${String(ds.length).padStart(2)} file${t === "ĐÃ MỚI" ? "" : `: ${ds.map((d) => d.rel).join(", ")}`}`);
@@ -137,9 +189,27 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     process.exit(3);
   }
 
+  /* CHƯA GHIM MÀ FILE ĐÃ KHÁC cũng phải DỪNG.
+   *
+   * Tài liệu vẫn nói "không đủ căn cứ thì báo, không đoán" — nhưng vòng ghi lại ghi mọi thứ trừ
+   * ĐÃ MỚI, nên repo cũ chưa ghim có file máy đã khác sẽ bị ghi đè MẶC ĐỊNH. Đó chính là ca
+   * nguy hiểm nhất: repo đã sống lâu, và không ai còn nhớ file đó khác vì lý do gì.
+   *
+   * THIẾU thì vẫn ghi — thiếu file là ca lắp lần đầu, không có gì để mất. */
+  const chuaGhim = dem("CHƯA GHIM");
+  if (chuaGhim.length && !force) {
+    console.error(`${NL}TU_CHOI: ${chuaGhim.length} file máy đã khác bản khung, mà repo CHƯA có sổ ghim`);
+    console.error(`nên không đủ căn cứ nói đó là bản cũ hay bản vá tại chỗ: ${chuaGhim.map((d) => d.rel).join(", ")}.`);
+    console.error("Đọc `git diff` ở repo đích. Chắc chắn bỏ được thì chạy lại kèm --force.");
+    console.error(`(Repo khớp hoàn toàn hoặc chỉ THIẾU file thì \`--apply\` chạy bình thường.)${NL}`);
+    process.exit(3);
+  }
+
   let daGhi = 0;
   for (const d of dong) {
-    if (d.trangThai === "ĐÃ MỚI") continue;
+    // ĐÃ BỎ = file bản khung không còn phát nữa. Chỉ kể tên, KHÔNG tự xoá: xoá file trong repo
+    // người khác là việc không lùi lại được, và nó phải do người quyết.
+    if (d.trangThai === "ĐÃ MỚI" || d.trangThai === "ĐÃ BỎ") continue;
     const dest = path.join(repo, ...d.rel.split("/"));
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     // Ghi ra file tạm rồi đổi tên: đổi tên là thao tác nguyên tử, nên một lần ngắt giữa chừng

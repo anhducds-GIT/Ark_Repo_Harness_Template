@@ -50,7 +50,7 @@ const dungRepo = (ghiSoGhim) => {
 {
   const root = dungRepo(true);
   try {
-    const dong = soSanh(root, chuan, docSoGhim(root));
+    const dong = soSanh(root, chuan, docSoGhim(root).so);
     assert.ok(dong.every((d) => d.trangThai === "ĐÃ MỚI"),
       `repo vua lap thi moi file phai la DA MOI, dang co: ${dong.filter((d) => d.trangThai !== "ĐÃ MỚI").map((d) => `${d.rel}=${d.trangThai}`).join(", ")}`);
   } finally { rmSync(root, { recursive: true, force: true }); }
@@ -70,7 +70,7 @@ const dungRepo = (ghiSoGhim) => {
     const root = dungRepo(true);
     try {
       writeFileSync(join(root, mot), `${chuan.get(mot)}\n// mot ban va tai cho cua nguoi khac\n`, "utf8");
-      const d = soSanh(root, chuan, docSoGhim(root)).find((x) => x.rel === mot);
+      const d = soSanh(root, chuan, docSoGhim(root).so).find((x) => x.rel === mot);
       assert.equal(d.trangThai, "SỬA TAY",
         "file lech khoi ban DA GHIM la SUA TAY — nang cap se xoa viec cua nguoi ta");
     } finally { rmSync(root, { recursive: true, force: true }); }
@@ -83,7 +83,7 @@ const dungRepo = (ghiSoGhim) => {
     try {
       const khungMoi = new Map(chuan);
       khungMoi.set(mot, `${chuan.get(mot)}\n// ban khung tien len\n`);
-      const d = soSanh(root, khungMoi, docSoGhim(root)).find((x) => x.rel === mot);
+      const d = soSanh(root, khungMoi, docSoGhim(root).so).find((x) => x.rel === mot);
       assert.equal(d.trangThai, "CŨ",
         "repo giu dung ban da ghim ma bo khung tien len thi la CU, khong phai SUA TAY");
     } finally { rmSync(root, { recursive: true, force: true }); }
@@ -95,7 +95,7 @@ const dungRepo = (ghiSoGhim) => {
     const root = dungRepo(false);
     try {
       writeFileSync(join(root, mot), `${chuan.get(mot)}\n// khac\n`, "utf8");
-      const d = soSanh(root, chuan, docSoGhim(root)).find((x) => x.rel === mot);
+      const d = soSanh(root, chuan, docSoGhim(root).so).find((x) => x.rel === mot);
       assert.equal(d.trangThai, "CHƯA GHIM",
         "khong co so ghim thi khong du can cu goi la SUA TAY");
     } finally { rmSync(root, { recursive: true, force: true }); }
@@ -122,4 +122,75 @@ const dungRepo = (ghiSoGhim) => {
   ok("--apply từ chối khi có file bị sửa tay, và không đụng vào file đó");
 }
 
-console.log(`\n${passed} passed, 0 failed, ${passed} total`);
+
+/* ---- 5. Sổ ghim HỎNG phải DỪNG, không được coi như chưa từng ghim -------- */
+{
+  // `docSoGhim` bắt mọi lỗi rồi trả `null`. Hậu quả: JSON cắt cụt, sai schema, hay không đọc
+  // được đều rơi vào nhánh CHƯA GHIM — và CHƯA GHIM thì bị ghi đè. Tức là **làm hỏng sổ ghim
+  // là cách để vượt qua lớp bảo vệ sửa tay**. Ba trạng thái, không phải hai: KHÔNG · CÓ · HỎNG.
+  const root = dungRepo(true);
+  try {
+    writeFileSync(join(root, ".ark", "harness.lock.json"), "{ day la json cut", "utf8");
+    const kq = docSoGhim(root);
+    assert.equal(kq?.trangThai, "HONG", "so ghim hong phai la HONG, khong duoc lan sang KHONG");
+    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--apply", root], { encoding: "utf8" });
+    assert.notEqual(r.status, 0, "so ghim hong thi --apply phai DUNG");
+    assert.match(String(r.stdout) + String(r.stderr), /SO_GHIM_HONG/, "phai noi ro so ghim hong");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("sổ ghim hỏng → dừng, không lẫn sang 'chưa ghim'");
+}
+
+/* ---- 6. CHƯA GHIM mà file đã khác → DỪNG --------------------------------- */
+{
+  // Tài liệu hứa "không đủ căn cứ thì báo, không đoán" — nhưng vòng ghi lại ghi mọi thứ trừ
+  // ĐÃ MỚI. Repo cũ chưa ghim mà có file máy đã khác sẽ bị ghi đè MẶC ĐỊNH. Đó đúng là ca
+  // nguy hiểm nhất: repo đã sống lâu, không ai biết file đó khác vì sao.
+  const root = dungRepo(false);
+  try {
+    const mot = fileMay(chuan)[0];
+    const daSua = `${chuan.get(mot)}\n// khac, va khong biet vi sao\n`;
+    writeFileSync(join(root, mot), daSua, "utf8");
+    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--apply", root], { encoding: "utf8" });
+    assert.notEqual(r.status, 0, "chua ghim ma file da khac thi --apply phai DUNG");
+    assert.equal(readFileSync(join(root, mot), "utf8"), daSua, "khong duoc dung vao file do");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("chưa ghim mà file đã khác → dừng, không ghi đè");
+}
+
+/* ---- 7. File bị LOẠI khỏi bản khung phải hiện ra ------------------------- */
+{
+  // So sánh chỉ duyệt file của bản MỚI. File từng nằm trong `managed` mà bản mới đã bỏ sẽ ở lại
+  // repo mãi mãi, rồi biến mất khỏi sổ ghim lần sau — thành rác vô chủ mà không công cụ nào kể.
+  const root = dungRepo(true);
+  try {
+    const khungMoi = new Map(chuan);
+    const bo = fileMay(chuan)[0];
+    khungMoi.delete(bo);
+    const dong = soSanh(root, khungMoi, docSoGhim(root).so);
+    const d = dong.find((x) => x.rel === bo);
+    assert.ok(d, "file bi loai khoi ban khung PHAI van hien trong ket qua so sanh");
+    assert.equal(d.trangThai, "ĐÃ BỎ", "phai goi ten no la DA BO, khong duoc im lang");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("file bị loại khỏi bản khung hiện ra là ĐÃ BỎ, không thành rác vô chủ");
+}
+
+/* ---- 8. Cùng phiên bản mà khác nội dung → DỪNG --------------------------- */
+{
+  // Bản trích dựng thẳng từ cây làm việc, còn số phiên bản chỉ đọc từ `package.json`. Nên nội
+  // dung đổi mà số vẫn `1.1.0` — và chính phép thử "giả bản vá ở bộ khung" của tôi đã đi qua
+  // đúng ca này. Một số phiên bản trỏ tới hai nội dung khác nhau thì nó không còn là mốc.
+  const root = dungRepo(true);
+  try {
+    const so = JSON.parse(readFileSync(join(root, ".ark", "harness.lock.json"), "utf8"));
+    assert.ok(so.bundle_digest, "so ghim phai mang dau van tay cua CA BAN TRICH, khong chi so phien ban");
+    so.bundle_digest = "0".repeat(16);          // cùng version, khác nội dung
+    writeFileSync(join(root, ".ark", "harness.lock.json"), JSON.stringify(so, null, 2), "utf8");
+    const r = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--plan", root], { encoding: "utf8" });
+    assert.match(String(r.stdout) + String(r.stderr), /CUNG_BAN_KHAC_NOI_DUNG/,
+      "cung so phien ban ma khac noi dung thi phai keu len");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("cùng phiên bản mà khác nội dung → kêu lên, số phiên bản mới là mốc thật");
+}
+
+console.log(`
+${passed} passed, 0 failed, ${passed} total`);

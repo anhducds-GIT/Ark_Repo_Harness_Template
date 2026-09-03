@@ -9,9 +9,9 @@ last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate t
 evidence_ref: docs/migrations/2026-09-03-nav-platform.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Chạy thử một vòng vá thật: sửa bộ khung, upgrade --plan hai repo, xem nó có bắt đúng file cũ không"
+next_step: "Rollback cả lô và sao lưu trước --force — hai việc còn lại của cơ chế nâng cấp"
 version_source: package.json
-current_focus: "v1.1: ghim phiên bản xong. Vá bộ khung nay đẩy sang repo đã lắp bằng một lệnh, và nó TỪ CHỐI ghi đè file bị sửa tay"
+current_focus: "v1.2: nâng cấp nay biết dừng trong bảy ca khác nhau, không chỉ ca sửa tay"
 human_action: "Không có việc nào cần bạn"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
