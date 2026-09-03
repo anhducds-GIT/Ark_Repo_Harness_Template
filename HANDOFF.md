@@ -159,3 +159,19 @@ sửa `session-check.mjs`.
    Lần đầu chạy KHÔNG bắt được gì, và đó là câu trả lời đúng: v1.2 chỉ sửa `upgrade.mjs`, mà
    file đó **ở lại nhà** — không nằm trong tầng máy đi theo. Phải có một bản vá vào file
    PORTABLE thì vòng vá mới có nghĩa.
+
+ - **2026-09-03 · `harness-vong2` · v1.2.1 + CI** — Audit độc lập đọc lại bốn cửa của v1.2 và
+   thấy **ba cái không đóng**, cùng một hình dạng: thông báo có, hành động không. (a) cùng số bản
+   khác nội dung chỉ in cảnh báo rồi VẪN nâng cấp và VẪN ghi lại sổ ghim; (b) sổ ghim thiếu
+   `bundle_digest` thì cửa (a) **tự tắt** — xoá đúng một dòng là vượt qua, cùng kiểu đường vòng
+   mà `SO_GHIM_HONG` sinh ra để chặn; (c) file `ĐÃ BỎ` kể tên đúng một lần rồi rơi khỏi sổ sau
+   `--apply`. Thêm (d): `claim --take` chạy lại mà không khai `--ai` thì **xoá tên AI đã biết**.
+   Cả bốn đã vá, đột biến ngược 4/4 đều bị bắt. Suite 61 (8 file).
+   Phép kiểm cũ cho (a) mang đúng tiêu đề "→ DỪNG" nhưng chỉ soi thông báo trên `--plan`, nên nó
+   xanh trong khi `--apply` vẫn đi tiếp — **một phép kiểm xanh không bảo vệ gì cả**. Nay kiểm cả
+   ba vế: thoát khác 0 · file trên đĩa không đổi · sổ ghim không đổi.
+   **CI** (`.github/workflows/cong-kiem.yml`): mọi lớp bảo vệ trước nay chạy trên máy người dùng
+   nên `git push` trần đi qua hết. Còn hở, nói thẳng: đỏ trên CI **chưa tự chặn merge** (một nút
+   trong Settings của GitHub, quyền của Đức), và phép kiểm secret chưa chạy trên CI — bật Secret
+   scanning + Push protection của GitHub thì tốt hơn regex của mình, vì nó chặn ngay lúc push.
+

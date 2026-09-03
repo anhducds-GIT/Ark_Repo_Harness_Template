@@ -173,6 +173,7 @@ minh được nó **tự** nạp lúc mở phiên.
 | **Xem bảng trạng thái trực quan (trang mẹ)** | https://claude.ai/code/artifact/78cd4694-6eb0-4389-94e9-b2675c1c4cae — sinh bằng `npm run overview -- <file.html>` |
 | **Nhìn lại đã migrate repo nào, ngày nào (trang vệ tinh)** | https://claude.ai/code/artifact/6807387b-6d45-4f9c-980d-072bdf369b5d — sinh bằng `npm run so-migrate -- <file.html>` |
 | **Bảy chỗ hợp đồng lõi đã từng vỡ, và phép kiểm phá cho từng chỗ** | `tests/core-contract.mjs` — bộ đo nói dối · đo được nghề khác · vòng đời một bảng · git hỏng không hoá số 0 · quy chủ theo tiền tố dài nhất · ADR xoá cũng bị bắt · khoá quyền nguyên tử |
+| **Biết cổng nào còn chạy sau khi mã rời máy** | [.github/workflows/](.github/workflows/) — `cong-kiem.yml` chạy trên GitHub: bộ phép kiểm · cấu trúc B1–B15 · artifact máy sinh còn tươi. Nó KHÔNG thay cổng đóng phiên (cổng đó hỏi những câu chỉ có nghĩa trong một phiên: bạn tên gì, giữ vùng nào, đã ghi Log chưa), mà bịt chỗ hở duy nhất còn lại: mọi lớp bảo vệ khác chạy trên máy người dùng nên `git push` trần đi qua hết |
 | **Biết bộ khung đang nặng bao nhiêu, và luật nào chưa từng chặn được gì** | `scripts/can-nang.mjs` (`npm run can-nang`) — bốn con số có ngân sách; quá thì phải BỚT trước khi nghĩ tới nới. Nhịp tháng, cố ý KHÔNG nằm trong cổng đóng phiên |
 
 **Phải là liên kết bấm được, không phải chữ thường.** Máy kiểm xem mỗi file có được file nào

@@ -9,10 +9,10 @@ last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate t
 evidence_ref: docs/migrations/2026-09-03-nav-platform.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Rollback cả lô và sao lưu trước --force — hai việc còn lại của cơ chế nâng cấp"
+next_step: "Bật chặn merge khi CI đỏ, và Secret scanning — hai nút trong Settings của GitHub"
 version_source: package.json
-current_focus: "v1.2: nâng cấp nay biết dừng trong bảy ca khác nhau, không chỉ ca sửa tay"
-human_action: "Không có việc nào cần bạn"
+current_focus: "v1.2.1: ba cửa của v1.2 chỉ nói mà không chặn, nay chặn thật; và có CI trên GitHub"
+human_action: "Bật hai nút trong Settings của repo trên GitHub: chặn merge khi CI đỏ, và Secret scanning"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---
