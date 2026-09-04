@@ -30,6 +30,10 @@ bằng lệnh, không chép tay. Nhãn `unproven` **đã gỡ từ v1.0.0**; câ
 sai suốt từ đó — chính nó là thứ khiến bảng và thân bài mâu thuẫn nhau.
 
 **Mốc Stable Baseline:** `v1.2.17` — xem [ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md).
-Repo thứ ba trở đi lắp từ mốc này, không lắp từ HEAD đang chạy.
+Repo thứ ba trở đi lắp từ mốc này, không lắp từ HEAD đang chạy. Lấy về bằng:
+
+```bash
+git clone --branch v1.2.17 https://github.com/anhducds-GIT/Ark_Repo_Harness_Template.git
+```
 
 **Việc kế:** đọc `next_step` ở đầu file này. Lộ trình cũ tới v1.0 — [ROADMAP-V1.md](docs/ROADMAP-V1.md) — **đã xong**, giữ lại làm lịch sử.
