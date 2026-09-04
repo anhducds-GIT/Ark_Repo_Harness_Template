@@ -469,3 +469,8 @@ sửa `session-check.mjs`.
    **Việc cần Đức: không có.** Còn treo: repo `Chrome_Extension_AI_Agentic` vẫn để tên
    `DASHBOARD.html` trơn — đổi tên ở đó phải chạm `scripts/` (`_code`) và `AGENTS.md` (`_root`),
    mà `_code` và `_docs` bên đó đang có chủ khác, nên chưa làm.
+
+ - **2026-09-04 · `harness-vong2`** — Dọn câu chữ theo việc trên: `README.md`, `docs/TINH-NANG.md`
+   và `docs/BAO-TRI-DINH-KY.md` còn dẫn người đọc chạy `npm run overview -- <file.html>` rồi mở
+   file tạm — cách dùng của thời bảng chưa vào repo. Ba chỗ nay trỏ thẳng tới
+   `DASHBOARD-Ark-Repo-Harness.html` ở gốc. **Việc cần Đức: không có.**
