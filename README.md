@@ -21,7 +21,7 @@ ra, không phải quét cả cây thư mục và không phải hỏi chủ repo 
 | Hiểu bộ khung này làm được gì cho tôi | đọc [docs/TINH-NANG.md](docs/TINH-NANG.md) |
 | Dựng một repo mới theo chuẩn | `npm run init -- <thư-mục> --ten "Tên repo"` |
 | Xem một repo đang có cách chuẩn bao xa | `npm run assess -- <đường-dẫn-repo>` |
-| Xem một trang có hình cho dễ nhìn | `npm run overview -- trang.html` rồi mở file đó bằng trình duyệt |
+| Xem một trang có hình cho dễ nhìn | Mở `DASHBOARD-Ark-Repo-Harness.html` ở gốc repo bằng trình duyệt. Sinh lại: `npm run overview` |
 | Tra một thuật ngữ lạ | [docs/LEGEND.md](docs/LEGEND.md) |
 | Sửa chính bộ khung | đọc [AGENTS.md](AGENTS.md) trước — đó là hiến pháp của repo này |
 

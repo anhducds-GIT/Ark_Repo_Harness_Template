@@ -99,7 +99,7 @@ Ba lệnh, không cần đọc code:
 ```bash
 npm run gate -- --as duc          # repo có lành không
 npm run bootstrap                 # nợ cấu trúc còn bao nhiêu
-npm run overview -- bang.html     # rồi mở bang.html bằng trình duyệt
+npm run overview                  # sinh lại bảng HTML ở gốc repo, rồi commit nó
 ```
 
 *(Đừng commit file HTML đó — nó là ảnh chụp một lúc, không phải tài liệu.)*

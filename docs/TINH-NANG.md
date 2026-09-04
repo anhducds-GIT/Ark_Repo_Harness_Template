@@ -35,7 +35,7 @@ flowchart TD
 | Không cho hai người sửa cùng một chỗ | người ghi sau xoá việc người ghi trước, **không ai biết** | `node scripts/claim.mjs --take <vùng> --as <tên-phiên>` |
 | Không cho đẩy nhầm việc của người khác | việc chưa được duyệt bị công bố ra ngoài | `npm run push -- --as <tên-phiên>` |
 | Bảng trạng thái tự viết, không ai gõ tay | bảng nói một đằng, repo một nẻo — và bảng thì luôn đẹp hơn | `npm run dashboard` |
-| Trang có hình cho người xem | không có gì đưa cho người không đọc code | `npm run overview -- <file.html>` |
+| Trang có hình cho người xem | không có gì đưa cho người không đọc code | `npm run overview` → `DASHBOARD-Ark-Repo-Harness.html` ở gốc repo |
 | Bản đồ "sắp làm X thì mở file nào" | tài liệu vẫn có, nhưng không ai tìm ra, nên coi như không có | (bảng ở `AGENTS.md` mục 6) |
 | Đo một repo cách chuẩn bao xa, **trước khi** bỏ công | quyết định làm hay không làm dựa trên cảm giác | `npm run assess -- <đường-dẫn-repo>` |
 | Dựng một repo mới bằng một lệnh | mỗi repo mới là một lần chép tay, mỗi lần chép tay lệch đi một chút | `npm run init -- <thư-mục> --ten "Tên repo"` |
