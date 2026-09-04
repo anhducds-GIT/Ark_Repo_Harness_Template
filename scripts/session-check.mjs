@@ -384,7 +384,6 @@ check("Không có secret lọt vào repo", () => {
     const full = path.join(ROOT, file);
     let buf;
     try { buf = fs.readFileSync(full); } catch { khongDocDuoc.push(file); continue; }
-    if (buf.length > 2_000_000) { khongDocDuoc.push(`${file} (quá lớn)`); continue; }
     /* "LÀ FILE NHỊ PHÂN" LÀ MỘT CÂU TRẢ LỜI, KHÔNG PHẢI MỘT DẤU HỎI.
      *
      * Bản đầu gộp nó với "đọc không được" và "quá lớn", nên mọi repo có một cái ảnh đều mang
@@ -399,6 +398,13 @@ check("Không có secret lọt vào repo", () => {
      * Hai ca kia thì GIỮ NGUYÊN là KHÔNG BIẾT: "đọc không được" và "quá lớn" là file văn bản
      * thật sự chưa được soi. */
     if (buf.subarray(0, 8192).includes(0)) { nhiPhan.push(file); continue; }
+    /* THỨ TỰ QUAN TRỌNG: phép thử nhị phân phải chạy TRƯỚC phép thử kích thước.
+       Đảo lại thì một tấm PNG 3MB bị gọi là "quá lớn" — tức KHÔNG BIẾT — trong khi ta biết
+       thừa nó là ảnh. Đo ở 3AI: sau khi tách nhị phân vẫn còn 4 file kẹt, cả bốn đều là
+       PNG/PPTX chỉ vì chúng vượt ngưỡng trước khi kịp được nhận là nhị phân.
+       "Có phải nhị phân không" không phụ thuộc kích thước; ngưỡng này để tránh giải mã một
+       file VĂN BẢN khổng lồ, nên nó thuộc về sau. */
+    if (buf.length > 2_000_000) { khongDocDuoc.push(`${file} (quá lớn)`); continue; }
     daDoc += 1;
     const text = buf.toString("utf8");
     for (const p of patterns) {

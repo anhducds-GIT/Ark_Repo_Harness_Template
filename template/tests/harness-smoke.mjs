@@ -650,6 +650,16 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
       "file nhi phan KHONG duoc goi la 'khong doc duoc' — do la mot cau tra loi, khong phai dau hoi");
     assert.match(khoiSecret, /bỏ qua 1 file nhị phân/, "nhung PHAI ke ra: bo qua im lang thi khong ai biet");
 
+    // VA: mot tam anh LON van la anh. Phep thu nhi phan phai chay TRUOC phep thu kich thuoc —
+    // dao lai thi PNG 3MB bi goi la "qua lon", tuc KHONG BIET, trong khi ta biet thua no la anh.
+    const anhTo = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00]), Buffer.alloc(2_100_000, 7)]);
+    writeFileSync(join(kho, "anh-to.png"), anhTo);
+    at("add", "-A"); at("commit", "-q", "-m", "anh to\n\nLane: thu");
+    const outTo = chay();
+    const khoiTo = outTo.slice(outTo.indexOf("Không có secret"), outTo.indexOf("Không có secret") + 400);
+    assert.match(khoiTo, /bỏ qua 2 file nhị phân/, "anh lon van la anh — khong duoc goi la 'qua lon'");
+    assert.doesNotMatch(khoiTo, /KHÔNG đọc được/, "chua co file van ban nao chua soi thi khong duoc bao 'khong doc duoc'");
+
     // DOI CHUNG: file van ban that su KHONG doc duoc thi VAN phai la "khong kiem duoc".
     writeFileSync(join(kho, "to.txt"), "x".repeat(2_000_001), "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "hai\n\nLane: thu");

@@ -3,7 +3,7 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
-## 1.2.13 — 2026-09-04 — "Là file nhị phân" là một câu trả lời, không phải một dấu hỏi
+## 1.2.14 — 2026-09-04 — "Là file nhị phân" là một câu trả lời, không phải một dấu hỏi
 
 Phép kiểm secret gộp **ba lý do** vào một rổ "không kiểm được": đọc lỗi · quá lớn · **nhị phân**.
 Nên **mọi repo có một cái ảnh** đều mang vĩnh viễn một mục `[BỎ]` — tức cổng **không bao giờ xanh
@@ -18,7 +18,13 @@ Hai lý do kia **giữ nguyên là KHÔNG BIẾT**: "đọc lỗi" và "quá l�
 được soi — bỏ chúng mới là nới lỏng. Có đối chứng dương cho đúng vế đó.
 
 Và vẫn phải **kể ra** số file nhị phân đã bỏ qua: bỏ qua im lặng thì lần sau không ai biết mình
-đang không được canh chỗ nào. Đột biến 3/3.
+đang không được canh chỗ nào.
+
+**Và thứ tự hai phép thử cũng là một lỗi riêng.** Vá xong vẫn còn 4 file kẹt ở 3AI, cả bốn đều
+là PNG/PPTX — chỉ vì ngưỡng kích thước chạy TRƯỚC phép thử nhị phân, nên một tấm ảnh 3MB bị gọi
+là "quá lớn", tức **KHÔNG BIẾT**, trong khi ta biết thừa nó là ảnh. "Có phải nhị phân không"
+không phụ thuộc kích thước; ngưỡng đó để tránh giải mã một file **văn bản** khổng lồ, nên nó
+thuộc về sau. Kết quả ở 3AI: **33 → 4 → 0**. Đột biến 4/4.
 
 ## 1.2.12 — 2026-09-04 — Cổng đóng phiên cũng chỉ biết một nhánh, và một phép kiểm đòi sửa thứ cấm sửa
 

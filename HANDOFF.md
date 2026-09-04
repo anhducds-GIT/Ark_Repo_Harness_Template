@@ -321,5 +321,7 @@ sửa `session-check.mjs`.
    **Không phải nới lỏng:** phép kiểm giải UTF-8 rồi dò mẫu CHỮ, nên nó chưa bao giờ soi được file
    nhị phân — gọi tên đúng thứ nó vốn không làm được thì không mất một phát hiện nào. Hai lý do kia
    **giữ nguyên là KHÔNG BIẾT** (đối chứng dương cho đúng vế đó), và vẫn phải **kể ra** số file đã
-   bỏ qua. Đột biến 3/3. Suite 78.
-
+   bỏ qua. Đột biến 4/4. Suite 78.
+   **Và thứ tự hai phép thử cũng là một lỗi riêng:** vá xong vẫn còn 4 file kẹt, cả bốn là
+   PNG/PPTX — chỉ vì ngưỡng kích thước chạy TRƯỚC phép thử nhị phân, nên ảnh 3MB bị gọi là "quá
+   lớn" (KHÔNG BIẾT) trong khi ta biết thừa nó là ảnh. Ở 3AI: **33 → 4 → 0**.
