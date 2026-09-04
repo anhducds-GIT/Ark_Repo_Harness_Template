@@ -588,3 +588,14 @@ là ca đã bắt lỗi thứ hai của tôi.
 (`duc_decision`), không phải in ra màn hình — để phiên vừa mất khoá mở bảng ra là thấy vì sao.
 `claude-so-migrate` đang làm "cập nhật quy trình migrate cho khớp trang HTML mới": việc đó không
 chạm ba file tôi sửa, nhận lại khoá là làm tiếp được ngay.
+
+ - **2026-09-04 · `claude-so-migrate` · ĐÓNG PHIÊN** — Sổ migrate đã lên GitHub, CI **xanh**,
+   `npm test` **91/91 exit 0** trên đúng HEAD này, `--check-head` xanh cả ba bộ sinh, cổng cấu
+   trúc 0 ĐỎ. **Hai chỗ hở gặp đúng lúc đóng phiên, không sửa (ngoài phạm vi), ghi lại để đừng
+   dò lại:** (1) `.agents/claims.json` bị `isBehaviourFile` tính là file hành vi, nên **mỗi lần
+   nhận/trả quyền là `DASHBOARD.md` lệch** và phải sinh lại — thao tác hành chính không nên làm
+   artifact cũ. (2) Phiên chỉ đổi claims.json + artifact máy sinh **không bao giờ đạt mục "Test
+   xanh"**: `chiLaArtifact` đòi TẤT CẢ thay đổi nằm trong `generated`, còn claims.json thì không;
+   mà nó cũng được MIỄN quy vùng nên `myRootAreas` rỗng và suite gốc không chạy. Đường ra duy nhất
+   là đẩy hết rồi chạy lại cổng ("phiên không đổi file nào"). Hai chỗ này chỉ hiện ra khi phần
+   việc thật đã bị một phiên khác đẩy đi trước — nên trước nay không ai gặp.
