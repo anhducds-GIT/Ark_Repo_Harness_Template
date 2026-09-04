@@ -614,4 +614,51 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   ok("cổng đóng phiên: mốc so theo nhánh đang đứng, không nổ trên nhánh tính năng");
 }
 
+/* ---- secret: "la nhi phan" khac "khong doc duoc" ------------------------ */
+{
+  // Ban dau gop ca ba ly do (doc loi · qua lon · nhi phan) vao mot ro "khong kiem duoc", nen moi
+  // repo co MOT CAI ANH deu mang vinh vien mot muc [BO] — tuc cong KHONG BAO GIO xanh duoc o bat
+  // ky repo that nao. Do o 3AI 04/09: 33 file PNG/XLSX giu cong o "chua du bang chung" mai mai.
+  //
+  // KHONG phai noi long: phep kiem nay giai UTF-8 roi do mau CHU, nen no chua bao gio soi duoc
+  // file nhi phan. Goi ten dung thu no von khong lam duoc thi khong mat mot chut phat hien nao.
+  const kho = mkdtempSync(join(tmpdir(), "secret-nhiphan-"));
+  try {
+    const at = (...a) => execFileSync("git", a, { cwd: kho, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(kho, "scripts"), { recursive: true });
+    mkdirSync(join(kho, ".agents"), { recursive: true });
+    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    // Mot "buc anh": co byte 0 trong 8KB dau.
+    writeFileSync(join(kho, "anh.png"), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x01, 0x02]));
+    writeFileSync(join(kho, "a.txt"), "khong co gi", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");
+
+    const chay = () => {
+      const r = spawnSync(process.execPath, [join(kho, "scripts", "session-check.mjs"), "--as", "thu"],
+        { cwd: kho, encoding: "utf8" });
+      return String(r.stdout || "") + String(r.stderr || "");
+    };
+    const out = chay();
+    const khoiSecret = out.slice(out.indexOf("Không có secret"), out.indexOf("Không có secret") + 400);
+    assert.doesNotMatch(khoiSecret, /KHÔNG đọc được/,
+      "file nhi phan KHONG duoc goi la 'khong doc duoc' — do la mot cau tra loi, khong phai dau hoi");
+    assert.match(khoiSecret, /bỏ qua 1 file nhị phân/, "nhung PHAI ke ra: bo qua im lang thi khong ai biet");
+
+    // DOI CHUNG: file van ban that su KHONG doc duoc thi VAN phai la "khong kiem duoc".
+    writeFileSync(join(kho, "to.txt"), "x".repeat(2_000_001), "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "hai\n\nLane: thu");
+    const out2 = chay();
+    const khoi2 = out2.slice(out2.indexOf("Không có secret"), out2.indexOf("Không có secret") + 400);
+    assert.match(khoi2, /KHÔNG đọc được/,
+      "file van ban chua duoc soi that thi VAN la 'khong kiem duoc' — day moi la noi long neu bo");
+  } finally { rmSync(kho, { recursive: true, force: true }); }
+  ok("secret: file nhị phân là câu trả lời, file văn bản chưa soi được vẫn là dấu hỏi");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

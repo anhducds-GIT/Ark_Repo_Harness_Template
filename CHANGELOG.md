@@ -3,6 +3,23 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.13 — 2026-09-04 — "Là file nhị phân" là một câu trả lời, không phải một dấu hỏi
+
+Phép kiểm secret gộp **ba lý do** vào một rổ "không kiểm được": đọc lỗi · quá lớn · **nhị phân**.
+Nên **mọi repo có một cái ảnh** đều mang vĩnh viễn một mục `[BỎ]` — tức cổng **không bao giờ xanh
+được ở bất kỳ repo thật nào**. Đo ở 3AI: 33 file PNG/XLSX trong `archive/` giữ cổng ở "chưa đủ
+bằng chứng" mãi mãi. Lại đúng bệnh "luật không thoả được thì sớm muộn bị bỏ qua cả cụm".
+
+**Đây không phải nới lỏng.** Phép kiểm này giải UTF-8 rồi dò mẫu **chữ**, nên nó **chưa bao giờ**
+soi được file nhị phân. Gọi tên đúng thứ nó vốn không làm được thì không mất đi một chút phát hiện
+nào — chỉ thôi dán nhãn "không biết" lên một chỗ ta biết rõ.
+
+Hai lý do kia **giữ nguyên là KHÔNG BIẾT**: "đọc lỗi" và "quá lớn" là file văn bản thật sự chưa
+được soi — bỏ chúng mới là nới lỏng. Có đối chứng dương cho đúng vế đó.
+
+Và vẫn phải **kể ra** số file nhị phân đã bỏ qua: bỏ qua im lặng thì lần sau không ai biết mình
+đang không được canh chỗ nào. Đột biến 3/3.
+
 ## 1.2.12 — 2026-09-04 — Cổng đóng phiên cũng chỉ biết một nhánh, và một phép kiểm đòi sửa thứ cấm sửa
 
 Hai lỗ, cùng một gốc: **bộ khung mặc định mọi repo có hình dạng giống nó.**

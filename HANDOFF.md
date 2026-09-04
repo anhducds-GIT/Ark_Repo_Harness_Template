@@ -314,3 +314,12 @@ sửa `session-check.mjs`.
    Và cơ chế sổ phát hành của v1.2.4 **chặn chính tôi** giữa lượt này: đổi file tầng máy sau khi
    đã đóng dấu 1.2.11 → bộ sinh từ chối → phải lên 1.2.12.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.13** — Phép kiểm secret gộp **ba lý do** vào một rổ "không
+   kiểm được": đọc lỗi · quá lớn · **nhị phân**. Nên **mọi repo có một cái ảnh** đều mang vĩnh viễn
+   một mục `[BỎ]` — cổng **không bao giờ xanh được ở repo thật nào**. Đo ở 3AI: 33 file PNG/XLSX
+   giữ cổng ở "chưa đủ bằng chứng" mãi mãi.
+   **Không phải nới lỏng:** phép kiểm giải UTF-8 rồi dò mẫu CHỮ, nên nó chưa bao giờ soi được file
+   nhị phân — gọi tên đúng thứ nó vốn không làm được thì không mất một phát hiện nào. Hai lý do kia
+   **giữ nguyên là KHÔNG BIẾT** (đối chứng dương cho đúng vế đó), và vẫn phải **kể ra** số file đã
+   bỏ qua. Đột biến 3/3. Suite 78.
+

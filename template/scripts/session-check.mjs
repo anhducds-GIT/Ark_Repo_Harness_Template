@@ -379,13 +379,26 @@ check("Không có secret lọt vào repo", () => {
   const suspects = [];
   let daDoc = 0;
   const khongDocDuoc = [];
+  const nhiPhan = [];
   for (const file of tracked) {
     const full = path.join(ROOT, file);
     let buf;
     try { buf = fs.readFileSync(full); } catch { khongDocDuoc.push(file); continue; }
     if (buf.length > 2_000_000) { khongDocDuoc.push(`${file} (quá lớn)`); continue; }
-    // Nhị phân thì bỏ, nhưng PHẢI kể ra. Dấu hiệu: có byte 0 trong 8KB đầu.
-    if (buf.subarray(0, 8192).includes(0)) { khongDocDuoc.push(`${file} (nhị phân)`); continue; }
+    /* "LÀ FILE NHỊ PHÂN" LÀ MỘT CÂU TRẢ LỜI, KHÔNG PHẢI MỘT DẤU HỎI.
+     *
+     * Bản đầu gộp nó với "đọc không được" và "quá lớn", nên mọi repo có một cái ảnh đều mang
+     * vĩnh viễn một mục [BỎ] — tức cổng KHÔNG BAO GIỜ xanh được ở bất kỳ repo thật nào. Đo được
+     * ở 3AI 04/09: 33 file (PNG, XLSX trong `archive/`) giữ cổng ở "chưa đủ bằng chứng" mãi mãi.
+     * Lại đúng cái bệnh "luật không thoả được thì sớm muộn bị bỏ qua cả cụm".
+     *
+     * ĐÂY KHÔNG PHẢI NỚI LỎNG: phép kiểm này giải UTF-8 rồi dò mẫu chữ, nên nó CHƯA BAO GIỜ soi
+     * được file nhị phân. Gọi tên đúng thứ nó vốn không làm được không mất đi một chút phát hiện
+     * nào — chỉ thôi dán nhãn "không biết" lên một chỗ ta biết rõ.
+     *
+     * Hai ca kia thì GIỮ NGUYÊN là KHÔNG BIẾT: "đọc không được" và "quá lớn" là file văn bản
+     * thật sự chưa được soi. */
+    if (buf.subarray(0, 8192).includes(0)) { nhiPhan.push(file); continue; }
     daDoc += 1;
     const text = buf.toString("utf8");
     for (const p of patterns) {
@@ -394,9 +407,10 @@ check("Không có secret lọt vào repo", () => {
     }
   }
   if (suspects.length) return { ok: false, msg: `Nghi có token thật trong: ${suspects.join(", ")}. Kiểm tra bằng mắt trước khi commit.` };
-  const duoi = khongDocDuoc.length
+  const duoi = (khongDocDuoc.length
     ? ` · ${khongDocDuoc.length} file KHÔNG đọc được (${khongDocDuoc.slice(0, 3).join(", ")}${khongDocDuoc.length > 3 ? ", …" : ""}) — không kiểm được, không phải đã sạch`
-    : "";
+    : "")
+    + (nhiPhan.length ? ` · bỏ qua ${nhiPhan.length} file nhị phân (phép kiểm này dò mẫu chữ, không áp dụng cho ảnh/nhị phân)` : "");
   // File khong doc duoc = CHUA KIEM. Bao [XANH] o day la dung cai benh ca cong nay sinh ra
   // de chua: badge xanh trong khi mot phan repo chua he duoc soi.
   return {
