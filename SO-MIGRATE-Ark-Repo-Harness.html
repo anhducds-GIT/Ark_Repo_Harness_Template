@@ -1,0 +1,165 @@
+<title>Sổ Migrate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --nen:#F7F5F0; --mat:#FFFFFF; --mat2:#EFEBE3; --vien:#DED8CC; --vien2:#C6BDAC;
+  --chu:#1C1A16; --chu2:#4E483E; --mo:#7C7466;
+  --nhan:#8A5A2B; --nhan-nen:#F3E7D6;
+  --xanh:#2F6B4F; --vang:#8A6A12; --do:#8C3A34;
+  --bong:0 1px 2px rgba(28,26,22,.05), 0 10px 28px -18px rgba(28,26,22,.28);
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --disp:"Bricolage Grotesque","IBM Plex Sans",-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --nen:#15130F; --mat:#1E1B16; --mat2:#282419; --vien:#38322A; --vien2:#4B4438;
+  --chu:#F2EDE4; --chu2:#C7BFB2; --mo:#948B7C;
+  --nhan:#D9A56B; --nhan-nen:#33261A;
+  --xanh:#7EC49E; --vang:#D9BE6B; --do:#E0928A;
+  --bong:0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.8);
+}}
+:root[data-theme="dark"]{
+  --nen:#15130F; --mat:#1E1B16; --mat2:#282419; --vien:#38322A; --vien2:#4B4438;
+  --chu:#F2EDE4; --chu2:#C7BFB2; --mo:#948B7C;
+  --nhan:#D9A56B; --nhan-nen:#33261A;
+  --xanh:#7EC49E; --vang:#D9BE6B; --do:#E0928A;
+  --bong:0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+body{background:var(--nen);color:var(--chu);font-family:var(--sans);font-size:15px;
+  line-height:1.62;margin:0;padding:clamp(18px,3vw,40px) clamp(14px,3vw,32px) 80px}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3,h4{font-family:var(--disp);margin:0;letter-spacing:-.018em;text-wrap:balance;color:var(--chu)}
+h1{font-size:clamp(26px,4.2vw,40px);font-weight:800;line-height:1.05}
+h2{font-size:clamp(18px,2.2vw,23px);font-weight:700}
+h3{font-size:15.5px;font-weight:700;margin-top:18px}
+p{margin:9px 0;max-width:70ch} ul,ol{margin:9px 0;padding-left:22px} li{margin:3px 0;max-width:70ch}
+a{color:var(--nhan)}
+code{font-family:var(--mono);font-size:.87em;background:var(--mat2);padding:.1em .34em;border-radius:3px;color:var(--chu2)}
+blockquote{border-left:3px solid var(--nhan);background:var(--nhan-nen);margin:12px 0;
+  padding:11px 15px;border-radius:0 8px 8px 0;color:var(--chu2)}
+.tw{overflow-x:auto;border:1px solid var(--vien);border-radius:9px;margin:12px 0;background:var(--mat)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:13.4px}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--vien);vertical-align:top}
+th{font-family:var(--mono);font-size:10.4px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--mo);background:var(--mat2);white-space:nowrap;font-weight:600}
+header.dau{border-bottom:2px solid var(--chu);padding-bottom:16px;margin-bottom:18px}
+.nhan-hang{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mo)}
+.tong{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;
+  background:var(--vien);border:1px solid var(--vien);border-radius:11px;overflow:hidden;margin:0 0 22px}
+.tong .m{background:var(--mat);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.tong .nhan{font-family:var(--mono);font-size:10.2px;letter-spacing:.11em;text-transform:uppercase;color:var(--mo)}
+.tong .gt{font-family:var(--disp);font-size:24px;font-weight:800;color:var(--nhan);font-variant-numeric:tabular-nums}
+.ho-so{background:var(--mat);border:1px solid var(--vien);border-radius:12px;
+  padding:clamp(15px,2.2vw,24px);margin:16px 0;box-shadow:var(--bong)}
+.hs-dau{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;
+  border-bottom:1px solid var(--vien);padding-bottom:12px;margin-bottom:14px}
+.hs-meta{font-family:var(--mono);font-size:11.6px;color:var(--mo);margin-top:5px}
+.den{width:16px;height:16px;border-radius:50%;flex:0 0 auto;margin-top:6px}
+.den.xanh{background:var(--xanh)} .den.vang{background:var(--vang)} .den.do{background:var(--do)}
+.hs-o{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1px;
+  background:var(--vien);border:1px solid var(--vien);border-radius:9px;overflow:hidden;margin-bottom:12px}
+.hs-o .o{background:var(--mat2);padding:11px 13px;display:flex;flex-direction:column;gap:2px}
+.hs-o .o b{font-family:var(--disp);font-size:17px;font-weight:800;color:var(--chu);line-height:1.2}
+.hs-o .o span{font-size:11.6px;color:var(--mo)}
+.hs-do{font-family:var(--mono);font-size:11.8px;color:var(--chu2);background:var(--mat2);
+  border-radius:7px;padding:8px 12px;margin-bottom:6px}
+.hs-do span{color:var(--mo);text-transform:uppercase;letter-spacing:.08em;font-size:10.2px}
+.hs-chan{margin-top:14px;padding-top:11px;border-top:1px solid var(--vien);
+  font-family:var(--mono);font-size:11px;color:var(--mo);word-break:break-all}
+.thieu{color:var(--do);font-style:normal;font-family:var(--mono);font-size:.86em}
+.trong{background:var(--mat);border:1px dashed var(--vien2);border-radius:11px;padding:22px;color:var(--mo)}
+footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
+  display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:11.6px;color:var(--mo)}
+</style>
+<div class="wrap">
+  <header class="dau">
+    <div class="nhan-hang"><span>sinh ngày 2026-09-04</span><span aria-hidden="true">·</span><a href="DASHBOARD-Ark-Repo-Harness.html">← bảng tổng quan</a></div>
+    <h1>Sổ Migrate</h1>
+    <p style="color:var(--chu2);font-size:16.5px;max-width:66ch">
+      Mỗi lần đưa một repo lên chuẩn để lại đúng một hồ sơ ở đây, cùng một khuôn. Việc này xảy ra
+      thưa, nên nếu không ghi thì <strong>cả người lẫn AI đều quên sạch</strong> — quên đã làm repo
+      nào, ngày nào, bằng bản khung nào, và còn treo câu hỏi gì.
+    </p>
+  </header>
+  <div class="tong">
+    <div class="m"><span class="nhan">đã migrate</span><span class="gt">2</span></div>
+    <div class="m"><span class="nhan">còn treo</span><span class="gt">1</span></div>
+    <div class="m"><span class="nhan">hồ sơ mới nhất</span><span class="gt" style="font-size:16px">2026-09-03</span></div>
+  </div>
+  <article class="ho-so">
+  <header class="hs-dau">
+    <div>
+      <h2>NAV Platform V1 (chứng khoán)</h2>
+      <div class="hs-meta">2026-09-03 · bản khung <code>0.3.0</code> · nền tảng phân tích kỹ thuật · dữ liệu chứng khoán EOD · Node + Python</div>
+    </div>
+    <span class="den xanh" title="cổng đóng phiên"></span>
+  </header>
+  <div class="hs-o">
+    <div class="o"><b>1 → <strong>3</strong></b><span>mức đạt chuẩn</span></div>
+    <div class="o"><b>9</b><span>lỗi bộ khung tìm ra</span></div>
+    <div class="o"><b>xanh</b><span>cổng đóng phiên</span></div>
+    <div class="o"><b>đã đóng</b><span>kết quả</span></div>
+  </div>
+  <div class="hs-do"><span>trước:</span> thả 7 · viết 9 · soi 0 &nbsp;·&nbsp; <span>sau:</span> thả 0 · viết 0 · soi 0</div>
+  <div class="hs-than"><h3>Trạng thái mới nhất</h3>
+<p><strong>Đã đóng — cổng XANH TOÀN BỘ.</strong> Mức 1 → <strong>mức 3</strong>, nợ về 0.</p>
+<p>Đức chốt ngày 03/09: dọn nợ QA. Hoá ra là <strong>hai việc khác hẳn nhau</strong>:</p>
+<ul><li><code>calendar-bootstrap</code> trỏ vào <code>app/index.html</code>, nhưng file đã đổi tên thành</li></ul>
+<p>  <code>app/NAV Dashboard.html</code> từ commit <code>d4b3cfb3</code>. Sửa đường dẫn — đạt ngay.</p>
+<ul><li>5 test <code>R01 V2</code> <strong>đỏ ngay tại commit sinh ra chúng</strong> (<code>4841ba92</code>). Chúng chưa từng bảo vệ</li></ul>
+<p>  điều gì; đó là đặc tả mong muốn commit vào lúc tính năng chưa xong.</p>
+<p>Không xoá (mất ý định), không để đỏ triền miên (người ta thôi đọc suite). Cho vào danh sách <strong>miễn trừ CÓ HẠN</strong>: lý do · người chốt · hạn 2026-12-02. Quá hạn là đỏ trở lại; đạt rồi thì suite tự báo để xoá khỏi danh sách.</p>
+<p><code>npm test</code> nay xanh: <strong>127/132 PASS + 5 nợ đã khai</strong>.</p>
+<h3>Báo cáo đầy đủ</h3>
+<p><code>drafts/MIGRATE-REPORT-NAV.md</code> trong chính repo đó — 9 lỗi của bộ khung, mỗi lỗi kèm lệnh tái hiện.</p>
+<p>Bốn lỗi NẶNG đáng nhớ:</p>
+<ul><li>Bảng máy sinh <strong>không bao giờ &quot;tươi&quot; được</strong>, nên cổng đỏ vĩnh viễn.</li><li>Sai hoa thường lọt qua trên Windows — <strong>đã vá giữa phiên</strong>.</li><li>Trả quyền xong là phép kiểm &quot;Test xanh&quot; <strong>tự chuyển sang XANH</strong> — xanh vì rỗng.</li><li>Quy trình đòi cổng xanh nhưng cấm dọn thứ làm cổng đỏ.</li></ul>
+<h3>Câu hỏi mở</h3>
+<ul><li>~~Bộ QA cũ: dọn hay để nguyên?~~ <strong>Đức chốt 03/09: dọn. Đã xong.</strong></li><li>Repo dùng nhiều nhánh; nhánh <code>main</code> trên máy đã rẽ khỏi <code>origin/main</code>.</li><li>Miễn trừ hết hạn <strong>2026-12-02</strong> — tới đó hoặc R01 V2 làm xong, hoặc phải gia hạn có lý do.</li></ul></div>
+  <div class="hs-chan">hồ sơ: <code>docs/migrations/2026-09-03-nav-platform.md</code> &nbsp;·&nbsp; repo: <code>C:\WORKING ZONE\Đầu tư Chứng khoán\nav_platform_main</code></div>
+</article>
+<article class="ho-so">
+  <header class="hs-dau">
+    <div>
+      <h2>Project 3 AI Agent Unify</h2>
+      <div class="hs-meta">2026-09-03 · bản khung <code>0.3.0</code> · điều phối nhiều AI · chủ yếu Python · trước đó tự có một bộ chuẩn đời cũ</div>
+    </div>
+    <span class="den vang" title="cổng đóng phiên"></span>
+  </header>
+  <div class="hs-o">
+    <div class="o"><b>1 → <strong>3</strong></b><span>mức đạt chuẩn</span></div>
+    <div class="o"><b>8</b><span>lỗi bộ khung tìm ra</span></div>
+    <div class="o"><b>chưa chạy</b><span>cổng đóng phiên</span></div>
+    <div class="o"><b>đã đóng phần làm được</b><span>kết quả</span></div>
+  </div>
+  <div class="hs-do"><span>trước:</span> thả 7 · viết 12 · soi 0 &nbsp;·&nbsp; <span>sau:</span> thả 0 · viết 0 · soi 0</div>
+  <div class="hs-than"><h3>Trạng thái mới nhất</h3>
+<p>Mức 1 → <strong>mức 3</strong>, nợ về 0. Repo này <strong>không hề có <code>package.json</code></strong> trước đó — nó là repo Python — nên đây là lần đầu bộ khung chạm một repo khác nghề thật sự.</p>
+<p><strong>Cổng: 9 XANH, 1 BỎ.</strong> Không mục nào đỏ. Mục BỎ là &quot;Nhãn lane trong commit&quot;: repo đang ở nhánh tính năng <code>codex/antigravity-operating-protocol-hooks</code>, nên không có mốc <code>origin/main</code> để so. Cổng nói thẳng <strong>&quot;chưa đủ bằng chứng&quot;</strong> thay vì báo xanh — đúng như thiết kế.</p>
+<p>Đức chốt 03/09: <strong>giữ một bộ chuẩn duy nhất</strong>. Đã gỡ <code>packages/universal-project-template-v1.0/</code> (71 file). Không mất gì độc nhất — file duy nhất có sửa-chưa-commit trong đó tự khai ở dòng đầu là <strong>mirror</strong>, bản thật ở <code>.agents/</code> gốc repo còn nguyên.</p>
+<p>Đã khai 22 file của bộ khung vào Bản đồ file. Việc này từng bị chặn vì một phiên Codex đang sửa dở <code>AGENTS.md</code>; giải bằng cách cất gọn thay đổi của họ ra, commit phần của mình, rồi trả lại — <strong>không cuốn theo một dòng nào của họ</strong>.</p>
+<h3>Báo cáo đầy đủ</h3>
+<p><code>drafts/MIGRATE-REPORT-3AI.md</code> trong chính repo đó — 8 lỗi, 5 chỗ quy trình viết sai, 9 khoản nợ của repo đích.</p>
+<p>Ba lỗi NẶNG đáng nhớ:</p>
+<ul><li>Suite hạt giống <strong>mâu thuẫn với chính quy trình</strong>: quy trình bảo để <code>bootstrap.blocking</code> rỗng</li></ul>
+<p>  vì repo mới migrate sẽ đỏ, còn suite lại khẳng định cứng &quot;0 đỏ&quot;. Hai cửa đo cùng một thứ, hai   kết quả.</p>
+<ul><li><code>units.marker</code> <strong>bắt buộc phải là JSON</strong> mà không tài liệu nào nói. Khai một file <code>.md</code> thì</li></ul>
+<p>  bộ sinh bảng <strong>chết</strong>, còn cổng cấu trúc thì không — hai công cụ nói hai đằng.</p>
+<ul><li>Cổng đóng cứng <code>origin/main</code>, trong khi repo này làm việc theo nhánh tính năng.</li></ul>
+<h3>Câu hỏi mở</h3>
+<ul><li>~~Giữ cả hai bộ chuẩn hay bỏ bộ cũ?~~ <strong>Đức chốt 03/09: bỏ bộ cũ. Đã gỡ.</strong></li><li><code>guidelines/</code> <strong>giữ nguyên, cố ý</strong>: <code>dashboard/dashboard_parser.py</code> dòng 2268 đọc thật</li></ul>
+<p>  <code>guidelines/AI_HOOK_MAP.md</code>. Gỡ cả thư mục là làm hỏng code đang chạy.</p>
+<ul><li>⚠️ <strong>Việc cho phiên đang làm Antigravity SSOT:</strong> <code>scripts/p003_antigravity_protocol_ssot.py</code></li></ul>
+<p>  dòng 26 vẫn trỏ tới thư mục vừa gỡ làm đích mirror. Tôi <strong>không sửa file đó</strong> — việc đang dở   của phiên khác.</p>
+<ul><li>Cổng chỉ đóng trọn vẹn được khi repo về nhánh chính.</li></ul></div>
+  <div class="hs-chan">hồ sơ: <code>docs/migrations/2026-09-03-project-3ai.md</code> &nbsp;·&nbsp; repo: <code>C:\WORKING ZONE\Project 3 AI Agent Unify</code></div>
+</article>
+  <footer>
+    <span>sinh ngày 2026-09-04 — không gõ tay</span>
+    <span>nguồn: docs/migrations/</span>
+  </footer>
+</div>
