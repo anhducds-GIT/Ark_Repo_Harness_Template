@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `d3595c7` (2026-09-04). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `02f86fb` (2026-09-04). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
 1. **Việc ưu tiên #1** — **_root** — Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa) · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-04 @ `d3595c7` · [HANDOFF.md](HANDOFF.md)
+2. **Phiên gần nhất** — 2026-09-04 @ `02f86fb` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 
@@ -15,7 +15,7 @@ Trang được sinh tại commit `d3595c7` (2026-09-04). Đây là lúc sinh tra
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.2.18 | active | 0 | 9 | 2026-09-03 @ `4550171` — npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề ([bằng chứng](docs/migrations/2026-09-03-nav-platform.md)) | CÓ (23 commit) | v1.2.17: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.2.20 | active | 0 | 9 | 2026-09-03 @ `4550171` — npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề ([bằng chứng](docs/migrations/2026-09-03-nav-platform.md)) | CÓ (24 commit) | v1.2.17: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 
