@@ -474,3 +474,42 @@ sửa `session-check.mjs`.
    và `docs/BAO-TRI-DINH-KY.md` còn dẫn người đọc chạy `npm run overview -- <file.html>` rồi mở
    file tạm — cách dùng của thời bảng chưa vào repo. Ba chỗ nay trỏ thẳng tới
    `DASHBOARD-Ark-Repo-Harness.html` ở gốc. **Việc cần Đức: không có.**
+
+ - **2026-09-04 · `claude-exec-promoteA` · CHẶNG A của gói Assistant** — Đưa hai lệnh của vai
+   điều phối vào bộ khung ở bản **portable**: `scripts/state-check.mjs` (cổng nhất quán trạng
+   thái, chạy trước khi báo cáo) và `scripts/what-next.mjs` (bản đồ việc: song song được gì · ai
+   giữ gì · chờ ai chốt gì). Kèm `tests/assistant-smoke.mjs` — **52 phép kiểm, xanh**, và **11
+   đột biến thử phá đều bị bắt đúng khẳng định, 0 lượt thoát**.
+   **Đã bóc:** mọi mã việc riêng của repo cũ, mọi tên gói cụ thể, và mọi tên khoá vùng đóng cứng.
+   Ba chỗ sửa thật, không phải đổi tên chuỗi: `stewardOf(...) || "_root"` là **mã chết** (hàm đó
+   không bao giờ trả rỗng) nên xoá, không thêm một trường cấu hình thứ hai · `units.rootDir ||
+   "workers"` nay trả rỗng vì lý do ĐÚNG khi repo không khai đơn vị con · tên người chốt đọc từ
+   `repo.owner`, thiếu thì mục C nói thẳng **KHÔNG LỌC ĐƯỢC** chứ không im lặng in danh sách rỗng.
+   **Hai defect chỉ fixture repo bắt được, không phép kiểm đơn vị nào thấy:** (1) `generatorsFrom`
+   NÉM khi `generators` rỗng, nên cả lệnh chết với mã thoát 1 — tức nó **báo có sai lệch** trong
+   khi thật ra chưa nhìn được gì; nay bọc lại thành `UNKNOWN`. (2) Sổ nợ chỉ được tìm trong cây
+   đơn vị con, nên ở repo khai vùng theo **thư mục** mà không có đơn vị con nào thì mọi sổ nợ vô
+   hình và bản đồ luôn nói "không có việc nào" — sai vì một lý do không ai nhìn ra được.
+   **Giữ nguyên hai điểm bắt buộc:** `UNKNOWN` là trạng thái riêng (mã thoát 2, không gộp vào
+   `OK`), và cấm tự sửa — ghim bằng **cấu trúc**: danh sách trắng git chỉ-đọc, đúng một chỗ gọi
+   `git`, và đúng một tiến trình con trong cả file (phép đếm đó là thứ chặn được lối đi vòng qua
+   danh sách trắng).
+   **Fixture repo cố tình khác hẳn** và cả hai lệnh chạy được ngay: tên vùng khác (`_luat` ·
+   `_may` · `_bangchung`, **không** có tên vùng của repo nhà), không đơn vị con, không sổ ý tưởng,
+   không sổ nợ ở gốc, không `STATUS.md`, và **không có remote** — ca cuối ra `UNKNOWN` mã thoát 2,
+   đúng yêu cầu, không ra `OK`.
+   **CHẶNG B CHƯA CHẠM MỘT DÒNG NÀO** (chờ Đức nói riêng): `template/` · sổ phát hành · số bản ·
+   `CHANGELOG.md` · đổi quan hệ hai repo — tất cả nguyên vẹn, `build-template.mjs --check` vẫn
+   nói "khớp bản gốc, 22 file, bản 1.2.20 khớp sổ phát hành".
+   **CÒN TREO, CẦN ĐỨC:** ba việc cuối của chặng A đều nằm ở khoá `_root`, mà `_root` đang có chủ
+   khác và phiên đó vẫn đang commit — nên chỉ đọc, không chạm. Ba việc đó là: khai suite mới vào
+   `scripts.test` của `package.json` (không khai thì phép kiểm mới **không hề chạy** trong cổng
+   đóng phiên lẫn cổng trên GitHub) · thêm hai dòng lệnh `state-check` và `what-next` vào
+   `package.json` (đây chính là cách bảng của bộ khung tự khai một thành phần — bảng đọc thẳng
+   danh sách lệnh, nên **không phải sửa bộ sinh nào**) · thêm hai dòng vào bản đồ file của mục 6.
+   **Và một câu chỉ Đức trả lời được, đã đo chứ không đoán:** đưa gói vào `template/` **không tách
+   được** khỏi việc cắt một bản mới. Dấu vân tay tầng máy đổi từ `a4dad42424aebb9b` sang
+   `9a62d96b8a1a3e5b`, số mới đó chưa có trong sổ phát hành, nên bộ kiểm sẽ đỏ và cách sửa duy
+   nhất công cụ đưa ra là tăng số bản. Vì vậy phép thử cuối của đề bài — dựng repo mới từ bộ khung
+   rồi chạy `state-check` ở đó — **chưa đạt được ở chặng A**: repo mới hiện nhận 6 lệnh, không có
+   gói này. Đã dựng thử một repo mới để xác nhận, không suy luận.
