@@ -671,4 +671,48 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   ok("secret: file nhị phân là câu trả lời, file văn bản chưa soi được vẫn là dấu hỏi");
 }
 
+/* ---- safe-push: detached HEAD thi TU CHOI ------------------------------- */
+{
+  // v1.2.9 viet `nhanhHienTai !== "HEAD" ? nhanhHienTai : "main"`, tuc dung o detached HEAD la
+  // cong cu LANG LE nham `main` roi day `HEAD:main`. Do dung la cu HOP NHAT ma luat muc 2 bat
+  // phai hoi Duc — toi bang duong TAI NAN, khong ai chon.
+  //
+  // Va no TE HON ban truoc v1.2.9: hoi do co mot cau `if` chan moi thu khong phai `main`; cai
+  // lui-ve-mac-dinh nay xoa mat cau do.
+  const cha = mkdtempSync(join(tmpdir(), "detached-"));
+  const kho = join(cha, "kho");
+  const bare = join(cha, "bare.git");
+  try {
+    execFileSync("git", ["init", "-q", "--bare", bare], { encoding: "utf8" });
+    mkdirSync(kho, { recursive: true });
+    const at = (...a) => execFileSync("git", a, { cwd: kho, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(kho, "scripts"), { recursive: true });
+    mkdirSync(join(kho, ".agents"), { recursive: true });
+    for (const name of ["safe-push.mjs", "repo-structure.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    writeFileSync(join(kho, "a.txt"), "hi", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");
+    at("remote", "add", "origin", bare);
+    at("push", "-q", "-u", "origin", "main");
+    writeFileSync(join(kho, "b.txt"), "hai", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "hai\n\nLane: thu");
+
+    const mainTruoc = String(execFileSync("git", ["rev-parse", "refs/heads/main"], { cwd: bare, encoding: "utf8" })).trim();
+    at("checkout", "-q", "--detach", "HEAD");
+    const r = spawnSync(process.execPath, [join(kho, "scripts", "safe-push.mjs"), "--as", "thu"], { cwd: kho, encoding: "utf8" });
+    const out = String(r.stdout || "") + String(r.stderr || "");
+    assert.notEqual(r.status, 0, "detached HEAD thi phai TU CHOI, khong duoc lui ve main");
+    assert.match(out, /detached HEAD/, "phai noi ro vi sao");
+    assert.doesNotMatch(out, /SẮP ĐẨY LÊN origin\/main/, "khong duoc nham main");
+    assert.equal(String(execFileSync("git", ["rev-parse", "refs/heads/main"], { cwd: bare, encoding: "utf8" })).trim(),
+      mainTruoc, "main tren remote PHAI y nguyen — day khong phai chuyen 'tien tay'");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("safe-push: detached HEAD → từ chối, không lùi về main");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

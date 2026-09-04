@@ -3,6 +3,37 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.15 — 2026-09-04 — Detached HEAD thôi lùi về `main`, và giành vùng có đường máy
+
+Hai lỗ, cùng một kiểu: **một mặc định "cho tiện" thay chỗ một câu từ chối.**
+
+**P1 — `detached HEAD` lặng lẽ hoá thành `main`.** v1.2.9 viết
+`nhanhHienTai !== "HEAD" ? nhanhHienTai : "main"`, nên đứng ở detached HEAD là công cụ nhắm
+`main` rồi đẩy `HEAD:main` — đúng cú **hợp nhất** mà luật mục 2 bắt phải hỏi Đức, tới bằng đường
+**tai nạn**. Và nó **tệ hơn bản trước v1.2.9**: hồi đó có một câu `if` chặn mọi thứ không phải
+`main`; cái lùi-về-mặc-định đã xoá mất câu đó. Đã dựng lại được: clone rồi `checkout --detach`,
+công cụ chạy tiếp bình thường. Nay TỪ CHỐI — detached HEAD nghĩa là không có nhánh nào đang
+đứng, nên "nhánh đích bằng nhánh đang đứng" mất nghĩa, và câu trả lời đúng là dừng.
+
+**P2 — giành vùng chỉ có đường tay.** Lệnh chỉ biết từ chối, nên khi Đức đã chốt thì cách duy
+nhất là **sửa tay `claims.json`** — và sửa tay thì câu chốt **không đi vào bảng**, chỉ nằm trong
+đầu người sửa. Người cần đọc nó là phiên **vừa bị mất vùng**, mà họ chỉ đọc bảng.
+
+Nay có `--duc-duyet "<câu chốt>"`, và câu đó ghi thẳng vào bảng (`taken_from` · `taken_by` ·
+`duc_decision`).
+
+**Và một cửa nữa, trả bằng tiền thật:** vùng còn **file sửa dở của chủ cũ** thì **không giành
+được, kể cả khi Đức đã chốt**. Câu chốt của Đức nói *"vùng này chuyển tay"*, nó **không** nói
+*"được đè lên file người ta đang sửa"*. Giá đã trả hôm 04/09: sau một lượt giành vùng,
+`git add <file>` cuốn theo hai dòng `AGENTS.md` của phiên khác — nội dung không mất, nhưng
+**nhãn lane ghi sai người làm**, mà nhãn lane là thứ cả cơ chế này dựa vào.
+
+Chặn ở lúc **giành**, không phải lúc commit: tới lúc commit thì người ta đã tin mình có quyền rồi.
+Không đo được vùng có sạch không → **từ chối**, không coi là sạch.
+
+Có đối chứng dương cho cả hai: vùng sạch thì giành được bình thường, và file dở ở **vùng khác**
+không bị chặn oan. Đột biến ngược 5/5.
+
 ## 1.2.14 — 2026-09-04 — "Là file nhị phân" là một câu trả lời, không phải một dấu hỏi
 
 Phép kiểm secret gộp **ba lý do** vào một rổ "không kiểm được": đọc lỗi · quá lớn · **nhị phân**.

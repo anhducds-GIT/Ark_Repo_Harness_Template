@@ -18,9 +18,12 @@
  *   node scripts/claim.mjs --list
  *   node scripts/claim.mjs --take <khoá> --as <phiên> --task "một câu" [--ai Codex]
  *   node scripts/claim.mjs --release <khoá> --as <phiên> [--task "một câu"]
+ *   node scripts/claim.mjs --take <khoá> --as <phiên> --task "…" --duc-duyet "<câu chốt của Đức>"
+ *       ↑ giành vùng người khác đang giữ. Đòi câu chốt, và TỪ CHỐI nếu vùng đó còn file sửa dở.
  *
  * Mã thoát:  0 xong · 2 dùng sai · 3 TỪ CHỐI (đã có chủ khác / không phải chủ) · 4 bị ghi đè
  */
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,7 +48,7 @@ export function readClaims(file = CLAIMS_FILE) {
 }
 
 /* Quyết định THUẦN — tách khỏi việc đọc/ghi để kiểm được mọi nhánh mà không cần đĩa. */
-export function decide(claims, { action, key, as, today, ai }) {
+export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty }) {
   if (!Object.prototype.hasOwnProperty.call(claims, key)) {
     return {
       code: EXIT.MISUSE,
@@ -58,11 +61,44 @@ export function decide(claims, { action, key, as, today, ai }) {
 
   if (action === "take") {
     if (owner && owner !== as) {
+      /* GIÀNH VÙNG NGƯỜI KHÁC: có đường máy, và đường đó ĐÒI CÂU CHỐT CỦA ĐỨC.
+       *
+       * Trước đây lệnh chỉ biết từ chối, nên khi Đức đã chốt thì cách duy nhất là **sửa tay**
+       * `claims.json` — và sửa tay thì câu chốt không đi vào bảng, chỉ nằm trong đầu người sửa.
+       * Người cần đọc câu đó là phiên vừa BỊ mất vùng, mà họ chỉ đọc bảng chứ không đọc lịch sử
+       * chat. Đo thật 04/09: một lượt giành vùng phải làm bằng tay đúng vì thiếu đường này. */
+      if (typeof ducDuyet !== "string" || ducDuyet.trim().length < 10) {
+        return {
+          code: EXIT.REFUSED,
+          message: `TU_CHOI: "${key}" đang do "${owner}" giữ, không phải bạn.`
+            + `\nGhi chú của họ: ${String(cur.task || "(không có)").slice(0, 160)}`
+            + "\nLuật mục 1: gói có chủ mà chủ không phải bạn thì CHỈ ĐƯỢC ĐỌC. Muốn giành thì hỏi Đức."
+            + "\nĐức chốt rồi thì chạy lại kèm:  --duc-duyet \"<câu chốt của Đức>\""
+            + "\nCâu đó được ghi VÀO BẢNG, không phải in ra màn hình — người cần đọc nó là phiên vừa mất vùng."
+        };
+      }
+      /* VÙNG CÒN VIỆC DỞ CỦA CHỦ CŨ THÌ KHÔNG GIÀNH ĐƯỢC, kể cả khi Đức đã chốt.
+       *
+       * Câu chốt của Đức nói "vùng này chuyển tay", nó KHÔNG nói "được đè lên file người ta đang
+       * sửa". Đo thật 04/09, và cái giá đã trả: sau một lượt giành vùng, `git add <file>` cuốn
+       * theo hai dòng `AGENTS.md` của phiên khác đang sửa dở — nội dung không mất, nhưng nhãn
+       * lane ghi sai người làm, mà nhãn lane là thứ cả cơ chế này dựa vào.
+       *
+       * Chặn ở đây, không phải ở lúc commit: lúc commit thì người ta đã tin mình có quyền rồi. */
+      if (Array.isArray(dirty) && dirty.length) {
+        return {
+          code: EXIT.REFUSED,
+          message: `TU_CHOI: "${key}" đang do "${owner}" giữ, và vùng đó CÒN ${dirty.length} file sửa dở:`
+            + `\n  ${dirty.slice(0, 8).join("\n  ")}${dirty.length > 8 ? `\n  … và ${dirty.length - 8} file nữa` : ""}`
+            + "\nĐức chốt việc CHUYỂN VÙNG, không chốt việc đè lên file người ta đang sửa."
+            + "\nCách xử lý: nhờ phiên đó commit (hoặc stash) phần của họ trước, rồi chạy lại."
+        };
+      }
       return {
-        code: EXIT.REFUSED,
-        message: `TU_CHOI: "${key}" đang do "${owner}" giữ, không phải bạn.`
-          + `\nGhi chú của họ: ${String(cur.task || "(không có)").slice(0, 160)}`
-          + "\nLuật mục 1: gói có chủ mà chủ không phải bạn thì CHỈ ĐƯỢC ĐỌC. Muốn giành thì hỏi Đức."
+        code: EXIT.OK,
+        giành: owner,
+        next: { ...cur, owner: as, ai: ai ?? null, claimed_at: today, released_at: null,
+          taken_from: owner, taken_by: as, duc_decision: ducDuyet.trim() }
       };
     }
     // Đã là của mình rồi thì không phải lỗi — chạy lại lệnh cùng nội dung phải an toàn.
@@ -91,7 +127,7 @@ export function decide(claims, { action, key, as, today, ai }) {
   return { code: EXIT.MISUSE, message: `HANH_DONG_LA: "${action}"` };
 }
 
-function main() {
+async function main() {
   const argv = process.argv.slice(2);
   const flag = (name) => {
     const i = argv.indexOf(`--${name}`);
@@ -167,7 +203,33 @@ function main() {
   process.on("exit", nhaKhoa);
 
   const today = new Date().toISOString().slice(0, 10);
-  const verdict = decide(parsed.claims, { action, key, as, today, ai: flag("ai") });
+
+  /* File sửa dở NẰM TRONG vùng sắp giành. Chỉ tính khi thật sự đi giành vùng người khác —
+     `git status` trên repo lớn không rẻ, và nhận một vùng trống thì không có gì để canh. */
+  const dangGianh = action === "take" && parsed.claims[key]?.owner && parsed.claims[key].owner !== as;
+  let dirty = [];
+  if (dangGianh) {
+    try {
+      const { stewardOf, claimPrefixesFrom, readStructureFromDisk } = await import("./repo-structure.mjs");
+      const cauTruc = readStructureFromDisk(ROOT);
+      const tienTo = claimPrefixesFrom(cauTruc);
+      dirty = execFileSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: ROOT, encoding: "utf8" })
+        .split(String.fromCharCode(10)).filter(Boolean)
+        .map((d) => d.slice(3).replace(/^"|"$/g, ""))
+        // File bảng quyền là thứ lệnh này SẮP ghi — nó luôn "dở" trong lúc chạy, và tính nó vào
+        // là tự chặn chính mình mãi mãi.
+        .filter((f) => f !== ".agents/claims.json")
+        .filter((f) => stewardOf(f, cauTruc, tienTo) === key);
+    } catch (e) {
+      // Không đo được thì KHÔNG ĐƯỢC coi là "vùng sạch" — đó là fail-open, và giành vùng là
+      // thao tác không lùi lại được.
+      console.error(`KHONG_DO_DUOC_VIEC_DO: ${String(e.message).split(String.fromCharCode(10))[0]}`);
+      console.error("Không biết vùng đó có file sửa dở hay không thì không được giành. Sửa lỗi trên rồi chạy lại.");
+      process.exit(EXIT.REFUSED);
+    }
+  }
+
+  const verdict = decide(parsed.claims, { action, key, as, today, ai: flag("ai"), ducDuyet: flag("duc-duyet"), dirty });
   if (verdict.code !== EXIT.OK) { console.error(verdict.message); process.exit(verdict.code); }
 
   parsed.claims[key] = typeof task === "string" ? { ...verdict.next, task } : verdict.next;
@@ -182,7 +244,7 @@ function main() {
     process.exit(EXIT.CLOBBERED);
   }
 
-  const verb = action === "take" ? (verdict.already ? "vẫn đang giữ" : "đã nhận") : "đã trả";
+  const verb = action === "take" ? (verdict.giành ? `đã GIÀNH từ "${verdict.giành}"` : verdict.already ? "vẫn đang giữ" : "đã nhận") : "đã trả";
   console.log(`${verb}: ${key}${action === "take" ? ` → ${as}` : ""}`);
   process.exit(EXIT.OK);
 }

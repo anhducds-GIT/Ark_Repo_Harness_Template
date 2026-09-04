@@ -53,7 +53,24 @@ const gitQuiet = (...a) => { try { return git(...a); } catch { return ""; } };
  * Nhánh CHƯA có upstream thì TỪ CHỐI: tạo một nhánh mới trên remote là công bố một thứ MỚI,
  * không phải cập nhật thứ đã có — việc đó là của người. */
 const nhanhHienTai = gitQuiet("rev-parse", "--abbrev-ref", "HEAD").trim();
-const NHANH = nhanhHienTai && nhanhHienTai !== "HEAD" ? nhanhHienTai : "main";
+
+/* DETACHED HEAD THÌ TỪ CHỐI — không được lùi về `main`.
+ *
+ * Bản v1.2.9 viết `nhanhHienTai !== "HEAD" ? nhanhHienTai : "main"`, tức đứng ở detached HEAD là
+ * công cụ **lặng lẽ nhắm `main`** rồi đẩy `HEAD:main`. Đó đúng là cú HỢP NHẤT mà luật mục 2 bắt
+ * phải hỏi Đức — tới bằng đường tai nạn, không ai chọn. Và nó tệ hơn bản trước v1.2.9: hồi đó có
+ * một câu `if` chặn mọi thứ không phải `main`; cái lùi-về-mặc-định này xoá mất câu đó.
+ *
+ * Detached HEAD nghĩa là KHÔNG CÓ nhánh nào đang đứng. "Nhánh đích bằng nhánh đang đứng" mất
+ * nghĩa, nên câu trả lời đúng là DỪNG, không phải đoán một cái tên. */
+if (!nhanhHienTai || nhanhHienTai === "HEAD") {
+  console.error(String.fromCharCode(10) + "TU_CHOI: đang ở detached HEAD — không đứng trên nhánh nào.");
+  console.error("Công cụ này đẩy lên ĐÚNG nhánh bạn đang đứng, mà ở đây không có nhánh nào để đẩy lên.");
+  console.error("Lùi về `main` cho tiện là biến một tai nạn thành một cú HỢP NHẤT — luật mục 2 bắt hỏi Đức.");
+  console.error("Cách xử lý: `git checkout <nhánh>` rồi chạy lại." + String.fromCharCode(10));
+  process.exit(1);
+}
+const NHANH = nhanhHienTai;
 const upstream = gitQuiet("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}").trim();
 if (NHANH !== "main" && upstream !== "origin/" + NHANH) {
   console.error(String.fromCharCode(10) + `TU_CHOI: nhánh "${NHANH}" chưa có nhánh tương ứng trên remote.`);

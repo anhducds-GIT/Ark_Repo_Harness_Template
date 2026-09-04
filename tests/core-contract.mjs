@@ -326,4 +326,69 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok("F10 · phép kiểm bỏ qua vùng chỉ-thêm, và nói ra — nhưng vùng rw thì vẫn soi");
 }
 
+/* ---- F11. Gianh vung: doi cau chot, va tu choi khi vung con viec do ------ */
+{
+  // Truoc day lenh CHI biet tu choi, nen khi Duc da chot thi cach duy nhat la SUA TAY claims.json
+  // — va sua tay thi cau chot khong di vao bang, chi nam trong dau nguoi sua. Nguoi can doc cau
+  // do la phien vua BI mat vung, ma ho chi doc bang.
+  //
+  // Va cai gia da tra that (04/09): sau mot luot gianh vung, `git add <file>` cuon theo hai dong
+  // AGENTS.md cua phien khac dang sua do. Noi dung khong mat, nhung NHAN LANE ghi sai nguoi lam —
+  // ma nhan lane la thu ca co che nay dua vao.
+  const cha = mkdtempSync(join(tmpdir(), "gianh-vung-"));
+  try {
+    const g = (...a) => execFileSync("git", a, { cwd: cha, encoding: "utf8" });
+    g("init", "-q", "-b", "main");
+    g("config", "user.name", "t"); g("config", "user.email", "t@e.invalid");
+    mkdirSync(join(cha, "scripts"), { recursive: true });
+    mkdirSync(join(cha, ".agents"), { recursive: true });
+    mkdirSync(join(cha, "docs"), { recursive: true });
+    for (const f of ["claim.mjs", "repo-structure.mjs"]) cpSync(join(ROOT, "scripts", f), join(cha, "scripts", f));
+    cpSync(join(ROOT, ".repo-structure.json"), join(cha, ".repo-structure.json"));
+    const bang = join(cha, ".agents", "claims.json");
+    const dat = () => writeFileSync(bang, JSON.stringify({ claims: {
+      _root: { owner: "phien-cu", ai: "Codex", task: "dang lam do", released_at: null },
+      _docs: { owner: "phien-cu", ai: "Codex", task: "dang lam do", released_at: null }
+    } }, null, 2), "utf8");
+    dat();
+    writeFileSync(join(cha, "a.txt"), "x", "utf8");
+    g("add", "-A"); g("commit", "-q", "-m", "mot");
+
+    const chay = (...co) => {
+      const r = spawnSync(process.execPath, [join(cha, "scripts", "claim.mjs"), ...co], { cwd: cha, encoding: "utf8" });
+      return { ...r, out: String(r.stdout || "") + String(r.stderr || "") };
+    };
+    const doc = (k) => JSON.parse(readFileSync(bang, "utf8")).claims[k];
+
+    // (a) Khong co cau chot -> van TU CHOI, y nhu cu.
+    const a = chay("--take", "_docs", "--as", "toi", "--task", "t");
+    assert.notEqual(a.status, 0, "khong co cau chot thi van phai TU CHOI");
+    assert.match(a.out, /--duc-duyet/, "phai chi ra duong hop le, khong de nguoi ta di sua tay");
+    assert.equal(doc("_docs").owner, "phien-cu", "tu choi thi bang KHONG duoc doi");
+
+    // (b) Co cau chot, vung SACH -> gianh duoc, va cau chot ghi VAO BANG.
+    const cauChot = "Duc chot 2026-09-04: lay lai vung nay di";
+    const b = chay("--take", "_docs", "--as", "toi", "--task", "t", "--duc-duyet", cauChot);
+    assert.equal(b.status, 0, `vung sach + co cau chot thi phai gianh duoc: ${b.out.slice(0, 300)}`);
+    const sau = doc("_docs");
+    assert.equal(sau.owner, "toi");
+    assert.equal(sau.taken_from, "phien-cu", "phai ghi lai gianh cua AI");
+    assert.equal(sau.duc_decision, cauChot, "cau chot phai nam TRONG BANG, khong chi in ra man hinh");
+
+    // (c) Vung con FILE SUA DO cua chu cu -> TU CHOI, ke ca khi Duc da chot.
+    dat();
+    writeFileSync(join(cha, "docs", "cua-ho.md"), "ho dang sua do", "utf8");
+    const c = chay("--take", "_docs", "--as", "toi", "--task", "t", "--duc-duyet", cauChot);
+    assert.notEqual(c.status, 0, "vung con viec do thi phai TU CHOI du Duc da chot");
+    assert.match(c.out, /sửa dở/, "phai noi ro vi sao, va ke ten file");
+    assert.match(c.out, /cua-ho\.md/, "phai ke dung file dang vuong");
+    assert.equal(doc("_docs").owner, "phien-cu", "tu choi thi bang KHONG duoc doi");
+
+    // (d) DOI CHUNG: file su do o vung KHAC thi khong duoc chan oan.
+    const d = chay("--take", "_root", "--as", "toi", "--task", "t", "--duc-duyet", cauChot);
+    assert.equal(d.status, 0, `file do nam o vung khac thi khong duoc chan oan: ${d.out.slice(0, 300)}`);
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("F11 · giành vùng: đòi câu chốt · ghi vào bảng · từ chối khi vùng còn việc dở · không chặn oan vùng khác");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

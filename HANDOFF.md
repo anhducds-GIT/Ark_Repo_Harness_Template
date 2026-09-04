@@ -331,3 +331,20 @@ sửa `session-check.mjs`.
    Và cổng vừa bắt chính tôi: bản ghi v1.2.14 đầu tiên tôi **sửa dòng Log cũ** thay vì thêm dòng
    mới — Log chỉ được THÊM. Đã khôi phục dòng cũ và ghi thành một dòng riêng.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.15 (FINAL-CLOSURE P1+P2)** — Hai lỗ cùng một kiểu: **một
+   mặc định "cho tiện" thay chỗ một câu từ chối.**
+   **P1:** v1.2.9 viết `nhanhHienTai !== "HEAD" ? nhanhHienTai : "main"`, nên `detached HEAD` lặng
+   lẽ hoá thành `main` rồi đẩy `HEAD:main` — đúng cú HỢP NHẤT mà luật mục 2 bắt hỏi Đức, tới bằng
+   đường **tai nạn**. Và nó **tệ hơn bản trước v1.2.9**: hồi đó có câu `if` chặn mọi thứ không phải
+   `main`; cái lùi-về-mặc-định xoá mất câu đó. Đã dựng lại được thật rồi vá: nay TỪ CHỐI.
+   **P2:** giành vùng chỉ có đường tay, nên câu chốt của Đức **không đi vào bảng** — mà người cần
+   đọc nó là phiên vừa MẤT vùng, và họ chỉ đọc bảng. Nay có `--duc-duyet`, ghi thẳng vào
+   `taken_from`/`taken_by`/`duc_decision`.
+   **Và cửa trả bằng tiền thật:** vùng còn **file sửa dở của chủ cũ** thì KHÔNG giành được, kể cả
+   khi Đức đã chốt. Câu chốt nói "vùng này chuyển tay", nó không nói "được đè lên file người ta
+   đang sửa". Đây chính là sự cố `AGENTS.md`/ClauCo hôm nay, nay thành luật máy. Chặn ở lúc GIÀNH,
+   không phải lúc commit — tới lúc commit thì người ta đã tin mình có quyền rồi. Không đo được thì
+   TỪ CHỐI, không coi là sạch.
+   Đối chứng dương cho cả hai: vùng sạch vẫn giành được, file dở ở vùng KHÁC không bị chặn oan.
+   Đột biến 5/5. Suite 80.
+
