@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `e594a23` (2026-09-04). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `4720527` (2026-09-04). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
 1. **Việc ưu tiên #1** — **_root** — Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa) · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-04 @ `e594a23` · [HANDOFF.md](HANDOFF.md)
+2. **Phiên gần nhất** — 2026-09-04 @ `4720527` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 
