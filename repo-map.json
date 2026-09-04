@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-04",
-  "generated_commit": "710eb6b",
+  "generated_commit": "9bdf635",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -39,7 +39,7 @@
       "superseded_by": null,
       "last_verified": "2026-09-03",
       "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
-      "open_item": "v1.2.13: cổng nay xanh được ở repo thật — thôi coi ảnh là chỗ chưa kiểm"
+      "open_item": "v1.2.14: cổng nay xanh được ở repo thật — thôi coi ảnh là chỗ chưa kiểm"
     }
   ],
   "active_work": [
