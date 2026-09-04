@@ -546,3 +546,45 @@ sửa `session-check.mjs`.
    dừng ở commit, không đẩy. Ngoài ra: `scripts/state-check.mjs` + `scripts/what-next.mjs` +
    `tests/assistant-smoke.mjs` của chặng A đã vào HEAD nhưng **chưa được khai vào `package.json`**
    (không có lệnh npm, không nằm trong `npm test`) — không phải việc của tôi, nhưng đừng để rơi.
+
+---
+
+## 2026-09-04 · `claude-multiflow` — bộ khung nay PHÁT KÈM tài liệu giải thích bốn cơ chế đa phiên
+
+**Lỗ thật, và nó là lỗ của bộ khung chứ không của repo nào:** bộ khung phát ra bốn cơ chế chống
+hai AI giẫm chân nhau (bảng chủ sở hữu · nhãn `Lane:` · cổng đóng phiên · cổng xuất bản) nhưng
+**không phát ra một dòng nào giải thích chúng**. Repo mới nhận được công cụ mà không nhận được
+lý do — và phiên AI đầu tiên thấy một chốt "trông vô dụng" sẽ dọn cho gọn. Đo được ở repo đầu
+tiên dùng bộ khung: trong một ngày, bốn lần một chốt vừa viết ra hoá ra vô tác dụng mà test vẫn
+xanh; nếu không có tài liệu nói *vì sao* thì không ai biết cái nào được phép gỡ.
+
+**Thêm `docs/protocols/MULTIFLOW.md`** (169 dòng), và khai vào cả hai bản đồ: `VERBATIM` của
+`build-template.mjs` để nó theo sang mọi repo mới, và mục 6 của `AGENTS.md` — **cả hai bản**, vì
+bộ trích thay hẳn mục 6 bằng bảng riêng cho template. Sửa một bên thì dòng đó không sang được,
+và tôi trượt đúng chỗ đó ở lần chạy đầu.
+
+**Nội dung — và ba thứ nó cố ý KHÔNG có:** không số đo, không kiểm kê chốt hiện có, không bảng
+mã lỗi. Lý do đo được: template có bộ mã lỗi riêng (`BAT_BIEN_HONG`, `DANG_BI_KHOA`,
+`BI_GHI_DE`, `CHAN_THIEU_KHAI`…) khác hẳn repo đầu tiên, nên một bảng mã chép sang sẽ **sai ngay
+từ dòng đầu**. Ba thứ đó khác nhau ở từng repo và mục nhanh hơn ai kịp sửa. Nó chỉ giữ **nguyên
+lý** (bốn cơ chế · năm bất biến kèm lý do · luật bảo trì + đột biến kiểm bắt buộc) — thứ đúng ở
+mọi repo — còn "repo NÀY đang cắm chốt nào" thì đưa câu lệnh để tự đo.
+
+**Hai lần tôi sai và bị chính bộ khung này bắt, ghi ra vì nó chứng minh cổng có răng:**
+
+1. Tôi viết thẳng vào `template/`. Cổng chặn: *"`docs/protocols/MULTIFLOW.md`: THỪA — không có
+   trong bản trích"*. `template/` là thư mục MÁY SINH; sửa ở đó thì lần sinh sau mất trắng. Đã
+   hoàn nguyên sạch rồi làm lại từ gốc.
+2. Frontmatter của tôi ghi `kind: protocol` và **thiếu `ttl_days`**. B11 gắn cờ ngay: *"không
+   chứng minh được là còn hạn thì bị tính là quá hạn — cố ý"*. Đó **đúng là bất biến ④** mà file
+   tôi vừa viết đang dạy ("không biết phải là ĐỎ"), và bộ khung đã áp nó cho tài liệu từ trước.
+   Đổi sang `kind: guide` + `ttl_days: 365` theo đúng quy ước của ba bản mẫu đã có.
+
+`npm test` **10/10 bước xanh**, kể cả ca "repo rỗng dựng từ template phải sạch cả VÀNG" — ca đó
+là ca đã bắt lỗi thứ hai của tôi.
+
+**Về khoá:** Đức chốt giành `_docs` · `_root` · `_code` từ `claude-so-migrate`. Cây làm việc lúc
+đó **sạch hoàn toàn** nên không phá việc dở của ai. Câu chốt của Đức đã được ghi **vào bảng**
+(`duc_decision`), không phải in ra màn hình — để phiên vừa mất khoá mở bảng ra là thấy vì sao.
+`claude-so-migrate` đang làm "cập nhật quy trình migrate cho khớp trang HTML mới": việc đó không
+chạm ba file tôi sửa, nhận lại khoá là làm tiếp được ngay.

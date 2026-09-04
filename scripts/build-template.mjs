@@ -46,6 +46,13 @@ const VERBATIM = [
   ["docs/_TEMPLATE-adr.md", "docs/_TEMPLATE-adr.md"],
   ["docs/_TEMPLATE-study.md", "docs/_TEMPLATE-study.md"],
   ["docs/_TEMPLATE-brief.md", "docs/_TEMPLATE-brief.md"],
+  // GIAO THỨC ĐA PHIÊN — chép nguyên văn sang mọi repo dựng từ bộ khung. Bộ khung phát ra bốn
+  // cơ chế chống hai AI giẫm chân nhau (bảng chủ sở hữu · nhãn `Lane:` · cổng đóng phiên · cổng
+  // xuất bản) nhưng trước 04/09 KHÔNG phát ra tài liệu nào giải thích chúng — nên repo mới nhận
+  // được công cụ mà không nhận được lý do, và phiên AI đầu tiên "dọn cho gọn" là mất chốt.
+  // File này cố ý KHÔNG chứa số đo, KHÔNG kiểm kê chốt hiện có, KHÔNG bảng mã lỗi: ba thứ đó
+  // khác nhau ở từng repo và mục nhanh hơn ai kịp sửa. Nó chỉ giữ nguyên lý + cách bảo trì.
+  ["docs/protocols/MULTIFLOW.md", "docs/protocols/MULTIFLOW.md"],
   // SUITE HẠT GIỐNG — MỘT bản dùng cho cả repo này lẫn mọi repo dựng từ bộ khung. Chép nguyên
   // văn chứ không nhúng thành chuỗi trong file này, vì hai lý do: nhúng một file JS vào một
   // template literal là mời gọi hỏng do backtick và `${`, và quan trọng hơn — chép nguyên văn
@@ -458,6 +465,7 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | Ghi một quyết định kiến trúc | bản mẫu [docs/_TEMPLATE-adr.md](docs/_TEMPLATE-adr.md) · luật [docs/adr/0000-…](docs/adr/0000-ghi-nhan-quyet-dinh-kien-truc.md) |
 | Viết một tài liệu nghiên cứu | [docs/_TEMPLATE-study.md](docs/_TEMPLATE-study.md) |
 | Viết đề bài cho một phiên AI | [docs/_TEMPLATE-brief.md](docs/_TEMPLATE-brief.md) |
+| **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) — bốn cơ chế (bảng chủ sở hữu · nhãn \`Lane:\` · cổng đóng phiên · cổng xuất bản), một ngày làm việc 5 bước, **năm bất biến kèm lý do từng cái**, và quy trình đổi cơ chế có **đột biến kiểm bắt buộc**. Mục 1–3 viết cho người không code. **Cố ý không chứa số đo, không kiểm kê chốt, không bảng mã lỗi** — ba thứ đó khác nhau ở từng repo và mục nhanh hơn ai kịp sửa, nên nó chỉ đưa câu lệnh để tự đo |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy \`npm run bootstrap\` |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống, chạy bằng \`npm test\` |

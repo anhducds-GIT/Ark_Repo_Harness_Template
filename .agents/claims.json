@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-so-migrate",
+      "owner": "claude-multiflow",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "so migrate thanh trang HTML co commit + gan link vao dashboard goc",
+      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
       "released_at": null,
-      "taken_from": "harness-vong2",
-      "taken_by": "claude-so-migrate",
-      "duc_decision": "Duc chot 2026-09-04: cho claude-so-migrate lay _root va _docs - phien harness-vong2 da DONG PHIEN trong HANDOFF nhung quen tra quyen."
+      "taken_from": "claude-so-migrate",
+      "taken_by": "claude-multiflow",
+      "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": "claude-so-migrate",
+      "owner": "claude-multiflow",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "cap nhat quy trinh migrate cho khop trang HTML moi",
+      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
       "released_at": null,
-      "taken_from": "harness-vong2",
-      "taken_by": "claude-so-migrate",
-      "duc_decision": "Duc chot 2026-09-04: cho claude-so-migrate lay _root va _docs - phien harness-vong2 da DONG PHIEN trong HANDOFF nhung quen tra quyen."
+      "taken_from": "claude-so-migrate",
+      "taken_by": "claude-multiflow",
+      "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-so-migrate",
+      "owner": "claude-multiflow",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "so migrate: doc tu HEAD + --check-head + phep kiem ghim",
+      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
       "released_at": null,
-      "taken_from": "claude-exec-promoteA",
-      "taken_by": "claude-so-migrate",
-      "duc_decision": "Duc chot 2026-09-04: cho claude-so-migrate gianh _code tu claude-exec-promoteA de lam so migrate HTML."
+      "taken_from": "claude-so-migrate",
+      "taken_by": "claude-multiflow",
+      "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "claude-multiflow",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "Dua MULTIFLOW.md vao bo khung — moi repo dung tu template se co san",
-      "released_at": "2026-09-04"
+      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
+      "released_at": null
     }
   }
 }
