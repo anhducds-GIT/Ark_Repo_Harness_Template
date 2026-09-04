@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-multiflow",
+      "owner": "claude-so-migrate",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
+      "task": "dong phien so migrate HTML: chay cong duoi dung nhan",
       "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": "claude-multiflow",
+      "owner": "claude-so-migrate",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
+      "task": "dong phien so migrate HTML",
       "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-multiflow",
+      "owner": "claude-so-migrate",
       "ai": null,
       "claimed_at": "2026-09-04",
-      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
+      "task": "dong phien so migrate HTML",
       "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "claude-multiflow",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-04",
       "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
-      "released_at": null
+      "released_at": "2026-09-04"
     }
   }
 }
