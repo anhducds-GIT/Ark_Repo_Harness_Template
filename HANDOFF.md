@@ -387,3 +387,15 @@ sửa `session-check.mjs`.
    lắp từ HEAD đang chạy. Chỗ hở duy nhất còn lại ghi thẳng trong ADR: CI **báo** chứ chưa
    **chặn**, và đó là quyết định gói GitHub của Đức, không phải thứ code tự đóng được.
 
+ - **2026-09-04 · `harness-vong2` · ĐÓNG GÓI: mốc có thẻ thật** — ADR-0003 chốt `v1.2.17` là mốc
+   Stable Baseline, nhưng repo **chưa hề có thẻ nào** — nên "lắp từ mốc" nghĩa là đi đào một SHA
+   bằng tay, **đúng thứ cả ngày hôm nay bỏ ra để xoá bỏ**. Một mốc không trỏ tới được thì nó chưa
+   phải mốc, nó là một câu chữ.
+   Nay có thẻ `v1.2.17` trên remote, trỏ tới `3a63955` (đã kiểm bằng `git ls-remote --tags`).
+   `STATUS.md` và `AGENTS.md` chỉ luôn câu clone.
+   **Không sửa ADR-0003 để thêm dòng này** — nó đã `Accepted`, tức bất biến, và B12 cưỡng chế điều
+   đó. Chỗ ghi là STATUS/AGENTS.
+   Đẩy thẻ bằng `git push origin refs/tags/v1.2.17`, **không** qua `safe-push`: công cụ đó chỉ
+   biết nhánh. Lý do luật cấm `git push` trần là "cuốn theo commit của phiên khác", mà đẩy đúng
+   một ref thẻ thì **không thể cuốn theo gì** — nên ghi rõ ở đây thay vì lặng lẽ làm.
+
