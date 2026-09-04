@@ -4,7 +4,7 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `873aeb5` (2026-09-04).
+Trang được sinh tại commit `30d5397` (2026-09-04).
 
 ## Việc ưu tiên #1
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `873aeb5` (2026-09-04).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.2.16: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật
+- [ark-repo-harness](STATUS.md): active — v1.2.17: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật
 
 ## Luật bắt buộc trước khi sửa gì
 
