@@ -3,6 +3,41 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.16 — 2026-09-04 — FINAL-CLOSURE P3: sáu phép kiểm chưa từng đỏ, nay chứng minh được là đỏ được
+
+`can-nang.mjs` đếm ra một danh sách khó chịu: qua **46 lượt chạy cổng**, sáu phép kiểm **chưa
+từng đỏ lần nào**. Đó không phải bằng chứng chúng tốt — nó chỉ là bằng chứng **chưa ai thử**. Và
+một phép kiểm chưa từng đỏ với một phép kiểm **không thể** đỏ **trông giống hệt nhau trên bảng**,
+mà bảng thì luôn xanh.
+
+`tests/cong-do-that.mjs`: mỗi khối dựng một kho git thật, phá **đúng một** thứ, rồi đòi **đúng
+phép kiểm ấy** đỏ.
+
+| Phép kiểm | Phá thế nào |
+|---|---|
+| Phạm vi trách nhiệm | bỏ chủ khỏi mọi vùng rồi sửa một file — việc không ai đứng tên |
+| Vùng bằng chứng | **SỬA** một file đã có trong vùng chỉ-thêm |
+| Không có secret | commit một chuỗi token đúng hình dạng thật |
+| Nhãn lane | nhãn **hỏng** (có dấu cách) — chứ không phải thiếu nhãn |
+| Bất biến quyền sở hữu | khai một vùng trỏ tới khoá quyền không tồn tại |
+| Mọi lệnh git đọc được | thư mục không phải kho git |
+
+**Không thêm phép kiểm mới** — đây chỉ là bằng chứng cho những phép kiểm đã có.
+
+Ba chỗ cố ý làm cho chặt, vì đây đúng là loại phép kiểm dễ xanh vì lý do sai:
+
+- **Tách ra ĐÚNG một mục theo tên**, không chỉ đòi "cổng đỏ". Cổng có thể đỏ vì chuyện khác trong
+  khi phép kiểm ta đang chứng minh chưa hề chạy tới — hôm nay đã dính đúng bẫy đó một lần.
+- **Đối chứng dương ở mỗi khối:** nền phải XANH trước khi phá. Thiếu vế đó thì một cổng đỏ sẵn
+  cũng cho ta "bằng chứng".
+- **Vùng bằng chứng có thêm đối chứng ngược:** *thêm* file vào vùng chỉ-thêm phải **vẫn xanh**.
+  Không có vế này thì một phép kiểm chặn tuốt cũng qua được.
+
+Và `Nhãn lane` phải phá đúng cách: **thiếu** nhãn chỉ nhắc (509 commit lịch sử không có nhãn, đỏ
+vì thiếu là chặn oan) — chỉ nhãn **hỏng** mới đỏ. Phép kiểm giữ cả hai vế.
+
+Đột biến ngược: tắt từng phép kiểm trong sáu, **cả sáu** đều bị bắt. Suite 86.
+
 ## 1.2.15 — 2026-09-04 — Detached HEAD thôi lùi về `main`, và giành vùng có đường máy
 
 Hai lỗ, cùng một kiểu: **một mặc định "cho tiện" thay chỗ một câu từ chối.**

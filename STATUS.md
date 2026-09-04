@@ -9,9 +9,9 @@ last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate t
 evidence_ref: docs/migrations/2026-09-03-nav-platform.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Soi lại cổng đóng phiên: 7 trong 11 phép kiểm chưa từng đỏ lần nào qua 34 lượt chạy"
+next_step: "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)"
 version_source: package.json
-current_focus: "v1.2.15: thôi lùi về mặc định — detached HEAD và giành vùng đều phải nói rõ"
+current_focus: "v1.2.16: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật"
 human_action: "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge"
 ref_readme: README.md
 ref_handoff: HANDOFF.md

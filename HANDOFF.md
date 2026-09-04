@@ -348,3 +348,18 @@ sửa `session-check.mjs`.
    Đối chứng dương cho cả hai: vùng sạch vẫn giành được, file dở ở vùng KHÁC không bị chặn oan.
    Đột biến 5/5. Suite 80.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.16 (FINAL-CLOSURE P3)** — `can-nang.mjs` đếm ra: qua **46
+   lượt chạy cổng**, sáu phép kiểm **chưa từng đỏ lần nào**. Đó không phải bằng chứng chúng tốt —
+   nó là bằng chứng **chưa ai thử**. Và một phép kiểm chưa từng đỏ với một phép kiểm **không thể**
+   đỏ trông giống hệt nhau trên bảng, mà bảng thì luôn xanh.
+   `tests/cong-do-that.mjs`: mỗi khối dựng một kho git thật, phá **đúng một** thứ, đòi **đúng phép
+   kiểm ấy** đỏ. Không thêm phép kiểm mới.
+   Ba chỗ cố ý làm chặt vì đây đúng loại phép kiểm dễ xanh vì lý do sai: (a) **tách ra đúng một
+   mục theo tên**, không chỉ đòi "cổng đỏ" — cổng có thể đỏ vì chuyện khác trong khi mục ta đang
+   chứng minh chưa hề chạy tới; (b) **đối chứng dương ở mỗi khối** — nền phải XANH trước khi phá;
+   (c) vùng bằng chứng có **đối chứng ngược**: *thêm* file vào vùng chỉ-thêm phải **vẫn xanh**,
+   không thì một phép kiểm chặn tuốt cũng qua được.
+   `Nhãn lane` phải phá đúng cách: **thiếu** nhãn chỉ nhắc (509 commit lịch sử không nhãn — đỏ vì
+   thiếu là chặn oan), chỉ nhãn **hỏng** mới đỏ. Phép kiểm giữ cả hai vế.
+   Đột biến: tắt từng phép kiểm trong sáu, **cả sáu** đều bị bắt. Suite 86.
+
