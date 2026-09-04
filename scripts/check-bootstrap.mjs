@@ -353,7 +353,16 @@ function countLines(text) {
    Nội dung trong khối code ``` cũng bỏ qua: đó là ví dụ lệnh, không phải luật. */
 export function checkB10(deps) {
   const findings = [];
+  /* VÙNG CHỈ-THÊM THÌ BỎ QUA — một phép kiểm đòi bạn SỬA một file mà repo CẤM sửa là một phép
+     kiểm không bao giờ thoả được, và luật nào không thoả được thì sớm muộn cũng bị bỏ qua cả cụm.
+     Đo thật 04/09 ở repo 3AI: 29 trong 63 phát hiện của B10 nằm trong một gói phát hành đã niêm
+     phong (có `FROZEN_CANDIDATE.md` + `SHA256SUMS.txt`), tức "dọn" chúng là phá niêm phong.
+     `mutability: "append-only"` vốn đã là khái niệm sống của bộ khung — chỉ là B10 chưa hỏi nó. */
+  const chiThem = appendOnlyAreas(deps);
+  const trongVungChiThem = (rel) => chiThem.some((v) => rel === v.replace(/\/$/, "") || rel.startsWith(v.endsWith("/") ? v : `${v}/`));
+  let daBoQua = 0;
   for (const relPath of deps.git.trackedPaths().filter((p) => /(^|\/)CLAUDE\.md$/.test(p)).sort(compareText)) {
+    if (trongVungChiThem(relPath)) { daBoQua += 1; continue; }
     const dir = path.posix.dirname(relPath) === "." ? "" : `${path.posix.dirname(relPath)}/`;
     const agentsPath = `${dir}AGENTS.md`;
     if (!deps.fileExists(agentsPath)) {
@@ -380,7 +389,8 @@ export function checkB10(deps) {
       });
     }
   }
-  return report("B10", RED, "CLAUDE.md chứa dòng luật không có trong AGENTS.md", findings);
+  return report("B10", RED, "CLAUDE.md chứa dòng luật không có trong AGENTS.md", findings,
+    daBoQua ? `đã bỏ qua ${daBoQua} file nằm trong vùng chỉ-thêm (không được sửa thì không thể đòi sửa)` : undefined);
 }
 
 export function ruleBearingLines(text) {

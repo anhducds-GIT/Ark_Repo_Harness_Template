@@ -3,6 +3,31 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.10 — 2026-09-04 — Cổng đóng phiên cũng chỉ biết một nhánh, và một phép kiểm đòi sửa thứ cấm sửa
+
+Hai lỗ, cùng một gốc: **bộ khung mặc định mọi repo có hình dạng giống nó.**
+
+**Lỗ một — cùng bệnh của v1.2.9, ở tool anh em.** `session-check.mjs` so với `origin/main` đóng
+cứng ở mười chỗ. Đứng trên một nhánh tính năng mà nhánh gốc chưa có `HANDOFF.md` thì
+`git show origin/main:HANDOFF.md` **nổ**, cổng báo `GIT_HONG`, và theo đúng luật fail-closed của
+chính nó thì **mọi con số phía trên thành "đoán"**. Đo thật ở repo 3AI: cổng **không thể xanh**
+trên nhánh đó — không phải vì repo sai, mà vì công cụ chỉ biết một hình dạng. Nay mốc so là
+upstream của nhánh đang đứng; chưa có upstream thì lùi về `origin/main` như cũ.
+
+**Lỗ hai — B10 đòi sửa file mà repo CẤM sửa.** Nó quét mọi `CLAUDE.md` được track, kể cả file
+nằm trong vùng khai `mutability: "append-only"`. Đo thật ở 3AI: **29 trong 63** phát hiện của
+B10 nằm trong một gói phát hành **đã niêm phong** (`FROZEN_CANDIDATE.md` + `SHA256SUMS.txt`,
+chạm lần cuối 21/07 chỉ để khôi phục sau khi bị xoá nhầm) — "dọn" chúng là phá niêm phong.
+
+Một phép kiểm đòi bạn **sửa** một file mà repo **cấm sửa** thì nó không bao giờ thoả được. Và
+luật nào không thoả được thì sớm muộn cũng bị bỏ qua **cả cụm** — đó là cách một cổng kiểm chết.
+`append-only` vốn đã là khái niệm sống của bộ khung; chỉ là B10 chưa hỏi nó. Nay có hỏi, **và
+nói ra** đã bỏ qua mấy file — bỏ qua im lặng thì lần sau không ai biết mình đang không được canh.
+
+Có đối chứng dương: vùng `rw` thì **vẫn soi**. Bỏ qua tuốt là làm yếu lớp bảo vệ, không phải sửa.
+
+Bốn phép đột biến ngược, cả bốn bị bắt. Suite 77.
+
 ## 1.2.9 — 2026-09-04 — `safe-push` biết nhánh, và luật merge được giữ bằng cấu trúc
 
 `main` bị đóng cứng ở **mười chỗ** trong `safe-push.mjs`: fetch, `ls-remote`, mốc so, câu đẩy.

@@ -57,6 +57,25 @@ const git = (...a) => {
   }
 };
 
+/* MỐC SO = UPSTREAM CỦA NHÁNH ĐANG ĐỨNG, không phải `origin/main` đóng cứng.
+ *
+ * Cùng bệnh đã vá ở `safe-push` (v1.2.9), ở tool anh em. Đứng trên một nhánh tính năng mà nhánh
+ * gốc chưa có `HANDOFF.md` thì `git show origin/main:HANDOFF.md` NỔ, cổng báo `GIT_HONG`, và
+ * theo đúng luật fail-closed của chính nó thì **mọi con số phía trên thành "đoán"**. Đo thật ở
+ * repo 3AI ngày 04/09: cổng không thể xanh trên nhánh đó — không phải vì repo sai, mà vì công cụ
+ * chỉ biết một hình dạng.
+ *
+ * Nhánh chưa có upstream thì lùi về `origin/main`: vẫn là câu trả lời cũ, và các lớp fail-closed
+ * sẵn có phía dưới lo phần "không phân giải được". */
+const MOC = (() => {
+  try {
+    const u = execFileSync("git", ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+      { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    if (u) return u;
+  } catch { /* chưa có upstream */ }
+  return "origin/main";
+})();
+
 const results = [];
 const check = (name, fn) => {
   try { const r = fn(); results.push({ name, ...r }); }
@@ -69,7 +88,7 @@ const check = (name, fn) => {
 // `?? evidence/`, khiến phép bản đồ không thể biết đường dẫn file nào cần được khai.
 const porcelain = git("status", "--porcelain", "--untracked-files=all").split("\n").filter(Boolean);
 const workingChanges = porcelain.map((line) => ({ code: line.slice(0, 2).trim(), file: line.slice(3).replace(/^"|"$/g, "") }));
-const unpushed = git("diff", "--name-only", "origin/main...HEAD").split("\n").filter(Boolean);
+const unpushed = git("diff", "--name-only", `${MOC}...HEAD`).split("\n").filter(Boolean);
 const touched = [...new Set([...workingChanges.map((c) => c.file), ...unpushed])];
 
 /* VIỆC ĐÃ COMMIT CỦA LANE KHÁC KHÔNG PHẢI VIỆC MỒ CÔI CỦA TÔI — K2-1b, 2026-09-02.
@@ -94,7 +113,7 @@ const touched = [...new Set([...workingChanges.map((c) => c.file), ...unpushed])
 // dùng đầu tiên (~30 dòng), và vì `const` có vùng chết tạm thời nên cổng NÉM NGAY khi
 // nạp — mọi phiên, mọi lệnh, không riêng ca nào. Đo được 03/09: `session-check.mjs --as`
 // bất kỳ đều chết ở dòng đầu tiên dùng nó.
-const originMainResolves = git("rev-parse", "--verify", "origin/main").trim() !== "";
+const originMainResolves = git("rev-parse", "--verify", MOC).trim() !== "";
 
 // Trạng thái của CẢ PHIÊN, không chỉ cây làm việc. `git status` không thấy file đã commit;
 // so thẳng origin/main → working tree thì thấy cả commit chưa push, staged và unstaged.
@@ -105,7 +124,7 @@ const parseNameStatus = (text) => String(text ?? "").split("\n").filter(Boolean)
   return { code, file: parts.join("\t").replace(/^"|"$/g, "") };
 });
 const comparedChanges = originMainResolves
-  ? parseNameStatus(git("diff", "--name-status", "--no-renames", "origin/main"))
+  ? parseNameStatus(git("diff", "--name-status", "--no-renames", MOC))
   : [];
 const sessionChanges = originMainResolves
   ? [...comparedChanges, ...workingChanges.filter((c) => c.code === "??")]
@@ -114,7 +133,7 @@ const sessionChanges = originMainResolves
 const workingFiles = new Set(workingChanges.map((c) => c.file));
 const nhanCuaFile = new Map();                       // file -> tập nhãn đã chạm nó (null = không nhãn)
 if (originMainResolves) {
-  for (const sha of git("log", "--format=%H", "origin/main..HEAD").split("\n").filter(Boolean)) {
+  for (const sha of git("log", "--format=%H", `${MOC}..HEAD`).split("\n").filter(Boolean)) {
     const { lane, problem } = laneFromMessage(git("log", "-1", "--format=%B", sha));
     // Nhãn HỎNG cũng coi như KHÔNG có nhãn: không quy thuộc được thì không được miễn cho ai.
     const nhan = problem ? null : lane;
@@ -215,8 +234,8 @@ const ROOT_HANDOFF = "HANDOFF.md";
 // cần nhận khoá gốc. `appendOnlyAtEof` đòi thêm: đúng một hunk, và nó bắt đầu ngay sau dòng cuối
 // của bản cũ. Đây là SIẾT, không phải nới: thứ trước đây lọt thì nay đỏ, và đó là chủ ý.
 const handoffAppendOnly = appendOnlyAtEof(
-  git("diff", "-U0", "origin/main", "--", ROOT_HANDOFF),
-  git("show", `origin/main:${ROOT_HANDOFF}`)
+  git("diff", "-U0", MOC, "--", ROOT_HANDOFF),
+  git("show", `${MOC}:${ROOT_HANDOFF}`)
 );
 const adminFile = (f) => f === ".agents/claims.json" || (f === ROOT_HANDOFF && handoffAppendOnly);
 
@@ -489,7 +508,7 @@ const coDongMoi = (rel) => {
   let xoa = 0;
   let doDuoc = false;
   for (const args of [
-    originMainResolves ? ["diff", "--numstat", "origin/main", "--", rel] : null,
+    originMainResolves ? ["diff", "--numstat", MOC, "--", rel] : null,
     ["diff", "--numstat", "HEAD", "--", rel]
   ]) {
     if (!args) continue;
@@ -800,9 +819,9 @@ check("Bất biến quyền sở hữu ba tầng", () => {
 // nên phiên này KHÔNG tự bật được. Đã ghi vào HANDOFF.
 check("Nhãn lane trong commit", () => {
   if (!originMainResolves) {
-    return { ok: true, skipped: true, msg: "Không so được với origin/main nên không đếm được commit nào chưa push — xem cảnh báo ở đầu báo cáo." };
+    return { ok: true, skipped: true, msg: `Không so được với ${MOC} nên không đếm được commit nào chưa push — xem cảnh báo ở đầu báo cáo.` };
   }
-  const shas = git("log", "--format=%H", "origin/main..HEAD").split("\n").filter(Boolean);
+  const shas = git("log", "--format=%H", `${MOC}..HEAD`).split("\n").filter(Boolean);
   if (!shas.length) return { ok: true, msg: "Không có commit nào chưa push." };
   const hong = [];
   const thieu = [];
@@ -862,7 +881,7 @@ if (results.length !== EXPECTED_CHECKS) {
 /* ---- báo cáo ------------------------------------------------------------ */
 console.log(`\nCỔNG KIỂM ĐÓNG PHIÊN — phiên "${asLabel}"`);
 if (!originMainResolves) {
-  console.log(`⚠ KHÔNG SO ĐƯỢC VỚI origin/main — cổng chỉ thấy CÂY LÀM VIỆC. Mọi commit chưa push`);
+  console.log(`⚠ KHÔNG SO ĐƯỢC VỚI ${MOC} — cổng chỉ thấy CÂY LÀM VIỆC. Mọi commit chưa push`);
   console.log(`  đều KHÔNG được xét: không đòi Log HANDOFF, không quy chủ, không kích hoạt suite.`);
   console.log(`  Kiểm: \`git remote -v\` và \`git branch -r\`. Repo mới thì chạy \`git fetch origin\` một lần.`);
 }

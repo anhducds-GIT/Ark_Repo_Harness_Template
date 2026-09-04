@@ -293,3 +293,14 @@ sửa `session-check.mjs`.
    đẩy" vẫn XANH — nó chứng minh BẢN BÁO CÁO, không chứng minh CÚ ĐẨY. Nay fixture đẩy thật vào
    một kho bare rồi đọc lại HAI ref: nhánh tính năng phải tiến, `main` phải y nguyên. 3/3. Suite 75.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.10** — Hai lỗ, cùng một gốc: **bộ khung mặc định mọi repo
+   có hình dạng giống nó.** (a) `session-check.mjs` so với `origin/main` đóng cứng ở mười chỗ —
+   cùng bệnh v1.2.9 ở tool anh em. Trên nhánh tính năng mà nhánh gốc chưa có `HANDOFF.md` thì
+   `git show origin/main:HANDOFF.md` NỔ → `GIT_HONG` → theo đúng luật fail-closed của chính nó,
+   **mọi con số phía trên thành "đoán"**. Cổng ở 3AI **không thể xanh** trên nhánh đó. (b) B10 quét
+   cả file trong vùng `append-only`: **29/63** phát hiện ở 3AI nằm trong gói phát hành đã niêm
+   phong, tức "dọn" chúng là phá niêm phong. **Một phép kiểm đòi sửa thứ repo cấm sửa thì không
+   bao giờ thoả được, và luật không thoả được thì bị bỏ qua cả cụm.**
+   Đối chứng dương cho (b): vùng `rw` vẫn soi — bỏ qua tuốt là làm yếu lớp bảo vệ. Đột biến 4/4.
+   Suite 77.
+

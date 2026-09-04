@@ -21,7 +21,7 @@ import { danhGia, mucDo, cauHinhDocDuoc } from "../scripts/assess.mjs";
 import { buildTemplateFiles } from "../scripts/build-template.mjs";
 import { isBehaviourFile, LIFECYCLES } from "../scripts/build-dashboard.mjs";
 import { VONG_DOI } from "../scripts/build-overview.mjs";
-import { blockingCodes, createBootstrapDeps } from "../scripts/check-bootstrap.mjs";
+import { blockingCodes, checkB10, createBootstrapDeps } from "../scripts/check-bootstrap.mjs";
 
 const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -292,5 +292,38 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok("F9 · cong cau truc co rang: B3 do lam lenh thoat khac 0 khi duoc khai chan");
 }
 
+
+/* ---- F10. Phep kiem khong duoc doi sua file ma repo CAM sua --------------- */
+{
+  // B10 quet MOI CLAUDE.md duoc track, ke ca file nam trong mot vung khai `append-only`. Do that
+  // 04/09 o repo 3AI: 29/63 phat hien cua B10 nam trong mot goi phat hanh DA NIEM PHONG
+  // (FROZEN_CANDIDATE.md + SHA256SUMS.txt) — "don" chung la pha niem phong.
+  //
+  // Mot phep kiem doi ban SUA mot file ma repo CAM sua thi no khong bao gio thoa duoc. Va luat
+  // nao khong thoa duoc thi som muon cung bi bo qua ca cum — do la cach mot cong kiem chet.
+  const luat = "## Luat\n- mot dong luat rieng khong co trong AGENTS.md, du dai de bi tinh\n";
+  const deps = (mutability) => ({
+    fileExists: (p) => ["CLAUDE.md", "AGENTS.md", "kho/CLAUDE.md", "kho/AGENTS.md", ".repo-structure.json"].includes(p),
+    readFile: (p) => {
+      if (p === ".repo-structure.json") return JSON.stringify({ areas: { "kho/": { steward: "_root", mutability } } });
+      if (p.endsWith("CLAUDE.md")) return luat;
+      return "# AGENTS\nkhong co dong luat kia\n";
+    },
+    git: { trackedPaths: () => ["CLAUDE.md", "kho/CLAUDE.md"] }
+  });
+
+  // Doi chung duong: vung `rw` thi VAN phai bat — bo qua tuot la lam yeu phep kiem, khong phai sua.
+  const rw = checkB10(deps("rw"));
+  const soRw = rw.findings.filter((f) => f.where.startsWith("kho/")).length;
+  assert.ok(soRw > 0, "vung rw thi B10 VAN phai soi — bo qua tuot la lam yeu lop bao ve");
+
+  const ao = checkB10(deps("append-only"));
+  assert.equal(ao.findings.filter((f) => f.where.startsWith("kho/")).length, 0,
+    "vung chi-them thi khong duoc doi sua noi dung file trong do");
+  assert.ok(ao.findings.some((f) => f.where.startsWith("CLAUDE.md")),
+    "file NGOAI vung chi-them thi van phai bi bat — khong duoc bo qua ca luot");
+  assert.match(String(ao.note ?? ""), /bỏ qua/, "phai NOI RA la da bo qua may file, khong im lang");
+  ok("F10 · phép kiểm bỏ qua vùng chỉ-thêm, và nói ra — nhưng vùng rw thì vẫn soi");
+}
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

@@ -548,4 +548,48 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   ok("safe-push: đẩy lên đúng nhánh đang đứng · chưa có upstream thì từ chối · ở main giữ nguyên");
 }
 
+/* ---- cong dong phien: moc so cung phai theo nhanh ----------------------- */
+{
+  // Cung benh da va o safe-push (v1.2.9), o tool anh em. Cong so voi `origin/main` dong cung.
+  // Dung tren mot nhanh tinh nang ma nhanh goc CHUA CO `HANDOFF.md` thi
+  // `git show origin/main:HANDOFF.md` NO, cong bao GIT_HONG, va theo dung luat fail-closed cua
+  // chinh no thi MOI con so phia tren thanh "doan". Do that o repo 3AI ngay 04/09: cong khong
+  // the xanh tren nhanh do — khong phai vi repo sai, ma vi cong cu chi biet mot hinh dang.
+  const cha = mkdtempSync(join(tmpdir(), "cong-nhanh-"));
+  const kho = join(cha, "kho");
+  const bare = join(cha, "bare.git");
+  try {
+    execFileSync("git", ["init", "-q", "--bare", bare], { encoding: "utf8" });
+    mkdirSync(kho, { recursive: true });
+    const at = (...a) => execFileSync("git", a, { cwd: kho, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(kho, "scripts"), { recursive: true });
+    mkdirSync(join(kho, ".agents"), { recursive: true });
+    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    writeFileSync(join(kho, "a.txt"), "hi", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");
+    at("remote", "add", "origin", bare);
+    at("push", "-q", "-u", "origin", "main");
+
+    // Nhanh tinh nang, va CHI o day moi co HANDOFF.md — dung hinh dang cua repo 3AI.
+    at("checkout", "-q", "-b", "tinh-nang");
+    writeFileSync(join(kho, "HANDOFF.md"), "# Log\n- mot dong\n", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "them handoff\n\nLane: thu");
+    at("push", "-q", "-u", "origin", "tinh-nang");
+
+    const r = spawnSync(process.execPath, [join(kho, "scripts", "session-check.mjs"), "--as", "thu"],
+      { cwd: kho, encoding: "utf8" });
+    const out = String(r.stdout || "") + String(r.stderr || "");
+    assert.doesNotMatch(out, /GIT_HONG/,
+      "moc so phai la upstream cua nhanh dang dung — so voi origin/main lam cong NO tren nhanh tinh nang");
+    assert.doesNotMatch(out, /origin\/main:HANDOFF\.md/, "khong duoc doc HANDOFF.md tu origin/main nua");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("cổng đóng phiên: mốc so theo nhánh đang đứng, không nổ trên nhánh tính năng");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
