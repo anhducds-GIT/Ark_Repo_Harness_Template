@@ -16,7 +16,12 @@
  *   CHANGELOG.md            -> nhật ký, gập được
  * Thiếu file nào thì mục đó **biến mất êm**, không vỡ trang — repo khác sẽ không có đủ cả bảy.
  *
- * BẢN RA KHÔNG COMMIT: nó để publish và tự in ngày sinh.
+ * BẢN RA CÓ COMMIT (đổi 04/09, Đức chốt) — `DASHBOARD-Ark-Repo-Harness.html` ở gốc repo.
+ * Trước đó bảng chỉ tồn tại dạng artifact trên claude.ai, tức là muốn xem trạng thái repo thì
+ * phải có một phiên Claude đăng hộ: điểm phụ thuộc một AI duy nhất của cả hệ. File trong repo
+ * xoá bỏ chỗ đó — mở bằng trình duyệt là xong, không nhờ ai. Đổi lại, nội dung phải suy HOÀN
+ * TOÀN TỪ HEAD (xem `doc`/`liet` và `mocHEAD` bên dưới): nó nằm trong khối `generators` nên
+ * cổng kiểm nó mỗi phiên, và một bộ sinh nhìn đồng hồ hay nhìn đĩa sẽ chặn push của MỌI phiên.
  */
 
 import { execFileSync, execSync } from "node:child_process";
@@ -29,9 +34,38 @@ import { esc, md, tachFrontmatter } from "./md-mini.mjs";
 const NL = String.fromCharCode(10);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const doc = (rel) => { try { return fs.readFileSync(path.join(ROOT, ...rel.split("/")), "utf8"); } catch (_) { return null; } };
-const liet = (rel) => { try { return fs.readdirSync(path.join(ROOT, ...rel.split("/"))).filter((f) => f.endsWith(".md")).sort(); } catch (_) { return []; } };
+/* ĐỌC TỪ HEAD, KHÔNG ĐỌC TỪ ĐĨA — và đây là chỗ dễ làm tê cả repo nhất, nên nói to.
+ *
+ * Từ khi trang này được commit, nó nằm trong khối `generators`: cổng đóng phiên chạy
+ * `--check-head` mỗi lượt và `safe-push` từ chối đẩy khi bản đã commit lệch HEAD. Nếu bộ sinh
+ * đọc THƯ MỤC LÀM VIỆC thì bất kỳ file sửa dở nào của bất kỳ phiên nào cũng làm trang lệch —
+ * và phiên bị chặn sẽ không hiểu vì sao, vì cái làm lệch không nằm trong commit của họ.
+ * Đọc từ HEAD thì "sinh" và "kiểm" hỏi cùng một câu, nên hai bên không thể trả lời khác nhau. */
+const gitRa = (...args) => execFileSync("git", ["-c", "core.quotepath=false", ...args],
+  { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+const doc = (rel) => { try { return gitRa("show", `HEAD:${rel}`); } catch (_) { return null; } };
+const liet = (rel) => {
+  try {
+    return gitRa("ls-tree", "-z", "--name-only", `HEAD:${rel}`)
+      .split("\0").filter((f) => f.endsWith(".md")).sort();
+  } catch (_) { return []; }
+};
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/* Mốc ngày của HEAD — thứ thay thế cho đồng hồ ở MỌI phép tính trong file này.
+ *
+ * FAIL-CLOSED, không fail-open. Lùi về `new Date()` khi không hỏi được git thì đúng một chỗ
+ * này mở lại cửa hậu mà cả đoạn ghi chú ở `ngay:` vừa đóng: sang ngày là lệch HEAD, cổng đỏ
+ * với mọi phiên, và không ai lần ra vì sao. Chết ngay tại chỗ kèm tên nguyên nhân thì rẻ hơn. */
+export function mocHEAD() {
+  let ra;
+  try { ra = gitRa("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d").trim(); }
+  catch (e) { throw new Error(`MOC_HEAD_HONG: không hỏi được git về ngày của HEAD (${String(e.message).split(NL)[0]}). Trang này phải suy mốc từ HEAD chứ không từ đồng hồ — không suy được thì KHÔNG sinh.`); }
+  if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(ra)) {
+    throw new Error(`MOC_HEAD_HONG: ngày của HEAD đọc ra "${ra}", không phải dạng YYYY-MM-DD. Trang này phải suy mốc từ HEAD — đọc không ra thì KHÔNG sinh.`);
+  }
+  return ra;
+}
 
 /* ---- gom dữ liệu ----------------------------------------------------------- */
 
@@ -607,6 +641,9 @@ export function gomDuLieu() {
   // Tài liệu quá hạn: mỗi file khai `ttl_days`, so với lần commit gần nhất của chính nó. Không
   // đo được (chưa commit, không có git) thì KHÔNG tính là nợ — thà bỏ sót còn hơn báo động sai.
   const taiLieuQuaHan = [];
+  // "Hôm nay" ở đây cũng là mốc HEAD, cùng lý do ghi ở `ngay:` bên dưới: lấy `Date.now()` thì
+  // con số này tự tăng theo lịch, và sang ngày là bản sinh lại lệch bản đã commit.
+  const homNay = Date.parse(`${mocHEAD()}T00:00:00Z`);
   for (const thuMuc of ["docs", "docs/workflows", "docs/protocols", "docs/briefs"]) {
     for (const f of liet(thuMuc)) {
       const fm = tachFrontmatter(doc(`${thuMuc}/${f}`) || "").fm;
@@ -626,7 +663,7 @@ export function gomDuLieu() {
         sua = ra ? new Date(ra) : null;
       } catch (_) { sua = null; }
       if (!sua) continue;
-      if ((Date.now() - sua.getTime()) / 86400000 > ttl) taiLieuQuaHan.push(`${thuMuc}/${f}`);
+      if ((homNay - sua.getTime()) / 86400000 > ttl) taiLieuQuaHan.push(`${thuMuc}/${f}`);
     }
   }
   // `null` = KHÔNG ĐO ĐƯỢC, và nó khác hẳn 0. Cổng cấu trúc thoát khác 0 là chuyện BÌNH THƯỜNG
@@ -664,15 +701,13 @@ export function gomDuLieu() {
   return {
     ten: tenNguoi || pkg.name || "Repo",
     ban: pkg.version || "0.0.0",
-    // Ngày THEO ĐỒNG HỒ CỦA NGƯỜI XEM, không theo UTC. Sinh trang lúc 00:30 giờ Việt Nam thì
-    // `toISOString()` vẫn trả ngày HÔM QUA — và banner "trang này bao nhiêu ngày tuổi" đếm sai
-    // ngay từ giây đầu tiên. Sai một ngày thì nhỏ, nhưng nó nằm đúng ở con số Đức dùng để quyết
-    // định có tin trang này hay không.
-    ngay: (() => {
-      const d = new Date();
-      const p = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-    })(),
+    // NGÀY CỦA HEAD, KHÔNG PHẢI NGÀY TRÊN ĐỒNG HỒ. Trước khi trang được commit, đây là
+    // `new Date()` — và cái đó vô hại đúng tới lúc trang vào repo. Từ lúc vào, đồng hồ sang
+    // ngày là bản sinh lại lệch bản đã commit **dù không một dữ liệu nào đổi**, cổng đỏ, và
+    // MỌI phiên bị chặn đẩy vì một ngày đã trôi qua. Việc BÁO CŨ không mất đi: đoạn JS cuối
+    // trang tự tính lúc người ta MỞ trang, từ `data-sinh` — đúng chỗ hơn, vì một trang tĩnh
+    // không biết trước bao giờ có người mở nó.
+    ngay: mocHEAD(),
     lenh: Object.entries(pkg.scripts || {}),
     banDo: docBanDo(doc("AGENTS.md")),
     workflows, protocols, adrs, nhatKy,
@@ -697,12 +732,44 @@ export function gomDuLieu() {
   };
 }
 
+/* TÊN FILE MANG TÊN DỰ ÁN, KHÔNG PHẢI "DASHBOARD.html" trơn.
+ *
+ * Đức chốt 04/09. Lý do rất đời: mỗi repo sinh ra một bảng, và cả đống bảng cùng rơi vào một
+ * thư mục Tải về. Ba file tên `DASHBOARD.html`, `DASHBOARD(1).html`, `DASHBOARD(2).html` thì
+ * mở cái nào cũng phải đoán. Tên mang tên dự án là biết ngay, không phải mở ra xem.
+ *
+ * Viết cứng ở đây chứ không suy từ `.repo-structure.json`: file này KHÔNG nằm trong bộ khung
+ * đem phát (xem `template/`), nên nó chỉ phục vụ đúng repo này. Suy tự động chỉ thêm một
+ * đường hỏng — đổi `repo.name` là tên file đổi theo, trong khi `generated` vẫn khai tên cũ,
+ * và cổng sẽ đỏ với một câu không nói gì về nguyên nhân thật. */
+export const TRANG_FILE = "DASHBOARD-Ark-Repo-Harness.html";
+
 const THIS = fileURLToPath(import.meta.url);
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
-  const ra = process.argv[2];
-  if (!ra) { console.error("Dùng: node scripts/build-overview.mjs <file-ra.html>"); process.exit(2); }
+  const args = process.argv.slice(2);
+
+  if (args.includes("--check-head")) {
+    // Cổng đóng phiên gọi đúng nhánh này. Nó hỏi MỘT câu: bản đã commit có còn đúng với HEAD
+    // không. Cả hai vế đều dựng từ HEAD, nên việc đang làm dở của bất kỳ ai không lọt vào.
+    const dangCo = doc(TRANG_FILE);
+    if (dangCo === null) {
+      console.error(`THIEU_TRANG: ${TRANG_FILE} chưa có trong HEAD. Sinh rồi commit: node scripts/build-overview.mjs`);
+      process.exit(1);
+    }
+    if (trang(gomDuLieu()) !== dangCo) {
+      console.error(`TRANG_CU: ${TRANG_FILE} đã commit không khớp với HEAD. Sinh lại rồi commit: node scripts/build-overview.mjs`);
+      process.exit(1);
+    }
+    console.log(`${TRANG_FILE} khớp với HEAD.`);
+    process.exit(0);
+  }
+
+  // Không đưa đường dẫn thì ghi vào bản chuẩn của repo. Có đưa thì ghi ra đó — để xem thử mà
+  // không chạm file trong repo.
+  const ra = args.find((a) => !a.startsWith("--")) || path.join(ROOT, TRANG_FILE);
   const dl = gomDuLieu();
   fs.mkdirSync(path.dirname(path.resolve(ra)), { recursive: true });
   fs.writeFileSync(path.resolve(ra), trang(dl), "utf8");
   console.log(`Đã sinh ${ra} — v${dl.ban} · ${dl.workflows.length} workflow · ${dl.protocols.length} protocol · ${dl.adrs.length} quyết định · ${dl.lenh.length} lệnh.`);
+  console.log(`  mốc HEAD ${dl.ngay} — việc báo cũ do trang tự tính lúc mở`);
 }

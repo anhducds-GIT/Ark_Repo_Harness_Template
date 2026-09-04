@@ -6,7 +6,15 @@
  */
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { gomDuLieu, noChuaChungMinh, trang } from "../scripts/build-overview.mjs";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -111,6 +119,43 @@ const html = trang(dl);
   assert.ok(trong.includes('id="tab-tong-quan"'), "tab tong quan luon con");
   assert.ok(trong.length > 2000, "van phai ra mot trang dung duoc, khong vo");
   ok("repo thiếu file: mục biến mất êm, trang vẫn dùng được");
+}
+
+/* ---- 6. Trang suy từ HEAD, KHÔNG suy từ đồng hồ ------------------------- */
+{
+  /* Vì sao ca này đắt hơn nó trông: từ 04/09 trang được COMMIT và nằm trong khối `generators`,
+     nên cổng chạy `--check-head` mỗi phiên. Một dòng `new Date()` lẻn về là sang ngày hôm sau
+     bản sinh lại lệch bản đã commit **dù không dữ liệu nào đổi**, cổng đỏ, và MỌI phiên bị
+     chặn đẩy vì một ngày đã trôi qua. Đó là kiểu hỏng làm tê cả repo mà không ai lần ra.
+
+     ĐỐI CHỨNG DƯƠNG dựng bằng một worktree ở commit CŨ, kèm `scripts/` hiện tại chép đè: nội
+     dung đọc từ HEAD cũ, mã thì là mã đang xét. Mốc phải là ngày của commit cũ. Nếu ai đó
+     đưa đồng hồ trở lại, mốc sẽ ra HÔM NAY và ca này đỏ. So `dl.ngay` với `mocHEAD()` thì
+     không bắt được gì cả — hai vế cùng một dòng code. */
+  // Lấy commit gần nhất có NGÀY KHÁC ngày HEAD — không lùi một số commit cố định. Repo này
+  // có ngày 127 commit, nên "lùi 25 commit" vẫn nằm nguyên trong hôm nay và ca kiểm tự vô hiệu.
+  const dong = execFileSync("git", ["log", "--format=%H %cd", "--date=format:%Y-%m-%d", "-n", "400"],
+    { cwd: ROOT, encoding: "utf8" }).split("\n").map((l) => l.trim()).filter(Boolean);
+  const khac = dong.map((l) => l.split(" ")).find(([, d]) => d !== dl.ngay);
+  assert.ok(khac, "can mot commit KHAC ngay HEAD, khong thi ca nay khong chung minh gi");
+  const [cu, ngayCu] = khac;
+
+  const noi = fs.mkdtempSync(path.join(os.tmpdir(), "ark-moc-"));
+  const cay = path.join(noi, "cay");
+  try {
+    execFileSync("git", ["worktree", "add", "--detach", cay, cu], { cwd: ROOT, stdio: "ignore" });
+    fs.cpSync(path.join(ROOT, "scripts"), path.join(cay, "scripts"), { recursive: true });
+    const ra = path.join(noi, "thu.html");
+    execFileSync(process.execPath, [path.join(cay, "scripts", "build-overview.mjs"), ra], { stdio: "ignore" });
+    const m = fs.readFileSync(ra, "utf8").match(/data-sinh="([0-9-]{10})"/);
+    assert.ok(m, "trang sinh o worktree phai co dau sinh");
+    assert.equal(m[1], ngayCu,
+      `moc phai la ngay cua commit dang doc (${ngayCu}), khong phai ngay tren dong ho (${dl.ngay})`);
+    ok(`mốc suy từ HEAD: đọc commit ${cu.slice(0, 7)} thì ra ${ngayCu}, không ra ngày hôm nay`);
+  } finally {
+    try { execFileSync("git", ["worktree", "remove", "--force", cay], { cwd: ROOT, stdio: "ignore" }); } catch (_) { /* dọn được thì tốt */ }
+    fs.rmSync(noi, { recursive: true, force: true });
+  }
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
