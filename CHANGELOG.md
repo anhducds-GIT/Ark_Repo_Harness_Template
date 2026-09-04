@@ -3,7 +3,7 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
-## 1.2.16 — 2026-09-04 — FINAL-CLOSURE P3: sáu phép kiểm chưa từng đỏ, nay chứng minh được là đỏ được
+## 1.2.17 — 2026-09-04 — FINAL-CLOSURE P3: sáu phép kiểm chưa từng đỏ, nay chứng minh được là đỏ được
 
 `can-nang.mjs` đếm ra một danh sách khó chịu: qua **46 lượt chạy cổng**, sáu phép kiểm **chưa
 từng đỏ lần nào**. Đó không phải bằng chứng chúng tốt — nó chỉ là bằng chứng **chưa ai thử**. Và
@@ -37,6 +37,12 @@ Và `Nhãn lane` phải phá đúng cách: **thiếu** nhãn chỉ nhắc (509 c
 vì thiếu là chặn oan) — chỉ nhãn **hỏng** mới đỏ. Phép kiểm giữ cả hai vế.
 
 Đột biến ngược: tắt từng phép kiểm trong sáu, **cả sáu** đều bị bắt. Suite 86.
+
+**Và cái cân thôi hỏi lại câu đã có đáp án.** "Chưa từng đỏ" đếm các lượt chạy THẬT, nên một ca
+hỏng dựng trong phép kiểm không bao giờ vào đó — danh sách sẽ lặp lại y nguyên sau mỗi phiên, kể
+cả những mục vừa được chứng minh. Một lời nhắc **đã được trả lời** mà vẫn kêu là cách nhanh nhất
+khiến người ta bỏ qua **cả danh sách**. Nay `can-nang.mjs` dò tên từng mục trong file ca hỏng và
+tách làm hai: mục còn phải hỏi, và mục đã có ca hỏng dựng sẵn.
 
 ## 1.2.15 — 2026-09-04 — Detached HEAD thôi lùi về `main`, và giành vùng có đường máy
 

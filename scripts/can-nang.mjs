@@ -178,9 +178,29 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   } else if (!kq.chuaTungDo.length) {
     console.log("      (không có — mọi phép kiểm đều đã bắt được ít nhất một lần)");
   } else {
-    for (const t of kq.chuaTungDo) console.log(`      · ${t}`);
-    console.log(`${NL}      Đây là danh sách để HỎI, không phải để xoá. Với từng cái: dựng nổi ca`);
-    console.log("      hỏng cho nó không? Không dựng nổi thì nó chưa bao giờ là phép kiểm thật.");
+    /* CÂU HỎI NÀY ĐÃ CÓ CHỖ TRẢ LỜI, nên đừng hỏi lại mãi.
+     *
+     * "Chưa từng đỏ" đếm các lượt chạy THẬT, và một ca hỏng dựng trong phép kiểm thì không bao
+     * giờ vào đó. Nếu chỉ liệt kê, danh sách này lặp lại y nguyên sau mỗi phiên — kể cả những
+     * mục đã có ca hỏng dựng sẵn. Một lời nhắc đã được trả lời mà vẫn kêu là cách nhanh nhất
+     * khiến người ta bỏ qua cả danh sách. */
+    const CA_HONG = "tests/cong-do-that.mjs";
+    let vanBan = "";
+    try { vanBan = fs.readFileSync(path.join(ROOT, CA_HONG), "utf8"); } catch { /* chưa có file */ }
+    const coCaHong = (ten) => vanBan.includes(ten);
+    const daTraLoi = kq.chuaTungDo.filter(coCaHong);
+    const conHoi = kq.chuaTungDo.filter((t) => !coCaHong(t));
+
+    for (const t of conHoi) console.log(`      · ${t}`);
+    if (daTraLoi.length) {
+      console.log(`      ${conHoi.length ? "—" : ""} ${daTraLoi.length} mục đã có ca hỏng dựng sẵn ở ${CA_HONG}:`);
+      for (const t of daTraLoi) console.log(`        ✓ ${t}`);
+      console.log("        (chưa đỏ trong lượt chạy thật, nhưng đã chứng minh là ĐỎ ĐƯỢC)");
+    }
+    if (conHoi.length) {
+      console.log(`${NL}      Đây là danh sách để HỎI, không phải để xoá. Với từng cái: dựng nổi ca`);
+      console.log("      hỏng cho nó không? Không dựng nổi thì nó chưa bao giờ là phép kiểm thật.");
+    }
   }
 
   console.log(`${NL}${canh.length ? `QUÁ NGÂN SÁCH ${canh.length} chỗ: ${canh.join(", ")}.

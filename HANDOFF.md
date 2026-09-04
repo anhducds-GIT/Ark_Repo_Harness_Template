@@ -363,3 +363,9 @@ sửa `session-check.mjs`.
    thiếu là chặn oan), chỉ nhãn **hỏng** mới đỏ. Phép kiểm giữ cả hai vế.
    Đột biến: tắt từng phép kiểm trong sáu, **cả sáu** đều bị bắt. Suite 86.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.17** — Cái cân **thôi hỏi lại câu đã có đáp án**. "Chưa từng
+   đỏ" đếm lượt chạy THẬT, nên ca hỏng dựng trong phép kiểm không bao giờ vào đó — danh sách sẽ lặp
+   y nguyên sau mỗi phiên, kể cả sáu mục vừa được chứng minh ở v1.2.16. **Một lời nhắc đã được trả
+   lời mà vẫn kêu là cách nhanh nhất khiến người ta bỏ qua cả danh sách.** Nay `can-nang.mjs` dò tên
+   từng mục trong `tests/cong-do-that.mjs` và tách hai nhóm: còn phải hỏi · đã có ca hỏng dựng sẵn.
+
