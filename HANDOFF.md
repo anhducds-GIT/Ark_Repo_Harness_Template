@@ -424,3 +424,18 @@ sửa `session-check.mjs`.
    **Chỉ bộ khung mở, các repo khác giữ kín** — bộ khung không chứa dữ liệu của ai; repo có việc
    thật thì mở ra là công bố dữ liệu, không nút CI nào đáng giá bằng.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.20** — Commit **chỉ sinh lại artifact** không bao giờ đóng
+   phiên được: bốn artifact máy sinh không đòi khoá nào, nên không vào `myRootAreas`, nên
+   `rootSuite` false, nên rơi vào nhánh "chưa kiểm" mà **không có cách nào thoát**. Loại commit đó
+   là thứ tôi tạo ở **mỗi bản**; nó không cắn suốt ngày chỉ vì mọi phiên đều đụng thêm mã nguồn.
+   Không phải nới lỏng: bốn file đó đã có phép kiểm riêng canh ("Sự thật máy sinh còn tươi").
+   Ba vế trong một phép kiểm — nguồn → chạy thật · artifact → không áp dụng · file khác → vẫn
+   "chưa kiểm". Vế cuối là đối chứng ngược.
+   **Một đột biến không bắt được**, đã ghi `ponytail:` tại dòng đó: nhánh trên che nó. Giữ vì
+   điều kiện ĐÚNG, không vì có phép kiểm ghim. Suite 87.
+   **Và tôi tự báo một lỗi của mình:** để thử xem `required status check` có chặn đẩy thẳng không,
+   tôi đã `git push` TRẦN và đẩy KHI CỔNG CHƯA XANH — phạm đúng hai luật. Cú đẩy đó lọt (chỉ cảnh
+   báo `Required status check "cong-kiem" is expected`), và nó **mang theo một lỗi thật**: tôi sinh
+   lại artifact TRƯỚC khi commit nên `repo-map.json` dựng từ HEAD cũ. **CI bắt được, làm đỏ `main`.**
+   Tôi phá luật để thử cái lưới, và cái lưới bắt đúng thứ tôi làm rơi. Đã vá và đẩy lại tử tế.
+

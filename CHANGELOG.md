@@ -3,6 +3,31 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.20 — 2026-09-04 — Commit chỉ sinh lại artifact thì không bao giờ đóng phiên được
+
+Bốn artifact máy sinh **không đòi khoá nào** (luật mục 1), nên chúng không vào `myRootAreas`, nên
+`rootSuite` false, nên một phiên **chỉ sinh lại artifact** rơi thẳng vào nhánh *"chưa kiểm"* — và
+**không có cách nào thoát**: chạy `npm test` cũng không đổi được kết luận.
+
+Tức một loại commit rất thường — `chore: sinh lai artifact`, thứ tôi tạo ở mỗi bản — **không bao
+giờ đóng phiên được**. Nó không cắn suốt cả ngày chỉ vì mọi phiên đều đụng thêm mã nguồn; lượt
+này là lượt đầu tiên diff chỉ có ba artifact, và cổng kẹt luôn.
+
+**Không phải nới lỏng.** Bốn file đó do máy sinh thẳng từ HEAD, và **đã có phép kiểm riêng canh
+chúng** ("Sự thật máy sinh còn tươi") — chạy suite cho chúng không chứng minh thêm gì. Cùng nguyên
+tắc đã dùng cho file nhị phân ở v1.2.13: **gọi tên đúng thứ vốn không áp dụng**, thay vì dán nhãn
+"không biết" lên chỗ ta biết rõ.
+
+Ba vế trong một phép kiểm, vì hai vế thì hở: đổi **file nguồn** → suite chạy thật · chỉ **artifact**
+→ không áp dụng · đổi **file khác** ở kho không có suite → vẫn *"chưa kiểm"*. Vế cuối là đối chứng
+ngược: thiếu nó thì một bản vá "coi mọi phiên là chỉ-artifact" sẽ im lặng báo xanh cho mọi thứ.
+
+Một đột biến **không bắt được**, và đã ghi `ponytail:` ngay tại dòng đó thay vì giả vờ 2/2: nhánh
+ngay trên đã chặn mọi ca đổi file thật trước khi tới đây, nên biến thể sai bị **che**. Giữ điều
+kiện chặt vì nó **đúng**, không vì có phép kiểm ghim nó.
+
+Suite 87.
+
 ## 1.2.18 — 2026-09-04 — FINAL-CLOSURE P4: dọn chỗ tự mâu thuẫn, rồi đóng băng mốc
 
 **Một trạng thái tự mâu thuẫn thì không đóng băng được — đóng băng nó chỉ là đóng băng lời nói

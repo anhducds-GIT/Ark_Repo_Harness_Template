@@ -187,4 +187,62 @@ function docMuc(kho, ten, as = "thu") {
   ok("6 · Mọi lệnh git đọc được ĐỎ được — repo không phải kho git");
 }
 
+/* ---- 7. Chi sinh lai artifact: "khong ap dung" chu khong phai "chua kiem" -- */
+{
+  // Bon artifact may sinh khong doi khoa nao (luat muc 1), nen chung khong vao `myRootAreas`,
+  // nen `rootSuite` false, nen mot phien CHI SINH LAI ARTIFACT roi thang vao nhanh "chua kiem"
+  // — va khong co cach nao thoat: chay `npm test` cung khong doi duoc ket luan. Tuc mot loai
+  // commit rat thuong (`chore: sinh lai artifact`) KHONG BAO GIO dong phien duoc.
+  //
+  // Cung nguyen tac da dung cho file nhi phan o v1.2.13: goi ten dung thu von khong ap dung,
+  // thay vi dan nhan "khong biet" len cho ta biet ro.
+  const { cha, kho, at } = khoNen();
+  try {
+    // Kho nen khong khai `scripts.test` (co y: khoi 1-6 khong can). Khoi nay thi CAN, vi ve (a)
+    // la doi chung "suite CHAY THAT" — thieu no thi ca hai ve deu BO va khoi nay xanh vo nghia.
+    writeFileSync(join(kho, "package.json"),
+      JSON.stringify({ name: "thu", version: "0.0.1", scripts: { test: "node tests/that.mjs" } }, null, 2) + NL, "utf8");
+    writeFileSync(join(kho, "tests", "that.mjs"), "console.log('  ok  mot phep kiem that');" + NL
+      + "console.log('1 passed, 0 failed, 1 total');" + NL, "utf8");
+    writeFileSync(join(kho, "STATUS.md"), "---" + NL + "ten: thu" + NL + "---" + NL + "# thu" + NL, "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "khai suite" + NL + NL + "Lane: thu");
+    at("push", "-q", "origin", "main");
+
+    // (a) Doi mot file MA NGUON -> suite PHAI chay that. Day la doi chung: thieu no thi mot ban
+    //     va "bo qua tuot" cung qua duoc khoi duoi.
+    writeFileSync(join(kho, "docs", "nguon.md"), "# doi mot file nguon" + NL, "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "doi file nguon" + NL + NL + "Lane: thu");
+    const m1 = docMuc(kho, "Test xanh");
+    assert.equal(m1.trangThai, "XANH", `doi file nguon thi suite phai chay: ${m1.chiTiet}`);
+    assert.match(m1.chiTiet, /passed/, "phai co so that cua suite, khong phai mot cau chung chung");
+
+    // (b) Chi sinh lai ARTIFACT -> khong ap dung, va phai noi ro la khong ap dung.
+    at("push", "-q", "origin", "main");
+    writeFileSync(join(kho, "DASHBOARD.md"), "# bang" + NL + "sinh lai" + NL, "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "sinh lai artifact" + NL + NL + "Lane: thu");
+    const m2 = docMuc(kho, "Test xanh");
+    assert.equal(m2.trangThai, "XANH",
+      `chi sinh lai artifact thi suite KHONG AP DUNG — bao "chua kiem" la khoa vinh vien mot loai commit rat thuong: ${m2.chiTiet}`);
+    assert.match(m2.chiTiet, /không áp dụng/, "phai noi ro la KHONG AP DUNG, khong im lang bao xanh");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+
+  // (c) DOI CHUNG NGUOC, va no phai o mot kho KHONG khai `scripts.test` — chi o do moi vao duoc
+  //     nhanh dang kiem. Doi mot file KHONG PHAI artifact thi van phai la "chua kiem": neu bo
+  //     nay thi mot ban va "coi moi phien la chi-artifact" se im lang bao xanh cho MOI THU.
+  const k2 = khoNen();
+  try {
+    writeFileSync(join(k2.kho, "docs", "that.md"), "# file nguon that" + NL, "utf8");
+    k2.at("add", "-A");
+    k2.at("commit", "-q", "-m", "doi file nguon o kho khong co suite" + NL + NL + "Lane: thu");
+    const m3 = docMuc(k2.kho, "Test xanh");
+    assert.equal(m3.trangThai, "BỎ",
+      `doi file KHONG phai artifact thi van phai la "chua kiem", khong duoc goi la "khong ap dung": ${m3.chiTiet}`);
+    assert.doesNotMatch(m3.chiTiet, /không áp dụng/, "day khong phai ca 'khong ap dung'");
+  } finally { rmSync(k2.cha, { recursive: true, force: true }); }
+  ok("7 · chỉ sinh lại artifact → không áp dụng · file nguồn → suite chạy thật · file khác → vẫn 'chưa kiểm'");
+}
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

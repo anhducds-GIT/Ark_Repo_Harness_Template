@@ -16,7 +16,7 @@ import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
 
 // fileURLToPath, không phải url.pathname: đường dẫn của Đức có dấu cách
 // ("C:\WORKING ZONE\...") và pathname trả về %20, khiến mọi lệnh git im lặng
@@ -641,6 +641,27 @@ check("Test xanh", () => {
    *   - phiên KHÔNG đổi gì  → đúng là không có gì phải kiểm. XANH thật.
    *   - phiên CÓ đổi mà không suite nào chạy → CHƯA KIỂM. Phải là `BỎ`, và mã thoát 2. */
   if (!suites.length && !rootSuite) {
+    /* CHỈ SINH LẠI ARTIFACT THÌ KHÔNG CÓ GÌ ĐỂ CHẠY TEST — và đó là một câu trả lời, không phải
+     * một dấu hỏi.
+     *
+     * Bốn artifact máy sinh không đòi khoá nào (luật mục 1), nên chúng không vào `myRootAreas`,
+     * nên `rootSuite` false, nên phiên **chỉ sinh lại artifact** rơi thẳng vào nhánh "chưa kiểm"
+     * — và không có cách nào thoát: chạy `npm test` cũng không đổi được kết luận. Tức một loại
+     * commit rất thường (`chore: sinh lai artifact`) **không bao giờ đóng phiên được**.
+     *
+     * KHÔNG phải nới lỏng: chúng do máy sinh thẳng từ HEAD, và đã có phép kiểm riêng canh chúng
+     * ("Sự thật máy sinh còn tươi") — chạy suite cho chúng không chứng minh thêm điều gì. Cùng
+     * một nguyên tắc đã dùng cho file nhị phân ở v1.2.13: gọi tên đúng thứ vốn không áp dụng,
+     * thay vì dán nhãn "không biết" lên chỗ ta biết rõ. */
+    /* ponytail: đột biến "coi MỌI phiên là chỉ-artifact" KHÔNG bắt được, và đó là câu trả lời
+       đúng: nhánh ngay trên (`myRootAreas.length > 0 && !hasRootTestScript()`) đã chặn mọi ca
+       đổi file thật trước khi tới đây, nên biến thể sai đó bị che. Giữ điều kiện chặt vì nó
+       ĐÚNG, không vì có phép kiểm ghim nó. Bỏ nhánh trên thì phải viết phép kiểm cho dòng này. */
+    const dsMaySinh = new Set(generatedFrom(structure));
+    const chiLaArtifact = sessionChanges.length > 0 && sessionChanges.every((c) => dsMaySinh.has(c.file ?? c));
+    if (chiLaArtifact) {
+      return { ok: true, msg: `Phiên này chỉ sinh lại ${sessionChanges.length} artifact máy sinh — suite không áp dụng; phép kiểm "Sự thật máy sinh còn tươi" mới là chỗ canh chúng.` };
+    }
     const coThayDoi = sessionChanges.length > 0;
     if (!coThayDoi) return { ok: true, msg: "Phiên này không đổi file nào — không có gì phải kiểm." };
     return {
