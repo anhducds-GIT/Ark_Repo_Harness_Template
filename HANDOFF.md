@@ -513,3 +513,36 @@ sửa `session-check.mjs`.
    nhất công cụ đưa ra là tăng số bản. Vì vậy phép thử cuối của đề bài — dựng repo mới từ bộ khung
    rồi chạy `state-check` ở đó — **chưa đạt được ở chặng A**: repo mới hiện nhận 6 lệnh, không có
    gói này. Đã dựng thử một repo mới để xác nhận, không suy luận.
+
+ - **2026-09-04 · `claude-so-migrate`** — Sổ migrate thôi là artifact trên claude.ai, thành file
+   trong repo: `SO-MIGRATE-Ark-Repo-Harness.html` ở gốc, máy sinh, có commit. Đức chốt duy trì
+   bảng ở dạng HTML trong repo để MỌI AI đọc và theo dõi được — trước đó muốn xem sổ là phải có
+   một phiên Claude đăng hộ, và **không ai kiểm được artifact đó có còn khớp với `docs/migrations/`
+   hay không**. Nay nó nằm trong khối `generators`, nên cổng kiểm nó mỗi phiên như bảng mẹ.
+   Đổi lại, `build-so-migrate.mjs` phải tất định từ HEAD: gỡ hai nguồn không tất định — `docHoSo`
+   đọc đĩa → đọc HEAD (`nguonHEAD`), và `trangSo(hoSo, ngay = homNay())` → mốc là **tham số bắt
+   buộc**, sai dạng thì chết kèm `NGAY_THIEU`. `mocHEAD()` mượn của bảng mẹ chứ không chép: nó
+   fail-closed, mà bản chép thứ hai của một luật thì bên lệch sẽ là bên ít ai đọc.
+   **Chỗ suýt hỏng âm thầm, và là phần đắt nhất của bản vá:** khối "Trang liên quan" của bảng mẹ
+   tìm chuỗi `https://claude.ai/code/artifact/`. Bỏ artifact đi là khối ấy **rỗng vĩnh viễn** —
+   sổ migrate mất đường dẫn khỏi trang mẹ, mà trang vẫn sinh ra trông hoàn toàn bình thường. Nay
+   `khoiLienQuan` tìm liên kết markdown tới file `.html` **CÓ THẬT trong HEAD** (link chết trên
+   trang mẹ còn tệ hơn không có link), và khối này trước đó **chưa từng có một phép kiểm nào**.
+   Mục 8 của hiến pháp: thêm thì phải bớt — hai dòng bản đồ nói gần cùng một việc đã **gộp còn
+   một**, nên `AGENTS.md` không dài thêm.
+   **Số đo:** `npm test` 88 → **91 phép kiểm, xanh, exit 0**; ba phép kiểm mới **đã thử đột biến,
+   3/3 đỏ đúng chỗ** (lùi mốc về đồng hồ · nguồn HEAD quay ra đọc đĩa · Trang liên quan chỉ nhận
+   artifact claude.ai). Cổng cấu trúc 0 ĐỎ · 3 VÀNG (B6, B9 — có từ trước). `--check-head` xanh
+   cả ba bộ sinh. **Không tăng số bản:** bản trích trong `template/` không đổi một byte.
+   **Hai chỗ vấp đáng nhớ cho phiên sau.** (1) `build-dashboard.mjs` nhúng mã commit của HEAD vào
+   `repo-map.json`/`DASHBOARD.md`, nên vòng lặp "sinh lại tới khi worktree sạch" **không bao giờ
+   dừng** — tôi đã tạo 3 commit đuổi theo một trường mà `--check-head` vốn bỏ qua. Cách đúng:
+   sinh một lượt, commit một lượt, rồi tin `--check-head`. (2) Bản vá viết bằng chuỗi tìm-thay LF,
+   còn thư mục làm việc trên Windows là CRLF: mọi mỏ neo nhiều dòng khớp **0 lần** cho tới khi
+   chuẩn hoá — và một ca đột biến "không dựng nổi" im lặng chính là thứ nó sinh ra để chống.
+   **CHƯA ĐẨY, và cần Đức xử một việc:** phiên `claude-multiflow` đã giành **cả bốn vùng**, kể cả
+   `_root`/`_docs`/`_code` tôi đang giữ, trong lúc tôi đang đo. Việc của tôi đã commit xong và
+   worktree sạch phần của tôi, nhưng cổng đóng phiên sẽ đỏ vì tôi không còn khoá nào — nên tôi
+   dừng ở commit, không đẩy. Ngoài ra: `scripts/state-check.mjs` + `scripts/what-next.mjs` +
+   `tests/assistant-smoke.mjs` của chặng A đã vào HEAD nhưng **chưa được khai vào `package.json`**
+   (không có lệnh npm, không nằm trong `npm test`) — không phải việc của tôi, nhưng đừng để rơi.
