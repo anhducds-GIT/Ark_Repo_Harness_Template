@@ -6,11 +6,12 @@
  */
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { docHoSo, khoiHoSo, trangSo } from "../scripts/build-so-migrate.mjs";
+import { docHoSo, khoiHoSo, nguonHEAD, trangSo } from "../scripts/build-so-migrate.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -114,6 +115,46 @@ Xong.
     assert.match(html, /docs\/migrations/, "va phai chi duong lam sao them ho so");
   } finally { rmSync(root, { recursive: true, force: true }); }
   ok("sổ rỗng nói rõ là rỗng và chỉ đường");
+}
+
+/* ---- 6. Nguồn HEAD đọc HEAD, KHÔNG đọc thư mục làm việc ----------------- */
+{
+  /* Vì sao ca này đắt hơn nó trông: từ 04/09 sổ này được COMMIT và nằm trong khối `generators`,
+     nên cổng đóng phiên chạy `--check-head` mỗi phiên. Một bộ sinh đọc THƯ MỤC LÀM VIỆC thì
+     file sửa dở của BẤT KỲ phiên nào cũng làm trang lệch — và phiên bị chặn sẽ không hiểu vì
+     sao, vì cái làm lệch không nằm trong commit của họ. Kiểu hỏng làm tê cả repo.
+
+     Kho thật: hồ sơ CÓ trong HEAD nhưng ĐÃ XOÁ trên đĩa. Nguồn HEAD phải vẫn thấy nó, nguồn
+     đĩa phải không. Thiếu vế sau thì một hàm đọc đĩa vẫn qua được vế đầu. */
+  const root = dungKho({ "a.md": hoSoDu });
+  try {
+    const g = (...a) => execFileSync("git", ["-c", "user.email=t@t", "-c", "user.name=t", ...a],
+      { cwd: root, stdio: "ignore" });
+    g("init", "-q");
+    g("add", "-A");
+    g("commit", "-q", "-m", "ho so dau");
+    rmSync(join(root, "docs", "migrations", "a.md"));
+    assert.equal(docHoSo(root, nguonHEAD(root)).length, 1,
+      "nguon HEAD phai VAN thay ho so da commit, du tren dia khong con");
+    assert.equal(docHoSo(root).length, 0,
+      "nguon dia phai KHONG thay — thieu ve nay thi mot ham doc dia cung qua duoc ve tren");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+  ok("nguồn HEAD đọc HEAD, không đọc thư mục làm việc");
+}
+
+/* ---- 7. Không có mặc định nhìn đồng hồ --------------------------------- */
+{
+  /* Một mặc định `homNay()` vô hại đúng tới lúc trang được commit. Từ lúc đó, sang ngày mới là
+     bản sinh lại lệch bản đã commit **dù không một dữ liệu nào đổi**, cổng đỏ, và MỌI phiên bị
+     chặn đẩy vì một ngày đã trôi qua. Đã thử đột biến: đưa `ngay = homNay()` trở lại làm mặc
+     định thì ca này ĐỎ. */
+  assert.throws(() => trangSo([], undefined), /NGAY_THIEU/,
+    "khong dua moc ngay thi phai chet ngay tai cho, khong duoc lui ve dong ho");
+  assert.throws(() => trangSo([], "hom nay"), /NGAY_THIEU/,
+    "moc sai dang cung phai chet — nhan bua thi trang tu khai sai tuoi ngay dong dau");
+  // ĐỐI CHỨNG DƯƠNG: mốc đúng dạng thì PHẢI sinh ra trang, không thì một hàm luôn ném cũng qua.
+  assert.match(trangSo([], "2026-01-01"), /2026-01-01/, "moc dung dang thi phai sinh ra trang");
+  ok("mốc ngày là tham số bắt buộc, không có mặc định nhìn đồng hồ");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

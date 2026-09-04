@@ -12,7 +12,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { gomDuLieu, noChuaChungMinh, trang } from "../scripts/build-overview.mjs";
+import { gomDuLieu, khoiLienQuan, noChuaChungMinh, trang } from "../scripts/build-overview.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -156,6 +156,32 @@ const html = trang(dl);
     try { execFileSync("git", ["worktree", "remove", "--force", cay], { cwd: ROOT, stdio: "ignore" }); } catch (_) { /* dọn được thì tốt */ }
     fs.rmSync(noi, { recursive: true, force: true });
   }
+}
+
+/* ---- 7. Trang mẹ PHẢI dẫn tới trang vệ tinh ----------------------------- */
+{
+  /* Khối "Trang liên quan" chưa từng có phép kiểm nào, và nó là kiểu hỏng ÂM THẦM: bản trước
+     tìm chuỗi `https://claude.ai/code/artifact/`, nên khi Đức chốt (04/09) bảng ở dạng file
+     HTML trong repo thì khối này rỗng VĨNH VIỄN — sổ migrate mất đường dẫn khỏi trang mẹ, mà
+     trang vẫn sinh ra trông hoàn toàn bình thường. Với người chỉ mở một link, trang vệ tinh
+     không có đường dẫn tới thì coi như không tồn tại. */
+  assert.match(html, /Trang liên quan/, "trang me phai co khoi Trang lien quan");
+  assert.match(html, /href="SO-MIGRATE-Ark-Repo-Harness\.html"/,
+    "phai co duong dan tu trang me sang so migrate");
+
+  // Link chết còn tệ hơn không link: chỉ nhận trang CÓ THẬT trong HEAD.
+  assert.equal(khoiLienQuan([["Sổ giả", "[so-gia.html](so-gia.html)"]], new Set()), "",
+    "file khong co trong HEAD thi KHONG duoc len trang me");
+  // Tên file viết trong câu văn không phải liên kết — không được lọt.
+  assert.equal(khoiLienQuan([["Sinh trang", "npm run overview -- <file-tam.html>"]], new Set(["file-tam.html"])), "",
+    "ten file trong cau van khong phai lien ket markdown, khong duoc lot");
+  // Trang mẹ tự trỏ về mình trong mục "trang liên quan" là nhiễu.
+  assert.equal(khoiLienQuan([["Trang mẹ", "[DASHBOARD-Ark-Repo-Harness.html](DASHBOARD-Ark-Repo-Harness.html)"]],
+    new Set(["DASHBOARD-Ark-Repo-Harness.html"])), "", "trang me khong duoc tu tro ve minh");
+  // ĐỐI CHỨNG DƯƠNG: đủ điều kiện thì PHẢI ra link, không thì một hàm luôn trả "" cũng qua hết.
+  assert.match(khoiLienQuan([["Sổ thật", "[X.html](X.html)"]], new Set(["X.html"])), /href="X\.html"/,
+    "co lien ket markdown va file co that thi PHAI ra link");
+  ok("trang mẹ dẫn tới sổ migrate, và chỉ dẫn tới trang có thật");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

@@ -13,34 +13,66 @@
  * và thiếu phần nào thì lộ ra ngay thay vì lẫn vào văn xuôi. Bốn phần cố định:
  *   trạng thái mới nhất · số đo trước→sau · báo cáo · câu hỏi mở
  *
- * KHÔNG COMMIT FILE HTML SINH RA. Nó là ảnh chụp một lúc; hồ sơ mới là tài liệu.
+ * BẢN RA CÓ COMMIT — `SO-MIGRATE-Ark-Repo-Harness.html` ở gốc repo, đứng cạnh bảng mẹ
+ * `DASHBOARD-Ark-Repo-Harness.html`. Đức chốt 04/09: bảng ở dạng file HTML trong repo thì MỌI AI
+ * đọc được và theo dõi được, không phải nhờ một phiên Claude đăng hộ lên claude.ai. Trước đó sổ
+ * này chỉ tồn tại dạng artifact — và không ai kiểm được một artifact có còn khớp với hồ sơ hay không.
+ *
+ * ĐỔI LẠI, NỘI DUNG PHẢI SUY HOÀN TOÀN TỪ HEAD. Từ lúc được commit, file này nằm trong khối
+ * `generators` của `.repo-structure.json`, nên cổng đóng phiên chạy `--check-head` MỖI PHIÊN.
+ * Bộ sinh nhìn ĐỒNG HỒ thì sang ngày mới là bản sinh lại lệch bản đã commit **dù không một dữ
+ * liệu nào đổi**, và MỌI phiên bị chặn đẩy. Bộ sinh đọc THƯ MỤC LÀM VIỆC thì file sửa dở của bất
+ * kỳ phiên nào cũng làm trang lệch, và phiên bị chặn không hiểu vì sao — cái làm lệch không nằm
+ * trong commit của họ. Nên: đọc HEAD (`nguonHEAD`), và mốc ngày lấy `mocHEAD()` của bảng mẹ.
  */
 
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Mượn của bảng mẹ, KHÔNG chép lại. `mocHEAD` fail-closed: không hỏi được git thì KHÔNG sinh,
+// thay vì lùi về `new Date()` — mà cái lùi-về ấy đúng là cửa hậu đoạn trên vừa đóng. `TRANG_FILE`
+// lấy về làm link "về bảng tổng quan": một nguồn duy nhất cho tên file bảng mẹ, nên đổi tên bên
+// đó thì link bên này không chết âm thầm.
+import { mocHEAD, TRANG_FILE as BANG_ME } from "./build-overview.mjs";
 import { md, esc, tachFrontmatter } from "./md-mini.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
 const THU_MUC = "docs/migrations";
 
-/* Ngày theo đồng hồ MÁY NÀY, không phải UTC — sinh lúc 0h30 giờ Việt Nam thì `toISOString()`
-   trả ngày HÔM QUA, và trang tự khai sai tuổi ngay dòng đầu. Lỗi này đã xảy ra thật hai lần. */
-function homNay() {
-  const x = new Date();
-  const z = (n) => String(n).padStart(2, "0");
-  return `${x.getFullYear()}-${z(x.getMonth() + 1)}-${z(x.getDate())}`;
+/* HAI NGUỒN HỒ SƠ — và chỉ một trong hai được dùng cho bản đem commit.
+ *
+ * `nguonHEAD` là nguồn thật: "sinh" và "kiểm" phải hỏi CÙNG MỘT CÂU, nếu không hai bên trả lời
+ * khác nhau và cổng đỏ mà không ai lần ra nguyên nhân. `nguonDia` chỉ để phép kiểm dựng kho giả
+ * trong thư mục tạm — chỗ đó chưa có commit nào nên không có HEAD mà đọc. */
+function nguonDia(root) {
+  const thuMuc = path.join(root, ...THU_MUC.split("/"));
+  return {
+    liet: () => { try { return fs.readdirSync(thuMuc).filter((f) => f.endsWith(".md")).sort(); } catch { return []; } },
+    doc: (f) => fs.readFileSync(path.join(thuMuc, f), "utf8")
+  };
 }
 
-export function docHoSo(root = ROOT) {
-  const thuMuc = path.join(root, ...THU_MUC.split("/"));
-  let ten;
-  try { ten = fs.readdirSync(thuMuc).filter((f) => f.endsWith(".md")); } catch { return []; }
+export function nguonHEAD(root = ROOT) {
+  const gitRa = (...args) => execFileSync("git", ["-c", "core.quotepath=false", ...args],
+    { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  return {
+    liet: () => {
+      try {
+        return gitRa("ls-tree", "-z", "--name-only", `HEAD:${THU_MUC}`)
+          .split(String.fromCharCode(0)).filter((f) => f.endsWith(".md")).sort();
+      } catch { return []; }
+    },
+    doc: (f) => gitRa("show", `HEAD:${THU_MUC}/${f}`)
+  };
+}
+
+export function docHoSo(root = ROOT, nguon = nguonDia(root)) {
   const ra = [];
-  for (const f of ten) {
-    const raw = fs.readFileSync(path.join(thuMuc, f), "utf8");
+  for (const f of nguon.liet()) {
+    const raw = nguon.doc(f);
     // `tachFrontmatter` tra ve `than`, khong phai `body`. Destructure sai ten thi `body` la
     // undefined, roi `body ?? raw` nga ve CA FILE — nen frontmatter bi in lai trong than bai.
     const { fm, than } = tachFrontmatter(raw);
@@ -84,7 +116,14 @@ export function khoiHoSo(h) {
 </article>`;
 }
 
-export function trangSo(hoSo, ngay = homNay()) {
+export function trangSo(hoSo, ngay) {
+  /* MỐC NGÀY LÀ THAM SỐ BẮT BUỘC, không có mặc định nhìn đồng hồ. Một mặc định `homNay()` vô
+     hại đúng tới lúc trang được commit: từ lúc đó, sang ngày là bản sinh lại lệch bản đã commit
+     **dù không dữ liệu nào đổi**, cổng đỏ, và mọi phiên bị chặn đẩy vì một ngày đã trôi qua.
+     Chết ngay tại chỗ kèm tên nguyên nhân thì rẻ hơn một cổng đỏ không ai giải thích được. */
+  if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String(ngay))) {
+    throw new Error(`NGAY_THIEU: trangSo() cần mốc ngày dạng YYYY-MM-DD, nhận "${ngay}". Trang này được commit nên mốc phải suy từ HEAD (mocHEAD()), không lấy từ đồng hồ.`);
+  }
   const dem = hoSo.length;
   const chuaDong = hoSo.filter((h) => String(h.fm.cong_dong_phien ?? "").trim() !== "xanh").length;
   const than = dem
@@ -172,7 +211,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
 </style>
 <div class="wrap">
   <header class="dau">
-    <div class="nhan-hang"><span>sinh ngày ${esc(ngay)}</span></div>
+    <div class="nhan-hang"><span>sinh ngày ${esc(ngay)}</span><span aria-hidden="true">·</span><a href="${esc(BANG_ME)}">← bảng tổng quan</a></div>
     <h1>Sổ Migrate</h1>
     <p style="color:var(--chu2);font-size:16.5px;max-width:66ch">
       Mỗi lần đưa một repo lên chuẩn để lại đúng một hồ sơ ở đây, cùng một khuôn. Việc này xảy ra
@@ -195,14 +234,47 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
 
 /* ---- chạy ------------------------------------------------------------------ */
 
+/* TÊN FILE MANG TÊN DỰ ÁN, cùng lý do bảng mẹ mang tên dự án (Đức chốt 04/09): mỗi repo sinh ra
+   một sổ, cả đống cùng rơi vào một thư mục Tải về, và ba file tên `SO-MIGRATE.html` thì mở cái
+   nào cũng phải đoán. Viết cứng chứ không suy từ `.repo-structure.json`: file này không nằm
+   trong bộ khung đem phát, nên suy tự động chỉ thêm một đường hỏng. */
+export const TRANG_FILE = "SO-MIGRATE-Ark-Repo-Harness.html";
+
+/* MỘT chỗ duy nhất dựng ra trang, dùng cho CẢ sinh lẫn kiểm. Hai đường dựng riêng thì sớm muộn
+   lệch nhau, và bên lệch sẽ là bên chỉ chạy ở cổng — tức bên không ai đọc kết quả. */
+export function sinh() {
+  const hoSo = docHoSo(ROOT, nguonHEAD());
+  return { hoSo, html: trangSo(hoSo, mocHEAD()) };
+}
+
 const THIS = fileURLToPath(import.meta.url);
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
-  const ra = process.argv.slice(2).find((a) => !a.startsWith("--"));
-  if (!ra) {
-    console.error("Dùng: node scripts/build-so-migrate.mjs <file-ra.html>");
-    process.exit(2);
+  const args = process.argv.slice(2);
+
+  if (args.includes("--check-head")) {
+    // Cổng đóng phiên gọi đúng nhánh này. Nó hỏi MỘT câu: bản đã commit có còn đúng với HEAD
+    // không. Cả hai vế đều dựng từ HEAD, nên việc sửa dở của bất kỳ phiên nào cũng không lọt vào.
+    let dangCo = null;
+    try {
+      dangCo = execFileSync("git", ["-c", "core.quotepath=false", "show", `HEAD:${TRANG_FILE}`],
+        { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    } catch (_) { dangCo = null; }
+    if (dangCo === null) {
+      console.error(`THIEU_TRANG: ${TRANG_FILE} chưa có trong HEAD. Sinh rồi commit: node scripts/build-so-migrate.mjs`);
+      process.exit(1);
+    }
+    if (sinh().html !== dangCo) {
+      console.error(`TRANG_CU: ${TRANG_FILE} đã commit không khớp với HEAD. Sinh lại rồi commit: node scripts/build-so-migrate.mjs`);
+      process.exit(1);
+    }
+    console.log(`${TRANG_FILE} khớp với HEAD.`);
+    process.exit(0);
   }
-  const hoSo = docHoSo();
-  fs.writeFileSync(path.resolve(ra), trangSo(hoSo), "utf8");
-  console.log(`Đã sinh ${ra} — ${hoSo.length} hồ sơ migrate.`);
+
+  // Không đưa đường dẫn thì ghi vào bản chuẩn của repo. Có đưa thì ghi ra đó — để xem thử mà
+  // không chạm file trong repo.
+  const ra = args.find((a) => !a.startsWith("--")) || path.join(ROOT, TRANG_FILE);
+  const { hoSo, html } = sinh();
+  fs.writeFileSync(path.resolve(ra), html, "utf8");
+  console.log(`Đã sinh ${ra} — ${hoSo.length} hồ sơ migrate · mốc HEAD ${mocHEAD()}.`);
 }

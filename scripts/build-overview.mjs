@@ -44,6 +44,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const gitRa = (...args) => execFileSync("git", ["-c", "core.quotepath=false", ...args],
   { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
 const doc = (rel) => { try { return gitRa("show", `HEAD:${rel}`); } catch (_) { return null; } };
+/* Trang .html ở GỐC repo, theo HEAD. Dùng để "Trang liên quan" chỉ trỏ tới trang có thật. */
+const lietHTML = () => {
+  try {
+    return gitRa("ls-tree", "-z", "--name-only", "HEAD")
+      .split(String.fromCharCode(0)).filter((f) => f.endsWith(".html"));
+  } catch (_) { return []; }
+};
 const liet = (rel) => {
   try {
     return gitRa("ls-tree", "-z", "--name-only", `HEAD:${rel}`)
@@ -405,20 +412,31 @@ export function khoiBatDau(dl) {
 
 /* TRANG LIÊN QUAN — đọc thẳng từ bản đồ mục 6, không khai lần thứ hai.
    Trang vệ tinh (sổ migrate…) trước đây không có đường nào dẫn tới từ trang mẹ, nên coi như
-   không tồn tại với người chỉ mở một link. */
-export function khoiLienQuan(banDo) {
-  const MAU = "https://claude.ai/code/artifact/";
-  const dong = (banDo || []).filter((c) => String(c[1] || "").includes(MAU));
-  if (!dong.length) return "";
-  const item = dong.map((c) => {
-    // Cắt bằng chỉ số, không bằng regex — đường dẫn có dấu `/` nên regex viết trong chuỗi rất
-    // dễ bị nuốt mất dấu thoát, và lúc đó nó im lặng khớp sai.
-    const tu = c[1].indexOf(MAU);
-    const url = c[1].slice(tu).split(/[\s)|<"']/)[0];
-    const ten = String(c[0]).split("**").join("");
-    return `<li><a href="${esc(url)}">${esc(ten)}</a></li>`;
-  }).join("");
-  return `<div class="the"><h2>Trang liên quan</h2><ul class="lienquan">${item}</ul></div>`;
+   không tồn tại với người chỉ mở một link.
+
+   ĐỔI 04/09, và đây là chỗ dễ hỏng ÂM THẦM nhất của cả bản vá này. Bản trước tìm chuỗi
+   `https://claude.ai/code/artifact/`, tức trang vệ tinh CHỈ hiện ra khi nó là artifact trên
+   claude.ai. Đức chốt bảng ở dạng file HTML trong repo — nên với phép tìm cũ, bỏ artifact đi
+   là khối này rỗng VĨNH VIỄN và đường dẫn tới sổ migrate mất hẳn khỏi trang mẹ, mà trang vẫn
+   sinh ra bình thường nên không ai thấy.
+
+   Nay tìm LIÊN KẾT MARKDOWN `[chữ](file.html)`, và chỉ nhận khi file đó CÓ THẬT trong HEAD —
+   một link chết trên trang mẹ còn tệ hơn không có link. Đòi dạng ngoặc đầy đủ là để
+   `<file-tạm.html>` và `bang.html` viết trong câu văn không lọt vào. */
+export function khoiLienQuan(banDo, trangCo) {
+  const co = trangCo instanceof Set ? trangCo : new Set(trangCo || []);
+  const item = [];
+  for (const c of banDo || []) {
+    for (const m of String(c[1] || "").matchAll(/\]\(([^()\s]+\.html)\)/g)) {
+      const url = m[1];
+      // Bỏ chính trang mẹ: một trang tự trỏ về mình trong mục "trang liên quan" là nhiễu.
+      if (url === TRANG_FILE || !co.has(url)) continue;
+      const ten = String(c[0]).split("**").join("");
+      item.push(`<li><a href="${esc(url)}">${esc(ten)}</a></li>`);
+    }
+  }
+  if (!item.length) return "";
+  return `<div class="the"><h2>Trang liên quan</h2><ul class="lienquan">${item.join("")}</ul></div>`;
 }
 
 export function trang(dl) {
@@ -497,7 +515,7 @@ export function trang(dl) {
   <section class="tab" id="tab-tong-quan" hidden>
     ${khoiNowNext(st)}
     ${khoiBatDau(dl)}
-    ${khoiLienQuan(dl.banDo)}
+    ${khoiLienQuan(dl.banDo, dl.trangCo)}
     ${khoiVongDoi(st)}
     ${khoiSucKhoe(so)}
     <details class="the">
@@ -710,6 +728,7 @@ export function gomDuLieu() {
     ngay: mocHEAD(),
     lenh: Object.entries(pkg.scripts || {}),
     banDo: docBanDo(doc("AGENTS.md")),
+    trangCo: new Set(lietHTML()),
     workflows, protocols, adrs, nhatKy,
     legend: legendRaw ? tachFrontmatter(legendRaw).than : null,
     st,
