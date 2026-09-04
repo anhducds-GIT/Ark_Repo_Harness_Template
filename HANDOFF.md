@@ -399,3 +399,14 @@ sửa `session-check.mjs`.
    biết nhánh. Lý do luật cấm `git push` trần là "cuốn theo commit của phiên khác", mà đẩy đúng
    một ref thẻ thì **không thể cuốn theo gì** — nên ghi rõ ở đây thay vì lặng lẽ làm.
 
+ - **2026-09-04 · `harness-vong2` · thử thật đường lấy mốc** — Không tin câu lệnh mình vừa viết:
+   clone thẻ về rồi chạy `upgrade --plan` như một repo thứ ba sẽ làm. Hai điều lộ ra, cả hai đã ghi
+   vào `STATUS.md`/`AGENTS.md`:
+   (a) **`--depth 1` thì KHÔNG phát được** — sổ phát hành đối chiếu với lịch sử git, mà clone nông
+   thì lịch sử bị cắt: `NHAN_CHUNG_HONG`. Đó là chính cái chốt v1.2.13 dựng ra, nay chặn đúng
+   đường đi tắt của tôi. Câu lệnh trong tài liệu nay nói rõ đừng dùng `--depth 1`.
+   (b) Clone theo thẻ thì đứng ở **detached HEAD**, và `safe-push` (từ v1.2.15) từ chối ở đó —
+   đúng, và không cản gì: từ bản sao mốc ta chỉ **phát đi**, không đẩy lên.
+   Clone đầy đủ: `upgrade --plan` chạy đúng, kể ra 7 file sẽ lắp. Đường lấy mốc **đã chạy thật**,
+   không phải một câu lệnh chép trong tài liệu.
+

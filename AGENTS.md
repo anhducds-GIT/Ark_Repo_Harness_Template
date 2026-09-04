@@ -151,7 +151,7 @@ minh được nó **tự** nạp lúc mở phiên.
 | Viết đề bài cho một phiên AI | [docs/_TEMPLATE-brief.md](docs/_TEMPLATE-brief.md) |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy `npm run bootstrap` |
-| **Lắp bộ khung vào một repo mới — lấy bản nào** | **thẻ `v1.2.17`**, mốc Stable Baseline — [ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md). `git clone --branch v1.2.17 <repo>`. Lắp từ mốc, đừng lắp từ HEAD đang chạy: HEAD là thứ **đang chạy**, không phải thứ **dùng được**. Thẻ có thật trên remote — không phải một con số gõ tay trong tài liệu |
+| **Lắp bộ khung vào một repo mới — lấy bản nào** | **thẻ `v1.2.17`**, mốc Stable Baseline — [ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md). `git clone --branch v1.2.17 <repo>` — **đừng thêm `--depth 1`**: sổ phát hành đối chiếu với lịch sử, clone nông thì bộ khung từ chối phát (`NHAN_CHUNG_HONG`, đã thử thật 04/09). Lắp từ mốc, đừng lắp từ HEAD đang chạy: HEAD là thứ **đang chạy**, không phải thứ **dùng được**. Thẻ có thật trên remote — không phải một con số gõ tay trong tài liệu |
 | **Biết vì sao bộ khung có hình dạng hôm nay** | [docs/ROADMAP-V1.md](docs/ROADMAP-V1.md) — **LỊCH SỬ, đã xong**. Bốn khối A→D dẫn tới v1.0, mỗi lỗ kèm cách chứng minh nó có thật. Việc đang làm thì đọc [STATUS.md](STATUS.md), từng bản đóng gì thì đọc [CHANGELOG.md](CHANGELOG.md) |
 | **Nhờ một AI khác brainstorm cho repo này** | [docs/briefs/BRAINSTORM-GPT-V1.md](docs/briefs/BRAINSTORM-GPT-V1.md) — dán trọn, đừng tóm tắt hộ |
 | **Việc lặp lại — làm theo danh sách kiểm, đừng tự nghĩ lại** | [docs/SO-TAY-AGENT.md](docs/SO-TAY-AGENT.md) — bảy mục, mỗi mục một checklist. **Việc nào có mục ở đó thì phải làm theo mục đó** |
