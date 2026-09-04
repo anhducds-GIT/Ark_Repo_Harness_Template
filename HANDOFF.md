@@ -439,3 +439,14 @@ sửa `session-check.mjs`.
    lại artifact TRƯỚC khi commit nên `repo-map.json` dựng từ HEAD cũ. **CI bắt được, làm đỏ `main`.**
    Tôi phá luật để thử cái lưới, và cái lưới bắt đúng thứ tôi làm rơi. Đã vá và đẩy lại tử tế.
 
+ - **2026-09-04 · `harness-vong2` · ĐÓNG PHIÊN** — `next_step` trên bảng vẫn ghi việc P4 đã làm
+   xong ("dọn trạng thái tự mâu thuẫn"), tức bảng lại nói một việc đã xong — đúng bệnh P4 vừa
+   chữa, ở chính dòng dùng để chữa nó. Đã sửa: nay ghi "không có việc bắt buộc — đóng băng ở mốc
+   v1.2.17, chỉ vá khi có lỗi thật".
+   **Trạng thái đóng phiên:** ba repo cùng ở `1.2.20`, cổng XANH ở cả ba, CI xanh, không còn gì
+   chưa đẩy. Bộ khung public + đã bật chặn merge/secret scanning/push protection (ADR-0004).
+   Mốc Stable Baseline `v1.2.17` có thẻ thật trên remote và **đã thử lấy về chạy được**.
+   **Việc cần Đức: không có.** Việc treo cho phiên sau (không gấp): ở 3AI,
+   `scripts/p003_antigravity_protocol_ssot.py:26` vẫn trỏ tới thư mục mirror đã gỡ, và ClauCo còn
+   3 file sửa dở chưa commit trên nhánh đó.
+
