@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-04",
-  "generated_commit": "6547332",
+  "generated_commit": "873aeb5",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,20 +33,20 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Soi lại cổng đóng phiên: 7 trong 11 phép kiểm chưa từng đỏ lần nào qua 34 lượt chạy",
+      "next_step": "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)",
       "human_action": "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-03",
       "last_verified_commit": "45501714a967d90e9026bdedcf616d50e7996f59",
-      "open_item": "v1.2.15: thôi lùi về mặc định — detached HEAD và giành vùng đều phải nói rõ"
+      "open_item": "v1.2.16: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Soi lại cổng đóng phiên: 7 trong 11 phép kiểm chưa từng đỏ lần nào qua 34 lượt chạy",
+      "title": "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)",
       "rank": 1,
       "claim": null
     }
