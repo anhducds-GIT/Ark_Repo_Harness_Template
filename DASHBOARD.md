@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `05eea28` (2026-09-04). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `aef3cc5` (2026-09-04). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
 1. **Việc ưu tiên #1** — **_root** — Không có việc bắt buộc — bộ khung đã đóng băng ở mốc v1.2.17, nay chỉ vá khi có lỗi thật · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-04 @ `05eea28` · [HANDOFF.md](HANDOFF.md)
+2. **Phiên gần nhất** — 2026-09-04 @ `aef3cc5` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 
