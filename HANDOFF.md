@@ -410,3 +410,17 @@ sửa `session-check.mjs`.
    Clone đầy đủ: `upgrade --plan` chạy đúng, kể ra 7 file sẽ lắp. Đường lấy mốc **đã chạy thật**,
    không phải một câu lệnh chép trong tài liệu.
 
+ - **2026-09-04 · `harness-vong2` · ĐÓNG CHỖ HỞ CUỐI** — Đức chuyển repo bộ khung sang **public**,
+   nên đã bật được: `required status check` = `cong-kiem` trên `main` · nhánh phải cập nhật trước
+   khi merge · cấm force-push · cấm xoá `main` · **secret scanning** · **push protection**. Đọc lại
+   bằng API để xác nhận, không tin thông báo lúc ghi. Ghi ở [ADR-0004](docs/adr/0004-repo-bo-khung-cong-khai.md).
+   **Quét lịch sử TRƯỚC khi mở, không mở rồi mới lo:** public nghĩa là cả 108 commit thành đọc
+   được, mà cổng chỉ soi cây làm việc — nó **chưa bao giờ** soi lịch sử. Sạch: không token, không
+   `.env`, bốn chỗ khớp mẫu đều là chú thích giải thích mẫu dò và đồ giả trong phép kiểm. Quét cả
+   `Chrome_Extension_AI_Agentic` (668 commit) vì repo đó cũng vừa mở — cũng sạch.
+   **Biên, ghi để không ai tưởng nhầm:** `enforce_admins` để TẮT có chủ ý. Hàng rào chặn **merge
+   qua PR**, KHÔNG chặn chủ repo đẩy thẳng `main` — bật nó thì mọi dòng Log cũng phải đi PR và dòng
+   chảy `safe-push` gãy. Đẩy thẳng vẫn là chuyện kỷ luật, không phải hàng rào.
+   **Chỉ bộ khung mở, các repo khác giữ kín** — bộ khung không chứa dữ liệu của ai; repo có việc
+   thật thì mở ra là công bố dữ liệu, không nút CI nào đáng giá bằng.
+
