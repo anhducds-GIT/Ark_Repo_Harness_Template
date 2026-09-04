@@ -369,3 +369,21 @@ sửa `session-check.mjs`.
    lời mà vẫn kêu là cách nhanh nhất khiến người ta bỏ qua cả danh sách.** Nay `can-nang.mjs` dò tên
    từng mục trong `tests/cong-do-that.mjs` và tách hai nhóm: còn phải hỏi · đã có ca hỏng dựng sẵn.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.18 (FINAL-CLOSURE P4)** — Dọn chỗ **tự mâu thuẫn** rồi
+   đóng băng mốc.
+   Mâu thuẫn thật, sống nhiều ngày: `STATUS.md` vẫn ghi *"chưa từng chạy trên repo thật khác nghề ·
+   nhãn `unproven` vẫn đúng"* trong khi bộ khung đã chạy thật ở **hai** repo và gỡ nhãn đó từ
+   `1.0.0`. **Bảng đọc frontmatter, người đọc thân bài** — nên hai bên nói ngược nhau mà không ai
+   thấy. Cùng câu sai đó còn nằm ở `AGENTS.md` (dòng bản đồ quy trình migrate) và
+   `docs/workflows/02-…` (cả frontmatter `mat:` lẫn câu trạng thái). Sửa cả bốn chỗ.
+   `docs/ROADMAP-V1.md` mở đầu bằng *"Nó chưa là v1.0"* trong khi D1–D4 đều xong từ lâu → đánh dấu
+   ✅ từng khối, `status: done`, và đổi hai đường link trỏ vào nó (AGENTS + STATUS) sang "đây là
+   lịch sử". **Giữ file, không xoá:** phần *vì sao* vẫn đáng đọc.
+   **KHÔNG sửa các dòng Log cũ** dù chúng cũng nói `unproven` — chúng **đúng lúc viết**, và Log chỉ
+   được THÊM. Sửa lịch sử cho khớp hiện tại là xoá mất bằng chứng mình từng ở đâu.
+   **Đóng băng:** [ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md) chốt `v1.2.17` là mốc
+   Stable Baseline, và chuyển sang chế độ bảo trì — vá thì vẫn vá, nhưng ngưỡng mở hệ thống con
+   mới cao hơn: phải có lỗi thật và dựng được ca hỏng. Repo thứ ba trở đi lắp **từ mốc**, không
+   lắp từ HEAD đang chạy. Chỗ hở duy nhất còn lại ghi thẳng trong ADR: CI **báo** chứ chưa
+   **chặn**, và đó là quyết định gói GitHub của Đức, không phải thứ code tự đóng được.
+

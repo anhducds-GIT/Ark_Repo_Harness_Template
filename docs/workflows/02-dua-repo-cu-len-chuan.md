@@ -2,13 +2,17 @@
 kind: workflow
 ten: Đưa một repo đang sống lên chuẩn
 ai_chay: AI, chủ dự án duyệt từng bước lớn
-mat: chưa đo được — chưa từng chạy thật
+mat: đã chạy thật 2 lần (2026-09-03) — hồ sơ ở docs/migrations/
 ---
 
 # Migrate một repo đang sống
 
-**Trạng thái: chưa từng chạy trên repo thật khác nghề.** Vài bước dưới đây sẽ sai, và lần chạy
-đầu tiên là để tìm ra chúng — không phải để nghiệm thu.
+**Trạng thái: đã chạy thật hai lần** (2026-09-03) trên hai repo khác nghề — `nav_platform_main`
+(Node, chứng khoán) và `Project 3 AI Agent Unify` (Python). Hồ sơ từng lượt, kèm **chỗ vấp thật**,
+ở [docs/migrations/](../migrations/).
+
+Đọc hồ sơ **trước** khi đọc các bước dưới. Các bước là ý định; hồ sơ là thứ đã xảy ra, và hai thứ
+đó lệch nhau ở vài chỗ.
 
 ```mermaid
 flowchart TD

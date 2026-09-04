@@ -151,7 +151,8 @@ minh được nó **tự** nạp lúc mở phiên.
 | Viết đề bài cho một phiên AI | [docs/_TEMPLATE-brief.md](docs/_TEMPLATE-brief.md) |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy `npm run bootstrap` |
-| **Biết còn thiếu gì để tới v1.0, và vì sao chưa gọi là v1.0** | [docs/ROADMAP-V1.md](docs/ROADMAP-V1.md) — bốn khối A→D, mỗi lỗ kèm cách chứng minh nó có thật |
+| **Lắp bộ khung vào một repo mới — lấy bản nào** | **`v1.2.17`, mốc Stable Baseline** — [ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md). Lắp từ mốc, đừng lắp từ HEAD đang chạy: HEAD là thứ đang chạy, không phải thứ dùng được |
+| **Biết vì sao bộ khung có hình dạng hôm nay** | [docs/ROADMAP-V1.md](docs/ROADMAP-V1.md) — **LỊCH SỬ, đã xong**. Bốn khối A→D dẫn tới v1.0, mỗi lỗ kèm cách chứng minh nó có thật. Việc đang làm thì đọc [STATUS.md](STATUS.md), từng bản đóng gì thì đọc [CHANGELOG.md](CHANGELOG.md) |
 | **Nhờ một AI khác brainstorm cho repo này** | [docs/briefs/BRAINSTORM-GPT-V1.md](docs/briefs/BRAINSTORM-GPT-V1.md) — dán trọn, đừng tóm tắt hộ |
 | **Việc lặp lại — làm theo danh sách kiểm, đừng tự nghĩ lại** | [docs/SO-TAY-AGENT.md](docs/SO-TAY-AGENT.md) — bảy mục, mỗi mục một checklist. **Việc nào có mục ở đó thì phải làm theo mục đó** |
 | **Đến hạn bảo trì, hoặc repo im ắng lâu ngày** | [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md) — ba nhịp (mỗi phiên · mỗi tuần · mỗi tháng) và ba dấu hiệu repo xuống cấp |
@@ -163,7 +164,7 @@ minh được nó **tự** nạp lúc mở phiên.
 | **Sinh một trang có hình cho người xem** — cũng là cách cho người khác xem bộ khung là gì | `npm run overview -- <file-ra.html>` rồi mở file HTML đó bằng trình duyệt. Đừng commit file HTML: nó là ảnh chụp một lúc, không phải tài liệu |
 | **Đo một repo khác cách bộ khung bao xa** | `npm run assess -- <đường-dẫn-repo>` · quy trình đọc kết quả: [docs/protocols/KIEM-MOT-REPO.md](docs/protocols/KIEM-MOT-REPO.md) |
 | **Dựng một repo mới từ bộ khung** | `npm run init -- <thư-mục> --ten "Tên repo"` |
-| **Đưa một repo đang sống lên chuẩn** | [docs/protocols/CHUYEN-REPO-LEN-CHUAN.md](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md) — **chưa từng chạy thật**, vài bước sẽ sai |
+| **Đưa một repo đang sống lên chuẩn** | [docs/protocols/CHUYEN-REPO-LEN-CHUAN.md](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md) — **đã chạy thật 2 lần** (03/09), hồ sơ từng lượt ở [docs/migrations/](docs/migrations/). Đọc hồ sơ trước: chỗ vấp thật nằm ở đó, không nằm trong quy trình |
 | **Sinh lại bản trích trong `template/`** | `npm run template` · chỉ kiểm không ghi: `npm run template -- --check` |
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | `tests/` — [tests/harness-smoke.mjs](tests/harness-smoke.mjs) là các khối hạt giống; chạy tất cả bằng `npm test` |

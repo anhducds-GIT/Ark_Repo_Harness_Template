@@ -3,6 +3,32 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.18 — 2026-09-04 — FINAL-CLOSURE P4: dọn chỗ tự mâu thuẫn, rồi đóng băng mốc
+
+**Một trạng thái tự mâu thuẫn thì không đóng băng được — đóng băng nó chỉ là đóng băng lời nói
+dối.** Nên P4 dọn trước, đóng sau.
+
+Mâu thuẫn sống nhiều ngày: `STATUS.md` vẫn ghi *"chưa từng chạy trên repo thật khác nghề · nhãn
+`unproven` vẫn đúng"*, trong khi bộ khung **đã chạy thật ở hai repo khác nghề** và **đã gỡ nhãn
+đó từ `1.0.0`**. Bảng đọc frontmatter, người đọc thân bài — nên hai bên nói ngược nhau mà không
+ai thấy. Cùng câu sai đó còn ở `AGENTS.md` và `docs/workflows/02-…` (cả frontmatter `mat:` lẫn
+câu trạng thái). Sửa bốn chỗ.
+
+`docs/ROADMAP-V1.md` mở đầu bằng *"Nó chưa là v1.0"* trong khi D1–D4 xong từ lâu → đánh dấu ✅
+từng khối, `status: done`, đổi hai đường link trỏ vào nó sang "đây là lịch sử". **Giữ file lại**:
+phần *vì sao* vẫn đáng đọc.
+
+**Không sửa các dòng Log cũ** dù chúng cũng nói `unproven`. Chúng **đúng lúc viết**, và Log chỉ
+được THÊM — sửa lịch sử cho khớp hiện tại là xoá mất bằng chứng mình từng ở đâu.
+
+**Đóng băng:** [ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md) chốt **`v1.2.17` là mốc
+Stable Baseline** và chuyển sang chế độ bảo trì. Ba điều, chỉ ba điều: vá thì vẫn vá · không mở
+hệ thống con mới nếu chưa có lỗi thật dựng được ca hỏng · repo thứ ba trở đi lắp **từ mốc**, không
+lắp từ HEAD đang chạy.
+
+Chỗ hở duy nhất còn lại ghi thẳng trong ADR: **CI báo chứ chưa chặn** — gói GitHub hiện tại
+không cho bật required status check. Đó là quyết định của Đức, không phải thứ code tự đóng được.
+
 ## 1.2.17 — 2026-09-04 — FINAL-CLOSURE P3: sáu phép kiểm chưa từng đỏ, nay chứng minh được là đỏ được
 
 `can-nang.mjs` đếm ra một danh sách khó chịu: qua **46 lượt chạy cổng**, sáu phép kiểm **chưa

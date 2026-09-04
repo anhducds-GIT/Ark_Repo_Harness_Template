@@ -1,6 +1,6 @@
 ---
 kind: roadmap
-status: active
+status: done
 ttl_days: 90
 ---
 
@@ -12,9 +12,13 @@ ttl_days: 90
 > **mọi lớp bảo vệ nó quảng cáo đều đã được chứng minh là chặn thật**. Không phải "chạy được" —
 > mà "chặn được khi bị phá".
 >
-> Nó **chưa** là v1.0, và lý do rất cụ thể: audit độc lập vòng một trả về **REJECT** với 6 phát
-> hiện mức NẶNG, trong đó **bốn cái là lớp bảo vệ báo xanh trong khi không chặn gì**.
-> (Nhãn phiên bản hiện tại đọc ở `package.json`, đừng gõ lại vào đây.)
+> **ĐÃ TỚI — file này là LỊCH SỬ, không phải việc đang làm.** v1.0 đóng ngày 2026-09-03, và bộ
+> khung đã đi tiếp nhiều bản kể từ đó. Nhãn phiên bản hiện tại đọc ở `package.json`; trạng thái
+> sống đọc ở [STATUS.md](../STATUS.md); từng bản đóng gì đọc ở [CHANGELOG.md](../CHANGELOG.md).
+>
+> Giữ file lại vì phần **vì sao** vẫn đáng đọc: nó ghi lý do rất cụ thể của lần REJECT vòng một —
+> 6 phát hiện mức NẶNG, trong đó **bốn cái là lớp bảo vệ báo xanh trong khi không chặn gì**. Đó là
+> bài học, không phải hàng tồn.
 
 ## Vì sao chưa gọi là v1.0
 
@@ -75,12 +79,16 @@ thì vô hại về kỹ thuật và tai hại về quyết định.
 
 Ba khối trên làm harness **đúng**. Khối này làm nó **được chứng minh**.
 
-- **D1** — migrate **một** repo thật, đang sống, khác nghề. Quy trình
-  `CHUYEN-REPO-LEN-CHUAN.md` hiện là **giả thuyết**; vài bước sẽ sai, và lần chạy đầu là để tìm
-  ra chúng.
-- **D2** — sửa quy trình theo đúng chỗ vấp, ngay tại file đó.
-- **D3** — audit vòng hai trên **một SHA đóng băng**.
-- **D4** — gỡ nhãn `unproven`, đóng v1.0.
+- **D1** ✅ — migrate repo thật, đang sống, khác nghề. Làm **hai** repo, không phải một:
+  `nav_platform_main` (Node, chứng khoán) và `Project 3 AI Agent Unify` (Python). Hồ sơ từng lượt
+  ở [docs/migrations/](migrations/).
+- **D2** ✅ — quy trình đã sửa theo chỗ vấp thật.
+- **D3** ✅ — audit vòng hai đã chạy, và chạy tiếp nhiều vòng sau đó; mỗi vòng một bản có số.
+- **D4** ✅ — nhãn `unproven` gỡ ở v1.0.0 (2026-09-03).
+
+> Một chỗ file này **nói sai suốt nhiều ngày**: `STATUS.md` vẫn ghi "chưa từng chạy trên repo thật
+> khác nghề · nhãn `unproven` vẫn đúng" trong khi D1–D4 đều xong. Bảng thì đọc frontmatter, người
+> thì đọc thân bài — nên hai bên nói ngược nhau mà không ai thấy. Sửa 04/09.
 
 ## Kỷ luật audit — một bài học từ vòng một
 
