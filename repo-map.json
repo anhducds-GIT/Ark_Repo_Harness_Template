@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-04",
-  "generated_commit": "91ae664",
+  "generated_commit": "d3595c7",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -34,7 +34,7 @@
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
       "next_step": "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)",
-      "human_action": "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge",
+      "human_action": "Không có việc nào cần bạn",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-03",
