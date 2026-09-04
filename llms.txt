@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `4c81e53` (2026-09-04).
+Trang được sinh tại commit `ae93439` (2026-09-04).
 
 ## Việc ưu tiên #1
 
-- **_root** — Phân loại 63 phát hiện B10 ở repo 3AI — chưa chắc là 63 vi phạm — rồi mới bật mã chặn ở đó
+- **_root** — Audit session-check.mjs — 7 trong 11 phép kiểm chưa từng đỏ qua 34 lần chạy
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `4c81e53` (2026-09-04).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — v1.2.8: cả năm tầng của sổ phát hành nay fail-closed, kể cả phép dò sự tồn tại
+- [ark-repo-harness](STATUS.md): active — v1.2.9: safe-push đẩy lên đúng nhánh đang đứng — bộ khung hết kén hình dạng repo
 
 ## Luật bắt buộc trước khi sửa gì
 
