@@ -3,7 +3,7 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
-## 1.2.10 — 2026-09-04 — Cổng đóng phiên cũng chỉ biết một nhánh, và một phép kiểm đòi sửa thứ cấm sửa
+## 1.2.12 — 2026-09-04 — Cổng đóng phiên cũng chỉ biết một nhánh, và một phép kiểm đòi sửa thứ cấm sửa
 
 Hai lỗ, cùng một gốc: **bộ khung mặc định mọi repo có hình dạng giống nó.**
 
@@ -26,7 +26,32 @@ nói ra** đã bỏ qua mấy file — bỏ qua im lặng thì lần sau không 
 
 Có đối chứng dương: vùng `rw` thì **vẫn soi**. Bỏ qua tuốt là làm yếu lớp bảo vệ, không phải sửa.
 
-Bốn phép đột biến ngược, cả bốn bị bắt. Suite 77.
+**Lỗ ba, lộ ra ngay khi vá xong hai lỗ trên.** Với mốc so đã đúng, cổng ở 3AI **vẫn** đỏ:
+`git show <mốc>:HANDOFF.md` thất bại vì **file đó do bộ khung thêm vào**, nên nó chưa có trên
+nhánh gốc. `git()` gộp mọi thất bại thành một dòng `gitLoi` → `GIT_HONG` → mọi con số thành
+"đoán". Vòng luẩn quẩn: **cổng đòi xanh mới được đẩy, mà chỉ đẩy xong nó mới hết đỏ.**
+
+Đây là **lần thứ sáu** cùng một hình dạng, và lần này ở chỗ khó chối nhất: `git show <rev>:<path>`
+thất bại vì hai lý do khác hẳn nhau — git hỏng, và **file chưa tồn tại ở revision đó**. Tách bằng
+`ls-tree`, y như đã làm cho sổ phát hành ở v1.2.8. Chưa có thì bản cũ là RỖNG, và "cả file là
+phần thêm mới" là câu trả lời đúng.
+
+Một chỗ tôi **bỏ đi thay vì thêm vào**: bản vá đầu kèm một hàm `gitYen` để phép dò không làm bẩn
+`gitLoi`. Dựng thử ca hỏng cho nó thì không dựng nổi — `ls-tree` chỉ thất bại khi mốc so không
+phân giải được, mà ca đó đã có đường mềm riêng. Một lớp không dựng nổi ca hỏng thì **chưa bao giờ
+là lớp bảo vệ**, nên đã xoá hẳn.
+
+Và một bài học về phép kiểm, lần thứ hai trong ngày: hai bản vá **che nhau**. Sau khi vá lỗ ba,
+đột biến "đóng cứng lại `origin/main`" **hết đỏ** — vì không còn nổ nữa, nó chỉ so với mốc sai
+một cách **im lặng**. Phải thêm một khẳng định về chính cái mốc (nhánh đã đẩy hết thì cổng phải
+thấy *không còn commit nào chưa push*) thì nó mới bắt lại được. Sai im lặng khó thấy hơn cả nổ.
+
+Đột biến ngược 5/5. Suite 77.
+
+**Và chính cơ chế của v1.2.4 chặn tôi ngay trong lượt này:** sửa xong fixture rồi chạy lại bộ
+sinh, nó **từ chối** — `SO_PHAT_HANH_LECH: bản 1.2.11 đã ghi dấu vân tay ec72102…, mà nội dung
+tầng máy hiện tại là d6fc1f8…`. Tôi đã đổi một file tầng máy **sau khi** số 1.2.11 được đóng dấu.
+Đúng việc nó sinh ra để làm, làm với chính tác giả của nó. Nên bản này là **1.2.12**.
 
 ## 1.2.9 — 2026-09-04 — `safe-push` biết nhánh, và luật merge được giữ bằng cấu trúc
 

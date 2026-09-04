@@ -233,9 +233,26 @@ const ROOT_HANDOFF = "HANDOFF.md";
 // dòng bịa vào GIỮA `HANDOFF.md` vẫn được miễn — một lỗ CẤP QUYỀN: ghi file luật ở gốc mà không
 // cần nhận khoá gốc. `appendOnlyAtEof` đòi thêm: đúng một hunk, và nó bắt đầu ngay sau dòng cuối
 // của bản cũ. Đây là SIẾT, không phải nới: thứ trước đây lọt thì nay đỏ, và đó là chủ ý.
+/* "FILE CHƯA CÓ Ở MỐC SO" KHÔNG PHẢI "GIT HỎNG" — lần thứ sáu cùng một hình dạng.
+ *
+ * `git show <mốc>:<file>` thất bại vì HAI lý do khác hẳn nhau, và `git()` gộp cả hai thành một
+ * dòng trong `gitLoi` → cổng báo `GIT_HONG` → theo đúng luật fail-closed của chính nó, MỌI con
+ * số phía trên thành "đoán". Đo thật ở 3AI 04/09: `HANDOFF.md` do bộ khung thêm vào nên nó chưa
+ * có trên nhánh gốc, và cổng KHÔNG THỂ XANH — trong khi repo hoàn toàn lành. Vòng luẩn quẩn:
+ * cổng đòi xanh mới được đẩy, mà chỉ đẩy xong nó mới hết đỏ.
+ *
+ * `ls-tree` tách được, y như đã làm cho sổ phát hành ở v1.2.8: mã thoát nói git có chạy được
+ * không, output rỗng nói đường dẫn có tồn tại ở mốc đó không. Chưa có thì bản cũ là RỖNG —
+ * và `appendOnlyAtEof` với bản cũ rỗng đúng nghĩa "cả file là phần thêm mới".
+ *
+ * Phép dò này CỐ Ý dùng `git()` chứ không phải một hàm im lặng: `ls-tree` chỉ thất bại khi mốc
+ * so không phân giải được, mà ca đó đã có đường mềm riêng ở dưới (lùi về `origin/main`, rồi
+ * "chỉ thấy CÂY LÀM VIỆC"). Thêm một hàm im lặng ở đây là thêm một lớp không có ca hỏng nào để
+ * canh — và một lớp không dựng nổi ca hỏng thì chưa bao giờ là lớp bảo vệ. */
+const handoffCoOMoc = git("ls-tree", MOC, "--", ROOT_HANDOFF).trim() !== "";
 const handoffAppendOnly = appendOnlyAtEof(
   git("diff", "-U0", MOC, "--", ROOT_HANDOFF),
-  git("show", `${MOC}:${ROOT_HANDOFF}`)
+  handoffCoOMoc ? git("show", `${MOC}:${ROOT_HANDOFF}`) : ""
 );
 const adminFile = (f) => f === ".agents/claims.json" || (f === ROOT_HANDOFF && handoffAppendOnly);
 

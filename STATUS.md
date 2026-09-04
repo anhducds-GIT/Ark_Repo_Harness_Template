@@ -11,7 +11,7 @@ owner: harness-vong2
 priority_rank: 1
 next_step: "Soi lại cổng đóng phiên: 7 trong 11 phép kiểm chưa từng đỏ lần nào qua 34 lượt chạy"
 version_source: package.json
-current_focus: "v1.2.10: cổng đóng phiên cũng theo nhánh, và phép kiểm thôi đòi sửa thứ cấm sửa"
+current_focus: "v1.2.12: cổng đóng phiên theo nhánh, và phép kiểm thôi đòi sửa thứ cấm sửa"
 human_action: "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge"
 ref_readme: README.md
 ref_handoff: HANDOFF.md

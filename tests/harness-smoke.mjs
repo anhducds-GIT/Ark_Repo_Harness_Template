@@ -588,6 +588,28 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     assert.doesNotMatch(out, /GIT_HONG/,
       "moc so phai la upstream cua nhanh dang dung — so voi origin/main lam cong NO tren nhanh tinh nang");
     assert.doesNotMatch(out, /origin\/main:HANDOFF\.md/, "khong duoc doc HANDOFF.md tu origin/main nua");
+    // VA phai la DUNG moc, khong chi la "khong no". Nhanh nay da day het len upstream cua no,
+    // nen cong phai thay KHONG CON commit nao chua push. Neu moc van la `origin/main` thi commit
+    // them HANDOFF se bi ke la "chua push" — sai, va sai mot cach IM LANG.
+    assert.match(out, /Không có commit nào chưa push/,
+      "moc so sai thi cong ke nham commit da day la chua day — sai im lang, kho thay hon ca no");
+
+    // VA: `HANDOFF.md` chua co tren moc so cung KHONG duoc goi la git hong. Day la ca CHUA DAY —
+    // file do bo khung them vao, nen no chi ton tai tren nhanh nay. Gop hai ly do lai la tu tao
+    // mot vong luan quan: cong doi xanh moi duoc day, ma chi day xong no moi het do.
+    // PHAI re tu `main` — nhanh KHONG co HANDOFF.md. Re tu `tinh-nang` thi upstream da co file
+    // do roi, va phep kiem xanh vi khong dung lai duoc ca can dung, chu khong phai vi dung.
+    at("checkout", "-q", "main");
+    at("checkout", "-q", "-b", "chua-day-lan-nao");
+    at("push", "-q", "-u", "origin", "chua-day-lan-nao");
+    writeFileSync(join(kho, "HANDOFF.md"), "# Log\n- dong moi\n", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "them handoff lan dau\n\nLane: thu");
+    const r2 = spawnSync(process.execPath, [join(kho, "scripts", "session-check.mjs"), "--as", "thu"],
+      { cwd: kho, encoding: "utf8" });
+    const out2 = String(r2.stdout || "") + String(r2.stderr || "");
+    assert.doesNotMatch(out2, /GIT_HONG/,
+      "'file chua co o moc so' KHONG phai 'git hong' — gop lai la tao mot vong luan quan");
+
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("cổng đóng phiên: mốc so theo nhánh đang đứng, không nổ trên nhánh tính năng");
 }

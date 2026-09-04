@@ -303,4 +303,14 @@ sửa `session-check.mjs`.
    bao giờ thoả được, và luật không thoả được thì bị bỏ qua cả cụm.**
    Đối chứng dương cho (b): vùng `rw` vẫn soi — bỏ qua tuốt là làm yếu lớp bảo vệ. Đột biến 4/4.
    Suite 77.
+   Ba lỗ (không phải hai): vá xong hai lỗ trên thì lộ lỗ thứ ba — `git show <mốc>:HANDOFF.md`
+   thất bại vì **file do bộ khung thêm vào nên chưa có trên nhánh gốc**, và `git()` gộp nó thành
+   `GIT_HONG`. Vòng luẩn quẩn: cổng đòi xanh mới được đẩy, mà đẩy xong nó mới hết đỏ. **Lần thứ
+   sáu** cùng hình dạng; tách bằng `ls-tree` như v1.2.8.
+   Hai bài học: (1) **hai bản vá che nhau** — sau khi vá lỗ ba, đột biến "đóng cứng lại
+   `origin/main`" HẾT ĐỎ, vì nó không còn nổ, chỉ so mốc sai một cách **im lặng**; phải thêm một
+   khẳng định về chính cái mốc mới bắt lại được. (2) Bản vá đầu có thêm một hàm `gitYen`; dựng thử
+   ca hỏng cho nó thì **không dựng nổi**, nên đã **xoá hẳn** thay vì giữ một lớp không canh gì.
+   Và cơ chế sổ phát hành của v1.2.4 **chặn chính tôi** giữa lượt này: đổi file tầng máy sau khi
+   đã đóng dấu 1.2.11 → bộ sinh từ chối → phải lên 1.2.12.
 
