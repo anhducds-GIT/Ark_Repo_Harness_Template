@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-04",
-  "generated_commit": "02f86fb",
+  "generated_commit": "079c56a",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,7 +33,7 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)",
+      "next_step": "Không có việc bắt buộc — bộ khung đã đóng băng ở mốc v1.2.17, nay chỉ vá khi có lỗi thật",
       "human_action": "Không có việc nào cần bạn",
       "priority_rank": 1,
       "superseded_by": null,
@@ -46,7 +46,7 @@
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)",
+      "title": "Không có việc bắt buộc — bộ khung đã đóng băng ở mốc v1.2.17, nay chỉ vá khi có lỗi thật",
       "rank": 1,
       "claim": null
     }

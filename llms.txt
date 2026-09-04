@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `02f86fb` (2026-09-04).
+Trang được sinh tại commit `079c56a` (2026-09-04).
 
 ## Việc ưu tiên #1
 
-- **_root** — Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)
+- **_root** — Không có việc bắt buộc — bộ khung đã đóng băng ở mốc v1.2.17, nay chỉ vá khi có lỗi thật
 
 ## Đọc theo thứ tự này
 
