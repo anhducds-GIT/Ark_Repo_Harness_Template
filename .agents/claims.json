@@ -3,32 +3,32 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-vong2",
-      "ai": "Claude",
+      "owner": null,
+      "ai": null,
       "claimed_at": "2026-09-02",
       "task": "vong 2: duyet doi luat chung, sinh lai bang",
-      "released_at": null
+      "released_at": "2026-09-04"
     },
     "_docs": {
-      "owner": "harness-vong2",
-      "ai": "Claude",
+      "owner": null,
+      "ai": null,
       "claimed_at": "2026-09-03",
       "task": "thu ai",
-      "released_at": null
+      "released_at": "2026-09-04"
     },
     "_code": {
-      "owner": "harness-vong2",
-      "ai": "Claude",
+      "owner": null,
+      "ai": null,
       "claimed_at": "2026-09-02",
       "task": "vong 2: va lo cong bao xanh ma khong kiem gi",
-      "released_at": null
+      "released_at": "2026-09-04"
     },
     "_template": {
-      "owner": "harness-vong2",
-      "ai": "Claude",
+      "owner": null,
+      "ai": null,
       "claimed_at": "2026-09-02",
       "task": "sinh lai ban trich",
-      "released_at": null
+      "released_at": "2026-09-04"
     }
   }
 }
