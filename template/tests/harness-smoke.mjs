@@ -467,4 +467,85 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   ok("ma thoat 0 khong phai bang chung: bo kiem cau truc cam thi cong phai DO");
 }
 
+/* ---- safe-push: nhanh dich = nhanh dang dung ---------------------------- */
+{
+  // `main` bi dong cung o muoi cho: fetch, ls-remote, moc so, cau day. Nen cong cu chi phuc vu
+  // duoc MOT hinh dang repo. Do that 04/09: repo 3AI co viec bo khung nam tren mot nhanh tinh
+  // nang, va cong cu KHONG CO CACH NAO day nhanh do len remote cua chinh no.
+  //
+  // Va luat "merge vao main phai hoi Duc" phai duoc GIU: dung o nhanh tinh nang thi day len
+  // dung nhanh do, KHONG BAO GIO len main.
+  const cha = mkdtempSync(join(tmpdir(), "push-nhanh-"));
+  const kho = join(cha, "kho");
+  const bare = join(cha, "bare.git");
+  try {
+    execFileSync("git", ["init", "-q", "--bare", bare], { encoding: "utf8" });
+    mkdirSync(kho, { recursive: true });
+    const at = (...a) => execFileSync("git", a, { cwd: kho, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
+    mkdirSync(join(kho, "scripts"), { recursive: true });
+    mkdirSync(join(kho, ".agents"), { recursive: true });
+    for (const name of ["safe-push.mjs", "repo-structure.mjs"]) {
+      copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
+    }
+    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
+    writeFileSync(join(kho, "a.txt"), "hi", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");
+    at("remote", "add", "origin", bare);
+    at("push", "-q", "-u", "origin", "main");
+
+    const chay = () => {
+      const r = spawnSync(process.execPath, [join(kho, "scripts", "safe-push.mjs"), "--as", "thu", "--dry-run"],
+        { cwd: kho, encoding: "utf8" });
+      return { ...r, out: String(r.stdout || "") + String(r.stderr || "") };
+    };
+
+    // (a) Nhanh tinh nang DA CO upstream -> day len chinh no, KHONG len main.
+    at("checkout", "-q", "-b", "tinh-nang");
+    writeFileSync(join(kho, "b.txt"), "hai", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "hai\n\nLane: thu");
+    at("push", "-q", "-u", "origin", "tinh-nang");
+    writeFileSync(join(kho, "c.txt"), "ba", "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "ba\n\nLane: thu");
+
+    const a = chay();
+    assert.equal(a.status, 0, `nhanh tinh nang co upstream thi phai chay duoc: ${a.out.slice(0, 400)}`);
+    assert.match(a.out, /origin\/tinh-nang/, "phai nham dung nhanh dang dung");
+    assert.doesNotMatch(a.out, /SẮP ĐẨY LÊN origin\/main/,
+      "dung o nhanh tinh nang ma nham main la mot quyet dinh HOP NHAT — luat bat hoi Duc");
+    assert.match(a.out, /\bba\b/, "moc so phai la upstream cua nhanh do, nen chi con commit chua day");
+    assert.doesNotMatch(a.out, /\bhai\b/, "commit da co tren upstream cua nhanh do thi khong duoc ke lai");
+
+    // (a2) VA PHAI DAY THAT. `--dry-run` chi chung minh BAN BAO CAO, khong chung minh CAU DAY —
+    //      dot bien "quay ve dong cung HEAD:main" van xanh neu chi kiem dry-run. Day that vao
+    //      kho bare o ngay canh, roi doc lai HAI ref: nhanh tinh nang phai tien, main phai y nguyen.
+    const refTruoc = (ten) => String(execFileSync("git", ["rev-parse", ten], { cwd: bare, encoding: "utf8" })).trim();
+    const mainTruoc = refTruoc("refs/heads/main");
+    const dayThat = spawnSync(process.execPath, [join(kho, "scripts", "safe-push.mjs"), "--as", "thu"],
+      { cwd: kho, encoding: "utf8" });
+    const dayOut = String(dayThat.stdout || "") + String(dayThat.stderr || "");
+    assert.equal(dayThat.status, 0, `day that phai chay duoc: ${dayOut.slice(0, 400)}`);
+    assert.equal(refTruoc("refs/heads/tinh-nang"), String(at("rev-parse", "HEAD")).trim(),
+      "nhanh tinh nang tren remote PHAI tien toi HEAD");
+    assert.equal(refTruoc("refs/heads/main"), mainTruoc,
+      "main tren remote PHAI y nguyen — day mot nhanh khac len main la quyet dinh HOP NHAT");
+
+    // (b) Nhanh tinh nang CHUA co upstream -> TU CHOI. Tao nhanh moi tren remote la cong bo mot
+    //     thu MOI, va do la viec cua nguoi.
+    at("checkout", "-q", "-b", "chua-co-tren-remote");
+    const b = chay();
+    assert.notEqual(b.status, 0, "nhanh chua co upstream thi phai TU CHOI");
+    assert.match(b.out, /TU_CHOI/, "phai noi ro vi sao tu choi");
+
+    // (c) DOI CHUNG: dung o `main` thi moi thu chay nhu cu.
+    at("checkout", "-q", "main");
+    const c = chay();
+    assert.equal(c.status, 0, "o main thi phai chay binh thuong nhu truoc");
+    assert.match(c.out, /origin\/main|Không có gì để push/, "o main thi moc so van la origin/main");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("safe-push: đẩy lên đúng nhánh đang đứng · chưa có upstream thì từ chối · ở main giữ nguyên");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

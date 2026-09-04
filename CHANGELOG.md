@@ -3,6 +3,32 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.2.9 — 2026-09-04 — `safe-push` biết nhánh, và luật merge được giữ bằng cấu trúc
+
+`main` bị đóng cứng ở **mười chỗ** trong `safe-push.mjs`: fetch, `ls-remote`, mốc so, câu đẩy.
+Nên nó chỉ phục vụ được **một hình dạng repo** — mọi thứ nằm trên `main`. Đo thật 04/09: repo
+3AI có toàn bộ việc bộ khung nằm trên một nhánh tính năng, và công cụ **không có cách nào** đẩy
+nhánh đó lên remote của chính nó. Đường duy nhất nó mở ra là `HEAD:main` — tức một cú **hợp
+nhất**, thứ mà luật bắt phải hỏi Đức. Một bộ khung tự nhận phục vụ 21 repo mà chỉ đẩy được một
+hình dạng thì nó chưa xong.
+
+Nay nhánh đích **bằng chính nhánh đang đứng**:
+
+| Đang đứng ở | Đẩy lên | Ghi chú |
+|---|---|---|
+| `main` | `origin/main` | y như cũ |
+| nhánh có upstream | **chính nhánh đó** | mốc so là upstream của nó, không phải `main` |
+| nhánh **chưa** có upstream | **TỪ CHỐI** | tạo nhánh mới trên remote là công bố một thứ mới — việc của người |
+
+**Luật "merge vào main phải hỏi Đức" KHÔNG bị nới — nó chặt hơn.** Trước đây nó là một câu `if`
+ở cuối file, tức một cửa có thể quên mở đúng chỗ. Nay ca "đưa nhánh khác lên main" **không dựng
+nổi**: đứng ở nhánh nào thì đẩy lên đúng nhánh đó.
+
+Một bài học về phép kiểm: bản fixture đầu chỉ chạy `--dry-run`, nên đột biến *"quay về đóng cứng
+`HEAD:main` ở câu đẩy"* vẫn **XANH** — nó chứng minh được **bản báo cáo**, không chứng minh được
+**cú đẩy**. Nay fixture đẩy thật vào một kho bare bên cạnh rồi đọc lại **hai** ref: nhánh tính
+năng phải tiến, `main` phải y nguyên. Đột biến 3/3 bị bắt. Suite 75.
+
 ## 1.2.8 — 2026-09-03 — Lỗ thứ năm, ở chính phép dò
 
 v1.2.7 tách "commit xoá file" khỏi "ledger hỏng" bằng `git cat-file -e`. Nhưng `cat-file -e`

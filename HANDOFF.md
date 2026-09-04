@@ -282,3 +282,14 @@ sửa `session-check.mjs`.
    sách 180 giây **không cần nới**, và **không được gộp fixture cho nhanh**: chính lượt v1.2.7 đã
    chứng minh gộp ca làm nhánh sau không bao giờ chạy tới.
 
+ - **2026-09-04 · `harness-vong2` · v1.2.9 SAFE-PUSH BIẾT NHÁNH** — `main` bị đóng cứng ở **mười
+   chỗ** trong `safe-push.mjs`, nên công cụ chỉ phục vụ được một hình dạng repo. Đo thật ở 3AI:
+   toàn bộ việc bộ khung nằm trên một nhánh tính năng, và đường duy nhất công cụ mở ra là
+   `HEAD:main` — tức một cú **hợp nhất**, thứ luật bắt phải hỏi Đức. Nay nhánh đích bằng chính
+   nhánh đang đứng; nhánh chưa có upstream thì từ chối.
+   **Luật merge vào main không bị nới, nó chặt hơn:** trước là một câu `if` ở cuối file (một cửa
+   có thể quên mở đúng chỗ), nay ca đó **không dựng nổi**.
+   Bài học phép kiểm: fixture đầu chỉ chạy `--dry-run` nên đột biến "quay về `HEAD:main` ở câu
+   đẩy" vẫn XANH — nó chứng minh BẢN BÁO CÁO, không chứng minh CÚ ĐẨY. Nay fixture đẩy thật vào
+   một kho bare rồi đọc lại HAI ref: nhánh tính năng phải tiến, `main` phải y nguyên. 3/3. Suite 75.
+

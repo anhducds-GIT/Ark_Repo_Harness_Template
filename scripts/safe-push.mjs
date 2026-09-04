@@ -38,6 +38,32 @@ const git = (...a) => execFileSync("git", ["-c", "core.quotepath=false", ...a], 
 const unquote = (line) => line.replace(/^"|"$/g, "");
 const gitQuiet = (...a) => { try { return git(...a); } catch { return ""; } };
 
+/* NHÁNH ĐÍCH — tính MỘT LẦN, rồi mọi chỗ dưới dùng nó.
+ *
+ * Bản đầu đóng cứng `main` ở mười chỗ: fetch, ls-remote, mốc so, câu đẩy. Nên nó chỉ phục vụ
+ * được MỘT hình dạng repo — mọi thứ nằm trên `main`. Đo thật 04/09: repo 3AI có việc bộ khung
+ * nằm trên một nhánh tính năng, và công cụ **không có cách nào** đẩy nhánh đó lên remote của
+ * chính nó. Một bộ khung tự nhận phục vụ 21 repo mà chỉ đẩy được một hình dạng thì chưa xong.
+ *
+ * LUẬT "MERGE VÀO MAIN PHẢI HỎI ĐỨC" KHÔNG BỊ NỚI — nó được giữ bằng CẤU TRÚC, và chặt hơn
+ * trước: đứng ở nhánh nào thì đẩy lên đúng nhánh đó, nên ca "đưa nhánh khác lên main" không còn
+ * tồn tại để mà phải chặn. Trước đây nó là một câu `if` ở cuối file — tức một cửa có thể quên
+ * mở đúng chỗ; nay nó là chuyện không dựng nổi.
+ *
+ * Nhánh CHƯA có upstream thì TỪ CHỐI: tạo một nhánh mới trên remote là công bố một thứ MỚI,
+ * không phải cập nhật thứ đã có — việc đó là của người. */
+const nhanhHienTai = gitQuiet("rev-parse", "--abbrev-ref", "HEAD").trim();
+const NHANH = nhanhHienTai && nhanhHienTai !== "HEAD" ? nhanhHienTai : "main";
+const upstream = gitQuiet("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}").trim();
+if (NHANH !== "main" && upstream !== "origin/" + NHANH) {
+  console.error(String.fromCharCode(10) + `TU_CHOI: nhánh "${NHANH}" chưa có nhánh tương ứng trên remote.`);
+  console.error("Tạo một nhánh MỚI trên remote là công bố một thứ mới, không phải cập nhật thứ đã có —");
+  console.error("việc đó là của người, không phải của công cụ.");
+  console.error("Muốn công bố thật thì tự tạo nhánh trên remote trước, rồi chạy lại." + String.fromCharCode(10));
+  process.exit(1);
+}
+const REMOTE = "origin/" + NHANH;
+
 // Đối chiếu với remote thật, không tin con trỏ cũ trên máy.
 //
 // FAIL CLOSED, và đây là một FAIL-OPEN THẬT vừa được vá (phát hiện bởi phiên K1 qua audit
@@ -62,11 +88,11 @@ const gitQuiet = (...a) => { try { return git(...a); } catch { return ""; } };
 // tức đúng đối tượng mà bộ khung nhắm tới. Tự kiểm sau mỗi lần đẩy: `git status -sb`, còn
 // `ahead N` là chưa đẩy thật.
 try {
-  git("fetch", "origin", "main", "--quiet");
+  git("fetch", "origin", NHANH, "--quiet");
 } catch (error) {
   const detail = String(error.stderr || error.stdout || error.message).trim().split("\n").slice(-2).join(" | ");
-  console.error(`\n⚠ KHONG_FETCH_DUOC: \`git fetch origin main\` thất bại → ${detail}`);
-  console.error(`  Vẫn đi tiếp, nhưng mốc so sánh là bản origin/main CŨ trên máy. Nếu push bị từ chối vì không tiến thẳng thì đó là lý do.\n`);
+  console.error(`\n⚠ KHONG_FETCH_DUOC: \`git fetch origin ${NHANH}\` thất bại → ${detail}`);
+  console.error(`  Vẫn đi tiếp, nhưng mốc so sánh là bản ${REMOTE} CŨ trên máy. Nếu push bị từ chối vì không tiến thẳng thì đó là lý do.\n`);
 }
 /* HAI CA khác hẳn nhau, cùng có hình dạng "không phân giải được origin/main":
  *   a) remote CHƯA CÓ nhánh main -> CÚ ĐẨY ĐẦU TIÊN của một repo mới. Hợp lệ, và MỌI repo
@@ -75,20 +101,20 @@ try {
  *   b) remote CÓ nhánh main mà máy không có -> máy đang lệch, chưa fetch bao giờ. PHẢI chặn.
  * Phân biệt bằng cách HỎI THẲNG REMOTE, không suy từ trạng thái máy — vì chính trạng thái
  * máy là thứ đang bị nghi. */
-const remoteCoMain = gitQuiet("ls-remote", "--heads", "origin", "main").trim() !== "";
-const coRefTrenMay = gitQuiet("rev-parse", "--verify", "origin/main").trim() !== "";
+const remoteCoMain = gitQuiet("ls-remote", "--heads", "origin", NHANH).trim() !== "";
+const coRefTrenMay = gitQuiet("rev-parse", "--verify", REMOTE).trim() !== "";
 const lanDau = !coRefTrenMay && !remoteCoMain;
 
 if (!coRefTrenMay && remoteCoMain) {
-  console.error(String.fromCharCode(10) + " KHONG_CO_ORIGIN_MAIN: remote CÓ nhánh main, nhưng bản sao trên máy này thì không.");
+  console.error(String.fromCharCode(10) + ` KHONG_CO_REF_REMOTE: remote CÓ nhánh ${NHANH}, nhưng bản sao trên máy này thì không.`);
   console.error("Máy đang lệch với remote. Đếm \"chưa đẩy\" bằng một mốc không tồn tại là báo xong cho một cú đẩy CHƯA HỀ XẢY RA.");
   console.error("Chạy `git fetch origin` một lần rồi thử lại." + String.fromCharCode(10));
   process.exit(1);
 }
 
 // Lần đầu thì mốc so là toàn bộ lịch sử — không có origin/main để trừ đi.
-const phamVi = lanDau ? "HEAD" : "origin/main..HEAD";
-if (lanDau) console.log(String.fromCharCode(10) + "LẦN ĐẦU: remote chưa có nhánh main. Sắp tạo nó bằng toàn bộ lịch sử repo này.");
+const phamVi = lanDau ? "HEAD" : `${REMOTE}..HEAD`;
+if (lanDau) console.log(String.fromCharCode(10) + `LẦN ĐẦU: remote chưa có nhánh ${NHANH}. Sắp tạo nó bằng toàn bộ lịch sử repo này.`);
 const pending = gitQuiet("log", "--format=%H%x1f%s%x1f%an", phamVi).split("\n").filter(Boolean)
   .map((line) => { const [sha, subject, author] = line.split("\x1f"); return { sha, subject, author }; });
 
@@ -133,8 +159,8 @@ const ROOT_HANDOFF = "HANDOFF.md";
 // đi. Cái phải dùng chung là HÀM QUYẾT ĐỊNH, không phải phạm vi. Đúng đúng cách chia đã khai ở
 // đầu `repo-structure.mjs`: hàm suy ra thì thuần và dùng chung, việc đọc thì mỗi bên tự làm.
 const handoffAppendOnly = appendOnlyAtEof(
-  gitQuiet("diff", "-U0", "origin/main", "HEAD", "--", ROOT_HANDOFF),
-  gitQuiet("show", `origin/main:${ROOT_HANDOFF}`)
+  gitQuiet("diff", "-U0", REMOTE, "HEAD", "--", ROOT_HANDOFF),
+  gitQuiet("show", `${REMOTE}:${ROOT_HANDOFF}`)
 );
 const adminFile = (file) => file === ".agents/claims.json" || (file === ROOT_HANDOFF && handoffAppendOnly);
 
@@ -180,7 +206,7 @@ if (khongCoNhan.length) {
   console.log(`  Từ nay thêm một dòng cuối thông điệp commit:  ${LANE_TRAILER} ${asLabel}\n`);
 }
 
-console.log(`\nSẮP ĐẨY LÊN origin/main — phiên "${asLabel}"`);
+console.log(`\nSẮP ĐẨY LÊN ${REMOTE} — phiên "${asLabel}"`);
 console.log(`${rows.length} commit:\n`);
 for (const row of rows) {
   const mark = row.foreign.length ? "  ⚠" : "   ";
@@ -211,14 +237,9 @@ if (blocked.length && carry) {
 
 /* Phép kiểm nhánh phải chạy TRƯỚC cửa `--dry-run`. Đặt nó sau thì lần chạy thử báo "sẽ đẩy
    được", rồi lần chạy thật mới từ chối — mà `--dry-run` tồn tại đúng để nói trước chuyện đó. */
-const nhanhHienTai = gitQuiet("rev-parse", "--abbrev-ref", "HEAD").trim();
-if (nhanhHienTai !== "main") {
-  console.error(`\nTU_CHOI: bạn đang ở nhánh "${nhanhHienTai}", không phải "main".`);
-  console.error("Công cụ này vừa soi `origin/main..HEAD`, nhưng đẩy lên `main` từ một nhánh khác là một");
-  console.error("quyết định HỢP NHẤT, không phải một cú đẩy — và luật bắt phải hỏi Đức trước.");
-  console.error("Cách xử lý: chuyển sang `main` rồi chạy lại, hoặc hỏi Đức về việc hợp nhất nhánh này.\n");
-  process.exit(1);
-}
+/* Cửa "đứng ngoài main thì từ chối" của bản cũ ĐÃ BỎ, và KHÔNG phải vì nới lỏng: nó không còn
+   ca nào để chặn. Nhánh đích nay bằng chính nhánh đang đứng (tính ở đầu file), nên "đưa nhánh
+   khác lên main" là chuyện không dựng nổi — chặt hơn một câu `if`, vì không có gì để quên. */
 
 if (dryRun) { console.log("\n--dry-run: dừng ở đây, chưa đẩy gì.\n"); process.exit(0); }
 
@@ -239,7 +260,7 @@ if (dryRun) { console.log("\n--dry-run: dừng ở đây, chưa đẩy gì.\n");
  *   2. Kể cả khi đang ở `main`, đẩy bằng `HEAD:main` — nói thẳng nguồn và đích, để không còn
  *      khoảng cách nào giữa thứ được soi và thứ được đẩy. */
 console.log("\nĐang đẩy...");
-try { console.log(git("push", "origin", "HEAD:main").trim() || "Xong."); }
+try { console.log(git("push", "origin", `HEAD:${NHANH}`).trim() || "Xong."); }
 catch (error) { console.error(`Push thất bại: ${String(error.stdout || error.stderr || error.message).trim()}`); process.exit(1); }
 // Đừng đóng cứng `_root`: sau A2 gốc repo có BỐN khoá, nên câu cũ dặn sai tên vùng — và đây là
 // chữ operator, tức luật vàng 5. Kể đúng vùng vừa đẩy, và nêu luôn lệnh trả quyền (đừng dặn sửa
