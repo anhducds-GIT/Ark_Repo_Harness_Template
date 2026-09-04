@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-04",
-  "generated_commit": "c702fc7",
+  "generated_commit": "54e5747",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,7 +33,7 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Audit session-check.mjs — 7 trong 11 phép kiểm chưa từng đỏ qua 34 lần chạy",
+      "next_step": "Soi lại cổng đóng phiên: 7 trong 11 phép kiểm chưa từng đỏ lần nào qua 34 lượt chạy",
       "human_action": "Chọn một: nâng GitHub Pro, hoặc để repo public, hoặc chấp nhận CI chỉ báo chứ không chặn. Gói free + repo private thì GitHub không cho chặn merge",
       "priority_rank": 1,
       "superseded_by": null,
@@ -46,7 +46,7 @@
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Audit session-check.mjs — 7 trong 11 phép kiểm chưa từng đỏ qua 34 lần chạy",
+      "title": "Soi lại cổng đóng phiên: 7 trong 11 phép kiểm chưa từng đỏ lần nào qua 34 lượt chạy",
       "rank": 1,
       "claim": null
     }
