@@ -321,7 +321,13 @@ sửa `session-check.mjs`.
    **Không phải nới lỏng:** phép kiểm giải UTF-8 rồi dò mẫu CHỮ, nên nó chưa bao giờ soi được file
    nhị phân — gọi tên đúng thứ nó vốn không làm được thì không mất một phát hiện nào. Hai lý do kia
    **giữ nguyên là KHÔNG BIẾT** (đối chứng dương cho đúng vế đó), và vẫn phải **kể ra** số file đã
-   bỏ qua. Đột biến 4/4. Suite 78.
-   **Và thứ tự hai phép thử cũng là một lỗi riêng:** vá xong vẫn còn 4 file kẹt, cả bốn là
-   PNG/PPTX — chỉ vì ngưỡng kích thước chạy TRƯỚC phép thử nhị phân, nên ảnh 3MB bị gọi là "quá
-   lớn" (KHÔNG BIẾT) trong khi ta biết thừa nó là ảnh. Ở 3AI: **33 → 4 → 0**.
+   bỏ qua. Đột biến 3/3. Suite 78.
+
+ - **2026-09-04 · `harness-vong2` · v1.2.14** — Vá xong v1.2.13 mà ở 3AI **vẫn còn 4 file kẹt**, cả
+   bốn là PNG/PPTX. Lý do: ngưỡng kích thước chạy **TRƯỚC** phép thử nhị phân, nên một tấm ảnh 3MB
+   bị gọi là "quá lớn" — tức KHÔNG BIẾT — trong khi ta biết thừa nó là ảnh. "Có phải nhị phân
+   không" **không phụ thuộc kích thước**; ngưỡng 2MB để tránh giải mã một file VĂN BẢN khổng lồ,
+   nên nó thuộc về sau. Ở 3AI: **33 → 4 → 0**. Đột biến 4/4.
+   Và cổng vừa bắt chính tôi: bản ghi v1.2.14 đầu tiên tôi **sửa dòng Log cũ** thay vì thêm dòng
+   mới — Log chỉ được THÊM. Đã khôi phục dòng cũ và ghi thành một dòng riêng.
+
