@@ -450,3 +450,22 @@ sửa `session-check.mjs`.
    `scripts/p003_antigravity_protocol_ssot.py:26` vẫn trỏ tới thư mục mirror đã gỡ, và ClauCo còn
    3 file sửa dở chưa commit trên nhánh đó.
 
+
+ - **2026-09-04 · `harness-vong2`** — Bảng trạng thái thôi là artifact trên claude.ai, thành
+   file trong repo: `DASHBOARD-Ark-Repo-Harness.html` ở gốc, máy sinh, có commit. Trước đó muốn
+   xem trạng thái bộ khung là phải có một phiên Claude đăng hộ — điểm phụ thuộc một AI duy nhất
+   của cả hệ, mà repo `Chrome_Extension_AI_Agentic` đã bỏ từ 03/09 còn bộ khung thì chưa. Tên
+   file mang tên dự án (Đức chốt): mỗi repo một bảng, cả đống cùng rơi vào thư mục Tải về, ba
+   file cùng tên `DASHBOARD.html` thì mở cái nào cũng phải đoán.
+   Đổi lại, `build-overview.mjs` phải tất định từ HEAD vì nó nay nằm trong khối `generators` và
+   bị cổng kiểm mỗi phiên. Gỡ ba nguồn không tất định: `doc()`/`liet()` đọc đĩa → đọc HEAD ·
+   `ngay: new Date()` → `mocHEAD()` fail-closed · phép đếm tài liệu quá hạn lấy "hôm nay" từ
+   HEAD. Để đồng hồ ở lại thì sang ngày mới là bản sinh lại lệch bản đã commit **dù không dữ
+   liệu nào đổi**, và MỌI phiên bị chặn đẩy. Thêm `--check-head` cho bộ sinh này.
+   Ca kiểm đối chứng dương: worktree ở commit cũ + `scripts/` hiện tại chép đè, mốc phải ra ngày
+   của commit cũ chứ không ra hôm nay. Đã thử đột biến (đưa `new Date()` trở lại) → ca kiểm ĐỎ.
+   Suite 86 → 88 phép kiểm, `npm test` xanh. **Không tăng số bản**: bản trích trong `template/`
+   không đổi một byte nào, nên sổ phát hành không có gì để ghi thêm.
+   **Việc cần Đức: không có.** Còn treo: repo `Chrome_Extension_AI_Agentic` vẫn để tên
+   `DASHBOARD.html` trơn — đổi tên ở đó phải chạm `scripts/` (`_code`) và `AGENTS.md` (`_root`),
+   mà `_code` và `_docs` bên đó đang có chủ khác, nên chưa làm.
