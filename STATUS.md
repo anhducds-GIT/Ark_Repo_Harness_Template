@@ -9,7 +9,7 @@ last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate t
 evidence_ref: docs/migrations/2026-09-03-nav-platform.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Dọn trạng thái đang tự mâu thuẫn (bảng nói đã chạy thật 2 repo, thân bài vẫn nói chưa)"
+next_step: "Không có việc bắt buộc — bộ khung đã đóng băng ở mốc v1.2.17, nay chỉ vá khi có lỗi thật"
 version_source: package.json
 current_focus: "v1.2.17: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật"
 human_action: "Không có việc nào cần bạn"
