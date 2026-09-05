@@ -948,3 +948,35 @@ cần người chốt quyết, không phải hệ quả phụ của một lượ
 trong khi `AGENTS.md` mục 2 đòi cổng XANH TOÀN BỘ mới được đẩy. Người chốt đã duyệt trước quyền
 commit/push cho lượt này, nhưng duyệt quyền không phải duyệt vượt cổng — ghi ra đây để lần sau
 không ai coi đó là tiền lệ. Mọi mục còn lại của cổng đều XANH, gồm `npm test` 145 phép 0 đỏ.
+
+## 2026-09-05 · `claude-dieu-phoi-0509` (tiếp) — repo nay CÓ chỗ để ghi nợ
+
+**`BACKLOG.md` chưa từng tồn tại, trong khi ba chỗ trong repo bắt dùng nó.** `AGENTS.md` mục 0
+bước 2 bảo mọi phiên *"việc ngoài phạm vi → ghi vào `BACKLOG.md`, không tự làm"*; `MULTIFLOW.md`
+trỏ theo; `what-next.mjs` đọc nó ở 6 chỗ và có hẳn một bộ phân tích cú pháp cho nó, kèm lưới
+hứng cho mục khai sai. File thì không có.
+
+Hệ quả đo được, không suy: `npm run what-next` báo **"0 việc mở"** cho cả hai vùng, và mục D
+"Ý tưởng đang xây — 0 mục". Không phải repo hết việc — **không có chỗ để việc rơi vào**. Mọi thứ
+phiên trước phát hiện ngoài phạm vi hoặc bốc hơi, hoặc chìm trong `HANDOFF.md` dài hơn 800 dòng,
+tức chỗ không ai đi tìm việc.
+
+Đúng bệnh repo này từng bắt với `claim.mjs` (audit 03/09: luật bắt dùng một file KHÔNG TỒN TẠI).
+Lần đó là một **lệnh**, lần này là một **file**. Cùng một hình dạng lỗi, hai năm khác nhau trong
+cùng một repo — đáng ghi vì nó sẽ còn lặp.
+
+**Đã dựng, nạp bằng nợ ĐO ĐƯỢC trong chính phiên này, không bịa:** KHUNG-1 (mục đỏ artifact, hai
+bug xếp chồng — P1) · KHUNG-2 (hai quy trình migrate không đi theo bản trích — P2) · KHUNG-3 (hai
+pilot chưa đo lại ở bản hiện tại — P2) · KHUNG-4 (ba luật vai điều phối chưa có phép kiểm — P3).
+Bản đồ việc **0 → 4 việc mở**.
+
+**Hai lỗ hở nhỏ lộ ra ngay khi lệnh có dữ liệu để chạy, vá cùng lượt:**
+- `.repo-structure.json` **chưa khai `repo.owner`**, nên mục "đang chờ người chốt" của bản đồ
+  việc nói thẳng *"KHÔNG LỌC ĐƯỢC"* suốt từ đầu. Đã khai. Mục C nay lọc được, ra 0 mục — và
+  "0 vì đã kiểm" khác hẳn "0 vì không biết cách tìm", đúng như lệnh tự phân biệt.
+- `BACKLOG.md` đã khai một dòng vào Bản đồ file, kèm quy ước sổ. Không khai thì cổng đếm nó là
+  file không ai trỏ tới — và luật của repo coi file đó như không tồn tại.
+
+**CÒN MỞ:** bản đồ việc báo khoá `_root` "giữ quá 6h ⚠" ngay sau khi vừa nhận vài phút. Nghi lệch
+múi giờ giữa lúc ghi bảng quyền và lúc đọc. Chưa đuổi, chưa ghi thành mục nợ vì chưa đo lại lần
+hai để chắc.

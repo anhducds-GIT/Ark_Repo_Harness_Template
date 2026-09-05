@@ -4,7 +4,8 @@
   "repo": {
     "_doc": "Danh tính repo, dùng cho trang cổng vào máy đọc. ĐỔI NGAY khi khởi tạo — bỏ trống thì trang sinh ra sẽ nói thẳng là repo chưa đặt tên.",
     "name": "Ark Repo Harness",
-    "tagline": null
+    "tagline": null,
+    "owner": "Đức"
   },
   "profile": "P1",
   "_profile_doc": "P1 monorepo nhiều gói · P2 ứng dụng đơn · P3 repo tài liệu · P4 repo hạ tầng · P5 điều phối repo khác",
