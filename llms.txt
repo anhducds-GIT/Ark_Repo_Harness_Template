@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `8ef645b` (2026-09-05).
+Trang được sinh tại commit `74567d4` (2026-09-05).
 
 ## Việc ưu tiên #1
 
-- **_root** — Ghi lại ở repo đã sinh ra gói điều phối rằng bộ khung nay là nơi phát hành nó — cần quyền bên đó, một lượt riêng
+- **_root** — Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn.
 
 ## Đọc theo thứ tự này
 

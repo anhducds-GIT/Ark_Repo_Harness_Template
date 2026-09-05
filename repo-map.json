@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-05",
-  "generated_commit": "8ef645b",
+  "generated_commit": "74567d4",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,7 +33,7 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Ghi lại ở repo đã sinh ra gói điều phối rằng bộ khung nay là nơi phát hành nó — cần quyền bên đó, một lượt riêng",
+      "next_step": "Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn.",
       "human_action": "Không có việc nào cần bạn",
       "priority_rank": 1,
       "superseded_by": null,
@@ -46,7 +46,7 @@
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Ghi lại ở repo đã sinh ra gói điều phối rằng bộ khung nay là nơi phát hành nó — cần quyền bên đó, một lượt riêng",
+      "title": "Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn.",
       "rank": 1,
       "claim": null
     }
