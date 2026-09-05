@@ -3,15 +3,15 @@ schema: extension-status/v2
 id: ark-repo-harness
 name: Ark Repo Harness
 lifecycle: active
-last_verified: 2026-09-03
-last_verified_commit: 45501714a967d90e9026bdedcf616d50e7996f59
-last_verified_how: "npm test 50/50 xanh · session-check 11/11 XANH · migrate thật 2 repo khác nghề"
-evidence_ref: docs/migrations/2026-09-03-nav-platform.md
+last_verified: 2026-09-05
+last_verified_commit: b4a08b262cc64e2cc16a85d5629a0e6e10f07ae2
+last_verified_how: "npm test 143/143 xanh · repo dựng mới từ bản 1.3.0 chạy được cả hai lệnh điều phối ngay, 65 phép xanh, cả hai dạng xuống dòng"
+evidence_ref: HANDOFF.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Không có việc bắt buộc — bộ khung đã đóng băng ở mốc v1.2.17, nay chỉ vá khi có lỗi thật"
+next_step: "Ghi lại ở repo đã sinh ra gói điều phối rằng bộ khung nay là nơi phát hành nó — cần quyền bên đó, một lượt riêng"
 version_source: package.json
-current_focus: "v1.2.17: sáu phép kiểm chưa từng đỏ nay đã chứng minh được là đỏ được thật"
+current_focus: "Bản 1.3.0: repo dựng mới nhận luôn hai lệnh của vai điều phối, sổ tay và 52 phép ghim — chạy được ngay, không phải sửa gì"
 human_action: "Không có việc nào cần bạn"
 ref_readme: README.md
 ref_handoff: HANDOFF.md
@@ -40,5 +40,10 @@ git clone --branch v1.2.17 https://github.com/anhducds-GIT/Ark_Repo_Harness_Temp
 cắt — bộ khung sẽ **từ chối phát** (`NHAN_CHUNG_HONG`). Đã thử thật 04/09, và nó từ chối đúng.
 Clone xong bạn đứng ở `detached HEAD`; không sao, vì từ bản sao này bạn chỉ **phát đi**, không
 đẩy lên.
+
+**Bản 1.3.0 (05/09):** bộ khung nay **phát hành gói điều phối** — hai lệnh (kiểm trạng thái
+trước khi báo cáo, và bản đồ việc), sổ tay vai điều phối, và 52 phép ghim đi kèm. Repo dựng mới
+chạy được cả hai **ngay, không sửa gì**. Vì sao mở ngoại lệ giữa chế độ bảo trì:
+[ADR-0005](docs/adr/0005-goi-assistant-phat-hanh-tu-bo-khung.md).
 
 **Việc kế:** đọc `next_step` ở đầu file này. Lộ trình cũ tới v1.0 — [ROADMAP-V1.md](docs/ROADMAP-V1.md) — **đã xong**, giữ lại làm lịch sử.
