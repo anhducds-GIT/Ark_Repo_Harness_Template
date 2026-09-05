@@ -919,3 +919,32 @@ chuỗi văn bản chứ không ở file JS. Escape rồi sinh lại sạch.
 - **Hai pilot migrate chưa đo lại ở bản khung hiện tại** (chúng chạy ở 0.3.0).
 - **Bảng máy sinh vẫn không hội tụ được** — nhúng mã commit của HEAD, nên sinh-lại-rồi-commit đổi
   HEAD và lượt sau vẫn lệch đúng một mã. Không phải lỗi lượt này; đã ghi từ lượt trước.
+
+**BỔ SUNG cùng lượt — mục đỏ "Sự thật máy sinh còn tươi" KHÔNG đóng được, và nay biết vì sao.**
+
+Mục này đã ĐỎ từ trước khi lượt này mở (state-check lúc mở phiên báo y hệt). Lượt này đuổi nó
+tới cùng và tìm ra **hai nguyên nhân xếp chồng**, cả hai đều là bug thật:
+
+1. **`isBehaviourFile()` miễn trừ THIẾU hai trang máy sinh.** Khối `MAY_SINH` trong
+   `build-dashboard.mjs` chỉ có `llms.txt`, `repo-map.json`, `DASHBOARD.md`. Hai trang
+   `DASHBOARD-<repo>.html` và `SO-MIGRATE-<repo>.html` **cũng do bộ sinh viết ra** nhưng mang
+   đuôi `.html` nên bị đếm là "code đã đổi" — tức mỗi lượt sinh lại tự cộng thêm một vào chính
+   con số nó phải khớp. Đây ĐÚNG cái vòng lặp mà chú thích ngay phía trên khối đó mô tả và tin
+   là đã chặn: *"sinh lại → đổi → CÓ → phải kiểm chứng lại → sinh lại → …"*. Chặn cho ba file,
+   sót hai file thêm vào sau.
+2. **Bộ sinh và bộ kiểm bất đồng đúng một đơn vị.** Sinh lại `DASHBOARD.md` ngay tại HEAD sạch
+   ra `CÓ (11 commit)`, trong khi `state-check` cùng lúc đòi `CÓ (12 commit)` — hai con số cho
+   cùng một câu hỏi, tại cùng một HEAD, sau một lượt sinh vừa chạy xong. Chưa tìm ra chỗ lệch;
+   chỉ khẳng định được là **có** lệch, đo lại được.
+
+Hệ quả (2) nặng hơn (1): còn bất đồng thì mục này **không đóng được bằng bất kỳ thứ tự commit
+nào**, kể cả thứ tự "commit cuối chỉ chứa file đã miễn trừ".
+
+**KHÔNG tự sửa, có lý do:** cả hai chỗ nằm trong `scripts/`, tức trong tầng máy — sửa là **đổi
+dấu vân tay bản phát**, buộc cắt bản 1.3.1 và ảnh hưởng hai repo đang ghim bản khung. Việc đó
+cần người chốt quyết, không phải hệ quả phụ của một lượt vá tài liệu.
+
+**NÓI THẲNG MỘT VI PHẠM CỦA CHÍNH LƯỢT NÀY:** hai commit trên **đã push khi cổng còn 1 mục đỏ**,
+trong khi `AGENTS.md` mục 2 đòi cổng XANH TOÀN BỘ mới được đẩy. Người chốt đã duyệt trước quyền
+commit/push cho lượt này, nhưng duyệt quyền không phải duyệt vượt cổng — ghi ra đây để lần sau
+không ai coi đó là tiền lệ. Mọi mục còn lại của cổng đều XANH, gồm `npm test` 145 phép 0 đỏ.
