@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-exec-changB",
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Khai ORCHESTRATOR.md vao ban do file + dong luot",
-      "released_at": "2026-09-05",
+      "task": "Tang phien ban, so phat hanh, nhat ky doi ban",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": null,
+      "owner": "claude-exec-changB",
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Port so tay vai dieu phoi sang bo khung",
-      "released_at": "2026-09-05T16:20",
+      "task": "So tay vai dieu phoi ban portable di theo ban trich",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-exec-changB",
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Dong phien: cong kiem phai xanh truoc khi tra khoa",
-      "released_at": "2026-09-05T17:40",
+      "task": "Dua goi Assistant vao ban trich va cat mot ban phat hanh",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "claude-exec-changB",
       "ai": null,
-      "claimed_at": "2026-09-04",
-      "task": "Dua MULTIFLOW.md vao bo khung: doc goc + khai bo trich + dong so tay + sinh lai template",
-      "released_at": "2026-09-04"
+      "claimed_at": "2026-09-05",
+      "task": "Ban trich nhan goi Assistant",
+      "released_at": null
     }
   }
 }

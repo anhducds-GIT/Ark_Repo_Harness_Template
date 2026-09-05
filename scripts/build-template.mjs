@@ -37,7 +37,13 @@ const PORTABLE_SCRIPTS = [
   "build-dashboard.mjs",
   "check-bootstrap.mjs",
   "session-check.mjs",
-  "safe-push.mjs"
+  "safe-push.mjs",
+  // GÓI ASSISTANT (bản 1.3.0) — hai lệnh của vai ĐIỀU PHỐI. Chúng CHỈ ĐỌC, không đòi khoá nào,
+  // và cả hai đã chạy được trên một repo cố tình khác hình dạng repo nhà (tên vùng khác · không
+  // đơn vị con · thiếu cả ba sổ · không remote). Suite ghim đi kèm là `tests/assistant-smoke.mjs`
+  // ở khối VERBATIM bên dưới — phát một lệnh mà không phát phép ghim của nó là phát một lời hứa.
+  "state-check.mjs",
+  "what-next.mjs"
 ];
 
 /* Chép nguyên văn, không đổi một ký tự. */
@@ -58,7 +64,16 @@ const VERBATIM = [
   // template literal là mời gọi hỏng do backtick và `${`, và quan trọng hơn — chép nguyên văn
   // nghĩa là repo gốc CHẠY THẬT đúng cái nó phát cho người khác. `--check` không cho hai bản
   // trôi khỏi nhau. Bốn khối bên trong đều đã qua đột biến.
-  ["tests/harness-smoke.mjs", "tests/harness-smoke.mjs"]
+  ["tests/harness-smoke.mjs", "tests/harness-smoke.mjs"],
+  // SỔ TAY VAI ĐIỀU PHỐI — bản portable. Bộ khung phát ra hai lệnh của vai đó (`state-check`,
+  // `what-next`) nhưng trước 1.3.0 không phát ra tài liệu nào nói vai đó ĐƯỢC LÀM GÌ và KHÔNG
+  // được làm gì. Công cụ không kèm hàng rào thì hàng rào là thứ đầu tiên mất.
+  ["docs/protocols/ORCHESTRATOR.md", "docs/protocols/ORCHESTRATOR.md"],
+  // PHÉP GHIM CỦA GÓI ASSISTANT — chép nguyên văn, cùng lý do như suite hạt giống: repo gốc
+  // CHẠY THẬT đúng cái nó phát cho người khác, và `--check` không cho hai bản trôi khỏi nhau.
+  // Khối E của nó tự dựng một repo git thật có hình dạng khác hẳn, nên nó chứng minh được
+  // "chạy ở repo lạ" ngay tại repo vừa dựng, không cần ai đi kiểm hộ.
+  ["tests/assistant-smoke.mjs", "tests/assistant-smoke.mjs"]
 ];
 
 /* ADR-0000 CỐ Ý KHÔNG chép nguyên văn. Bản gốc kể lại lịch sử di trú của riêng repo gốc — ba
@@ -468,7 +483,10 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) — bốn cơ chế (bảng chủ sở hữu · nhãn \`Lane:\` · cổng đóng phiên · cổng xuất bản), một ngày làm việc 5 bước, **năm bất biến kèm lý do từng cái**, và quy trình đổi cơ chế có **đột biến kiểm bắt buộc**. Mục 1–3 viết cho người không code. **Cố ý không chứa số đo, không kiểm kê chốt, không bảng mã lỗi** — ba thứ đó khác nhau ở từng repo và mục nhanh hơn ai kịp sửa, nên nó chỉ đưa câu lệnh để tự đo |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy \`npm run bootstrap\` |
-| Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống, chạy bằng \`npm test\` |
+| **Sắp BÁO CÁO trạng thái cho người chốt — kiểm xem điều mình sắp nói có khớp nguồn thẩm quyền không** | \`npm run state-check\` — **không phải cổng đóng phiên**: cổng kia hỏi "việc tôi làm đẩy được chưa", cái này hỏi "điều tôi sắp nói có đúng không". Ba mã thoát, cố ý không gộp: \`OK\` · \`MISMATCH\` · \`UNKNOWN\` — không đọc được thì nói KHÔNG BIẾT, không nói OK. **Chỉ đọc, không đòi khoá nào** |
+| **Không biết làm gì tiếp, hoặc muốn biết việc nào chạy song song được ngay** | \`npm run what-next\` — bản đồ việc, giao ba nguồn: bảng quyền × sổ nợ từng đơn vị × sổ ý tưởng. Luật song song nó cưỡng chế chỉ một câu: hai việc song song được **khi và chỉ khi** thuộc hai khoá khác nhau và cả hai đang trống. **Chỉ đọc, không đòi khoá nào** |
+| **Là phiên ĐIỀU PHỐI: người chốt hỏi "đang có gì · làm gì tiếp · việc nào chạy song song được"** | [docs/protocols/ORCHESTRATOR.md](docs/protocols/ORCHESTRATOR.md) — sổ tay vai điều phối: luật mở phiên, **hàng rào vai cứng** (vai này KHÔNG code, KHÔNG debug, KHÔNG đề xuất bản vá), luật nạp báo cáo năm mục, lối ra bàn giao cho executor. **Đọc khối cảnh báo ở đầu file trước** |
+| Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống · [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) — phép ghim của hai lệnh trên, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó. Chạy cả hai bằng \`npm test\` |
 | Biết luật riêng của NGHỀ repo bạn (không phải luật chung) | phụ lục nghề: [docs/ANNEX-tu-dong-hoa-trinh-duyet.md](docs/ANNEX-tu-dong-hoa-trinh-duyet.md) là bản mẫu có thật · viết cái của bạn theo [docs/_TEMPLATE-annex.md](docs/_TEMPLATE-annex.md) |
 
 **Vì sao phải là liên kết chứ không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
@@ -662,10 +680,14 @@ function packageJson(version) {
       bootstrap: "node scripts/check-bootstrap.mjs",
       gate: "node scripts/session-check.mjs",
       push: "node scripts/safe-push.mjs",
+      // Hai lệnh của vai điều phối. Khai ở đây chứ không chỉ để file nằm trong `scripts/`:
+      // bảng "Lệnh chạy được" đọc thẳng khối này, nên lệnh không khai = lệnh không ai thấy.
+      "state-check": "node scripts/state-check.mjs",
+      "what-next": "node scripts/what-next.mjs",
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
-      test: "node tests/harness-smoke.mjs"
+      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs"
     }
   }, null, 2) + "\n";
 }
