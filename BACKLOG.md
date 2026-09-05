@@ -187,3 +187,25 @@ là Python**.
 Bản 1.3.1 đã nối đường truyền tham số (`behaviourOpts`), nên chỗ vá sẵn sàng. Còn thiếu hai vế:
 **khai `behaviour_globs`** ở nơi cần, và **một phép ghim dựng nổi ca hỏng** cho nó — không thì
 lại đúng bệnh KHUNG-5. Vùng: `_code`.
+
+### KHUNG-15 · Cổng báo "Test xanh ĐỎ" trong khi mọi suite exit 0
+
+**Triệu chứng, đo 05/09 — KHÔNG chẩn đoán nguyên nhân ở đây** (mục nợ ghi triệu chứng; tìm
+nguyên nhân là việc của executor có brief):
+
+- `npm test` → **exit 0**, 145 phép xanh, 0 đỏ.
+- `node tests/cong-do-that.mjs` → exit 0. `node tests/core-contract.mjs` → exit 0.
+- `node scripts/session-check.mjs --as <phiên>` → mục **"Test xanh" ĐỎ**, với dòng giải thích
+  `suite gốc repo ĐỎ →` rồi liệt kê **toàn dòng `ok`**.
+
+Một chi tiết đáng đưa cho người điều tra, không phải kết luận: các phép kiểm được liệt kê ở đó
+mang tên chứa sẵn chữ **`HỎNG`**, **`KHÔNG BIẾT`**, **`XOÁ`** — vì chúng là các phép kiểm *về*
+trạng thái hỏng. Nếu cổng phân loại kết quả suite bằng cách dò chuỗi trong output thì đó là chỗ
+đáng nhìn trước tiên.
+
+**Hướng sai lệch là fail-closed** (báo đỏ khi thực ra xanh), nhẹ hơn chiều ngược lại. Nhưng hậu
+quả thật vẫn nặng: **cổng đóng phiên không đóng được**, nên hoặc phiên treo, hoặc người ta bắt
+đầu push khi đỏ — và một khi đã push-khi-đỏ một lần thì lần sau dễ hơn.
+
+Gắn với KHUNG-9 (`can-nang` xác nhận ca hỏng bằng tìm chuỗi) và KHUNG-10: nếu đúng là dò chuỗi
+thì đây là **lần thứ ba** một cơ chế của bộ khung dùng phép đo bằng chuỗi văn bản. Vùng: `_code`.

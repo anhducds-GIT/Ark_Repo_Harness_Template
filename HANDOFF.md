@@ -1121,3 +1121,20 @@ Cố ý không có ngày tháng, không có bản vá kỹ thuật, không chép
 nguồn"*. Không phải lỗi mới — trang overview **suy hoàn toàn từ HEAD**, nên nó chiếu `next_step`
 bản CŨ (còn nhắc `build-dashboard.mjs`) trong khi bản trên đĩa đã sửa. Sinh lại sau khi commit là
 hết. Ghi ra vì nó trông y hệt một phép kiểm tự nhiên hỏng.
+
+**BỔ SUNG — cổng đóng phiên không đóng được, ghi lại rồi DỪNG.** Cuối lượt 1.3.1, cổng báo hai
+mục đỏ mà repo không tái hiện được bằng lệnh trực tiếp:
+
+- *"Test xanh"* ĐỎ trong khi `npm test` **exit 0 / 145 xanh**, và từng suite chạy riêng cũng
+  exit 0 (`cong-do-that`, `core-contract`). Ghi thành **KHUNG-15**.
+- *"Sự thật máy sinh còn tươi"* ĐỎ ở `DASHBOARD.md` dòng 18 — cùng cột `changedCount` mà bản
+  1.3.1 vừa vá. Bản vá đúng (đột biến chứng minh được), nhưng cột này còn một đường khác chưa
+  hội tụ: nó **so file trong HEAD với giá trị sinh tại HEAD**, mà mỗi commit lại đổi HEAD.
+
+**DỪNG chẩn đoán ở đây, có lý do.** `ORCHESTRATOR.md` mục 4 cấm vai điều phối đi tìm nguyên nhân
+lỗi; mục 4b nói lối ra là viết brief và giao executor. Phiên này đã trượt vai vài lần rồi — lần
+này ghi triệu chứng đúng như đo được, kèm một chi tiết cho người điều tra (tên các phép kiểm
+chứa sẵn chữ `HỎNG` / `KHÔNG BIẾT` / `XOÁ`), và **không đoán tiếp**.
+
+**6 commit đang giữ local, CHƯA PUSH.** Cổng chưa xanh thì không đẩy — kể cả khi có lý do tin
+rằng đỏ này là dương tính giả. Đây là quyết định của người chốt, không phải của phiên.
