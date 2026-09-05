@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-09-05",
-  "generated_commit": "27abb49",
+  "generated_commit": "afe9ddf",
   "profile": "P1",
   "entry_point": "llms.txt",
   "law_files": [
@@ -33,20 +33,20 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-vong2",
-      "next_step": "Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn.",
-      "human_action": "Không có việc nào cần bạn",
+      "next_step": "KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới.",
+      "human_action": "CÓ — KHUNG-11: bớt cái gì trong 998 dòng tài liệu vượt ngân sách. Mọi việc còn lại đều THÊM chữ, nên chốt càng muộn càng vượt xa. Xem BACKLOG.md.",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-05",
       "last_verified_commit": "b4a08b262cc64e2cc16a85d5629a0e6e10f07ae2",
-      "open_item": "Bản 1.3.0: repo dựng mới nhận luôn hai lệnh của vai điều phối, sổ tay và 52 phép ghim — chạy được ngay, không phải sửa gì"
+      "open_item": "Bản 1.3.1 · migrate nay là BA việc trong một (migrate + audit + bring AI assistant onboard), Đức chốt 05/09 — xong không còn nghĩa là cổng xanh"
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn.",
+      "title": "KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới.",
       "rank": 1,
       "claim": null
     }

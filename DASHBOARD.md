@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `27abb49` (2026-09-05). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `afe9ddf` (2026-09-05). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
-1. **Việc ưu tiên #1** — **_root** — Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn. · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-05 @ `27abb49` · [HANDOFF.md](HANDOFF.md)
+1. **Việc ưu tiên #1** — **_root** — KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới. · [STATUS](STATUS.md)
+2. **Phiên gần nhất** — 2026-09-05 @ `afe9ddf` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 
@@ -15,7 +15,7 @@ Trang được sinh tại commit `27abb49` (2026-09-05). Đây là lúc sinh tra
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.3.0 | active | 0 | 10 | 2026-09-05 @ `b4a08b2` — npm test 143/143 xanh · repo dựng mới từ bản 1.3.0 chạy được cả hai lệnh điều phối ngay, 65 phép xanh, cả hai dạng xuống dòng ([bằng chứng](HANDOFF.md)) | CÓ (11 commit) | Bản 1.3.0: repo dựng mới nhận luôn hai lệnh của vai điều phối, sổ tay và 52 phép ghim — chạy được ngay, không phải sửa gì | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.3.1 | active | 0 | 10 | 2026-09-05 @ `b4a08b2` — npm test 145/145 xanh · bản trích nay mang .gitattributes đi theo (28 file) · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái ([bằng chứng](HANDOFF.md)) | CÓ (11 commit) | Bản 1.3.1 · migrate nay là BA việc trong một (migrate + audit + bring AI assistant onboard), Đức chốt 05/09 — xong không còn nghĩa là cổng xanh | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 

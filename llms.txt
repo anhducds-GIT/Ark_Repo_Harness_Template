@@ -4,11 +4,11 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `27abb49` (2026-09-05).
+Trang được sinh tại commit `afe9ddf` (2026-09-05).
 
 ## Việc ưu tiên #1
 
-- **_root** — Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn.
+- **_root** — KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới.
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh tại commit `27abb49` (2026-09-05).
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — Bản 1.3.0: repo dựng mới nhận luôn hai lệnh của vai điều phối, sổ tay và 52 phép ghim — chạy được ngay, không phải sửa gì
+- [ark-repo-harness](STATUS.md): active — Bản 1.3.1 
 
 ## Luật bắt buộc trước khi sửa gì
 
