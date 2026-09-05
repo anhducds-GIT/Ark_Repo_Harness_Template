@@ -3,6 +3,71 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.6 — 2026-09-05 — Bảng có tab "Đã xong", và migrate có BƯỚC 0: audit trước khi thả file nào
+
+**Tab "Đã xong" trên bảng HTML.** Bảng vốn chỉ chiếu thứ ĐANG mở — việc còn lại, nợ còn treo, chỗ
+chờ người chốt. Người chốt nhìn mãi một danh sách việc chưa xong thì không thấy repo đang tiến,
+chỉ thấy nó đang nợ. Việc đã đóng **vốn nằm sẵn trong sổ nợ**, chỉ là không ai chiếu ra.
+Đọc đúng dấu của sổ (**mã bị gạch**), cùng dấu mà `what-next.mjs` đọc — hai chỗ đọc một dấu thì
+không trôi khỏi nhau. Ghim kèm vế đối chứng: việc **còn mở** không được lọt, và một câu văn xuôi
+nói "đã xong" cũng **không** được tính.
+
+**BƯỚC 0 của quy trình migrate: audit độc lập TRƯỚC khi thả file nào.** Bước này đứng trước cả
+bước đo, và nó ra đời từ một con số: trial trên `ALL_SKILL_MANAGEMENT` cho thấy repo đích đang
+giữ **1824 dòng nội dung riêng** trong bốn file **trùng tên** với thứ bộ khung sắp thả vào —
+`AGENTS.md` (26 luật riêng) · `DASHBOARD.md` (viết tay, có mirror sang Google Sheet) ·
+`decisions.md` · `handoff.md` (**1225 dòng**).
+
+**Luật cứng: bốn file đó KHÔNG ĐƯỢC ĐÈ.** Repo đích có sẵn thì THÊM VÀO, không thay thế. Và đo
+bằng **số dòng trước/sau**, không chỉ kiểm "file còn tồn tại" — một file bị ghi đè vẫn còn tồn
+tại, chỉ là rỗng ruột.
+
+**Audit giao cho AI khác, chạy trên bản clone trong thư mục tạm** — tác nhân ngoài không có lý do
+gì được quyền ghi vào repo đang sống. Brief hỏi sáu câu; câu đắt nhất là câu 6: *file nào trùng
+tên, và trùng thì mất gì*.
+
+**Và luật vàng số 4 áp cho cả audit của AI khác.** Trial 05/09: Codex báo ba lệnh thoát mã
+`2/1/1` ở repo `n8n-orchestrator` — đo lại thì **cả ba exit 0**. Tin thẳng thì đã đi sửa ba thứ
+không hỏng. Mỗi phát hiện phải tự chạy lại trước khi đưa vào kế hoạch.
+
+`1.3.5` → `1.3.6`.
+
+## 1.3.5 — 2026-09-05 — Bịt CỬA HẬU do chính bản 1.3.3 mở ra
+
+**Bản 1.3.3 cho repo khai `docs.file_map` — cần thiết, và nó mở một cửa hậu.** Đường đọc bản đồ
+vốn có dòng `if (!existsSync(...)) continue`: an toàn khi nơi đặt bản đồ còn đóng cứng
+`AGENTS.md` (package con không có `AGENTS.md` là chuyện thường), thành **cửa hậu ngay khi nơi
+đó khai được**.
+
+**Đo thật:** khai `file_map` trỏ tới một file không tồn tại, thêm một file mới chưa khai ở đâu
+cả → cổng báo **XANH**, *"Mọi thứ mới đều đã khai"*. **Một dòng cấu hình vô hiệu hoá cả một
+cổng**, không cảnh báo gì. Đúng loại lỗ mà luật vàng số 3 cấm.
+Chi tiết đáng ghi: file **rỗng** thì cổng ĐỎ đúng — chỉ file **không tồn tại** mới lọt. Hai
+đường đi khác nhau cho hai ca trông giống nhau.
+
+Nay tách hai ca: repo **không** khai thì giữ nguyên hành vi cũ (không làm đỏ hàng loạt repo đang
+chạy); repo **có** khai mà file không có thì **ĐỎ**, và nói thẳng đó là *khai sai*, không phải
+*thiếu bản đồ* — hai thứ có hai cách sửa khác hẳn.
+**Ghim ở `tests/cong-do-that.mjs` khối 8**, nơi dựng kho git thật, kèm vế đối chứng.
+
+**Ba chỗ nữa do audit độc lập Codex chỉ ra, đã kiểm chứng lại từng cái:**
+- **`budget` sai kiểu lùi về mặc định IM LẶNG.** `"budget": "rất lớn"` hay `"budget": 5` đều
+  lặng lẽ thành "không khai", và người viết tưởng ngân sách riêng đang có hiệu lực — trong khi
+  `CHANGELOG` 1.3.4 khẳng định nó bị từ chối. Nay từ chối thật.
+- **Ngân sách không có TRẦN.** `1e300` hợp lệ, nên mọi chỉ số đều nằm dưới ngân sách và thước đo
+  im lặng mất tác dụng. Nay trần = 100 lần mặc định: đủ rộng cho repo lớn thật, đủ hẹp để chặn
+  một con số vô nghĩa.
+- **`F13` tự khai quá phạm vi.** Tên khối nói "ba lỗi" trong khi thân chỉ kiểm hai. Một phép kiểm
+  tự khai quá phạm vi là một lỗi riêng: người sau đọc tên rồi tin rằng vế thứ ba đã có ai canh.
+  Đổi tên cho khớp bằng chứng, và ghi rõ vế thứ ba nằm ở đâu.
+
+**Điều đáng nói nhất về lượt này:** cửa hậu do **tôi** mở ở 1.3.3 khi vá một lỗi thật. Nó không
+lộ ra qua `npm test` — 149 phép đều xanh — mà lộ ra khi **đi dựng lại đúng ca hỏng**. Tối ưu và
+vá lỗi đều là lúc lớp bảo vệ dễ mất nhất, và cách duy nhất bắt được là tự tay dựng ca hỏng chứ
+không đọc lại diff.
+
+`1.3.4` → `1.3.5`.
+
 ## 1.3.4 — 2026-09-05 — Repo migrate nay được dọn theo, không chỉ được chuẩn theo
 
 Bộ khung vốn phát ra **luật** và **cổng kiểm**, nhưng không phát ra **nhịp dọn**. Repo dựng từ

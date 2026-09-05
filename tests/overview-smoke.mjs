@@ -12,7 +12,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { gomDuLieu, khoiLienQuan, noChuaChungMinh, trang } from "../scripts/build-overview.mjs";
+import { gomDuLieu, khoiLienQuan, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -182,6 +182,37 @@ const html = trang(dl);
   assert.match(khoiLienQuan([["Sổ thật", "[X.html](X.html)"]], new Set(["X.html"])), /href="X\.html"/,
     "co lien ket markdown va file co that thi PHAI ra link");
   ok("trang mẹ dẫn tới sổ migrate, và chỉ dẫn tới trang có thật");
+}
+
+/* ---- Tab "Đã xong": chiếu việc ĐÃ ĐÓNG, và chỉ việc đã đóng ------------- */
+{
+  /* VÌ SAO TAB NÀY ĐÁNG CÓ: bảng vốn chỉ chiếu thứ ĐANG mở — việc còn lại, nợ còn treo, chỗ chờ
+     người chốt. Người chốt nhìn mãi một danh sách việc chưa xong thì không thấy repo đang tiến,
+     chỉ thấy nó đang nợ. Việc đã đóng vốn nằm sẵn trong sổ, chỉ là không ai chiếu ra.
+     ĐỌC ĐÚNG DẤU CỦA SỔ (gạch mã), cùng dấu mà `what-next.mjs` đọc — hai chỗ đọc một dấu thì
+     không trôi khỏi nhau. */
+  const so = [
+    "## P1",
+    "### ~~AA-1~~ · viec da dong han",
+    "### AA-2 · viec CON MO",
+    "## P3",
+    "### ~~AA-3~~ · viec da dong o nhom khac",
+    "van xuoi noi rang AA-9 da xong roi",
+  ].join(String.fromCharCode(10));
+
+  const ra = tachDaXong(so);
+  assert.equal(ra.length, 2, `chi duoc lay muc DA GACH MA, dang lay ${ra.length}`);
+  assert.deepEqual(ra.map((v) => v.ma), ["AA-1", "AA-3"]);
+  // VE DOI CHUNG, va khong co no thi ve tren vo nghia: viec CON MO khong duoc lot vao.
+  assert.ok(!ra.some((v) => v.ma === "AA-2"), "viec con mo KHONG duoc hien o tab da-xong");
+  // Van xuoi noi "da xong" cung khong duoc tinh — chi dau gach ma moi tinh.
+  assert.ok(!ra.some((v) => v.ma === "AA-9"), "van xuoi KHONG duoc tinh la da dong");
+  // Uu tien luc mo phai theo dung nhom no nam duoi.
+  assert.equal(ra[0].uuTien, "P1");
+  assert.equal(ra[1].uuTien, "P3");
+  assert.deepEqual(tachDaXong(""), [], "so rong -> khong co gi, khong duoc no");
+
+  ok("tab Đã xong: chỉ lấy mục đã gạch mã, việc còn mở và văn xuôi không lọt");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

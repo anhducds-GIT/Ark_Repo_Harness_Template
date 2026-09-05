@@ -428,10 +428,11 @@ check("Không có secret lọt vào repo", () => {
 
 /* File nào chứa Bản đồ file. Repo khai `docs.file_map` trong `.repo-structure.json`; không khai
    thì vẫn là `AGENTS.md` như trước — repo cũ không phải đổi gì. */
-const FILE_BAN_DO = (() => {
+const KHAI_BAN_DO = (() => {
   const v = structure?.docs?.file_map;
-  return typeof v === "string" && v.trim() ? v.trim() : "AGENTS.md";
+  return typeof v === "string" && v.trim() ? v.trim() : null;
 })();
+const FILE_BAN_DO = KHAI_BAN_DO || "AGENTS.md";
 
 /* ---- 4. File mới phải khai vào Bản đồ file ------------------------------ */
 check("File mới đã khai vào Bản đồ file", () => {
@@ -455,6 +456,7 @@ check("File mới đã khai vào Bản đồ file", () => {
     };
   }
   const undeclared = [];
+  const khaiSaiBanDo = new Set();
   /* TÌM BẢN ĐỒ BẰNG MỐC, KHÔNG BẰNG SỐ MỤC.
    *
    * Bản đầu đóng cứng `## 6.` … `## 7.` — tức là số mục trong `AGENTS.md` CỦA BỘ KHUNG. Repo
@@ -504,7 +506,22 @@ check("File mới đã khai vào Bản đồ file", () => {
      * `AGENTS.md`. Kết quả: repo đó nay có HAI bản đồ ở hai file — hai nguồn cho một khái niệm,
      * đúng bệnh mà cả bộ khung sinh ra để chữa, và lần đó bộ khung là thủ phạm. */
     const agentsPath = path.join(ROOT, base, FILE_BAN_DO);
-    if (!fs.existsSync(agentsPath)) continue;
+    /* KHAI TRỎ VÀO HƯ KHÔNG PHẢI ĐỎ, KHÔNG ĐƯỢC BỎ QUA IM LẶNG.
+     *
+     * `continue` ở đây an toàn khi nơi đặt bản đồ còn đóng cứng `AGENTS.md`: package con không
+     * có `AGENTS.md` là chuyện thường, và bản đồ gốc đã canh phần còn lại.
+     * Từ 1.3.3, repo khai được `docs.file_map` — và đúng lúc đó dòng này thành CỬA HẬU. Đo thật
+     * ngay trong lượt 1.3.4: khai `file_map` trỏ tới một file không tồn tại, thêm một file mới
+     * chưa khai ở đâu cả, cổng báo **XANH** — "Mọi thứ mới đều đã khai".
+     * Một dòng cấu hình vô hiệu hoá cả một cổng, không cảnh báo gì. Đây là loại lỗ mà chính
+     * luật vàng số 3 cấm: không được làm yếu lớp bảo vệ đã có.
+     *
+     * Nên tách hai ca: repo KHÔNG khai (dùng mặc định) thì giữ nguyên hành vi cũ; repo CÓ khai
+     * mà file không có thì ĐỎ, và nói thẳng đó là khai sai chứ không phải thiếu bản đồ. */
+    if (!fs.existsSync(agentsPath)) {
+      if (KHAI_BAN_DO) { khaiSaiBanDo.add(path.join(base, FILE_BAN_DO).replaceAll("\\", "/")); }
+      continue;
+    }
     const rest = pkgDir ? file.slice(pkgDir.length + 1) : file;
     if (!rest || rest === FILE_BAN_DO) continue;
     const map = mapSection(fs.readFileSync(agentsPath, "utf8"));
@@ -530,6 +547,11 @@ check("File mới đã khai vào Bản đồ file", () => {
   }
   // Không tìm thấy bản đồ là một lỗi RIÊNG, có cách sửa RIÊNG. Gộp nó vào "chưa khai" là bảo
   // người ta đi khai từng file vào một mục không tồn tại.
+  /* Khai sai là lỗi RIÊNG, nặng hơn "thiếu bản đồ": thiếu thì người ta quên, khai sai thì cổng
+     đã bị vô hiệu hoá mà bảng vẫn xanh. Báo nó TRƯỚC mọi thứ khác. */
+  if (khaiSaiBanDo.size) {
+    return { ok: false, msg: `\`docs.file_map\` trong .repo-structure.json trỏ tới file KHÔNG TỒN TẠI: ${[...khaiSaiBanDo].join(", ")}. Cổng này khi đó không kiểm được gì — sửa đường dẫn, hoặc bỏ hẳn khối \`docs.file_map\` để dùng mặc định AGENTS.md.` };
+  }
   const thieu = [...new Set(thieuBanDo)];
   if (thieu.length) {
     return { ok: false, msg: `KHÔNG TÌM THẤY Bản đồ file trong: ${thieu.join(", ")}. Cổng không biết đối chiếu vào đâu. Sửa: đặt hai dòng \`<!-- BAN-DO:BEGIN -->\` và \`<!-- BAN-DO:END -->\` quanh bảng bản đồ, HOẶC đặt tiêu đề chứa chữ "Bản đồ file".` };

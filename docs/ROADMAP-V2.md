@@ -4,7 +4,7 @@ status: active
 ttl_days: 120
 ---
 
-# ROADMAP V2 — 12 mục nợ, 5 đợt
+# ROADMAP V2 — sau ba bản vá và một lượt pilot
 
 > **Đây là lớp ĐIỀU PHỐI: thứ tự · phân luồng · phụ thuộc · chỗ cần người chốt.** Nội dung từng
 > mục ở [BACKLOG.md](../BACKLOG.md) — file này **không chép lại**, chỉ nói *làm cái nào trước,
@@ -15,6 +15,26 @@ ttl_days: 120
 >
 > Luật song song cưỡng chế chỉ một câu ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 2): **hai
 > việc chạy song song được khi và chỉ khi thuộc hai khoá khác nhau và cả hai khoá đang trống.**
+
+## Cập nhật 2026-09-05 — pilot đổi thứ tự ưu tiên
+
+Lượt migrate thật `n8n-orchestrator` cộng audit độc lập đã **đóng 8 mục** (KHUNG-1, 2, 5, 12,
+19, 20, 21, và cửa hậu 1.3.5) và **mở 7 mục mới**. Điều đáng nói không phải con số, mà là:
+**bốn lỗi nặng nhất trong ngày đều do migrate lôi ra, không do đọc lại code.**
+
+| Bản | Vá gì | Ai tìm ra |
+|---|---|---|
+| 1.3.1 | bộ đếm đếm luôn sản phẩm của chính bộ sinh | đuổi lỗi ở nhà |
+| 1.3.3 | ba lỗi: trường khai nghề bị từ chối · bảng quyền nổ vì `null` · cổng đóng cứng bản đồ | **pilot migrate** |
+| 1.3.4 | nhịp DỌN + thước cân nặng đi theo bản trích | Đức yêu cầu |
+| 1.3.5 | **cửa hậu do chính 1.3.3 mở ra** | tự dựng ca hỏng + Codex xác nhận |
+
+**Bài học vào roadmap, không chỉ vào changelog:** `npm test` xanh **không** chứng minh gì về một
+lớp bảo vệ vừa bị nới. Cách duy nhất bắt được là **tự tay dựng ca hỏng**. Nên từ nay mọi lượt nới
+một cấu hình đều phải kèm một khối trong `tests/cong-do-that.mjs`.
+
+**Thứ tự đổi:** migrate không còn là "đợt 5, sau khi dọn xong nợ". Nó lên **đợt 1** — mỗi lượt
+migrate là một lượt tìm lỗi mà bảy phiên ở nhà không tìm ra.
 
 ## Ba hình dạng lỗi, không phải mười hai việc rời
 

@@ -49,12 +49,27 @@ export const NGAN_SACH_MAC_DINH = {
 export function nganSachTu(structure) {
   const khai = structure?.budget;
   const ra = { ...NGAN_SACH_MAC_DINH };
-  if (!khai || typeof khai !== "object") return ra;
+  if (khai === undefined) return ra;
+  /* SAI KIỂU PHẢI NÓI RA, KHÔNG ĐƯỢC LÙI VỀ MẶC ĐỊNH IM LẶNG.
+     Bản đầu viết `if (!khai || typeof khai !== "object") return ra` — nên `"budget": "rất lớn"`
+     hay `"budget": 5` đều lặng lẽ thành "không khai", và người viết tưởng ngân sách riêng của
+     mình đang có hiệu lực. Audit độc lập Codex bắt được 05/09, cùng ngày khối này ra đời. */
+  if (khai === null || typeof khai !== "object" || Array.isArray(khai)) {
+    throw new Error(`BUDGET_HONG: \`budget\` phải là object các mục ngân sách. Đang là: ${Array.isArray(khai) ? "mảng" : typeof khai}`);
+  }
   for (const [k, v] of Object.entries(khai)) {
     if (k.startsWith("_")) continue;
     if (!(k in ra)) throw new Error(`BUDGET_HONG: \`budget.${k}\` không phải mục ngân sách. Hợp lệ: ${Object.keys(ra).join(", ")}`);
+    /* CÓ TRẦN, và trần là phần khiến khối này còn nghĩa. Không trần thì `1e300` hợp lệ, mọi chỉ
+       số thực tế đều nằm dưới ngân sách, và thước đo im lặng mất tác dụng — cách vô hiệu hoá nó
+       mà bảng vẫn xanh. Trần đặt ở 100 lần mặc định: đủ rộng cho repo lớn thật, đủ hẹp để một
+       con số vô nghĩa bị chặn. */
+    const tran = NGAN_SACH_MAC_DINH[k] * 100;
     if (typeof v !== "number" || !Number.isFinite(v) || v <= 0) {
       throw new Error(`BUDGET_HONG: \`budget.${k}\` phải là số dương. Đang là: ${JSON.stringify(v)}`);
+    }
+    if (v > tran) {
+      throw new Error(`BUDGET_HONG: \`budget.${k}\` = ${v} vượt trần ${tran} (100 lần mặc định ${NGAN_SACH_MAC_DINH[k]}). Một ngân sách lớn tới mức không bao giờ chạm là cách vô hiệu hoá thước đo trong khi bảng vẫn xanh. Repo lớn thật thì nới vừa đủ, và ghi lý do vào decisions.md.`);
     }
     ra[k] = v;
   }

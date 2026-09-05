@@ -95,6 +95,54 @@ Làm xong ba phép này ở repo đích thì việc 3 đạt. Chưa làm thì **
 Phép 3 là phép duy nhất chứng minh được việc 3, và nó **phải chạy thật**, không suy từ hai phép
 trên. Hai lượt migrate 03/09 đều dừng ở mức cổng xanh, tức chưa lượt nào đi qua phép này.
 
+## BƯỚC 0 — AUDIT ĐỘC LẬP TRƯỚC KHI THẢ FILE NÀO
+
+> **Thêm 2026-09-05, sau lượt trial trên `ALL_SKILL_MANAGEMENT`.** Bước này đứng TRƯỚC cả bước
+> đo, và nó tồn tại vì một lý do đo được: repo đích thường **đã có sẵn file trùng tên** với thứ
+> bộ khung sắp thả vào.
+
+**Đo thật ở `ALL_SKILL_MANAGEMENT`:** bốn file trùng tên đang giữ **1824 dòng nội dung riêng** —
+`AGENTS.md` (26 luật riêng), `DASHBOARD.md` (viết tay, có bản mirror sang Google Sheet),
+`decisions.md` (sổ quyết định chỉ-thêm), `handoff.md` (**1225 dòng** nhật ký vận hành). Thả đè
+là mất sạch, và mất theo cách không ai nhận ra ngay.
+
+### Giao audit cho một AI KHÁC, không tự audit
+
+```bash
+codex exec -s workspace-write -m <model> -c windows.sandbox='"unelevated"' - < brief-audit.txt
+```
+
+**Chạy trên một bản clone trong thư mục tạm, không chạy trên repo thật.** Tác nhân ngoài không có
+lý do gì được quyền ghi vào repo đang sống.
+
+Brief phải hỏi đủ sáu câu, và câu 6 là câu đắt nhất:
+1. Repo này là gì — một đoạn cho người không đọc code.
+2. Chia mấy **khoá vùng**, gồm thư mục nào, vì sao. Chỗ nào **bắt buộc chung khoá**.
+3. File nào **máy sinh**, sinh bằng lệnh gì.
+4. **Xung đột luật** — repo đã có cơ chế phân quyền riêng chưa, nó chọi với khoá vùng ở đâu.
+5. Một phiên AI mới **sẽ vấp ở đâu**.
+6. **File nào trùng tên với thứ bộ khung sắp ghi vào, và trùng thì mất gì.**
+
+### Luật cứng: BỐN FILE KHÔNG ĐƯỢC ĐÈ
+
+`AGENTS.md` · `DASHBOARD.md` · `decisions.md` · `handoff.md`/`HANDOFF.md`.
+
+Repo đích có sẵn thì **THÊM VÀO, không thay thế** — thêm một mục mới ở cuối, giữ nguyên phần cũ.
+Đo trước và sau bằng số dòng, **không chỉ kiểm "file còn tồn tại"**:
+
+```bash
+wc -l AGENTS.md DASHBOARD.md decisions.md handoff.md    # trước, ghi lại
+wc -l AGENTS.md DASHBOARD.md decisions.md handoff.md    # sau, phải >= trước
+```
+
+Số dòng **giảm** ở bất kỳ file nào trong bốn = đã đè mất nội dung. Dừng, hoàn nguyên.
+
+### Kiểm chứng lại audit, đừng tin thẳng
+
+Luật vàng số 4 áp cho cả audit của AI khác. Trial 05/09: Codex báo ba lệnh thoát mã `2/1/1` ở
+repo `n8n-orchestrator` — đo lại thì **cả ba exit 0**. Nếu tin thẳng thì đã đi sửa ba thứ không
+hỏng. Mỗi phát hiện phải tự chạy lại trước khi đưa vào kế hoạch migrate.
+
 ## Sáu bước, theo đúng thứ tự
 
 ### 1. Đo trước, và ghi lại con số

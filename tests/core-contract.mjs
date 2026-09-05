@@ -433,7 +433,7 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok("F12 - luat trong khuon khong tro toi file ban trich khong mang");
 }
 
-/* ---- F13. BA LOI DO PILOT MIGRATE LOI RA (05/09, repo n8n-orchestrator) -----
+/* ---- F13. HAI trong BA loi do pilot migrate loi ra (05/09) ----------------
  *
  * Ba loi nay KHONG loi ra qua bay phien o repo nha, vi repo nha khong dung phai:
  *   A. repo nha la JS nen khong ai can khai `units.behaviour_globs`
@@ -491,7 +491,12 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     assert.doesNotThrow(() => readClaims(f), "khuon dung PHAI van chay");
   } finally { rmSync(thu, { recursive: true, force: true }); }
 
-  ok("F13 - ba loi pilot: behaviour_globs khai duoc va doi hanh vi - bang quyen null noi ro thay vi no");
+  /* LOI THU BA (`docs.file_map`) KHONG ghim o day, va do la co y sau khi audit doc lap chi ra:
+     no can mot kho git that de chay het cong dong phien, nen nam o `tests/cong-do-that.mjs`
+     khoi 8. Ten khoi nay truoc do noi "ba loi" trong khi than chi kiem hai — audit Codex 05/09
+     bat dung cho do. Mot phep kiem tu khai qua pham vi cua no la mot loi rieng: nguoi sau doc
+     ten roi tin rang ve thu ba da co ai canh. */
+  ok("F13 - hai loi pilot: behaviour_globs khai duoc va doi hanh vi - bang quyen null noi ro thay vi no");
 }
 
 /* ---- F14. NGAN SACH CAN NANG: khai duoc, va tu choi dau vao hong ----------
@@ -517,6 +522,22 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     "go sai ten muc ngan sach phai bi tu choi, khong duoc im lang bo qua");
   assert.throws(() => nganSachTu({ budget: { soNhatKy: 0 } }), /BUDGET_HONG/, "so <= 0 khong hop le");
   assert.throws(() => nganSachTu({ budget: { soNhatKy: "nhieu" } }), /BUDGET_HONG/, "phai la so");
+
+  /* BAN THAN `budget` SAI KIEU cung phai noi ra. Ban dau lui ve mac dinh IM LANG, nen
+     `"budget": "rat lon"` khien nguoi viet tuong ngan sach rieng dang co hieu luc trong khi
+     khong. Audit doc lap Codex bat duoc 05/09, cung ngay khoi nay ra doi. */
+  for (const sai of ["chuoi", 5, [], null]) {
+    assert.throws(() => nganSachTu({ budget: sai }), /BUDGET_HONG/,
+      `budget = ${JSON.stringify(sai)} phai bi tu choi, khong duoc lui ve mac dinh im lang`);
+  }
+
+  /* CO TRAN. Khong tran thi 1e300 hop le, moi chi so thuc te deu nam duoi ngan sach, va thuoc do
+     im lang mat tac dung — cach vo hieu hoa no ma bang van xanh. */
+  assert.throws(() => nganSachTu({ budget: { soNhatKy: 1e300 } }), /vượt trần/,
+    "so cuc lon phai bi chan: mot ngan sach khong bao gio cham la mot thuoc do da tat");
+  // VE DOI CHUNG: noi vua du van phai chay, neu khong ban va nay chan ca repo lon that.
+  assert.equal(nganSachTu({ budget: { soNhatKy: 1200 } }).soNhatKy, 1200,
+    "noi vua du PHAI van hop le");
 
   // Chu thich `_doc` trong khoi budget khong duoc tinh la go sai ten.
   assert.doesNotThrow(() => nganSachTu({ budget: { _doc: "ghi chu", soNhatKy: 800 } }));

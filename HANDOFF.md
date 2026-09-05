@@ -1234,3 +1234,39 @@ phiên **11/11 XANH**, cổng cấu trúc 0 đỏ. Bản `1.3.2` → `1.3.3`.
 
 **CÒN MỞ:** KHUNG-18 (mã việc tiền tố có số bị bỏ qua im lặng — `N8N-1` phải đổi thành `CP-1`)
 **chưa vá**; Đức chốt ba lỗi A/B/C, mục này không nằm trong đó.
+
+## 2026-09-05 · `claude-token` — TAB "ĐÃ XONG", BƯỚC 0 CỦA MIGRATE, và cửa hậu tự mở tự bịt
+
+**Bốn việc Đức giao, làm hết.**
+
+**(1) Cross-audit validate optimize — và nó bắt được thứ đáng bắt.** Bản 1.3.3 khi vá lỗi C (cho
+repo khai `docs.file_map`) đã **mở một cửa hậu**: khai trỏ tới file không tồn tại → cổng báo
+XANH *"Mọi thứ mới đều đã khai"*. Một dòng cấu hình vô hiệu hoá cả một cổng.
+**Nó KHÔNG lộ ra qua `npm test`** — 149 phép đều xanh. Chỉ lộ khi tự tay dựng ca hỏng. Tôi tìm ra
+trước khi Codex trả kết quả; Codex xác nhận độc lập và bổ sung chi tiết tôi chưa đo: file **rỗng**
+thì cổng ĐỎ đúng, chỉ file **không tồn tại** mới lọt. Bịt ở 1.3.5, ghim ở `cong-do-that.mjs`
+khối 8.
+Codex chỉ thêm ba chỗ, kiểm chứng lại đều đúng: `budget` sai kiểu lùi về mặc định im lặng ·
+ngân sách không có trần (`1e300` hợp lệ → thước đo tắt mà bảng vẫn xanh) · `F13` tự khai kiểm
+"ba lỗi" trong khi thân chỉ kiểm hai.
+
+**(2) Push 9 commit lên `n8n-Orchestrator`.** Xong, trả ba khoá, cổng 11/11 XANH.
+
+**(3) Trial điều phối Codex audit `ALL_SKILL_MANAGEMENT` — làm TIỀN ĐỀ migrate.** Đo trước
+(`assess`: mức 1/3, 0/32, không `package.json`), rồi giao Codex audit trên **bản clone**.
+Phát hiện đắt nhất: **bốn file trùng tên đang giữ 1824 dòng nội dung riêng**, `handoff.md` một
+mình 1225 dòng. Thả đè là mất sạch. Đã thành **luật cứng ở BƯỚC 0** của quy trình migrate, kèm
+cách đo bằng số dòng trước/sau.
+Repo này có `authority_matrix.md` + `discussion_protocol.md` + `rounds/` — **đã có sẵn cơ chế
+hiệp đồng nhiều AI trước khi bộ khung đến**. Ca khó nhất trong ba repo đã chạm. **Chưa migrate,
+cố ý** — cần Đức chốt cách gộp hai cơ chế (KHUNG-23, đã cắm cờ chờ-chốt).
+
+**(4) Tab "Đã xong" trên bảng HTML.** 7 việc, đọc mã bị gạch trong sổ nợ. Kiểm dashboard repo
+Chrome Extension trước khi làm: nó có 9 tab nhưng **không** có tab này — nên đây là tính năng
+mới, không phải chép. Ghim kèm hai vế đối chứng.
+
+**Số:** `npm test` 149 xanh trước khi thêm tab; overview-smoke 8 → 9. Bản `1.3.4` → `1.3.6`
+(1.3.5 bịt cửa hậu, 1.3.6 tab + BƯỚC 0).
+
+**CÒN MỞ:** KHUNG-18 (mã việc tiền tố có số) vẫn chưa vá — Đức chốt ba lỗi A/B/C, mục này không
+nằm trong đó. KHUNG-24: tab "Đã xong" chỉ đọc sổ nợ ở gốc, repo có đơn vị con sẽ thiếu.

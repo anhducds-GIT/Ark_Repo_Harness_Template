@@ -101,7 +101,29 @@ export function docBanDo(luat) {
 
 /* Nhật ký: mỗi khối `## <bản> — <ngày> — <một câu>`. Bản đầu mở sẵn, các bản cũ gập lại — người
    xem quan tâm "vừa đổi gì", không phải toàn bộ lịch sử. */
-export function tachNhatKy(text) {
+/* VIỆC ĐÃ XONG 100% — đọc từ sổ nợ, mục có mã BỊ GẠCH (`### ~~MÃ~~ · …`).
+ *
+ * Vì sao tab này đáng có: bảng vốn chỉ chiếu thứ ĐANG mở — việc còn lại, nợ còn treo, chỗ chờ
+ * người chốt. Người chốt nhìn mãi một danh sách việc chưa xong thì không thấy repo đang tiến,
+ * chỉ thấy nó đang nợ. Việc đã đóng là bằng chứng ngược lại, và nó vốn đã nằm sẵn trong sổ —
+ * chỉ là không ai chiếu ra.
+ *
+ * ĐỌC ĐÚNG QUY ƯỚC SỔ, không dò từ khoá trong văn xuôi: gạch mã là cách sổ khai "đã đóng", và
+ * `what-next.mjs` cũng đọc đúng dấu đó. Hai chỗ đọc cùng một dấu thì không trôi khỏi nhau. */
+export function tachDaXong(text) {
+  if (!text) return [];
+  const ra = [];
+  let uuTien = "";
+  for (const dong of String(text).replaceAll(CR, "").split(NL)) {
+    const p = /^##\s+(P[1-9])\b/.exec(dong);
+    if (p) { uuTien = p[1]; continue; }
+    const m = /^###\s+~~([A-Za-z0-9]+-\d+)~~\s*[·:]?\s*(.*)$/.exec(dong);
+    if (m) ra.push({ ma: m[1], tieuDe: m[2].trim(), uuTien });
+  }
+  return ra;
+}
+
+function tachNhatKy(text) {
   if (!text) return [];
   const dong = text.split(CR).join("").split(NL);
   const ra = [];
@@ -440,7 +462,7 @@ export function khoiLienQuan(banDo, trangCo) {
 }
 
 export function trang(dl) {
-  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, huongDan, st } = dl;
+  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st } = dl;
 
   const tabs = [
     // Thứ tự = tần suất dùng, không phải thứ tự viết ra. "Cách vận hành" và "Sổ tay" là hai
@@ -452,6 +474,7 @@ export function trang(dl) {
     ["bao-tri", "Bảo trì"],
     ["kien-truc", "Bên trong"],
     ["tra-cuu", "Tra cứu"],
+    ["da-xong", "Đã xong"],
     ["nhat-ky", "Nhật ký"]
   ].filter(([id]) => {
     if (id === "lam-duoc-gi") return Boolean(dl.tinhNang);
@@ -459,6 +482,7 @@ export function trang(dl) {
     if (id === "so-tay") return Boolean(dl.soTay) || protocols.length > 0;
     if (id === "bao-tri") return Boolean(dl.baoTri);
     if (id === "tra-cuu") return Boolean(legend);
+    if (id === "da-xong") return daXong.length > 0;
     if (id === "nhat-ky") return nhatKy.length > 0;
     return true;
   });
@@ -608,6 +632,20 @@ export function trang(dl) {
 
   ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><details class="the" open><summary>Bảng tra cứu thuật ngữ</summary><div>${md(legend)}</div></section>` : ""}
 
+  ${daXong.length ? `<section class="tab" id="tab-da-xong" hidden>
+    <div class="the">
+      <h2>Đã xong 100% — ${daXong.length} việc</h2>
+      <p>Việc đã <strong>đóng hẳn</strong> trong sổ nợ, không phải việc đang làm dở. Nguồn là
+      <span class="ref">BACKLOG.md</span>: mục nào có mã bị gạch thì nó nằm ở đây.</p>
+      <p><strong>Sổ giữ lại mục đã đóng chứ không xoá</strong> — để tra được việc gì đã làm, làm
+      lúc nào, và vì sao. Bảng này chỉ chiếu lại phần đó cho dễ nhìn; nó không phải nguồn sự thật
+      thứ hai.</p>
+      <div class="tw"><table><thead><tr><th>Mã</th><th>Việc</th><th>Ưu tiên lúc mở</th></tr></thead><tbody>
+      ${daXong.map((v) => `<tr><td><code>${esc(v.ma)}</code></td><td>${md(v.tieuDe).replace(/^<p>|<\/p>$/g, "")}</td><td>${esc(v.uuTien || "—")}</td></tr>`).join("")}
+      </tbody></table></div>
+    </div>
+  </section>` : ""}
+
   ${nhatKy.length ? `<section class="tab" id="tab-nhat-ky" hidden>
     ${nhatKy.map((k, idx) => `<details${idx === 0 ? " open" : ""}>
       <summary><strong>v${esc(k.ban)}</strong><span class="ngay">${esc(k.ngay)}</span><span class="tt">${esc(k.tomTat)}</span></summary>
@@ -647,6 +685,7 @@ export function gomDuLieu() {
     tenNguoi = j?.repo?.name || null;
   }
   const nhatKy = tachNhatKy(doc("CHANGELOG.md"));
+  const daXong = tachDaXong(doc("BACKLOG.md"));
   const workflows = docTaiLieu("docs/workflows");
   const protocols = docTaiLieu("docs/protocols");
   const adrs = docTaiLieu("docs/adr");
@@ -729,7 +768,7 @@ export function gomDuLieu() {
     lenh: Object.entries(pkg.scripts || {}),
     banDo: docBanDo(doc("AGENTS.md")),
     trangCo: new Set(lietHTML()),
-    workflows, protocols, adrs, nhatKy,
+    workflows, protocols, adrs, nhatKy, daXong,
     legend: legendRaw ? tachFrontmatter(legendRaw).than : null,
     st,
     tinhNang: tinhNangRaw ? tachFrontmatter(tinhNangRaw).than : null,

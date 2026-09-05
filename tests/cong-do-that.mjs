@@ -245,4 +245,40 @@ function docMuc(kho, ten, as = "thu") {
   ok("7 · chỉ sinh lại artifact → không áp dụng · file nguồn → suite chạy thật · file khác → vẫn 'chưa kiểm'");
 }
 
+/* ---- 8. `docs.file_map` tro vao hu khong PHAI DO ------------------------- */
+{
+  /* CUA HAU DO CHINH BAN 1.3.3 MO RA, va do duoc ngay trong luot 1.3.4.
+   *
+   * 1.3.3 cho repo khai `docs.file_map` de noi Ban do file nam o dau — can thiet, vi repo
+   * `n8n-orchestrator` de ban do o `design_brief.md` va luat do CO TRUOC bo khung.
+   * Nhung duong doc ban do von co dong `if (!existsSync(...)) continue` — an toan khi noi dat
+   * ban do con dong cung, thanh CUA HAU ngay khi no khai duoc.
+   *
+   * Do that: khai `file_map` tro toi mot file khong ton tai, them mot file moi chua khai o dau
+   * ca -> cong bao XANH "Moi thu moi deu da khai". MOT DONG CAU HINH vo hieu hoa ca mot cong,
+   * khong canh bao gi. Dung loai lo ma luat vang so 3 cam: khong duoc lam yeu lop bao ve da co.
+   *
+   * VE DOI CHUNG o cuoi khoi la phan quan trong: repo KHONG khai thi hanh vi cu phai giu nguyen,
+   * neu khong ban va nay se lam do hang loat repo dang chay binh thuong. */
+  const { cha, kho, at } = khoNen();
+  try {
+    assert.equal(docMuc(kho, "Bản đồ file").trangThai, "XANH", "nen phai xanh truoc da");
+
+    const ct = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+    ct.docs = { file_map: "FILE-KHONG-HE-CO.md" };
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(ct, null, 2) + NL, "utf8");
+    writeFileSync(join(kho, "file-moi-chua-khai.md"), "x" + NL, "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "khai file_map tro vao hu khong" + NL + NL + "Lane: thu");
+
+    const m = docMuc(kho, "Bản đồ file");
+    assert.equal(m.trangThai, "ĐỎ",
+      `file_map tro toi file khong ton tai phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+    assert.match(m.chiTiet, /KHÔNG TỒN TẠI/,
+      "phai noi ro la KHAI SAI, khong phai 'thieu ban do' — hai cai co hai cach sua khac han");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("8 · `docs.file_map` trỏ vào hư không ĐỎ được — cửa hậu do 1.3.3 mở, bịt ở 1.3.4");
+}
+
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

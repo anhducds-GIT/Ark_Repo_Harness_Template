@@ -347,3 +347,29 @@ XANH**. Tức vế "bộ sinh có thật sự dùng lớp đó không" chưa có
 Đây đúng hình dạng của KHUNG-12 vừa đóng: hàm đúng, không ai gọi, chú thích nói như thể đã dùng.
 Ghim được vế này cần một bộ `deps` giả đầy đủ cho `collectModel` — chưa có helper nào trong
 `tests/`, nên là một lượt riêng. Ghi ra thay vì để người sau tưởng F13 đã phủ. Vùng: `_code`.
+
+### KHUNG-23 · `ALL_SKILL_MANAGEMENT` — audit tiền-migrate xong, CHƯA migrate
+
+Trial ngày 05/09: đo bằng `npm run assess` (**mức 1/3**, 0/32 file khớp, không có
+`package.json`) rồi giao Codex audit độc lập trên bản clone.
+
+**Kết quả đáng giá nhất — bốn file trùng tên đang giữ 1824 dòng nội dung riêng:**
+`AGENTS.md` (26 luật riêng) · `DASHBOARD.md` (viết tay, có mirror sang Google Sheet) ·
+`decisions.md` (sổ chỉ-thêm) · `handoff.md` (**1225 dòng**). Thả đè là mất sạch. Đã thành **luật
+cứng ở BƯỚC 0** của quy trình migrate.
+
+Repo này còn có `authority_matrix.md` + `discussion_protocol.md` + `rounds/` — tức **đã có sẵn cơ
+chế phân quyền và hiệp đồng nhiều AI trước khi bộ khung đến**. Đây là ca khó nhất trong ba repo
+đã chạm: hai bộ luật hiệp đồng chồng nhau, không phải một bộ luật gặp một repo trống.
+
+**Chưa migrate, cố ý.** Cần Đức chốt trước: gộp hai cơ chế hiệp đồng thế nào — giữ
+`authority_matrix` làm chuẩn và bộ khung chỉ thêm khoá vùng, hay ngược lại. Cùng câu hỏi với
+CP-1 ở repo n8n, nhưng nặng hơn vì repo này lấy chính việc điều phối AI làm nghề.
+
+> **CHỜ NGƯỜI CHỐT:** hai cơ chế hiệp đồng nhiều AI (authority_matrix + discussion_protocol của repo, và khoá vùng + cổng đóng phiên của bộ khung) — gộp thế nào, cái nào là chuẩn?
+
+### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
+
+Tab mới (05/09) chiếu mục nợ đã gạch mã — 7 việc. Nhưng nó chỉ đọc `BACKLOG.md` ở gốc; repo có
+đơn vị con, mỗi đơn vị một sổ nợ, thì các mục đã đóng ở đơn vị con **không hiện**. Chưa đau ở
+repo nhà (không có đơn vị con), sẽ đau ở repo dùng `units.root_dir`. Vùng: `_code`.
