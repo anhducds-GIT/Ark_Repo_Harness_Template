@@ -28,6 +28,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { buildTemplateFiles, leakedNames, soleHeadingIndex, stripNghe, TEMPLATE_VERSION } from "../scripts/build-template.mjs";
 
@@ -208,6 +209,71 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
 }
 
 
+/* ---- 2b1. SỔ TAY VAI ĐIỀU PHỐI không mang định danh của repo nào --------- */
+/* Từ bản 1.3.0 sổ tay này ĐI THEO bản trích, nên nó ra tới repo khác. Cổng `leakedNames` ở
+   mục 1 chỉ canh BỐN tên dự án gốc — nó KHÔNG canh mã việc, KHÔNG canh tên khoá vùng, KHÔNG
+   canh tên riêng của người chốt. Ba thứ đó đúng là ba thứ đã phải bóc tay lúc port sổ này
+   sang, và là ba thứ dễ lẻn về nhất ở lượt sửa sau: sửa một câu, tiện tay đưa lại một ví dụ
+   có số hiệu.
+
+   ĐỌC CẢ HAI BẢN, cố ý. Bản trong khuôn (`files`) là bản THẬT SỰ ra ngoài — nó đi qua một
+   lượt thay chuỗi, nên "bản nhà sạch" không tự nó kéo theo "bản phát đi sạch". Bản nhà đọc
+   thẳng từ đĩa, vì đó là bản người ta sửa.
+
+   Phép ghim này ĐẶT Ở ĐÂY chứ không đặt trong suite đi theo bản trích, và đây là quyết định
+   chứ không phải tiện tay. Hai lý do. Một: luật "không được nhắc tên khoá vùng" là luật của
+   NGƯỜI PHÁT HÀNH — ở một repo dựng từ khuôn, viết `_root` vào sổ tay của chính nó là việc
+   ĐÚNG, nên bê phép kiểm này xuống đó là phát đi một luật sai chỗ, và việc đầu tiên repo mới
+   làm sẽ là xoá nó. Hai: mọi file trong bản trích dưới `scripts/` và `tests/` đều tính vào
+   dấu vân tay bản phát, nên sửa một suite ĐI THEO là buộc phải cắt bản mới. */
+{
+  const banSoTay = [];
+  const relSoTay = "docs/protocols/ORCHESTRATOR.md";
+  if (files.has(relSoTay)) banSoTay.push(["bản trong khuôn", files.get(relSoTay)]);
+  banSoTay.push(["bản ở repo nhà", readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", relSoTay), "utf8")]);
+
+  // Bỏ khối chú thích HTML TRƯỚC KHI dò. Chú thích là chỗ giải thích VÌ SAO đã bỏ, nên nó bắt
+  // buộc phải nhắc lại chuỗi bị cấm; dò cả chú thích thì phép kiểm này chỉ dạy người ta xoá
+  // lời giải thích. Vế thứ hai bên dưới canh rằng nhánh miễn trừ này THẬT SỰ chạy tới được.
+  const CHU_THICH_HTML = /<!--[\s\S]*?-->/g;
+
+  // Biên chữ TỰ VIẾT, không dùng `\b`. `\b` dựa trên [A-Za-z0-9_], nên cạnh một chữ có dấu
+  // (Đ, ế…) không có biên nào và mẫu khớp RỖNG mà im lặng — bẫy đã cắn hai lần trong một giờ.
+  const MA_VIEC = /(^|[^A-Za-z0-9])[A-Z]-\d+([^A-Za-z0-9]|$)/;
+
+  // CỐ Ý KHÔNG dò TÊN DỰ ÁN ở đây. Mục 1 đã dò, và nó chạy trước — đo thật: trồng một tên gói
+  // của repo gốc vào sổ tay thì mục 1 đỏ, phép kiểm này chưa kịp chạy tới. Chép lại danh sách
+  // đó vào đây là ba dòng KHÔNG BAO GIỜ đỏ được, tức ba dòng chỉ tốn công đọc ở mọi lượt sau.
+  // Chỗ này canh ĐÚNG cái mục 1 bỏ trống: mã việc, mã defect, tên khoá vùng, tên người chốt.
+  const CAM = [
+    [MA_VIEC, "ma viec dang chu-gach-so"],
+    [/[A-Z]+-DRIFT-\d+/i, "ma defect cua repo goc"]
+  ];
+
+  assert.ok(banSoTay.length === 2, "phai doc duoc CA HAI ban so tay — thieu mot ban la mat nua doi tuong");
+  for (const [ten, text] of banSoTay) {
+    const ma = text.replace(CHU_THICH_HTML, "");
+    for (const [mau, vi] of CAM) {
+      const moc = ma.match(mau);
+      assert.ok(!moc, ten + " con " + vi + ": " + (moc && moc[0].trim()));
+    }
+    for (const khoa of ["_root", "_docs", "_code", "_template"]) {
+      assert.ok(!ma.includes(khoa),
+        ten + " con dong cung ten khoa vung `" + khoa + "` — repo khac khai vung khac, ten do tro vao hu khong");
+    }
+    assert.ok(!ma.includes("Đức"), ten + " con ten rieng cua nguoi chot — tai lieu phai dung tu chi vai");
+
+    // NHÁNH BỎ CHÚ THÍCH KHÔNG ĐƯỢC LÀ ĐỒ TRANG TRÍ. Đo thật lúc dựng nguyên mẫu: bỏ HẲN
+    // nhánh đó đi mà phép kiểm vẫn XANH — tức nó chưa bao giờ chạy tới, vì chú thích vô tình
+    // né hết chuỗi cấm. Một nhánh miễn trừ không chứng minh được là có tác dụng thì nó không
+    // phải miễn trừ, nó là chữ.
+    const khoi = text.match(CHU_THICH_HTML) || [];
+    assert.ok(khoi.length > 0, ten + " khong con khoi chu thich giai thich vi sao da bo dinh danh");
+    assert.ok(khoi.some((c) => c.includes("_root") && MA_VIEC.test(c)),
+      ten + " chu thich thoi khong chua chuoi bi cam — nhanh bo chu thich thanh do trang tri");
+  }
+  ok("so tay vai dieu phoi khong mang ma viec / ten khoa vung / ten nguoi chot — ca ban trong khuon lan ban o repo nha");
+}
 /* ---- 2b. Mốc cắt mục 6 phải là TIÊU ĐỀ THẬT và DUY NHẤT ------------------ */
 /* Phiên K1 chỉ ra 02/09, mục (d). Bản cũ dùng `indexOf("\n## 6.")` — lấy lần khớp ĐẦU TIÊN,
    không kiểm gì. Một dòng văn hay khối trích dẫn nhắc `## 6.` nằm TRƯỚC tiêu đề thật là cắt
