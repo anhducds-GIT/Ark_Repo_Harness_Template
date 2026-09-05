@@ -23,11 +23,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-exec-crlf",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "Dong phien: cong kiem phai xanh truoc khi tra khoa",
-      "released_at": null,
+      "released_at": "2026-09-05T17:40",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
