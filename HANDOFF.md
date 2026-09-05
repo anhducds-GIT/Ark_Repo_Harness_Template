@@ -813,3 +813,62 @@ mà người clone nhận được, rồi chạy suite → **52 xanh, 0 đỏ**.
      repo mới là im lặng thôi chạy 52 phép đó. Đo được: bỏ một **script** thì cổng đỏ (đã thử),
      bỏ một **dòng khai lệnh** thì không.
    - **`.gitattributes` vẫn chưa có** — nợ cũ từ lượt `claude-exec-crlf`, chưa động tới.
+
+ - **2026-09-05 · `claude-exec-harness-no` · Ba lỗ hổng ghi ở lượt trước nay đã có răng —
+   không tăng số phiên bản, không cắt bản mới** — Bản 1.3.0 vừa ra tới repo khác, nên ba chỗ
+   hở mà lượt `claude-exec-changB` đo được đã nguy hơn lúc nó được ghi. Lượt này vá cả ba,
+   mỗi việc một commit riêng.
+   **(a) Bỏ một dòng khai lệnh thì không cổng nào đỏ — DỰNG ĐƯỢC CA HỎNG TRƯỚC KHI VÁ.** Bỏ
+   dòng khai lệnh `what-next` trong `package.json` mà bản trích sinh ra, rồi sinh lại: bộ trích
+   nói *khớp bản gốc, 27 file, bản 1.3.0 khớp sổ phát hành*, và `npm test` **xanh toàn bộ, mã
+   thoát 0**. Tức repo mới dựng từ khuôn im lặng mất một lệnh, không dấu vết. Vá bằng ba vế,
+   **cả ba suy từ chính bản trích chứ không gõ sẵn danh sách** — gõ sẵn là thêm một chỗ phải
+   nhớ, mà chỗ nào phải nhớ thì chỗ đó sẽ quên: (1) suite nào bản trích mang theo thì chuỗi
+   `test` phải gọi nó; (2) lệnh trỏ tới file nào thì file đó phải có mặt; (3) tài liệu đi theo
+   dạy chạy lệnh nào thì lệnh đó phải được khai.
+   **Vế (3) bắt được một lỗi CÓ THẬT ngay lượt chạy đầu, không phải lo xa:** mục 8 của luật
+   trong khuôn dạy đo cân nặng bằng một lệnh mà bản trích **không mang theo** — repo mới chạy
+   câu đó sẽ nhận *Missing script*. **Sửa nguồn, không sửa phép kiểm:** mục 8 trong khuôn nay
+   nói thẳng rằng bộ khung không mang công cụ đo và ngân sách là con số của riêng repo đó. Bộ
+   trích **ném** nếu phép thay trượt, chứ không im lặng phát đi bản cũ.
+   **(b) Sổ tay vai điều phối nay có phép ghim canh định danh.** Cổng bộ trích chỉ canh bốn
+   tên dự án gốc; nó không canh mã việc, không canh tên khoá vùng, không canh tên riêng người
+   chốt. Phép ghim mới canh đúng bốn chỗ đó, trên **CẢ HAI bản** — bản trong khuôn (bản thật
+   sự đi ra ngoài, vì nó qua một lượt thay chuỗi nên "bản nhà sạch" không kéo theo "bản phát
+   đi sạch") và bản ở repo nhà.
+   **ĐẶT Ở REPO NHÀ, KHÔNG ĐI THEO BẢN TRÍCH — đây là quyết định, ghi ra để đừng ai "sửa lại
+   cho đúng chỗ".** Hai lý do. Một: luật "không được nhắc tên khoá vùng" là luật của NGƯỜI
+   PHÁT HÀNH; ở một repo dựng từ khuôn, viết `_root` vào sổ tay của chính nó là việc ĐÚNG,
+   nên bê phép kiểm xuống đó là phát đi một luật sai chỗ và việc đầu tiên repo mới làm sẽ là
+   xoá nó. Hai, đo được: đặt vào suite đi theo bản trích thì dấu vân tay tầng máy đổi và sổ
+   phát hành **chặn ngay** (`SO_PHAT_HANH_LECH`) — tức buộc phải cắt bản mới, mà đề bài lượt
+   này cấm.
+   **Cắt bớt ngay khi vừa viết:** ba mẫu dò tên dự án lúc đầu chép sang từ nguyên mẫu đã bị
+   **bỏ đi**, vì đo thật cho thấy cổng cũ chạy trước và đỏ trước — ba dòng đó không bao giờ đỏ
+   được, tức chỉ tốn công đọc ở mọi lượt sau.
+   **(c) Bộ khung nay có `.gitattributes`.** Đo ngay trước khi thêm: cùng một cây làm việc,
+   cùng một commit, **75 file LF và 21 file CRLF**, mà `git status` nói sạch. Đó là bệnh gốc
+   của defect vá ở lượt `claude-exec-crlf` — bản vá hồi đó chặn ở một suite, file này chặn ở
+   toàn repo.
+   **THỬ PHÁ — 12 ca, 0 lượt thoát ở vòng đầu.** Bốn ca cho (a): bỏ suite khỏi chuỗi `test` ·
+   khai lệnh trỏ tới file không mang theo · bỏ dòng khai lệnh (chính ca hỏng đo được lúc đầu)
+   · tài liệu dạy một lệnh chưa khai. Tám ca cho (b): mã việc · tên khoá vùng · tên người chốt
+   · mã defect · tên gói repo gốc · xoá hẳn khối chú thích · dọn sạch chuỗi cấm KHỎI khối chú
+   thích · **làm bẩn RIÊNG bản trong khuôn trong khi bản nhà sạch nguyên**. Ca cuối là ca đáng
+   giá nhất: nó chứng minh vế "canh cả bản trong khuôn" có răng thật, chứ không ăn theo vế kia.
+   Ca "tên gói repo gốc" đỏ ở **cổng cũ** chứ không ở phép ghim mới — nói thẳng, vì đó chính là
+   bằng chứng cho việc cắt ba mẫu thừa nói ở trên. Hoàn nguyên bằng **ghi lại byte gốc**, không
+   bằng `git checkout` — chính lệnh đó là cái bẫy mà (c) đang vá.
+   **KHÔNG chạm bản phát:** số phiên bản giữ nguyên **1.3.0**, sổ phát hành không đụng, bộ trích
+   vẫn nói *khớp sổ phát hành*. Bốn cổng `session-check.mjs` · `safe-push.mjs` · `claim.mjs` ·
+   `repo-structure.mjs` không sửa một dòng.
+   **Số thật:** `npm test` **145 phép kiểm, 0 đỏ** — trước lượt này 143, thêm đúng hai phép
+   (một cho (a), một cho (b)). Cổng cấu trúc: **0 đỏ, 6 vàng** — y hệt trước lượt này.
+   **CÒN MỞ — ghi lại, KHÔNG tự làm:**
+   - **Bản trích chưa mang `.gitattributes` đi theo.** Repo mới dựng từ khuôn vẫn dính đúng
+     bệnh này. Đo được là **thêm nó KHÔNG buộc phải cắt bản mới**: dấu vân tay chỉ băm file
+     dưới `scripts/` và `tests/`, mà `.gitattributes` không nằm ở đó. Lượt này cố ý không làm
+     vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn — một lượt riêng.
+   - **Bảng máy sinh không thể hội tụ bằng cách sinh lại.** Nó nhúng mã commit của HEAD, mà
+     mỗi lượt commit bảng lại đổi HEAD — nên sinh-lại rồi commit thì lượt sinh sau vẫn khác
+     đúng một mã. Không phải lỗi mới của lượt này; ghi ra để phiên sau đừng đuổi theo nó.

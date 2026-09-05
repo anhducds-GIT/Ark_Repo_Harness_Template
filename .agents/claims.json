@@ -33,11 +33,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "claude-exec-harness-no",
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Ban trich nhan goi Assistant",
-      "released_at": "2026-09-05"
+      "task": "Sinh lai ban trich sau khi sua muc 8 cua luat trong khuon",
+      "released_at": null
     }
   }
 }
