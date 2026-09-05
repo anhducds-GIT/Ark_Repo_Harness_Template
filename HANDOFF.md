@@ -1166,3 +1166,12 @@ là một lần hai repo đích phải nâng. Gom hai bản cho năm đợt, đ�
 **Cân nặng:** 84 → 97 dòng. Repo đang vượt ngân sách tài liệu 45% (KHUNG-11), nên nói thẳng:
 lượt này **cộng thêm 13 dòng** vào chỗ đang quá tải. Đổi lại là một thứ tự thi hành đọc được
 trong một lần. Không tạo file mới — sửa file đã có, đúng luật mục 8.
+
+**BỔ SUNG NGAY SAU ĐÓ — KHUNG-15 CHẬP CHỜN, không đỏ ổn định.** Lượt cổng kế tiếp, cùng lệnh,
+cùng repo, không sửa gì liên quan → *"Test xanh"* **XANH**. Đã ghi vào mục nợ kèm cảnh báo cho
+người nhận: phép kiểm chập chờn tệ hơn phép kiểm đỏ ổn định, vì người ta sẽ **chạy lại cho tới
+khi xanh** — và thói quen đó vô hiệu hoá cổng mà không ai phải quyết định vô hiệu hoá nó.
+
+Điều này **không làm quyết định push 05/09 sai** — lúc đó đã đo suite exit 0 bằng lệnh trực tiếp
+trước khi đẩy, và đó vẫn là bằng chứng đúng. Nhưng nó đổi bản chất mục nợ: từ *"cổng đọc sai kết
+quả"* thành *"cổng đọc kết quả không ổn định"*, và hai thứ đó điều tra khác nhau.

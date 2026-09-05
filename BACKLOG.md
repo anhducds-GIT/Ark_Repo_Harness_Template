@@ -209,3 +209,17 @@ quả thật vẫn nặng: **cổng đóng phiên không đóng được**, nên
 
 Gắn với KHUNG-9 (`can-nang` xác nhận ca hỏng bằng tìm chuỗi) và KHUNG-10: nếu đúng là dò chuỗi
 thì đây là **lần thứ ba** một cơ chế của bộ khung dùng phép đo bằng chuỗi văn bản. Vùng: `_code`.
+
+**BỔ SUNG 05/09, và đây là dữ kiện quan trọng hơn lần đỏ đầu: NÓ CHẬP CHỜN.** Lượt chạy ngay
+sau đó, cùng lệnh, cùng repo, không sửa gì liên quan → mục *"Test xanh"* **XANH**. Tức nó không
+đỏ ổn định.
+
+Phép kiểm chập chờn **tệ hơn** phép kiểm đỏ ổn định, vì hai lý do:
+1. Đỏ ổn định thì ai cũng phải xử. Chập chờn thì người ta **chạy lại cho tới khi xanh** — và
+   thói quen đó vô hiệu hoá cổng mà không ai phải quyết định vô hiệu hoá nó.
+2. Nó xoá bằng chứng của chính mình: lần chạy sau xanh thì không còn gì để điều tra.
+
+Ai nhận mục này: **đừng bắt đầu bằng cách chạy lại cho ra đỏ.** Bắt đầu bằng câu hỏi *cổng đọc
+kết quả suite từ đâu, và cái gì khác nhau giữa hai lượt chạy* — thời gian chạy, thứ tự suite,
+trạng thái cây làm việc, hay output bị cắt. Ghi lại lượt nào đỏ lượt nào xanh trước khi đổi
+bất cứ dòng nào.
