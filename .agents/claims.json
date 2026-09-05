@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-exec-changB",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "Tang phien ban, so phat hanh, nhat ky doi ban",
-      "released_at": null,
+      "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": "claude-exec-changB",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "So tay vai dieu phoi ban portable di theo ban trich",
-      "released_at": null,
+      "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-exec-changB",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "Dua goi Assistant vao ban trich va cat mot ban phat hanh",
-      "released_at": null,
+      "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "claude-exec-changB",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "Ban trich nhan goi Assistant",
-      "released_at": null
+      "released_at": "2026-09-05"
     }
   }
 }
