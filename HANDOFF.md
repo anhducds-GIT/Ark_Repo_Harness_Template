@@ -686,3 +686,44 @@ gốc):**
    này** — hai việc bạn đang chờ (khai `docs/protocols/ORCHESTRATOR.md` vào bảng tra `AGENTS.md`,
    và cắm phép ghim tầng mã nguồn vào `tests/assistant-smoke.mjs`) tôi **cố ý không làm hộ**,
    vì chúng ngoài phạm vi lượt này.
+
+ - **2026-09-05 · `claude-exec-crlf` · Suite Assistant nay xanh với MỌI người clone repo, không
+   chỉ với máy vừa ghi file** — Lượt trước (`claude-exec-harness-wire`) tự phát hiện và ghi lại
+   một cái bẫy: `tests/assistant-smoke.mjs` xanh trên bản vừa ghi ra, nhưng **đỏ trên bản vừa
+   `git checkout`** — tức đỏ với bất kỳ ai clone repo này. Repo không có `.gitattributes` và máy
+   Windows đang bật chế độ tự đổi kiểu xuống dòng, nên **một commit có hai dạng byte**, mà
+   `git status` nói SẠCH ở cả hai. Lượt đó chưa sửa vì phải chạm `tests/`, ngoài phạm vi.
+   **Vì sao không để sau:** gói này sắp được đúc vào bản trích. Đúc lúc đang hỏng thì mọi repo
+   mới sinh ra đều có một bộ kiểm ĐỎ ngay ngày đầu, và người dựng repo đó sẽ không hiểu vì sao —
+   vì trên máy người phát hành nó xanh.
+   **Dựng lại ca đỏ TRƯỚC khi sửa, số thật:** 28 xanh rồi chết, `AssertionError` ở phép *"nguồn
+   KHÔNG chứa một lời gọi ghi file nào"* — dòng nhập `node:fs` cắt ra còn dính ký tự xuống dòng
+   thừa ở cuối, nên không khớp chuỗi mong đợi.
+   **Sửa ở GỐC, một chỗ:** hai lần đọc mã nguồn nay đi qua **một cửa chung** (`docNguon`), và
+   cửa đó chuẩn hoá kiểu xuống dòng trước khi trả về. **Không** rắc bản vá vào từng phép khẳng
+   định — sáu phép cùng ăn theo một nguồn, rắc từng chỗ thì chỗ thứ tám bị quên và triệu chứng
+   lại đúng là cái đã cắn một lần: *"phép kiểm tự nhiên hỏng"*.
+   **Không phép nào bị làm yếu.** Chúng khẳng định về CẤU TRÚC MÃ — có mấy chỗ gọi tiến trình
+   con, nhập những tên nào từ `node:fs`, còn đóng cứng tên khoá vùng không. Không phép nào nói
+   về kiểu xuống dòng, nên bỏ byte đó đi không bỏ mất điều được khẳng định.
+   **Số thật sau khi vá:** chạy trên **cả hai dạng** file — dạng Unix **52 xanh**, dạng Windows
+   **52 xanh**, cùng một con số. Round-trip thật (xoá file → `git checkout` → chạy lại, file trở
+   về đúng dạng Windows như bản clone): **52 xanh cả hai lượt**. `npm test` **143 phép kiểm, 0
+   đỏ** — đúng bằng con số trước lượt này, không mất phép nào.
+   **THỬ PHÁ — 16 lượt, 0 lượt thoát ở vòng đầu.** Tám ca phá (nhập cả `fs` thay vì tên lẻ ·
+   thêm chỗ gọi tiến trình `git` thứ hai · thêm một lời gọi ghi file · thêm `execFileSync` thứ
+   hai · thôi tái dùng phép đo đã có · đóng cứng tên khoá vùng vào mã · chèn dấu vết riêng của
+   một repo · chuyển chỗ gọi `git` duy nhất ra ngoài thân hàm cửa), **chạy lại nguyên bộ trên
+   CẢ HAI dạng xuống dòng**. Cả 16 lượt đều ĐỎ và đỏ **đúng khẳng định đó**. Hai dạng cho kết
+   quả y hệt nhau — đó mới là điểm: nếu chuẩn hoá đang che một lỗi thật thì dạng Windows sẽ
+   xanh trong khi dạng Unix đỏ. Nó không xanh. Ca phá thứ nhất chính là phép khẳng định vừa
+   hỏng, nên nó cũng là bằng chứng phép đó **vẫn còn sức** sau khi vá.
+   **Hoàn nguyên bằng ghi lại byte gốc, KHÔNG bằng `git checkout`** — chính lệnh đó là cái bẫy
+   đang vá, dùng nó để dọn thì lượt đo sau vô nghĩa.
+   **KHÔNG chạm chặng B:** bản trích · sổ phát hành · nhật ký đổi bản đều không đụng, số phiên
+   bản giữ nguyên **1.2.20**, phép kiểm bản trích vẫn nói *khớp sổ phát hành*.
+   **VIỆC NGOÀI PHẠM VI, ghi lại chứ KHÔNG tự làm — cần người chốt quyết:** thêm
+   `.gitattributes` khai kiểu xuống dòng cho cả repo sẽ chặn bệnh này **tận gốc cho mọi file**,
+   không chỉ ba file lượt này. Nhưng nó đổi cách lấy file ra của **toàn bộ** repo, chạm khoá
+   gốc, và có thể làm cả cây làm việc hiện một lượt thay đổi lớn. Lượt này cố ý chỉ làm phép
+   kiểm chịu được cả hai dạng — đó là thứ đề bài yêu cầu, và là thứ lùi lại được.
