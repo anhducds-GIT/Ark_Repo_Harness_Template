@@ -4,8 +4,8 @@ id: ark-repo-harness
 name: Ark Repo Harness
 lifecycle: active
 last_verified: 2026-09-05
-last_verified_commit: b4a08b262cc64e2cc16a85d5629a0e6e10f07ae2
-last_verified_how: "npm test 145/145 xanh · bản trích nay mang .gitattributes đi theo (28 file) · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái"
+last_verified_commit: baebd07fafa3a5e1435977894372a2ba76a76599
+last_verified_how: "npm test 145/145 xanh · cổng đóng phiên XANH TOÀN BỘ 11/11 · bản 1.3.1 đã phát, dấu vân tay 5b2b74c0eee8e3b6 trong sổ phát hành · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái"
 evidence_ref: HANDOFF.md
 owner: harness-vong2
 priority_rank: 1
