@@ -599,3 +599,52 @@ chạm ba file tôi sửa, nhận lại khoá là làm tiếp được ngay.
    mà nó cũng được MIỄN quy vùng nên `myRootAreas` rỗng và suite gốc không chạy. Đường ra duy nhất
    là đẩy hết rồi chạy lại cổng ("phiên không đổi file nào"). Hai chỗ này chỉ hiện ra khi phần
    việc thật đã bị một phiên khác đẩy đi trước — nên trước nay không ai gặp.
+
+## 2026-09-05 · `claude-exec-promoteA2` — bộ khung nay có SỔ TAY VAI ĐIỀU PHỐI, bản portable
+
+Vòng một của việc promote gói Assistant chỉ mang **công cụ** sang (`state-check.mjs`,
+`what-next.mjs`, suite ghim). Nó không mang **luật vai** — nên bộ khung có mắt mà không có
+firewall chống trượt vai, không có luật query-driven, không có mẫu bàn giao brief.
+
+**Thêm `docs/protocols/ORCHESTRATOR.md`** (~415 dòng), port từ repo gốc theo nguyên tắc **giữ
+lý do, bỏ định danh**: bỏ sạch mã việc, mã defect, tên gói sản phẩm, tên khoá vùng gõ cứng, và
+tên riêng của người chốt (thay bằng từ chỉ vai — tài liệu không đọc được cấu hình). Câu chuyện
+thật thì giữ, kể không cần tên.
+
+**Bỏ HẲN hai mục, không phải bóc mỏng — ghi ra vì đây là quyết định, không phải sót:**
+
+1. Mục "địa bàn là hai repo" — nói về quan hệ giữa hai repo cụ thể và một quyết định kiến trúc
+   của riêng chúng; bóc định danh đi thì không còn gì đứng được. Phần lõi còn giá trị ở mọi repo
+   (repo mà **mọi thứ đều là hạ tầng** thì biên hạ-tầng/sản-phẩm mất điểm tựa, nên firewall phải
+   SIẾT chứ không nới) đã giữ lại thành một mục con của mục 4.
+2. Mục "ghi sổ ý tưởng không còn đòi khoá gốc" — bản ghi một quyết định của riêng repo gốc, về
+   một file bộ khung không phát ra. Luật chung tương đương đã nằm ở `AGENTS.md` mục 1.
+
+**Nói thẳng chỗ chưa có răng, ngay đầu file:** firewall (mục 4), query-driven (mục 0b) và luật
+nạp báo cáo năm mục **KHÔNG có phép kiểm máy nào trong bộ khung**. Ở repo gốc có một phép kiểm
+firewall nhưng nó chưa đi theo bộ khung. Bê một luật chưa cưỡng chế sang repo khác mà không nói
+là bán một cái khoá không có ruột.
+
+**ĐO ĐƯỢC, không suy — dấu vân tay bản phát hành:** dấu vân tay chỉ băm `scripts/` + `tests/`
+(`fileMay`). Thêm một file **tài liệu** vào bản trích: số file 23 → 24, số file tầng máy 7 → 7,
+dấu vân tay **KHÔNG ĐỔI**. Tức tài liệu vào `template/` được mà không phải cắt bản mới.
+**Nhưng vẫn CHƯA đưa vào**, vì hai lý do khác: (a) hai lệnh sổ tay dạy ở mục 1b —
+`what-next.mjs` và `state-check.mjs` — **không nằm trong `PORTABLE_SCRIPTS`**, nên repo dựng từ
+bản trích sẽ đọc một sổ tay trỏ tới lệnh không tồn tại; thêm chúng vào thì dấu vân tay ĐỔI THẬT
+và đó là chặng B, chưa được duyệt. (b) sửa `VERBATIM` cần khoá `scripts/`, đang có chủ.
+
+**Đột biến kiểm — 8 ca, báo cả số xấu.** Sáu ca chèn định danh (mã việc · tên khoá · tên người ·
+mã defect · tên gói · tên repo gốc) ĐỎ ngay lượt đầu. Ca xoá khối chú thích ĐỎ. **Ca thứ tám
+THOÁT ở lượt đầu:** bỏ nhánh "bỏ chú thích trước khi dò" mà phép kiểm vẫn xanh — tức nhánh miễn
+trừ chưa bao giờ chạy tới, vì chú thích cố tình né mọi chuỗi cấm. Đã sửa: chú thích **viết thẳng
+ví dụ chuỗi cấm**, và có thêm một phép khẳng định bắt nó phải chứa chuỗi cấm. Sau sửa: 8/8 ĐỎ
+đúng chỗ.
+
+**CÒN MỞ — ba việc, cả ba vì khoá đang có chủ (`claude-exec-harness-wire` giữ `scripts/` và
+gốc):**
+
+- Phép ghim ở tầng mã nguồn chưa cắm vào `tests/assistant-smoke.mjs` — nguyên mẫu đã chạy và đã
+  qua 8 ca đột biến, chỉ còn dán vào. Cần khoá của `scripts/`+`tests/`.
+- Chưa khai `docs/protocols/ORCHESTRATOR.md` vào bảng tra của `AGENTS.md` — cần khoá gốc. Hệ
+  quả hôm nay: B6 (cảnh báo, **không chặn**) sẽ gắn cờ nó là chưa ai trỏ tới.
+- `PROMPTS.md` chưa có ở bộ khung — mục "mở phiên điều phối" chưa viết được. Cần khoá gốc.
