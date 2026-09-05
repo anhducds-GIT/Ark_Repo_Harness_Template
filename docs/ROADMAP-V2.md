@@ -4,81 +4,94 @@ status: active
 ttl_days: 120
 ---
 
-# ROADMAP V2 — 10 mục nợ, xếp thành 4 đợt
+# ROADMAP V2 — 12 mục nợ, 5 đợt
 
-> **Đây là lớp ĐIỀU PHỐI: thứ tự · phân luồng · phụ thuộc · chỗ cần Đức chốt.** Nội dung từng
-> mục nằm ở [BACKLOG.md](../BACKLOG.md) — file này **không chép lại**, chỉ nói *làm cái nào
-> trước, cái nào chạy cùng lúc được, và vì sao*.
+> **Đây là lớp ĐIỀU PHỐI: thứ tự · phân luồng · phụ thuộc · chỗ cần người chốt.** Nội dung từng
+> mục ở [BACKLOG.md](../BACKLOG.md) — file này **không chép lại**, chỉ nói *làm cái nào trước,
+> cái nào chạy cùng lúc được, và vì sao*.
 >
 > [ROADMAP-V1](ROADMAP-V1.md) là **lịch sử** (bốn khối A→D dẫn tới v1.0, đã xong). File này là
 > việc **đang mở**, sau bản 1.3.1.
 >
-> Luật song song cưỡng chế chỉ một câu (`ORCHESTRATOR.md` mục 2): **hai việc chạy song song được
-> khi và chỉ khi thuộc hai khoá khác nhau và cả hai khoá đang trống.** Bảng dưới đã chia sẵn theo
-> khoá — đừng gộp hai việc cùng khoá thành hai luồng, kể cả khi chúng đụng hai file khác nhau.
+> Luật song song cưỡng chế chỉ một câu ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 2): **hai
+> việc chạy song song được khi và chỉ khi thuộc hai khoá khác nhau và cả hai khoá đang trống.**
 
-## Một câu về hình dạng của nợ hiện tại
+## Ba hình dạng lỗi, không phải mười hai việc rời
 
-Trong 10 mục còn mở, **ba mục cùng một hình dạng lỗi**: luật trỏ tới thứ không tồn tại
-(`decisions.md`, "bảng lỗi của sổ tay"), và một biến thể của nó — tài liệu nói sai về chính repo.
-Repo này đã dính hình dạng đó **ba lần** (`claim.mjs` 03/09 · `BACKLOG.md` 05/09 · `decisions.md`
-05/09). Ba lần thì nó không còn là tai nạn. **Đợt 2 tồn tại để chặn hình dạng đó, không phải để
-vá ba chỗ.**
+Đọc sổ nợ theo từng mục thì thấy mười hai việc lặt vặt. Đọc theo hình dạng thì thấy **ba**, và
+thứ tự dưới đây xếp theo hình dạng chứ không theo mục:
 
-Hình dạng thứ hai, hai mục: **phép kiểm không phân biệt được hai nhánh** (KHUNG-9 dùng tìm chuỗi
-để xác nhận "đã có ca hỏng"; KHUNG-12 có một lớp chưa từng chạy ở luồng thật). Cùng bệnh với
-KHUNG-5 vừa vá ở 1.3.1.
+| Hình dạng | Mục | Vì sao gom lại |
+|---|---|---|
+| **Luật trỏ tới thứ không tồn tại** | KHUNG-7 · KHUNG-8 · KHUNG-13 | Đã xảy ra **bốn lần** (`claim.mjs` 03/09 · `BACKLOG.md` · `decisions.md` · bản trích 05/09). Bốn lần thì không còn là tai nạn — vá ba chỗ mà không chặn hình dạng là hẹn lần thứ năm |
+| **Phép đo bằng chuỗi văn bản** | KHUNG-9 · KHUNG-15 (nghi) · KHUNG-12 | Một phép kiểm không phân biệt được hai nhánh là đồ trang trí, dù nó xanh (luật vàng số 2) |
+| **Tài liệu nói quá / nói sai** | KHUNG-10 · KHUNG-6 · KHUNG-11 | Mỗi câu sai còn sống là một phiên sau tin nhầm — và phiên sau không có cách nào biết |
 
-## Đợt 1 — ba luồng, chạy song song được NGAY
+## Đợt 0 — KHUNG-15, chặn MỌI phiên
 
-Ba khoá khác nhau, cả ba đang trống. Không luồng nào chờ luồng nào.
+**Làm trước mọi thứ khác.** Cổng đóng phiên báo *"Test xanh"* ĐỎ trong khi `npm test` exit 0 và
+từng suite chạy riêng cũng exit 0.
 
-| Luồng | Khoá | Việc | Vì sao đợt 1 |
+Hậu quả không giới hạn ở một lượt: **phiên nào cũng đứng trước cùng một lựa chọn khó chịu** —
+treo việc, hoặc push khi đỏ. Đức đã phải chốt tay một lần ngày 05/09 (xem
+[decisions.md](../decisions.md)), và quyết định đó ghi rõ nó **không phải tiền lệ**. Chưa vá thì
+lần sau lại phải chốt tay, và lần thứ ba thì nó thành thói quen.
+
+Vùng: `_code`. Đây là **brief cho executor**, không phải việc của vai điều phối.
+
+## Đợt 1 — ba luồng song song, chạy được ngay sau đợt 0
+
+| Luồng | Khoá | Việc | Vì sao ở đây |
 |---|---|---|---|
-| **A** | `_code` | KHUNG-12 → KHUNG-9 | Cùng bệnh với lỗi vừa vá ở 1.3.1; đường truyền tham số đã nối sẵn nên KHUNG-12 rẻ nhất lúc này |
-| **B** | `_docs` | KHUNG-10 → KHUNG-6 | Cả hai là **sửa câu nói quá**, không phải sửa cơ chế. Rẻ, và mỗi câu sai còn sống là một phiên sau tin nhầm |
-| **C** | *(không khoá)* | KHUNG-3 | `npm run assess` chỉ đọc. Chạy được cả khi ba khoá kia đều bận |
-
-**Luồng A đổi tầng máy → sẽ phải cắt bản mới.** Gộp KHUNG-12 và KHUNG-9 vào **một** lượt phát,
-đừng cắt hai bản cho hai mục — mỗi bản phát là một lần hai repo đích phải nâng.
+| **A** | `_code` + `_template` | **KHUNG-13** | Ưu tiên số 1 trên bảng. Mỗi ngày trôi là mỗi repo dựng mới **sinh ra đã mang lỗi** — đây là mục duy nhất mà chi phí trì hoãn tăng theo số repo, không theo thời gian |
+| **B** | `_docs` | KHUNG-10 | Sửa một câu nói quá trong bảng tra. Rẻ nhất cả sổ |
+| **C** | *(không khoá)* | KHUNG-3 + **KHUNG-14** | `npm run assess` chỉ đọc, chạy được cả khi mọi khoá bận. Hai mục này **phải làm cùng lượt**: cùng đi tới hai repo pilot, tách ra là đi hai lần |
 
 ## Đợt 2 — chặn hình dạng lỗi, không vá ba chỗ
 
-Chờ đợt 1 xong ở khoá tương ứng. **Xếp hàng, không song song**: cả hai mục đều đụng `_root`.
+Xếp hàng sau luồng A (cùng đụng `_code`), và sau đợt 1 vì KHUNG-13 dạy ta hình dạng đầy đủ.
 
-| Thứ tự | Việc | Ghi chú |
+| Thứ tự | Việc |
+|---|---|
+| 1 | KHUNG-7 + KHUNG-8 — **cùng một lượt**, chúng là hai triệu chứng của một bệnh |
+| 2 | *(kèm)* một phép kiểm máy quét **"luật trỏ tới file/lệnh không tồn tại"** |
+
+**Mục 2 mới là giá trị của đợt này.** Câu phải trả lời **trước khi viết** nó, không phải sau:
+*dựng nổi ca hỏng không?* Không dựng nổi thì đừng viết — ghi vào sổ nợ và chờ.
+
+## Đợt 3 — dọn nốt phép đo bằng chuỗi
+
+KHUNG-9 → KHUNG-12, cùng khoá `_code` nên **xếp hàng, không song song**. Cả hai cùng họ với
+KHUNG-5 đã vá ở 1.3.1, nên làm sau đợt 2 thì rẻ hơn: lúc đó đã có sẵn cách dựng ca hỏng.
+
+## Đợt 4 — hai việc CHỜ NGƯỜI CHỐT
+
+| Việc | Cần quyết | Không quyết thì sao |
 |---|---|---|
-| 1 | KHUNG-7 + KHUNG-8 | Làm **cùng một lượt** — chúng là hai triệu chứng của một bệnh |
-| 2 | *(kèm)* một phép kiểm máy quét "luật trỏ tới file/lệnh không tồn tại" | **Đây mới là giá trị của đợt 2.** Không có nó thì lần thứ tư sẽ tới, và lại do người phát hiện |
+| **KHUNG-11** | **Bớt cái gì** trong 998 dòng tài liệu vượt ngân sách? | Ngân sách do chính repo đặt ra bị bỏ qua — và một luật bị bỏ qua một lần thì lần sau dễ hơn |
+| KHUNG-6 | Chỉ **ghi rõ giới hạn** của ba lớp quy trách nhiệm, hay **siết thật**? | Người đọc tiếp tục nhầm bốn cơ chế chống-giẫm-chân thành một lớp bảo mật |
 
-Câu hỏi phải trả lời **trước khi** viết phép kiểm đó, không phải sau: *nó dựng nổi ca hỏng
-không?* (`AGENTS.md` luật vàng số 2). Dựng không nổi thì đừng viết — viết vào sổ nợ và chờ.
+**KHUNG-11 phải chốt SỚM, và không phải vì nó khó.** Vì mọi việc còn lại đều **thêm** chữ vào
+repo — kể cả chính file này. Chốt càng muộn thì con số càng xa.
 
-## Đợt 3 — hai việc CHỜ ĐỨC CHỐT, không ai làm thay được
-
-Hai mục này **không phải chỗ sót, mà là câu hỏi hướng**. Không chốt thì không có việc để giao.
-
-| Việc | Đức cần quyết | Nếu không quyết |
-|---|---|---|
-| KHUNG-2 | Hai quy trình migrate có đi theo bản trích không? | Repo mới vẫn nhận công cụ mà không nhận quy trình dùng nó |
-| KHUNG-11 | **Bớt cái gì** trong 998 dòng tài liệu vượt ngân sách? | Ngân sách do chính repo đặt ra bị bỏ qua — và luật bị bỏ qua một lần thì lần sau dễ hơn |
-
-**KHUNG-11 là mục nguy hiểm nhất của cả roadmap, và không phải vì nó khó.** Vì mọi việc còn lại
-đều **thêm** chữ vào repo — kể cả chính file này. Nên KHUNG-11 phải chốt **sớm**, và từ lúc đó
-mỗi lượt thêm chữ phải kèm một lượt bớt chữ (`AGENTS.md` mục 8).
-
-## Đợt 4 — sau khi ba đợt trên xong
+## Đợt 5 — sau cùng
 
 | Việc | Điều kiện |
 |---|---|
-| KHUNG-4 (ba luật vai điều phối chưa có phép kiểm máy) | Sau đợt 2 — vì phép kiểm của đợt 2 có thể dùng lại được cho hai trong ba luật đó |
-| Đẩy bản vá sang hai repo đang ghim bản khung (`npm run upgrade`) | Sau khi **mọi** lượt cắt bản của đợt 1–2 đã xong. Nâng một lần, không nâng ba lần |
+| KHUNG-4 (ba luật vai điều phối chưa có phép kiểm máy) | Sau đợt 2 — phép kiểm của đợt đó dùng lại được cho hai trong ba luật |
+| Đẩy bản vá sang hai repo đang ghim bản khung (`npm run upgrade`) | Sau khi **mọi** lượt cắt bản đã xong |
+
+### Một luật cắt ngang mọi đợt: GOM BẢN PHÁT
+
+Sáu mục chạm `scripts/` — KHUNG-15 · 13 · 9 · 12 · 4, và phép kiểm của đợt 2. **Mỗi lượt cắt bản
+là một lần hai repo đích phải nâng.** Gom theo đợt: một bản cho đợt 0+1, một bản cho đợt 2+3.
+Đừng cắt sáu bản cho sáu mục.
 
 ## Ba thứ roadmap này CỐ Ý không chứa
 
-1. **Không có ngày tháng.** Repo này chạy theo phiên, không theo lịch. Gán ngày là tạo một con số
-   sai ngay hôm sau.
+1. **Không có ngày tháng.** Repo chạy theo phiên, không theo lịch. Gán ngày là tạo một con số sai
+   ngay hôm sau.
 2. **Không có bản vá kỹ thuật cho từng mục.** Đó là việc của brief giao executor
-   (`ORCHESTRATOR.md` mục 4b), và brief kèm sẵn bản vá là điều sổ tay đó cấm.
+   ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 4b), và brief kèm sẵn bản vá là điều sổ tay đó cấm.
 3. **Không nhắc lại nội dung từng mục nợ.** Hai nguồn sự thật cho cùng một việc là đúng bệnh mà
-   cả bộ khung này sinh ra để chữa. Nội dung ở `BACKLOG.md`; thứ tự ở đây.
+   cả bộ khung này sinh ra để chữa. Nội dung ở [BACKLOG.md](../BACKLOG.md); thứ tự ở đây.

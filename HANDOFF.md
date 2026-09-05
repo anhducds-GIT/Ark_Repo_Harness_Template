@@ -1138,3 +1138,31 @@ chứa sẵn chữ `HỎNG` / `KHÔNG BIẾT` / `XOÁ`), và **không đoán ti�
 
 **6 commit đang giữ local, CHƯA PUSH.** Cổng chưa xanh thì không đẩy — kể cả khi có lý do tin
 rằng đỏ này là dương tính giả. Đây là quyết định của người chốt, không phải của phiên.
+
+## 2026-09-05 · `claude-roadmap-0509` — ROADMAP-V2 xếp lại theo HÌNH DẠNG lỗi, không theo mục
+
+Bản trước của file này viết khi sổ nợ có **10** mục và xếp theo mục. Sau lượt 1.3.1 sổ có **12**
+mục mở (KHUNG-2 đóng; thêm KHUNG-13, 14, 15) — tức roadmap **lỗi thời ngay ngày nó ra đời**.
+
+**Đổi cách xếp, và đây là phần đáng ghi.** Đọc sổ nợ theo mục thì thấy mười hai việc lặt vặt.
+Đọc theo hình dạng thì thấy **ba**:
+- **Luật trỏ tới thứ không tồn tại** — KHUNG-7 · 8 · 13. Đã xảy ra **bốn lần**. Vá ba chỗ mà
+  không chặn hình dạng là hẹn lần thứ năm.
+- **Phép đo bằng chuỗi văn bản** — KHUNG-9 · 15 (nghi) · 12.
+- **Tài liệu nói quá / nói sai** — KHUNG-10 · 6 · 11.
+
+**KHUNG-15 nâng lên ĐỢT 0, trước mọi thứ khác.** Lý do không phải nó nặng nhất về kỹ thuật, mà
+vì nó **chặn mọi phiên**: chưa vá thì phiên nào cũng đứng trước lựa chọn treo-việc-hay-push-khi-
+đỏ, và Đức phải chốt tay từng lượt. Quyết định 05/09 đã ghi rõ nó không phải tiền lệ — nhưng một
+ngoại lệ phải viện dẫn lần thứ ba thì nó thành thói quen, bất kể ghi gì.
+
+**KHUNG-13 là mục duy nhất mà chi phí trì hoãn tăng theo SỐ REPO, không theo thời gian** — mỗi
+repo dựng mới lại sinh ra đã mang lỗi. Đó là lý do nó đứng đầu đợt 1 chứ không phải ưu tiên P
+của nó cao hơn.
+
+**Thêm một luật cắt ngang mọi đợt: GOM BẢN PHÁT.** Sáu mục chạm `scripts/`, và mỗi lượt cắt bản
+là một lần hai repo đích phải nâng. Gom hai bản cho năm đợt, đừng cắt sáu bản cho sáu mục.
+
+**Cân nặng:** 84 → 97 dòng. Repo đang vượt ngân sách tài liệu 45% (KHUNG-11), nên nói thẳng:
+lượt này **cộng thêm 13 dòng** vào chỗ đang quá tải. Đổi lại là một thứ tự thi hành đọc được
+trong một lần. Không tạo file mới — sửa file đã có, đúng luật mục 8.
