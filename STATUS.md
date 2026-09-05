@@ -5,14 +5,14 @@ name: Ark Repo Harness
 lifecycle: active
 last_verified: 2026-09-05
 last_verified_commit: b4a08b262cc64e2cc16a85d5629a0e6e10f07ae2
-last_verified_how: "npm test 143/143 xanh · repo dựng mới từ bản 1.3.0 chạy được cả hai lệnh điều phối ngay, 65 phép xanh, cả hai dạng xuống dòng"
+last_verified_how: "npm test 145/145 xanh · bản trích nay mang .gitattributes đi theo (28 file) · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái"
 evidence_ref: HANDOFF.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Bản trích CHƯA mang khai báo kiểu xuống dòng đi theo, nên repo mới dựng từ khuôn vẫn dính đúng bệnh vừa vá: một phép kiểm đọc mã nguồn rồi cắt theo dòng sẽ xanh trên máy vừa ghi file và đỏ với người clone. Đã đo: thêm nó KHÔNG buộc cắt bản mới, vì dấu vân tay bản phát chỉ băm phần scripts và tests. Cần một lượt riêng vì nó kéo theo khai báo cấu trúc và bảng tra của luật trong khuôn."
+next_step: "Đức chốt KHUNG-1 trong BACKLOG.md: có cắt bản 1.3.1 để vá mục đỏ vĩnh viễn của cổng đóng phiên hay không. Nguyên nhân đã xác định và chỉ có một — khối miễn trừ trong build-dashboard.mjs sót hai trang HTML do chính bộ sinh viết ra, nên mỗi lượt sinh artifact tự làm artifact đó cũ đi. Vá nằm trong scripts/, tức đổi dấu vân tay bản phát, tức chạm hai repo đang ghim bản khung — nên không tự làm."
 version_source: package.json
 current_focus: "Bản 1.3.0: repo dựng mới nhận luôn hai lệnh của vai điều phối, sổ tay và 52 phép ghim — chạy được ngay, không phải sửa gì"
-human_action: "Không có việc nào cần bạn"
+human_action: "CÓ — hai việc chờ Đức chốt: KHUNG-1 (cắt 1.3.1 để vá mục đỏ của cổng?) và KHUNG-2 (hai quy trình migrate có nên đi theo bản trích không?). Xem BACKLOG.md."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---
@@ -45,5 +45,11 @@ Clone xong bạn đứng ở `detached HEAD`; không sao, vì từ bản sao nà
 trước khi báo cáo, và bản đồ việc), sổ tay vai điều phối, và 52 phép ghim đi kèm. Repo dựng mới
 chạy được cả hai **ngay, không sửa gì**. Vì sao mở ngoại lệ giữa chế độ bảo trì:
 [ADR-0005](docs/adr/0005-goi-assistant-phat-hanh-tu-bo-khung.md).
+
+**Bản trích nay mang `.gitattributes`** (05/09) — repo mới dựng từ khuôn không còn dính bệnh
+kiểu xuống dòng. Việc này từng là `next_step`; đã xong, không phải việc kế nữa.
+
+**Repo nay có `BACKLOG.md`** — trước đó luật bắt ghi nợ vào một file không tồn tại, nên bản đồ
+việc báo "0 việc mở" suốt. Nay 6 mục nợ có thật, xem [BACKLOG.md](BACKLOG.md).
 
 **Việc kế:** đọc `next_step` ở đầu file này. Lộ trình cũ tới v1.0 — [ROADMAP-V1.md](docs/ROADMAP-V1.md) — **đã xong**, giữ lại làm lịch sử.

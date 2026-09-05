@@ -980,3 +980,69 @@ Bản đồ việc **0 → 4 việc mở**.
 **CÒN MỞ:** bản đồ việc báo khoá `_root` "giữ quá 6h ⚠" ngay sau khi vừa nhận vài phút. Nghi lệch
 múi giờ giữa lúc ghi bảng quyền và lúc đọc. Chưa đuổi, chưa ghi thành mục nợ vì chưa đo lại lần
 hai để chắc.
+
+## 2026-09-05 · `claude-dieu-phoi-0509` (tiếp) — audit độc lập Codex, và MỘT CHẨN ĐOÁN CỦA TÔI BỊ BÁC
+
+**Đức yêu cầu gửi Codex CLI audit toàn bộ repo.** Chạy `codex exec` trên một **bản sao clone
+trong scratchpad**, không phải repo thật — tác nhân ngoài không có lý do gì được quyền ghi vào
+repo đang làm việc. Kiểm lại sau khi chạy: repo thật không đổi một byte.
+
+**Ba lần chạy hỏng trước khi ra kết quả, ghi lại vì nó sẽ còn cắn ai đó:**
+1. Model mặc định trong `~/.codex/config.toml` là `gpt-6-astra` — bản CLI 0.152.1 không chạy nổi,
+   trả `400 requires a newer version`. Chạy được với `-m gpt-5.6-sol`.
+2. `-s read-only` **không đọc nổi file nào** trên máy này: `helper_unknown_error: apply deny-read
+   ACLs`. Không phải quyền của repo — là lớp exec helper.
+3. `-s workspace-write` cũng vậy. **Thủ phạm là `[windows] sandbox = "elevated"`** trong
+   `~/.codex/config.toml`; override thành `-c windows.sandbox='"unelevated"'` là đọc được ngay.
+
+**Điểm đáng ghi nhận về chính Codex:** hai lượt bị chặn, nó trả lời *"cả 6 mục là CHƯA KIỂM
+ĐƯỢC, không phải không tìm thấy"* và từ chối đưa phát hiện suy đoán. Nếu nó bịa cho đủ, tôi đã
+có một bản audit trông rất thuyết phục và rỗng hoàn toàn.
+
+**KẾT QUẢ: 14 phát hiện. Tự kiểm chứng lại từng cái theo luật vàng số 4, không lấy lời nó làm
+bằng chứng.**
+
+**CHỖ NẶNG NHẤT LÀ CHỖ NÓ BÁC TÔI.** Log trước của chính phiên này khẳng định mục đỏ artifact có
+**hai** nguyên nhân, trong đó nguyên nhân thứ hai là *"bộ sinh và bộ kiểm bất đồng đúng một đơn
+vị — sinh ra 11, state-check đòi 12"*. **Sai.** Đo lại dứt điểm tại HEAD `85accf1`:
+`git show HEAD:DASHBOARD.md` → `CÓ (11 commit)`; sinh lại trên đĩa → `CÓ (14 commit)`. `11` là
+con số nằm trong **file đã commit**, `14` là con số **sinh lại tại HEAD**. Một bộ đếm, hai thời
+điểm. Không có bất đồng nào.
+Bài học đáng giá hơn cả bản vá: *"hai con số khác nhau"* chưa phải *"hai bộ đếm khác nhau"* —
+phải hỏi hai con số ấy được đọc từ đâu trước khi kết luận. Tôi đã kết luận trước khi hỏi.
+`BACKLOG.md` KHUNG-1 đã sửa lại thành **một** nguyên nhân, kèm ghi rõ chẩn đoán cũ sai ở đâu.
+
+**Nợ mới nạp vào sổ — KHUNG-5 tới KHUNG-11, đều đã tự kiểm chứng:**
+- KHUNG-5 · phép ghim của khối miễn trừ thử đúng ba file, **bỏ sót hai file đang gây lỗi**.
+- KHUNG-6 · danh tính phiên là thứ tự khai ở cả ba lớp (`--as` · `Lane:` · commit thiếu nhãn).
+  Ghi kèm giới hạn thiết kế: bốn cơ chế đó chống **giẫm chân vô ý**, không chống **mạo danh cố
+  ý** — việc rẻ nhất có thể chỉ là ghi rõ điều đó ra, đừng để ai đọc nhầm thành lớp bảo mật.
+- KHUNG-7 · `AGENTS.md` mục 7 bắt ghi vào `decisions.md` — **file không tồn tại**. Kiểm: `ls` →
+  không có. **Đây là lần thứ BA cùng một hình dạng lỗi**: `claim.mjs` (03/09) · `BACKLOG.md`
+  (05/09) · `decisions.md` (05/09). Ba lần thì nên có phép kiểm máy, đừng chờ lần thứ tư.
+- KHUNG-8 · luật bắt ghi vào "bảng lỗi của sổ tay" — không bảng nào mang tên đó.
+- KHUNG-9 · `can-nang.mjs` xác nhận "đã có ca hỏng" **bằng cách tìm chuỗi**: tên phép kiểm nằm
+  trong một dòng chú thích cũng đủ. Công cụ sinh ra để phát hiện luật-chưa-từng-chặn-gì, mà tự
+  nó dùng một phép đo không phân biệt được hai nhánh.
+- KHUNG-10 · `cong-do-that.mjs` dựng ca đỏ cho **6/11** mục cổng, trong khi bảng tra giới thiệu
+  nó như thể cả cổng. Một trong bốn mục chưa phủ **chính là mục đang đỏ vĩnh viễn**.
+- KHUNG-11 · **đo lại độc lập: 3.198/2.200 dòng tài liệu, vượt 998 dòng (45%)** — Codex báo
+  3.169, chênh vì `BACKLOG.md` vừa thêm; hai lượt đo khớp. Kèm một số sát trần chưa ai để ý:
+  **thời gian chạy trọn bộ kiểm 174/180 giây**, còn 6 giây. Đã thấy hệ quả thật ngay trong phiên
+  này — `npm test` vượt thời gian chờ mặc định, phải chạy nền.
+
+**BA CHỖ `STATUS.md` NÓI SAI, và một trong ba là lỗi của chính phiên này — đã sửa:**
+- `next_step` vẫn nói *"bản trích CHƯA mang khai báo kiểu xuống dòng"* trong khi tôi **vừa làm
+  xong việc đó ở đầu phiên**. Tức bản đồ việc và bảng trạng thái đang lấy một việc đã hoàn thành
+  làm việc kế tiếp. Đúng cái bẫy `CHUYEN-REPO-LEN-CHUAN.md` vừa dính và tôi vừa vá cho nó —
+  rồi tự dính lại ở file bên cạnh, trong cùng một phiên.
+- `last_verified_how` ghi `143/143`, thực tế `145`.
+- `human_action` ghi *"Không có việc nào cần bạn"* trong khi có **hai** việc chờ Đức chốt.
+
+**Bản đồ việc: 0 → 11 việc mở.** Mục "đang chờ người chốt" nay lọc được (0 mục) thay vì nói
+"KHÔNG LỌC ĐƯỢC".
+
+**CÒN MỞ:** phát hiện #6 của Codex (`AGENTS.md` gọi CI là chỗ *"bịt lỗ hở duy nhất"* trong khi
+`CHANGELOG` nói CI chưa chặn merge và chưa quét secret) — **chưa kiểm chứng**, vì kiểm nó cần đọc
+cấu hình branch protection trên GitHub, việc mà phiên này không làm. Không ghi thành mục nợ khi
+chưa tự đo; ghi ở đây để phiên sau đi đo.

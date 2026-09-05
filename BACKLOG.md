@@ -18,23 +18,37 @@
 
 ## P1
 
-### KHUNG-1 · Mục đỏ "Sự thật máy sinh còn tươi" — hai bug xếp chồng, cổng không đóng được
+### KHUNG-1 · Mục đỏ "Sự thật máy sinh còn tươi" — MỘT bug, không phải hai
 
-Cổng đóng phiên có **một mục đỏ vĩnh viễn**. Đuổi tới cùng ngày 05/09, ra hai nguyên nhân:
+Cổng đóng phiên có **một mục đỏ vĩnh viễn**.
 
-1. Khối `MAY_SINH` trong `build-dashboard.mjs` chỉ miễn trừ `llms.txt`, `repo-map.json`,
-   `DASHBOARD.md`. Hai trang `DASHBOARD-<repo>.html` và `SO-MIGRATE-<repo>.html` **cũng do bộ
-   sinh viết ra** nhưng mang đuôi `.html` nên bị `isBehaviourFile()` đếm là "code đã đổi" — mỗi
-   lượt sinh lại tự cộng thêm một vào chính con số nó phải khớp. Đúng vòng lặp mà chú thích ngay
-   trên khối đó mô tả và tin là đã chặn; chặn cho ba file, sót hai file thêm vào sau.
-2. **Bộ sinh và bộ kiểm bất đồng đúng một đơn vị:** sinh lại `DASHBOARD.md` tại HEAD sạch ra
-   `CÓ (11 commit)`, `state-check` cùng lúc cùng HEAD đòi `CÓ (12 commit)`.
+**Nguyên nhân, đúng một cái:** khối `MAY_SINH` trong `build-dashboard.mjs:408` chỉ miễn trừ
+`llms.txt`, `repo-map.json`, `DASHBOARD.md`. Hai trang `DASHBOARD-<repo>.html` và
+`SO-MIGRATE-<repo>.html` **cũng do bộ sinh viết ra** nhưng mang đuôi `.html`, nên
+`isBehaviourFile()` đếm chúng là "code đã đổi". Mỗi commit sinh lại artifact tự cộng thêm một
+vào chính con số mà artifact vừa sinh phải khớp — artifact vừa commit xong là lập tức cũ.
+Đúng vòng lặp mà chú thích ngay trên khối đó mô tả và tin là đã chặn: chặn cho ba file, sót hai
+file thêm vào sau.
 
-(2) nặng hơn (1): còn bất đồng thì mục này **không đóng được bằng bất kỳ thứ tự commit nào**.
+**MỘT CHẨN ĐOÁN SAI, GHI LẠI ĐỂ KHÔNG AI ĐUỔI LẠI:** bản đầu của mục này (và Log
+`claude-dieu-phoi-0509` trong `HANDOFF.md`) khẳng định có **nguyên nhân thứ hai** — "bộ sinh và
+bộ kiểm bất đồng đúng một đơn vị: sinh ra 11, state-check đòi 12". **Sai.** Audit độc lập của
+Codex ngày 05/09 chỉ ra, và đo lại xác nhận: `11` là con số nằm trong **file đã commit**, `12`
+là con số **sinh lại tại HEAD**. Một bộ đếm, hai thời điểm — không phải hai bộ đếm bất đồng.
+Đo lại dứt điểm tại HEAD `85accf1`: `git show HEAD:DASHBOARD.md` cho `CÓ (11 commit)`, sinh lại
+trên đĩa cho `CÓ (14 commit)`. Bài học: *"hai con số khác nhau"* chưa phải *"hai bộ đếm khác
+nhau"* — phải hỏi hai con số đó được đọc từ đâu trước khi kết luận.
 
-Hệ quả nếu để lâu: mục đỏ vĩnh viễn thì người ta thôi đọc cổng — chính điều `AGENTS.md` mục 8
-cảnh báo. Vùng: `_code`. **Sửa là đổi dấu vân tay tầng máy → buộc cắt 1.3.1 → chạm hai repo
-đang ghim bản khung. Cần người chốt trước khi làm.**
+Vá được bằng cách thêm hai trang HTML vào khối miễn trừ. Vùng: `_code`. **Sửa là đổi dấu vân tay
+tầng máy → buộc cắt 1.3.1 → chạm hai repo đang ghim bản khung. Cần người chốt trước khi làm.**
+
+### KHUNG-5 · Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi
+
+`tests/core-contract.mjs` thử `isBehaviourFile()` với đúng ba file `repo-map.json`, `llms.txt`,
+`DASHBOARD.md` — **không thử hai trang HTML**, dù chúng được khai là máy sinh trong
+`.repo-structure.json`. Nên phép kiểm xanh trong khi ca hỏng đang tồn tại ngay trong repo. Đây
+là luật vàng số 2 bị vi phạm ở chính bộ phép kiểm: *fixture phải dựng nổi ca hỏng*. Đi kèm
+KHUNG-1, sửa cùng lượt. Vùng: `_code`.
 
 ## P2
 
@@ -60,3 +74,71 @@ nó. Chốt xong mới biết có việc để làm hay không. Vùng: `_docs` +
 cả ba **chưa có phép kiểm nào canh**. Ở repo sinh ra sổ này, một phép kiểm cho hàng rào **đã
 được viết nhưng chưa đi theo bộ khung**. `AGENTS.md` mục 7: *luật nào máy không kiểm được thì
 sớm muộn cũng bị bỏ qua* — nên ba mục đó hiện là quy ước, không phải chốt. Vùng: `_code`.
+
+### KHUNG-6 · Danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin lời khai
+
+Audit độc lập Codex 05/09. Cả ba chốt quy trách nhiệm chỉ so chuỗi, không có gì chứng minh
+người chạy đúng là người họ khai:
+
+- `claim.mjs` — trả quyền chỉ kiểm `--as` có khớp `owner` không. Phiên B biết tên phiên A là
+  chạy được `--release <khoá> --as A`, và bảng quyền tin.
+- `safe-push.mjs` — commit thuộc về ai chỉ dựa vào dòng chữ `Lane:` trong thông điệp commit.
+- `session-check.mjs` — commit **thiếu** nhãn chỉ bị cảnh báo; `safe-push` khi đó quy về chủ vùng
+  hiện tại. Nên sau khi vùng đổi chủ, commit cũ không nhãn **bị quy cho người mới**.
+
+Cần nói thẳng giới hạn trước khi ai đó định "vá": ba cơ chế này sinh ra để chống **giẫm chân do
+vô ý** giữa các phiên AI hợp tác, không phải chống **mạo danh cố ý**. Chống mạo danh thật cần
+chữ ký, tức một hạng mục khác hẳn. Việc đáng làm trước mắt có thể chỉ là **ghi rõ giới hạn đó
+vào `MULTIFLOW.md`**, để không ai đọc bốn cơ chế kia như một lớp bảo mật. Vùng: `_docs`
+(nếu chỉ ghi giới hạn) hoặc `_code` (nếu muốn siết thật).
+
+### KHUNG-7 · Luật đóng phiên bắt ghi vào `decisions.md` — file không tồn tại
+
+`AGENTS.md` mục 7 bước 2: *"Quyết định mới của Đức → `decisions.md`"*. Repo **không có file này**,
+và Bản đồ file cũng không khai nó. Nên khi Đức chốt một việc thật, phiên AI không có đích hợp lệ
+để tuân luật — và quyết định rơi vào `HANDOFF.md` hoặc bốc hơi.
+
+**Đây là lần thứ BA cùng một hình dạng lỗi trong repo này:** `claim.mjs` (audit 03/09) ·
+`BACKLOG.md` (05/09) · `decisions.md` (05/09). Ba lần, ba file khác nhau, cùng một bệnh: luật
+trỏ tới thứ không tồn tại. Đáng cân nhắc một phép kiểm máy quét chính điều này, thay vì chờ lần
+thứ tư. Vùng: `_root` + `_code`.
+
+### KHUNG-8 · Luật bắt ghi vào "bảng lỗi của sổ tay" — không chỉ ra bảng nào
+
+`AGENTS.md` mục 7 bước 3 bắt thêm một dòng vào *"bảng lỗi của sổ tay"* khi gặp lỗi mới ở hệ thống
+bên ngoài. Repo không có bảng nào được đặt tên là bảng lỗi. Mỗi phiên sẽ ghi vào một chỗ khác,
+hoặc bỏ qua. Cùng họ với KHUNG-7. Vùng: `_root`.
+
+### KHUNG-9 · `can-nang.mjs` xác nhận "đã có ca hỏng" bằng cách TÌM CHUỖI
+
+`coCaHong()` chỉ hỏi: tên phép kiểm có xuất hiện đâu đó trong `tests/cong-do-that.mjs` không.
+**Một cái tên nằm trong dòng chú thích cũng đủ** để phép kiểm đó được đánh dấu là "đã có ca
+hỏng", dù không assertion nào chứng minh nó đỏ được.
+
+Mỉa mai đúng chỗ: đây là công cụ sinh ra để phát hiện *luật chưa từng chặn được gì*, và bản thân
+nó đang dùng một phép đo không phân biệt được hai nhánh — chính luật vàng số 2. Vùng: `_code`.
+
+### KHUNG-10 · `cong-do-that.mjs` dựng ca đỏ cho 6 trong 11 mục cổng, nhưng bảng tra nói như thể cả cổng
+
+Bảng tra `AGENTS.md` mục 6 giới thiệu file này là chỗ *"biết cổng đóng phiên có ĐỎ THẬT được
+không"*. Thực tế nó dựng ca hỏng cho **sáu** mục; cổng có **mười một**. Bốn mục chưa có ca kho
+thật độc lập trong file đó: file mới đã khai vào Bản đồ · HANDOFF đã ghi Log · **Sự thật máy
+sinh còn tươi** · cổng cấu trúc được gọi và truyền đúng kết quả.
+
+Chú ý mục thứ ba: đó chính là mục đang đỏ vĩnh viễn (KHUNG-1). Một mục vừa chưa chứng minh được
+là đỏ-thật-được, vừa đang đỏ thật — và không ai bắt được sự trớ trêu đó cho tới khi audit ngoài
+vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng chứng. Vùng: `_docs`.
+
+### KHUNG-11 · Repo đã vượt ngân sách cân nặng của chính nó
+
+`can-nang.mjs` đặt ngân sách tài liệu **2.200 dòng**. **Đo lại độc lập 05/09: 3.198 dòng — vượt
+998 dòng, 45%.** (Codex báo 3.169; chênh vì `BACKLOG.md` vừa thêm. Hai lượt đo khớp nhau.)
+`AGENTS.md` mục 8 nói rõ: quá ngân sách thì **phải BỚT trước khi nghĩ tới nới**.
+
+Ba con số còn lại vẫn trong ngân sách, nhưng **một con số sát trần đáng để mắt**: thời gian chạy
+trọn bộ phép kiểm **174/180 giây**. Còn 6 giây. Thêm một suite nữa là vượt — và đã thấy hệ quả
+thật trong phiên 05/09: `npm test` vượt quá thời gian chờ mặc định, phải chạy nền. Phép kiểm
+chậm tới mức người ta ngại chạy là phép kiểm sắp bị bỏ qua.
+
+Bớt cái gì thì cần Đức chốt hướng — đây là tài liệu của repo, không phải code thừa. Vùng:
+`_docs` + `_root`.
