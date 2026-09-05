@@ -223,3 +223,33 @@ Ai nhận mục này: **đừng bắt đầu bằng cách chạy lại cho ra đ
 kết quả suite từ đâu, và cái gì khác nhau giữa hai lượt chạy* — thời gian chạy, thứ tự suite,
 trạng thái cây làm việc, hay output bị cắt. Ghi lại lượt nào đỏ lượt nào xanh trước khi đổi
 bất cứ dòng nào.
+
+### KHUNG-16 · `DASHBOARD.md` nhúng mã commit HEAD nên KHÔNG THỂ hội tụ
+
+**Đo dứt điểm 05/09.** Sau khi bản 1.3.1 vá cột `changedCount` và mốc kiểm chứng được cập nhật,
+trang vẫn lệch mỗi lượt — và diff cho thấy **đúng hai dòng**:
+
+```
+-Trang được sinh tại commit `0b1e0f4` …
++Trang được sinh tại commit `d639387` …
+-2. **Phiên gần nhất** — … @ `0b1e0f4` …
++2. **Phiên gần nhất** — … @ `d639387` …
+```
+
+Trang **nhúng mã commit của HEAD**. Mà commit chính trang đó lại đổi HEAD. Nên: sinh → commit →
+HEAD đổi → trang vừa commit đã cũ. **Không thứ tự commit nào hội tụ**, kể cả sinh-ngay-trước-push.
+
+Đây là **giới hạn thiết kế**, không phải lỗi lập trình — và phải nói rõ thế, vì ai nhận mục này
+mà đi "sửa bug" sẽ không tìm thấy bug nào. Ba lối, chọn một là quyết định kiến trúc:
+
+1. **Bỏ mã commit khỏi trang** — giữ ngày, bỏ mã. Rẻ nhất; mất khả năng truy trang này sinh tại
+   commit nào.
+2. **Nhúng mã commit CHA** (`HEAD` lúc sinh sẽ thành cha của commit chứa trang) — hội tụ, nhưng
+   chỉ đúng khi trang luôn được commit ngay sau khi sinh, tức thêm một quy ước bất thành văn.
+3. **Miễn hẳn hai dòng đó khỏi phép so tươi** — cổng chỉ so phần còn lại. Giữ được thông tin,
+   nhưng phép kiểm thôi canh một phần nội dung.
+
+**Hậu quả nếu để nguyên:** mục *"Sự thật máy sinh còn tươi"* của cổng đóng phiên **đỏ lại sau mỗi
+commit**, và mọi phiên đều phải chạy thêm một vòng sinh-lại-commit vô ích rồi vẫn đỏ. Đây là lý
+do thật khiến mục đó đỏ suốt nhiều phiên trước — bản 1.3.1 vá **một** trong **hai** đường; đây là
+đường còn lại. Vùng: `_code`.

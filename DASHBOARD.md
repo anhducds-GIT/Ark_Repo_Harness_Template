@@ -2,12 +2,12 @@
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
-Trang được sinh tại commit `0b1e0f4` (2026-09-06). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
+Trang được sinh tại commit `d639387` (2026-09-06). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.
 
 ## A · Bắt đầu từ đâu
 
 1. **Việc ưu tiên #1** — **_root** — KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới. · [STATUS](STATUS.md)
-2. **Phiên gần nhất** — 2026-09-06 @ `0b1e0f4` · [HANDOFF.md](HANDOFF.md)
+2. **Phiên gần nhất** — 2026-09-06 @ `d639387` · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
 

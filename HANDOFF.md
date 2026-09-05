@@ -1175,3 +1175,29 @@ khi xanh** — và thói quen đó vô hiệu hoá cổng mà không ai phải q
 Điều này **không làm quyết định push 05/09 sai** — lúc đó đã đo suite exit 0 bằng lệnh trực tiếp
 trước khi đẩy, và đó vẫn là bằng chứng đúng. Nhưng nó đổi bản chất mục nợ: từ *"cổng đọc sai kết
 quả"* thành *"cổng đọc kết quả không ổn định"*, và hai thứ đó điều tra khác nhau.
+
+## 2026-09-05 · `claude-sync-0509` — TÌM RA ĐƯỜNG THỨ HAI, và nó là giới hạn thiết kế
+
+Đức hỏi *"dashboard đã đồng bộ chưa"*. Đo thì chưa, và lần này đuổi tới tận cùng.
+
+**Hai nguyên nhân khác nhau, tách bạch:**
+
+**(a) Mốc kiểm chứng khai tay bị cũ — ĐÃ SỬA.** `last_verified_commit` trong `STATUS.md` vẫn trỏ
+`b4a08b2`, tức **trước cả bản 1.3.1**. Nên cột *"code đã đổi sau lần kiểm chứng"* báo `CÓ (15
+commit)` — **không phải bug**, nó đếm đúng số commit kể từ mốc được khai. Cập nhật mốc về
+`baebd07` kèm lý do kiểm chứng thật (145 xanh · cổng 11/11 · 1.3.1 đã phát) → cột về `KHÔNG`.
+
+**(b) Trang NHÚNG MÃ COMMIT HEAD — KHÔNG THỂ hội tụ, ghi thành KHUNG-16.** Sau khi (a) xong, trang
+vẫn lệch mỗi lượt, và diff rút gọn còn **đúng hai dòng**: cả hai chứa mã commit HEAD. Mà commit
+chính trang đó lại đổi HEAD. Sinh → commit → HEAD đổi → trang vừa commit đã cũ.
+
+**Nói rõ để người sau không mất thì giờ: đây là giới hạn thiết kế, không phải lỗi lập trình.** Ai
+nhận KHUNG-16 mà đi tìm bug sẽ không tìm thấy bug nào. Ba lối ra đã ghi trong mục nợ, và chọn lối
+nào là **quyết định kiến trúc**, không phải bản vá.
+
+**Điều này giải thích lịch sử:** mục *"Sự thật máy sinh còn tươi"* đỏ suốt nhiều phiên vì có
+**hai** đường, không phải một. Bản 1.3.1 vá đường thứ nhất (hai trang HTML lọt vào danh sách file
+hành vi) — đúng và có đột biến chứng minh. Đường thứ hai là cái này. Lượt trước tôi kết luận
+"một bug, không phải hai" sau khi Codex bác — **kết luận đó đúng cho phạm vi đang xét lúc đó**
+(hai con số 11/12 là một bộ đếm hai thời điểm), nhưng mục đỏ tổng thể thì thật sự có hai nguồn.
+Ghi ra vì đây là lần thứ hai trong một ngày tôi phải chỉnh lại chính chẩn đoán của mình về mục này.
