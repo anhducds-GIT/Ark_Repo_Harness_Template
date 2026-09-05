@@ -727,3 +727,27 @@ gốc):**
    không chỉ ba file lượt này. Nhưng nó đổi cách lấy file ra của **toàn bộ** repo, chạm khoá
    gốc, và có thể làm cả cây làm việc hiện một lượt thay đổi lớn. Lượt này cố ý chỉ làm phép
    kiểm chịu được cả hai dạng — đó là thứ đề bài yêu cầu, và là thứ lùi lại được.
+
+## Lượt · Đẩy hộ 12 commit của bốn lane — phiên điều phối, duyệt thường trực
+
+**Phiên:** `claude-dieu-phoi` · 2026-09-05 · vai điều phối
+
+Đức duyệt **thường trực** cho `safe-push` kể cả `--carry` (quyết định ghi ở repo Extension,
+`ADR-0005`). Đổi lại, luật buộc **kể tên lane bị cuốn theo**. Lượt này cuốn theo:
+
+- `claude-exec-crlf` — vá phép ghim phụ thuộc kiểu xuống dòng
+- `claude-exec-harness-wire` — cắm suite Assistant vào cổng kiểm, thêm hai lệnh chạy được
+- `claude-exec-promoteA2` — port sổ tay vai điều phối, bản portable
+
+**Đã kiểm chứng độc lập trước khi đẩy, không tin báo cáo:** `git checkout` ba file về đúng dạng
+mà người clone nhận được, rồi chạy suite → **52 xanh, 0 đỏ**. Trước lượt vá, cùng phép đo đó cho
+**28 xanh rồi chết**.
+
+**Còn mở, đã ghi để không mất:**
+
+- **`.gitattributes`** chưa có. Bản vá lượt này chặn bệnh ở suite Assistant, không chặn ở toàn
+  repo. Thêm nó đổi cách lấy file ra của mọi file nên chưa tự làm — cần một lượt riêng.
+- **Hai bản sao của một luật:** danh sách file máy sinh gõ cứng trong bộ sinh khai **3** file,
+  còn khối `generated` của `.repo-structure.json` khai **5**. Hệ quả đo được: hai trang HTML bị
+  tính là file hành vi, và mỗi lượt sinh lại tự làm bảng lệch thêm một nhịp — phải commit
+  sinh-lại **ba lần** mới hội tụ. Cùng họ với lỗi đã ghi ở lượt `claude-so-migrate`.

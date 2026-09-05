@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-dieu-phoi",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "Khai ORCHESTRATOR.md vao ban do file + dong luot",
-      "released_at": null,
+      "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
