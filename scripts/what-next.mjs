@@ -56,6 +56,14 @@ const UU_TIEN = /^##\s+(P[1-9])\b/;
    `khaiSai`) thay vì âm thầm bỏ qua — cách viết thứ năm sẽ xuất hiện, và lúc đó phải có người
    thấy. In hoa toàn phần là cố ý: `đóng phiên` trong văn xuôi không trúng lưới. */
 const GACH = /^###\s+~~/;
+
+/* CO "CHO NGUOI CHOT" trong mot muc no. In HOA va co dau hai cham la co y: cau van xuoi
+   "viec nay cho nguoi chot quyet" KHONG trung, chi dong khai moi trung.
+   VI SAO CAN: truoc 05/09 muc C cua ban do CHI doc so y tuong (IDEAS.md). Repo khong co so do
+   thi muc C in ra "0 muc, khong ai lam thay duoc" — tuc KHANG DINH da kiem va khong co gi —
+   trong khi so no dang co muc can nguoi chot. Nguoi chot doc bang roi tin minh khong phai quyet
+   gi. Do that o repo nha: 2 muc cho chot, bang bao 0. */
+const CHO_CHOT = /\*\*CHỜ NGƯỜI CHỐT:?\*\*/;
 // KHÔNG dùng `\b` ở đây: `\b` dựa trên `\w` = [A-Za-z0-9_], nên `Đ` là non-word và
 // `\bĐÓNG` không bao giờ khớp. Bản đầu viết `\b(ĐÃ ĐÓNG|ĐÓNG|…)\b` và một mục ĐÃ ĐÓNG
 // THOÁT LƯỚI — bảng vẫn đem nó đi giao cho phiên khác. Lỗi im lặng, không báo gì.
@@ -67,17 +75,27 @@ export function parseBacklog(text) {
   const ra = [];
   const khaiSai = [];
   let uuTien = "P?";
+  let hienTai = null;
   for (const dong of String(text).split(/\r?\n/)) {
     const moc = UU_TIEN.exec(dong);
     if (moc) { uuTien = moc[1]; continue; }
     const viec = MA_VIEC.exec(dong);
-    if (!viec) continue;
+    if (!viec) {
+      // CO CHO NGUOI CHOT — khai TUONG MINH trong than muc, khong do ten trong van xuoi.
+      // Do ten la phep do bang chuoi: doi cach xung ho mot chu la muc bien mat, va khong ai biet.
+      // Co thi hoac co hoac khong.
+      if (hienTai && CHO_CHOT.test(dong)) hienTai.choChot = true;
+      continue;
+    }
+    hienTai = null;
     if (GACH.test(dong)) continue;
     if (TU_DONG.test(dong)) { khaiSai.push(viec[1]); continue; }
-    ra.push({ ma: viec[1], tieuDe: lamSach(viec[2]), uuTien });
+    hienTai = { ma: viec[1], tieuDe: lamSach(viec[2]), uuTien, choChot: false };
+    ra.push(hienTai);
   }
   return { mo: ra, khaiSai };
 }
+
 
 const TRUONG = (ten) => new RegExp("^\\s*[-*]\\s+\\*\\*" + ten + ":?\\*\\*:?\\s*(.*)$");
 // KHÔNG đóng cứng tiền tố mã: repo nào tự chọn chữ đầu của mã ý tưởng.
@@ -228,7 +246,7 @@ export function dangBiChan(vungs) {
 
 const KE = (n) => "".padEnd(n, "─");
 
-export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], tenNguoiChot = "" }) {
+export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], tenNguoiChot = "", noChoChot = [] }) {
   const d = [];
   d.push("BẢN ĐỒ VIỆC — trạng thái sống, đọc lúc " + now.toISOString().slice(0, 16).replace("T", " "));
   d.push(KE(78));
@@ -282,20 +300,31 @@ export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], tenNguoi
   d.push("  ⚠ = giữ quá " + GIO_NHAC + "h. Cũ KHÔNG có nghĩa là chết. Đây là số liệu để HỎI,");
   d.push("    không phải giấy phép để giành. Nhắn phiên đang giữ trước — rẻ hơn giành.");
 
+  /* MỤC C ĐỌC HAI NGUỒN, và nói rõ nguồn nào kiểm được nguồn nào không.
+     Trước 05/09 nó chỉ đọc sổ ý tưởng. Repo không có `IDEAS.md` thì nó in "0 mục, không ai làm
+     thay được" — tức KHẲNG ĐỊNH đã kiểm — trong khi sổ nợ đang có mục chờ chốt. Đo thật ở repo
+     nhà: 2 mục chờ chốt, bảng báo 0. Người chốt đọc bảng rồi tin mình không phải quyết gì. */
   const cho = locChoNguoiChot(ideas, tenNguoiChot);
+  const tuSoNo = noChoChot.filter((m) => m.choChot);
   d.push("");
+  // KHI MOT NGUON KHONG LOC DUOC, KHONG DUOC IN MOT CON SO TONG. Con so tong ham y "da kiem
+  // het"; o day moi kiem duoc mot nua. In so kem canh bao van khien nguoi doc nho con so.
+  d.push(cho === null
+    ? "C · ĐANG CHỜ NGƯỜI CHỐT — KHÔNG LỌC ĐƯỢC TRỌN VẸN (sổ nợ: " + tuSoNo.length + " · sổ ý tưởng: chưa lọc được)"
+    : "C · ĐANG CHỜ NGƯỜI CHỐT — " + (tuSoNo.length + cho.length) + " mục, không ai làm thay được");
+  for (const m of tuSoNo) {
+    d.push("  ▸ " + m.ma + " · " + catNgan(m.tieuDe, 76) + "   [sổ nợ, " + m.uuTien + "]");
+  }
   if (cho === null) {
-    d.push("C · ĐANG CHỜ NGƯỜI CHỐT — KHÔNG LỌC ĐƯỢC");
-    d.push("  Chưa khai `repo.owner` trong `.repo-structure.json`, nên không biết tìm tên ai.");
-    d.push("  Đây là \"chưa kiểm\", không phải \"không có mục nào chờ\".");
+    d.push("  ⚠ Sổ Ý TƯỞNG: KHÔNG LỌC ĐƯỢC — chưa khai `repo.owner` trong `.repo-structure.json`.");
+    d.push("    Đây là \"chưa kiểm\", không phải \"không có mục nào chờ\".");
   } else {
-    d.push("C · ĐANG CHỜ NGƯỜI CHỐT — " + cho.length + " mục, không ai làm thay được");
-    if (!cho.length) d.push("  (không có)");
     for (const y of cho) {
-      d.push("  ▸ " + y.ma + " · " + catNgan(y.tieuDe, 76) + "   [bậc: " + (y.bac || "?") + "]");
+      d.push("  ▸ " + y.ma + " · " + catNgan(y.tieuDe, 76) + "   [ý tưởng, bậc: " + (y.bac || "?") + "]");
       if (y.viecKe) d.push("      việc kế: " + catNgan(y.viecKe, 84));
     }
   }
+  if (!tuSoNo.length && cho && !cho.length) d.push("  (không có)");
 
   const dangXay = ideas.filter((y) => /đang xây|dang xay/i.test(y.bac));
   d.push("");
@@ -419,9 +448,10 @@ function main() {
   const ideas = fs.existsSync(ideasFile) ? parseIdeas(fs.readFileSync(ideasFile, "utf8")) : [];
 
   const vungs = banDoVung({ viecTheoFile, tieuDiemTheoFile, claims, structure, prefixes });
+  const noChoChot = viecTheoFile.flatMap((x) => x.viec);
   process.stdout.write(render({
     vungs, ideas, now: new Date(), dauNiemPhong: canhBao, khaiSai,
-    tenNguoiChot: tenNguoiChotTu(structure),
+    tenNguoiChot: tenNguoiChotTu(structure), noChoChot,
   }) + "\n");
 }
 

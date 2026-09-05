@@ -488,11 +488,13 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | Hiểu bộ khung này gồm gì và dùng thế nào | [README.md](README.md) |
 | Khai trạng thái cho một đơn vị công việc | [STATUS.template.md](STATUS.template.md) |
 | Ghi một quyết định kiến trúc | bản mẫu [docs/_TEMPLATE-adr.md](docs/_TEMPLATE-adr.md) · luật [docs/adr/0000-…](docs/adr/0000-ghi-nhan-quyet-dinh-kien-truc.md) |
+| **Tra nhanh người chốt đã chốt gì, ngày nào** | [decisions.md](decisions.md) — sổ quyết định, **chỉ thêm**, luật mục 7 bắt ghi vào đây. Lập luận dài thì viết ADR, file này giữ một dòng trỏ sang |
 | Viết một tài liệu nghiên cứu | [docs/_TEMPLATE-study.md](docs/_TEMPLATE-study.md) |
 | Viết đề bài cho một phiên AI | [docs/_TEMPLATE-brief.md](docs/_TEMPLATE-brief.md) |
 | **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) — bốn cơ chế (bảng chủ sở hữu · nhãn \`Lane:\` · cổng đóng phiên · cổng xuất bản), một ngày làm việc 5 bước, **năm bất biến kèm lý do từng cái**, và quy trình đổi cơ chế có **đột biến kiểm bắt buộc**. Mục 1–3 viết cho người không code. **Cố ý không chứa số đo, không kiểm kê chốt, không bảng mã lỗi** — ba thứ đó khác nhau ở từng repo và mục nhanh hơn ai kịp sửa, nên nó chỉ đưa câu lệnh để tự đo |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy \`npm run bootstrap\` |
+| **Phát sinh việc ngoài phạm vi phiên mình — chỗ ghi nợ, luật mục 0 bắt** | [BACKLOG.md](BACKLOG.md) — nhóm \`## P<n>\`, mỗi mục \`### <MÃ>-<số> · <tiêu đề>\`, đóng thì **gạch mã** chứ đừng xoá. \`npm run what-next\` đọc thẳng file này; sai quy ước một ký tự là mục biến mất khỏi bản đồ việc |
 | **Sắp BÁO CÁO trạng thái cho người chốt — kiểm xem điều mình sắp nói có khớp nguồn thẩm quyền không** | \`npm run state-check\` — **không phải cổng đóng phiên**: cổng kia hỏi "việc tôi làm đẩy được chưa", cái này hỏi "điều tôi sắp nói có đúng không". Ba mã thoát, cố ý không gộp: \`OK\` · \`MISMATCH\` · \`UNKNOWN\` — không đọc được thì nói KHÔNG BIẾT, không nói OK. **Chỉ đọc, không đòi khoá nào** |
 | **Không biết làm gì tiếp, hoặc muốn biết việc nào chạy song song được ngay** | \`npm run what-next\` — bản đồ việc, giao ba nguồn: bảng quyền × sổ nợ từng đơn vị × sổ ý tưởng. Luật song song nó cưỡng chế chỉ một câu: hai việc song song được **khi và chỉ khi** thuộc hai khoá khác nhau và cả hai đang trống. **Chỉ đọc, không đòi khoá nào** |
 | **Là phiên ĐIỀU PHỐI: người chốt hỏi "đang có gì · làm gì tiếp · việc nào chạy song song được"** | [docs/protocols/ORCHESTRATOR.md](docs/protocols/ORCHESTRATOR.md) — sổ tay vai điều phối: luật mở phiên, **hàng rào vai cứng** (vai này KHÔNG code, KHÔNG debug, KHÔNG đề xuất bản vá), luật nạp báo cáo năm mục, lối ra bàn giao cho executor. **Đọc khối cảnh báo ở đầu file trước** |
@@ -599,6 +601,66 @@ const CLAIMS_SEED = `{
     "_docs": { "owner": null, "ai": null, "claimed_at": null, "task": null, "released_at": null }
   }
 }
+`;
+
+/* HAI SỔ MÀ LUẬT BẮT DÙNG — hạt giống, không phải file rỗng cho đủ mặt.
+ *
+ * VÌ SAO PHẢI ĐI THEO, đo được 05/09: luật trong khuôn bắt ghi việc ngoài phạm vi vào
+ * `BACKLOG.md` (mục 0 bước 2) và quyết định của người chốt vào `decisions.md` (mục 7 bước 2) —
+ * mà bản trích KHÔNG mang file nào trong hai. Nên repo dựng từ khuôn SINH RA ĐÃ MANG SẴN đúng
+ * bệnh repo nhà mất bốn lượt mới vá xong: luật trỏ tới thứ không tồn tại.
+ *
+ * Hậu quả đã đo ở repo nhà, không suy: `what-next.mjs` đọc `BACKLOG.md` ở sáu chỗ, nên thiếu
+ * file thì bản đồ việc báo "0 việc mở" VĨNH VIỄN — không phải hết việc, mà không có chỗ để việc
+ * rơi vào. Và quyết định của người chốt thì chìm vào `HANDOFF.md`, nơi không ai đi tra quyết định.
+ *
+ * MANG THEO QUY ƯỚC SỔ, KHÔNG CHỈ MANG TIÊU ĐỀ. `what-next.mjs` phân tích cú pháp rất chặt —
+ * sai một ký tự là mục biến mất khỏi bản đồ mà không báo gì. File rỗng không dạy được điều đó. */
+const BACKLOG_SEED = `# BACKLOG — sổ nợ của repo
+
+> **Luật mục 0 bước 2 bắt ghi vào đây:** việc phát sinh ngoài phạm vi phiên mình thì ghi lại,
+> **không tự làm**. Thiếu file này thì luật trỏ vào khoảng không, và \`npm run what-next\` báo
+> "0 việc mở" mãi mãi — không phải vì hết việc, mà vì việc không có chỗ rơi vào.
+
+**Quy ước sổ — \`what-next.mjs\` đọc đúng ba thứ này, sai một ký tự là mục biến mất:**
+
+- Nhóm ưu tiên: một dòng \`## P1\` … \`## P9\`. Mục nằm dưới nhóm nào ăn ưu tiên nhóm đó.
+- Mỗi mục: \`### <MÃ>-<số> · <tiêu đề>\` — chọn một tiền tố mã cho repo này rồi giữ nguyên.
+- Đóng một mục: **gạch ngang mã** — \`### ~~<MÃ>-1~~ · …\`. Giữ lại, đừng xoá: sổ còn dùng để
+  tra lịch sử. Viết \`ĐÓNG\` mà quên gạch thì lệnh **nêu tên mục đó** là khai sai, không im lặng.
+- Mục cần người chốt quyết: thêm một dòng **\`> **CHỜ NGƯỜI CHỐT:** <quyết gì>\`** trong thân mục.
+  Bản đồ việc gom chúng vào mục C. **Phải khai tường minh** — một câu văn xuôi có chữ "chờ người
+  chốt" KHÔNG được tính, cố ý: dò chữ trong văn xuôi thì đổi cách xưng hô một chữ là mục biến
+  mất khỏi bảng, và không ai biết.
+
+---
+
+## P1
+
+_(chưa có mục nào — phiên đầu tiên gặp việc ngoài phạm vi thì ghi vào đây)_
+`;
+
+const DECISIONS_SEED = `# QUYẾT ĐỊNH — người chốt đã chốt gì, ngày nào, vì sao
+
+> **Luật mục 7 bước 2 bắt ghi vào đây.** Thiếu file này thì quyết định hoặc chìm trong
+> \`HANDOFF.md\` (nơi không ai đi tra quyết định), hoặc bốc hơi.
+>
+> **Chỉ THÊM, không sửa mục cũ.** Đổi ý thì ghi mục mới trỏ ngược lại mục cũ — một quyết định bị
+> sửa tại chỗ là một quyết định không ai truy được đã từng nói gì.
+>
+> **Quyết định có lập luận dài thì viết ADR** (\`docs/adr/\`), file này giữ một dòng trỏ sang.
+> Đây là sổ tra nhanh, không phải nơi chứa lập luận.
+
+---
+
+## YYYY-MM-DD · <một câu nói rõ đã chốt gì>
+
+**<Ai> chốt.** <Nội dung quyết định.>
+
+**Vì sao:** <lý do — phần này quan trọng hơn phần trên, vì người sau đọc để biết quyết định còn
+đúng không khi hoàn cảnh đổi.>
+
+**Hệ quả trực tiếp:** <cái gì đổi ngay sau quyết định này.>
 `;
 
 const HANDOFF_SEED = `# HANDOFF — bàn giao giữa các phiên
@@ -750,6 +812,8 @@ export function buildTemplateFiles() {
   files.set(".repo-structure.json", STRUCTURE_SEED);
   files.set(".agents/claims.json", CLAIMS_SEED);
   files.set("HANDOFF.md", HANDOFF_SEED);
+  files.set("BACKLOG.md", BACKLOG_SEED);
+  files.set("decisions.md", DECISIONS_SEED);
   files.set("STATUS.md", STATUS_SEED);
   files.set("README.md", readme(TEMPLATE_VERSION));
   // Chín dòng luật-nghề mà `stripNghe()` tách khỏi luật chung phải HẠ CÁNH ở đâu đó. Không có

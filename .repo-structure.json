@@ -56,11 +56,6 @@
     "build-overview.mjs",
     "build-so-migrate.mjs"
   ],
-  "_generated_files_doc": "File do các bộ sinh trên VIẾT RA. Khác `generators` một chữ, và chỗ khác đó từng làm cổng đỏ vĩnh viễn: không khai thì bộ đếm 'code đã đổi sau lần kiểm chứng' đếm luôn sản phẩm của chính bộ sinh, nên commit sinh lại artifact tự làm artifact vừa sinh cũ đi. Ba file llms.txt, repo-map.json, DASHBOARD.md đã miễn sẵn trong code; khai ở đây những file repo này sinh thêm.",
-  "generated_files": [
-    "DASHBOARD-Ark-Repo-Harness.html",
-    "SO-MIGRATE-Ark-Repo-Harness.html"
-  ],
   "_generators_doc": "Script nào sinh ra artifact đã commit. Cổng đóng phiên đối chiếu từng cái với HEAD. CHỈ khai script repo này THẬT SỰ có — khai thừa là cổng đỏ vì thiếu file.",
   "generated": [
     "DASHBOARD.md",

@@ -19,9 +19,11 @@ import { fileURLToPath } from "node:url";
 import { readStructureFromDisk, unitsFrom, stewardOf, claimPrefixesFrom } from "../scripts/repo-structure.mjs";
 import { danhGia, mucDo, cauHinhDocDuoc } from "../scripts/assess.mjs";
 import { buildTemplateFiles } from "../scripts/build-template.mjs";
-import { isBehaviourFile, LIFECYCLES } from "../scripts/build-dashboard.mjs";
+import { behaviourOptsFrom, isBehaviourFile, LIFECYCLES } from "../scripts/build-dashboard.mjs";
 import { VONG_DOI } from "../scripts/build-overview.mjs";
 import { blockingCodes, checkB10, createBootstrapDeps } from "../scripts/check-bootstrap.mjs";
+import { behaviourGlobsFrom, kiemKhoaLa } from "../scripts/repo-structure.mjs";
+import { readClaims } from "../scripts/claim.mjs";
 
 const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -389,6 +391,106 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     assert.equal(d.status, 0, `file do nam o vung khac thi khong duoc chan oan: ${d.out.slice(0, 300)}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("F11 · giành vùng: đòi câu chốt · ghi vào bảng · từ chối khi vùng còn việc dở · không chặn oan vùng khác");
+}
+
+/* ---- F12. Luat trong khuon KHONG duoc tro toi file ban trich khong mang ------
+ *
+ * HINH DANG LOI DA XAY RA BON LAN trong repo nay, va lan thu tu la lan nang nhat vi no NHAN BAN:
+ *   claim.mjs (03/09) - BACKLOG.md (05/09) - decisions.md (05/09) - ban trich (05/09).
+ * Ba lan dau la mot file thieu o repo nha: mot cho, mot lan sua. Lan thu tu la ban trich PHAT DI
+ * mot bo luat bat dung hai file ma chinh no khong mang theo, tuc MOI repo dung tu khuon sinh ra
+ * DA MANG SAN benh do.
+ *
+ * Do that truoc khi viet phep kiem nay: template/AGENTS.md dong 11 bat ghi vao BACKLOG.md, dong
+ * 175 bat ghi vao decisions.md; ban trich luc do co 28 file, khong file nao trong hai.
+ *
+ * PHEP KIEM NAY CHAN HINH DANG, KHONG CHAN BA CHO. Bang tra o muc 6 cua luat la NOI KHAI moi file
+ * cua repo, va luat tu noi "khong khai = khong ton tai". Nen dao lai: moi duong dan ma bang tra
+ * tro toi PHAI co that trong ban trich. Them mot dong bang tra tro toi file chua mang la do ngay. */
+{
+  const files = buildTemplateFiles();
+  const luat = files.get("AGENTS.md");
+  assert.ok(luat, "ban trich phai co AGENTS.md");
+
+  const links = [...luat.matchAll(/\]\(([^)#\s]+)\)/g)].map((m) => m[1])
+    .filter((h) => !/^https?:/.test(h) && !h.endsWith("/"));
+  assert.ok(links.length >= 5, `bang tra phai co it nhat vai link, dang co ${links.length}`);
+
+  const thieu = links.filter((h) => !files.has(h.replace(/^\.\//, "")));
+  assert.deepEqual(thieu, [],
+    `luat trong khuon tro toi file ban trich KHONG mang: ${thieu.join(", ")}`);
+
+  // HAI FILE CU THE, ghim rieng: chung la ca hong da xay ra that, va khac moi link khac o cho
+  // luat bat BUOC dung chung (muc 0 buoc 2 va muc 7 buoc 2), khong chi gioi thieu.
+  for (const f of ["BACKLOG.md", "decisions.md"]) {
+    assert.ok(files.has(f), `${f}: luat muc 0/muc 7 bat dung, ban trich PHAI mang theo`);
+    // VE THU HAI: mang file rong cho du mat thi khong day duoc gi. Quy uoc so phai di theo, vi
+    // what-next.mjs phan tich cu phap rat chat - sai mot ky tu la muc bien mat, khong bao gi.
+    assert.ok(files.get(f).length > 400,
+      `${f}: phai la HAT GIONG co quy uoc so, khong phai file rong cho du mat`);
+  }
+  ok("F12 - luat trong khuon khong tro toi file ban trich khong mang");
+}
+
+/* ---- F13. BA LOI DO PILOT MIGRATE LOI RA (05/09, repo n8n-orchestrator) -----
+ *
+ * Ba loi nay KHONG loi ra qua bay phien o repo nha, vi repo nha khong dung phai:
+ *   A. repo nha la JS nen khong ai can khai `units.behaviour_globs`
+ *   B. repo nha chua bao gio viet `null` cho mot muc trong bang quyen
+ *   C. repo nha von de Ban do file dung o `AGENTS.md`
+ * Do la ly do pilot ton tai. Ghim lai de lan sau khong phai migrate moi biet. */
+{
+  // --- A. `units.behaviour_globs` PHAI khai duoc, va phai doi duoc hanh vi bo dem.
+  // Truoc 1.3.3: chu thich trong build-dashboard.mjs day dung truong nay, ma validator TU CHOI no.
+  assert.deepEqual(kiemKhoaLa({ units: { behaviour_globs: ["**/*.py"] } }), [],
+    "units.behaviour_globs phai la truong HOP LE — khong duoc bao 'khong nhan ra'");
+  assert.deepEqual(behaviourGlobsFrom({ units: { behaviour_globs: ["**/*.py"] } }), ["**/*.py"]);
+  assert.equal(behaviourGlobsFrom({}), null, "khong khai -> null, giu mac dinh");
+  assert.equal(isBehaviourFile("tools/render.py"), false, "mac dinh KHONG dem .py");
+  assert.equal(isBehaviourFile("tools/render.py", { behaviourGlobs: ["**/*.py"] }), true,
+    "khai .py roi thi PHAI dem .py");
+  // VE DOI CHUNG: khai .py thi .js thoi la nghe cua repo. Thieu ve nay thi mot ban va bien
+  // moi thu thanh "co dem" cung qua duoc phep kiem.
+  assert.equal(isBehaviourFile("app/x.js", { behaviourGlobs: ["**/*.py"] }), false,
+    "khai .py thi .js KHONG con duoc dem");
+  // Dau vao hong phai NOI RO, khong im lang bo qua.
+  assert.throws(() => behaviourGlobsFrom({ units: { behaviour_globs: [] } }), /BEHAVIOUR_GLOBS_HONG/);
+  assert.throws(() => behaviourGlobsFrom({ units: { behaviour_globs: ["khong-co-duoi"] } }), /BEHAVIOUR_GLOBS_HONG/);
+
+  // DUONG TRUYEN: bo dem phai lay CA HAI lop tu cau hinh, khong chi mot.
+  // Bo sinh goi `behaviourOptsFrom(structure)` roi truyen thang xuong `isBehaviourFile`.
+  const opts = behaviourOptsFrom({
+    units: { behaviour_globs: ["**/*.py"] },
+    generated: ["views/BOARD.md"],
+  });
+  assert.deepEqual(opts.behaviourGlobs, ["**/*.py"], "opts phai mang nghe cua repo");
+  assert.deepEqual(opts.generatedFiles, ["views/BOARD.md"], "opts phai mang file may sinh");
+  assert.equal(isBehaviourFile("tools/render.py", opts), true, "qua opts: .py phai duoc dem");
+  assert.equal(isBehaviourFile("views/BOARD.md", opts), false, "qua opts: file may sinh KHONG dem");
+
+  /* GIOI HAN CUA PHEP GHIM NAY, noi thang thay vi de nguoi sau tuong da phu:
+     no ghim ham dung opts, KHONG ghim rang `collectModel` co goi ham do khong. Dot bien thu
+     05/09: go dong truyen opts trong collectModel -> suite nay VAN XANH. Ghim not ve do can
+     dung mot bo `deps` gia day du cho collectModel; da ghi thanh muc no, chua lam. */
+
+
+  // --- B. Bang quyen co muc `null` phai NOI RO, khong duoc nem TypeError.
+  const thu = mkdtempSync(join(tmpdir(), "claims-null-"));
+  try {
+    const f = join(thu, "claims.json");
+    writeFileSync(f, JSON.stringify({ claims: { _root: null } }), "utf8");
+    let loi = null;
+    try { readClaims(f); } catch (e) { loi = e; }
+    assert.ok(loi, "muc `null` phai bi tu choi, khong duoc di tiep");
+    assert.match(loi.message, /CLAIMS_MUC_HONG/, "phai la loi CO MA, khong phai TypeError");
+    assert.doesNotMatch(loi.message, /Cannot read properties/, "khong duoc de TypeError lot ra");
+    assert.match(loi.message, /owner/, "phai in ra KHUON DUNG de nguoi ta sua duoc");
+    // DOI CHUNG: khuon dung thi van doc binh thuong.
+    writeFileSync(f, JSON.stringify({ claims: { _root: { owner: null } } }), "utf8");
+    assert.doesNotThrow(() => readClaims(f), "khuon dung PHAI van chay");
+  } finally { rmSync(thu, { recursive: true, force: true }); }
+
+  ok("F13 - ba loi pilot: behaviour_globs khai duoc va doi hanh vi - bang quyen null noi ro thay vi no");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

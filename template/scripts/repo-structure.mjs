@@ -465,30 +465,26 @@ export function profileFrom(parsed) {
    cổng cấu trúc. */
 export const DEFAULT_GENERATORS = Object.freeze(["build-dashboard.mjs", "feature-parity.mjs"]);
 
-/* FILE DO BỘ SINH VIẾT RA — khác `generators` (tên SCRIPT) một chữ, và chính chỗ khác đó là
- * cái bẫy. `generators` trả lời "chạy lệnh nào để sinh lại"; khối này trả lời "lệnh đó ĐẺ RA
- * file nào". Không có vế thứ hai thì bộ đếm "code đã đổi sau lần kiểm chứng" đếm luôn sản phẩm
- * của chính bộ sinh — và một commit sinh lại artifact tự làm artifact vừa sinh cũ đi ngay.
+/* NGHỀ NÀO ĐẾM FILE NGHỀ ẤY. Bộ đếm "code đã đổi sau lần kiểm chứng" mặc định chỉ nhìn
+ * .js/.mjs/.json/.css/.html — tức nó ĐO ĐƯỢC ĐÚNG MỘT NGHỀ. Repo Python thì `tools/*.py` đổi cả
+ * ngày mà cột đó vẫn nói KHÔNG, và không ai biết nó đang mù.
  *
- * ĐO THẬT 05/09, đó là lý do khối này ra đời: `DASHBOARD-<repo>.html` và `SO-MIGRATE-<repo>.html`
- * mang đuôi `.html` nên lọt vào danh sách đuôi file hành vi. Cổng đóng phiên có một mục đỏ
- * VĨNH VIỄN, không thứ tự commit nào hội tụ được.
- *
- * KHAI Ở CẤU HÌNH, KHÔNG ĐÓNG CỨNG TRONG CODE — tên hai file đó mang tên dự án, mà file này đi
- * theo bản trích sang mọi repo. Đóng cứng là phát tên repo gốc đi khắp nơi, và là đúng cái bệnh
- * "đo được đúng một nghề" mà `duoiTuGlob()` phía dưới sinh ra để chữa. */
-export function generatedFilesFrom(parsed) {
-  const value = parsed?.generated_files;
-  if (value === undefined) return Object.freeze([]);
-  if (!Array.isArray(value)) {
-    throw new Error("GENERATED_FILES_HONG: `generated_files` phải là mảng đường dẫn tương đối tính từ gốc repo (hoặc bỏ hẳn).");
+ * VẤP THẬT 05/09, lượt migrate `n8n-orchestrator`: trường này được chú thích trong
+ * `build-dashboard.mjs` như thể đã dùng được, nhưng `kiemKhoaLa()` TỪ CHỐI nó — repo Python khai
+ * vào là lệnh nổ ngay. Chú thích dạy một trường, bộ kiểm cấm trường ấy, và không ai đối chiếu
+ * hai chỗ. Nay trường hợp lệ, và hàm này là chỗ duy nhất đọc nó. */
+export function behaviourGlobsFrom(parsed) {
+  const value = parsed?.units?.behaviour_globs;
+  if (value === undefined) return null;              // null = repo không khai, giữ mặc định
+  if (!Array.isArray(value) || value.length === 0) {
+    throw new Error("BEHAVIOUR_GLOBS_HONG: `units.behaviour_globs` phải là mảng không rỗng các mẫu như \"**/*.py\" (hoặc bỏ hẳn để dùng mặc định).");
   }
-  for (const name of value) {
-    if (typeof name !== "string" || name === "") {
-      throw new Error(`GENERATED_FILES_HONG: mỗi phần tử phải là một đường dẫn. Đang là: ${JSON.stringify(name)}`);
+  for (const g of value) {
+    if (typeof g !== "string" || !g.includes(".")) {
+      throw new Error(`BEHAVIOUR_GLOBS_HONG: mỗi mẫu phải là chuỗi có phần đuôi, ví dụ "**/*.py". Đang là: ${JSON.stringify(g)}`);
     }
   }
-  return Object.freeze(value.map((n) => n.replaceAll("\\", "/")));
+  return Object.freeze([...value]);
 }
 
 export function generatorsFrom(parsed) {
@@ -547,7 +543,7 @@ export function unitDirsUnder(areaPath, units = DEFAULT_UNITS, listDirs) {
  * Đúng là kiểu hỏng mà cả lớp cấu hình này sinh ra để chặn: repo tưởng đang được canh, thật ra
  * không. Nên: trường lạ = NÉM. Thà chặn một cấu hình hợp lệ mà lạ, còn hơn im lặng bỏ canh.
  * Trường bắt đầu bằng `_` được miễn — bản hạt giống dùng `_doc`, `_ten_doc` để chú thích. */
-const KHOA_UNITS = new Set(["root_dir", "marker", "depth", "ten"]);
+const KHOA_UNITS = new Set(["root_dir", "marker", "depth", "ten", "behaviour_globs"]);
 const KHOA_AREA = new Set(["steward", "ownership_mode", "claim_prefix", "mutability", "note"]);
 
 export function kiemKhoaLa(parsed) {

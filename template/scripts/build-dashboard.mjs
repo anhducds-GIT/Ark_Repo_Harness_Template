@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { DEFAULT_UNITS, generatedFilesFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, unitsFrom } from "./repo-structure.mjs";
+import { behaviourGlobsFrom, DEFAULT_UNITS, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, unitsFrom } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -490,11 +490,32 @@ function measuredRow(deps, dirRelPath, manifestRelPath, tracked = trackedIndex(d
    (kèm mã B2/B5/B7/DRIFT) thay vì ném ra.
    Lỗi ĐẦU VÀO HỎNG (claims.json, .repo-structure.json) vẫn ném ở cả hai chế độ: đó không
    phải "một đơn vị khai sai" mà là "không đọc nổi bảng chủ sở hữu" — đoán tiếp là nói dối. */
+/* HAI LOP "DO CHO DUNG" GOM VE MOT CHO, va tach ra de ghim duoc.
+ *
+ * `generated`      — file do bo sinh viet ra, khong duoc dem la code doi.
+ * `behaviour_globs` — nghe cua repo. Mac dinh chi nhin .js/.mjs/.json/.css/.html, tuc DO DUOC
+ *                     DUNG MOT NGHE; repo Python thi tools/*.py doi ca ngay ma cot van noi KHONG.
+ *
+ * Truoc 1.3.3 lop thu hai co ham nhung KHONG AI TRUYEN VAO, va validator con TU CHOI truong do —
+ * chu thich day mot dang, bo kiem cam dang ay. Vap that o luot migrate `n8n-orchestrator` 05/09.
+ * Tach thanh ham rieng chinh vi the: mot ham export duoc thi ghim duoc, mot bieu thuc noi trong
+ * `collectModel` thi khong. */
+export function behaviourOptsFrom(structure) {
+  return {
+    generatedFiles: generatedFrom(structure),
+    behaviourGlobs: behaviourGlobsFrom(structure) || undefined,
+  };
+}
+
 export function collectModel(deps = createDefaultDeps(), { tolerant = false } = {}) {
   const tracked = trackedIndex(deps);
   const units = readUnits(deps);
   const structure = deps.fileExists(STRUCTURE_FILE) ? readJson(deps, STRUCTURE_FILE) : {};
-  const behaviourOpts = { generatedFiles: generatedFilesFrom(structure) };
+  // Dung CHINH khoi `generated` da co, khong dat khoi moi. Ban 1.3.1 tung them
+  // `generated_files` cho viec nay — TRUNG LAP: `generated` da liet ke dung nhung file do,
+  // chi khac muc dich su dung (mien nhan quyen). Hai ten cho mot khai niem la hai cho phai
+  // nho cap nhat, va cho thu hai se bi quen.
+  const behaviourOpts = behaviourOptsFrom(structure);
   const repo = repoIdentityFrom(structure);
   const profile = profileFrom(structure);
   // Ở chế độ tolerant, một `manifest.json` thiếu/hỏng không được phép giết cả lượt chạy —

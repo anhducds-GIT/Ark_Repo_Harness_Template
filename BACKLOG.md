@@ -164,6 +164,8 @@ vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng c
 
 ### KHUNG-11 · Repo đã vượt ngân sách cân nặng của chính nó
 
+> **CHỜ NGƯỜI CHỐT:** bớt cái gì trong 998 dòng vượt ngân sách — đây là tài liệu của repo, không phải code thừa.
+
 `can-nang.mjs` đặt ngân sách tài liệu **2.200 dòng**. **Đo lại độc lập 05/09: 3.198 dòng — vượt
 998 dòng, 45%.** (Codex báo 3.169; chênh vì `BACKLOG.md` vừa thêm. Hai lượt đo khớp nhau.)
 `AGENTS.md` mục 8 nói rõ: quá ngân sách thì **phải BỚT trước khi nghĩ tới nới**.
@@ -176,7 +178,7 @@ chậm tới mức người ta ngại chạy là phép kiểm sắp bị bỏ qu
 Bớt cái gì thì cần Đức chốt hướng — đây là tài liệu của repo, không phải code thừa. Vùng:
 `_docs` + `_root`.
 
-### KHUNG-12 · Lớp "nghề nào đếm file nghề ấy" chưa từng chạy ở luồng thật
+### ~~KHUNG-12~~ · Lớp "nghề nào đếm file nghề ấy" chưa từng chạy ở luồng thật
 
 Phát hiện khi vá KHUNG-1. `isBehaviourFile()` nhận `opts.behaviourGlobs` để repo Python khai
 `**/*.py` mà đếm cho đúng — nhưng trước bản 1.3.1, `changedCommitCount()` gọi nó **không kèm
@@ -226,6 +228,8 @@ bất cứ dòng nào.
 
 ### KHUNG-16 · `DASHBOARD.md` nhúng mã commit HEAD nên KHÔNG THỂ hội tụ
 
+> **CHỜ NGƯỜI CHỐT:** chọn một trong ba lối (bỏ mã commit · nhúng mã commit cha · miễn hai dòng khỏi phép so) — là quyết định kiến trúc, không phải bản vá.
+
 **Đo dứt điểm 05/09.** Sau khi bản 1.3.1 vá cột `changedCount` và mốc kiểm chứng được cập nhật,
 trang vẫn lệch mỗi lượt — và diff cho thấy **đúng hai dòng**:
 
@@ -253,3 +257,93 @@ mà đi "sửa bug" sẽ không tìm thấy bug nào. Ba lối, chọn một là
 commit**, và mọi phiên đều phải chạy thêm một vòng sinh-lại-commit vô ích rồi vẫn đỏ. Đây là lý
 do thật khiến mục đó đỏ suốt nhiều phiên trước — bản 1.3.1 vá **một** trong **hai** đường; đây là
 đường còn lại. Vùng: `_code`.
+
+### KHUNG-17 · Mục "đang chờ người chốt" của bản đồ việc CHỈ đọc sổ ý tưởng, không đọc sổ nợ
+
+**Đo 05/09.** `npm run what-next` in ra:
+
+```
+C · ĐANG CHỜ NGƯỜI CHỐT — 0 mục, không ai làm thay được
+  (không có)
+```
+
+Trong khi sổ nợ **đang có ít nhất hai mục cần người chốt**: KHUNG-11 (*bớt cái gì trong 998 dòng
+vượt ngân sách*) và KHUNG-16 (*chọn một trong ba lối cho mã commit nhúng trong trang*).
+
+Nguyên nhân ở `scripts/what-next.mjs:285` — `locChoNguoiChot(ideas, …)` lọc từ **`IDEAS.md`**,
+không từ `BACKLOG.md`. Repo này không có `IDEAS.md`, nên mục C luôn rỗng.
+
+**Vì sao nguy hiểm hơn một mục hiển thị thiếu:** dòng in ra là *"0 mục, không ai làm thay được"*
+— tức nó **khẳng định đã kiểm và không có gì**. Chính công cụ này ở chỗ khác phân biệt rất kỹ
+giữa *"0 vì đã kiểm"* và *"KHÔNG LỌC ĐƯỢC"*; ở đây nó nói vế thứ nhất trong khi thực tế là chưa
+nhìn vào đúng sổ. Người chốt đọc bảng và tin rằng mình không có gì phải quyết.
+
+Sửa được theo hai hướng, và cần chọn: (a) mục C đọc cả sổ nợ, nhận diện bằng một quy ước khai
+tay trong mục nợ; hay (b) giữ nguyên phạm vi nhưng **đổi câu chữ** cho đúng — *"0 mục trong sổ ý
+tưởng; mục nợ KHÔNG được lọc ở đây"*. Hướng (b) rẻ hơn nhiều và đã đủ chặn cái hại chính.
+Vùng: `_code`.
+
+### KHUNG-18 · Mã việc không nhận tiền tố có SỐ — repo tên chứa số vấp ngay
+
+**Vấp thật 05/09, lượt migrate `n8n-orchestrator`.** Mã việc tự nhiên cho repo đó là `N8N-1`.
+Bản đồ việc **bỏ qua im lặng** — `MA_VIEC = /^###\s+~*\s*([A-Z]+-\d+)~*.../` đòi tiền tố CHỈ
+gồm chữ cái, nên `N8N` không khớp.
+
+**Không có cảnh báo nào.** Mục nằm trong sổ, đúng định dạng `### <MÃ>-<số> · <tiêu đề>` theo mắt
+người đọc, và biến mất khỏi bảng. Đây đúng cái mà quy ước sổ tự cảnh báo — *"sai quy ước một ký
+tự là mục biến mất"* — nhưng ở đây người viết **không sai quy ước**: quy ước chưa bao giờ nói
+tiền tố phải toàn chữ cái.
+
+Phải lách bằng cách đổi mã sang `CP-`. Repo nào tên chứa số (n8n · s3 · web3 · i18n) đều vấp.
+
+Hai lối: (a) nới regex cho phép chữ+số trong tiền tố — cẩn thận đừng để `## P1` lọt vào; hay
+(b) giữ nguyên nhưng **nói rõ trong quy ước sổ** và cho lệnh **nêu tên mục bị bỏ qua** thay vì im
+lặng. Lối (b) rẻ hơn và chữa đúng cái hại chính: im lặng. Vùng: `_code`.
+
+### ~~KHUNG-19~~ · Cổng đóng cứng vị trí "Bản đồ file" ở AGENTS.md
+
+**Vấp thật 05/09.** Repo `n8n-orchestrator` để Bản đồ file ở `design_brief.md` mục 8 — hợp lệ
+theo luật của chính nó, và luật đó có trước bộ khung. Cổng đóng phiên **chỉ tìm trong
+`AGENTS.md`**, nên đỏ cho tới khi phải thêm một mục thứ hai vào `AGENTS.md`.
+
+Kết quả: repo đó nay có **hai** bản đồ file ở hai file khác nhau. Chạy được, nhưng là hai nguồn
+cho một khái niệm — đúng bệnh mà cả bộ khung sinh ra để chữa, và lần này **bộ khung là thủ phạm**.
+
+Sửa: cho repo khai nơi đặt bản đồ trong `.repo-structure.json` (ví dụ `docs.file_map`), mặc định
+vẫn là `AGENTS.md`. Vùng: `_code`.
+
+### ~~KHUNG-20~~ · `units.behaviour_globs` bị validator TỪ CHỐI, dù chú thích trong code dạy đúng trường đó
+
+**Vấp thật 05/09, và đây là KHUNG-12 nặng hơn tưởng.** Khai `units.behaviour_globs` vào
+`.repo-structure.json` thì `readStructureFromDisk` **ném lỗi**:
+`CAU_TRUC_HONG: units.behaviour_globs — không phải trường hợp lệ. Hợp lệ: root_dir, marker, depth, ten`
+
+Trong khi `build-dashboard.mjs:416` viết nguyên văn: *"Nên repo tự khai `units.behaviour_globs`"*.
+
+Tức lớp "nghề nào đếm file nghề ấy" **không dùng được**: chú thích dạy một trường, bộ kiểm cấm
+trường ấy, và không ai đối chiếu hai chỗ. KHUNG-12 nói lớp đó *chưa được truyền vào luồng thật*;
+đo tiếp thì hoá ra nó còn **chưa khai được**.
+
+**Hậu quả đang sống:** repo `n8n-orchestrator` là Python + YAML, phải gỡ khai báo để chạy tiếp,
+nên cột "code đã đổi sau lần kiểm chứng" ở đó **mù với `tools/*.py` và `state/*.yaml`** — tức mù
+với gần như toàn bộ repo. Làm cùng lượt với KHUNG-12. Vùng: `_code`.
+
+### ~~KHUNG-21~~ · `claim.mjs` crash khi một khoá có giá trị `null`
+
+**Vấp thật 05/09.** Bảng quyền khai `{"_root": null}` — cách viết tự nhiên cho "chưa ai giữ" —
+làm `claim.mjs --list` **ném `TypeError: Cannot read properties of null (reading 'owner')`** và
+chết ở dòng 143.
+
+Khuôn đúng là object đủ năm trường, nhưng **không chỗ nào nói thế**, và lệnh không nói ra khi
+gặp `null` — nó nổ. So với chính triết lý của bộ khung: đầu vào hỏng thì phải **nói rõ hỏng ở
+đâu**, không phải rơi stack trace vào mặt người dùng. Vùng: `_code`.
+
+### KHUNG-22 · Chưa ghim được "collectModel có truyền opts xuống không"
+
+Lộ ra khi đột biến bản vá 1.3.3. Phép ghim F13 kiểm `behaviourOptsFrom()` trả đúng, và
+`isBehaviourFile()` nhận đúng — nhưng **gỡ dòng truyền opts trong `collectModel` thì suite vẫn
+XANH**. Tức vế "bộ sinh có thật sự dùng lớp đó không" chưa có ai canh.
+
+Đây đúng hình dạng của KHUNG-12 vừa đóng: hàm đúng, không ai gọi, chú thích nói như thể đã dùng.
+Ghim được vế này cần một bộ `deps` giả đầy đủ cho `collectModel` — chưa có helper nào trong
+`tests/`, nên là một lượt riêng. Ghi ra thay vì để người sau tưởng F13 đã phủ. Vùng: `_code`.

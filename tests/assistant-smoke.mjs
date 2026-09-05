@@ -647,4 +647,37 @@ kiem("artifactSoVoiHead: bộ sinh đã khai mà KHÔNG có file → khop null, 
   }
 }
 
+/* ---- CO "CHO NGUOI CHOT" trong so no -------------------------------------
+ *
+ * CA HONG DA XAY RA THAT, 05/09: muc C cua ban do CHI doc so y tuong (IDEAS.md). Repo khong co
+ * so do thi muc C in ra "0 muc, khong ai lam thay duoc" — tuc KHANG DINH da kiem va khong co gi —
+ * trong khi so no dang co HAI muc can nguoi chot. Nguoi chot doc bang roi tin minh khong phai
+ * quyet gi. Do that o repo nha: 2 muc cho chot, bang bao 0.
+ *
+ * CO KHAI TUONG MINH, KHONG DO TEN TRONG VAN XUOI. Ban cu lay ten nguoi chot roi tim ten do
+ * trong truong "viec ke" — doi cach xung ho mot chu la muc bien mat, va khong ai biet. */
+kiem("so no: co CHO NGUOI CHOT khai tuong minh, van xuoi khong trung, khong dinh sang muc sau", () => {
+  const { mo } = parseBacklog([
+    "## P1",
+    "### K-1 · muc can quyet",
+    "> **CHỜ NGƯỜI CHỐT:** chon mot trong ba loi",
+    "### K-2 · muc thuong",
+    "van xuoi noi viec nay cho nguoi chot quyet, nhung KHONG phai dong khai",
+    "### K-3 · muc thuong khac",
+  ].join(String.fromCharCode(10)));
+
+  assert.equal(mo.length, 3, "phai doc du ba muc");
+  assert.equal(mo[0].choChot, true, "K-1 khai co tuong minh -> phai la cho chot");
+  // VE DOI CHUNG, va khong co no thi ve tren vo nghia: van xuoi KHONG duoc tinh la co.
+  assert.equal(mo[1].choChot, false, "K-2 chi co van xuoi -> KHONG duoc tinh la cho chot");
+  assert.equal(mo[2].choChot, false, "K-3 khong co gi -> khong phai cho chot");
+
+  // Co cua muc truoc KHONG duoc dinh sang muc sau.
+  const { mo: m2 } = parseBacklog([
+    "### A-1 · a", "> **CHỜ NGƯỜI CHỐT:** x", "### A-2 · b",
+  ].join(String.fromCharCode(10)));
+  assert.equal(m2[0].choChot, true, "A-1 phai co co");
+  assert.equal(m2[1].choChot, false, "co KHONG duoc dinh sang muc ke tiep");
+});
+
 console.log(`\n${so} passed, 0 failed, ${so} total`);

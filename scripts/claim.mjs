@@ -34,6 +34,8 @@ export const CLAIMS_FILE = path.join(ROOT, ".agents", "claims.json");
 
 export const EXIT = Object.freeze({ OK: 0, MISUSE: 2, REFUSED: 3, CLOBBERED: 4 });
 
+const KHUON_MUC = '"owner": null, "ai": null, "claimed_at": null, "task": null, "released_at": null }';
+
 export function readClaims(file = CLAIMS_FILE) {
   let raw;
   try { raw = fs.readFileSync(file, "utf8"); }
@@ -43,6 +45,24 @@ export function readClaims(file = CLAIMS_FILE) {
   catch (error) { throw new Error(`CLAIMS_HONG: không phải JSON đọc được (${error.message}). Sửa tay rồi chạy lại.`); }
   if (!parsed || typeof parsed.claims !== "object" || Array.isArray(parsed.claims)) {
     throw new Error("CLAIMS_HONG: thiếu khối `claims` dạng object.");
+  }
+  /* MỖI MỤC PHẢI LÀ OBJECT, và nói ra ngay tại cửa nếu không.
+   * VẤP THẬT 05/09, lượt migrate `n8n-orchestrator`: bảng quyền khai `{"_root": null}` — cách
+   * viết tự nhiên cho "chưa ai giữ" — và `--list` NỔ với `TypeError: Cannot read properties of
+   * null (reading 'owner')`, rơi stack trace vào mặt người dùng ở dòng 143.
+   * Không nhận `null` là "trống", cố ý: hai cách biểu diễn cùng một trạng thái thì phép so sánh
+   * bảng-trên-máy ↔ bảng-trên-remote có hai kết quả cho cùng một sự thật. Một cách viết, và
+   * khi sai thì NÓI RÕ SAI Ở ĐÂU — đó là điều bộ khung này làm ở mọi cửa vào khác. */
+  for (const [key, value] of Object.entries(parsed.claims)) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new Error(
+        "CLAIMS_MUC_HONG: khoa " + '`' + key + '`' + " phai la object, dang la "
+          + (value === null ? "null" : typeof value) + ".\n"
+          + "  Khuon dung: " + JSON.stringify(key) + ": { " + KHUON_MUC + "\n"
+          + "  Viet null cho ca muc la cach viet tu nhien cho chua-ai-giu, nhung KHONG hop le:\n"
+          + "  hai cach bieu dien cung mot trang thai lam phep doi chieu bang quyen co hai ket qua."
+      );
+    }
   }
   return parsed;
 }

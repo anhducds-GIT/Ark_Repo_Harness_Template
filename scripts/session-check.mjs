@@ -426,6 +426,13 @@ check("Không có secret lọt vào repo", () => {
   };
 });
 
+/* File nào chứa Bản đồ file. Repo khai `docs.file_map` trong `.repo-structure.json`; không khai
+   thì vẫn là `AGENTS.md` như trước — repo cũ không phải đổi gì. */
+const FILE_BAN_DO = (() => {
+  const v = structure?.docs?.file_map;
+  return typeof v === "string" && v.trim() ? v.trim() : "AGENTS.md";
+})();
+
 /* ---- 4. File mới phải khai vào Bản đồ file ------------------------------ */
 check("File mới đã khai vào Bản đồ file", () => {
   // LỌC THEO VÙNG MÌNH GIỮ LÀ ĐÚNG — nhưng lọc còn RỖNG thì KHÔNG phải "đã đạt".
@@ -490,12 +497,18 @@ check("File mới đã khai vào Bản đồ file", () => {
     // thư mục top-level mới mà không khai vào bản đồ thì không ai bắt — đúng lỗ mà luật vàng 4
     // ("không khai = không tồn tại") sinh ra để bịt.
     const base = pkgDir ?? "";
-    const agentsPath = path.join(ROOT, base, "AGENTS.md");
+    /* NƠI ĐẶT BẢN ĐỒ DO REPO KHAI, mặc định `AGENTS.md`.
+     * VẤP THẬT 05/09, lượt migrate `n8n-orchestrator`: repo đó để Bản đồ file ở
+     * `design_brief.md` mục 8 — hợp lệ theo luật của chính nó, và luật đó có TRƯỚC bộ khung.
+     * Cổng chỉ tìm trong `AGENTS.md` nên đỏ cho tới khi phải thêm một mục thứ hai vào
+     * `AGENTS.md`. Kết quả: repo đó nay có HAI bản đồ ở hai file — hai nguồn cho một khái niệm,
+     * đúng bệnh mà cả bộ khung sinh ra để chữa, và lần đó bộ khung là thủ phạm. */
+    const agentsPath = path.join(ROOT, base, FILE_BAN_DO);
     if (!fs.existsSync(agentsPath)) continue;
     const rest = pkgDir ? file.slice(pkgDir.length + 1) : file;
-    if (!rest || rest === "AGENTS.md") continue;
+    if (!rest || rest === FILE_BAN_DO) continue;
     const map = mapSection(fs.readFileSync(agentsPath, "utf8"));
-    if (map === null) { thieuBanDo.push(path.join(base, "AGENTS.md").replaceAll("\\", "/")); continue; }
+    if (map === null) { thieuBanDo.push(path.join(base, FILE_BAN_DO).replaceAll("\\", "/")); continue; }
     // KHAI MỘT THƯ MỤC LÀ ĐÃ KHAI NHỮNG GÌ TRONG NÓ.
     //
     // Bản đầu chỉ nhận đúng đường dẫn đầy đủ. Nghe thì chặt, nhưng dùng thật thì hỏng: mỗi hồ sơ

@@ -1201,3 +1201,36 @@ hành vi) — đúng và có đột biến chứng minh. Đường thứ hai là
 "một bug, không phải hai" sau khi Codex bác — **kết luận đó đúng cho phạm vi đang xét lúc đó**
 (hai con số 11/12 là một bộ đếm hai thời điểm), nhưng mục đỏ tổng thể thì thật sự có hai nguồn.
 Ghi ra vì đây là lần thứ hai trong một ngày tôi phải chỉnh lại chính chẩn đoán của mình về mục này.
+
+## 2026-09-05 · `claude-fix-abc` — BẢN 1.3.3: ba lỗi mà bảy phiên ở nhà không tìm ra
+
+**Đức chốt: fix cả ba lỗi A/B/C rồi phát bản mới.** Đã làm. Điểm đáng ghi nhất không phải ba bản
+vá, mà là **vì sao chúng sống sót**: cả ba chỉ lộ ra khi lắp bộ khung vào một repo THẬT khác nghề.
+Repo nhà không dính lỗi nào trong ba — nó là JS, nó chưa bao giờ viết `null` vào bảng quyền, và
+nó vốn để Bản đồ file đúng chỗ bộ khung mong đợi.
+
+**(A) `units.behaviour_globs` bị validator TỪ CHỐI** dù `build-dashboard.mjs:416` dạy đúng trường
+đó. Đo tiếp thì lỗi sâu hơn: lớp đó **chưa từng được truyền vào luồng thật**. Nay trường hợp lệ,
+có `behaviourGlobsFrom()`, và đã nối. Đóng luôn KHUNG-12 và KHUNG-20.
+**(B) `claim.mjs` NỔ khi bảng quyền có mục `null`** — `TypeError` rơi vào mặt người dùng. Nay trả
+mã `CLAIMS_MUC_HONG` kèm khuôn đúng. Không nhận `null` là "trống", cố ý: hai cách biểu diễn cùng
+một trạng thái làm phép đối chiếu bảng-máy ↔ bảng-remote có hai kết quả. Đóng KHUNG-21.
+**(C) Cổng đóng cứng vị trí Bản đồ file.** Nay repo khai `docs.file_map`; không khai thì vẫn là
+`AGENTS.md`. Đóng KHUNG-19.
+
+**MỘT ĐỘT BIẾN KHÔNG ĐỎ, và tôi ghi ra thay vì giấu.** Ba đột biến chạy: bỏ trường khỏi danh sách
+hợp lệ → đỏ · bỏ hàng kiểm bảng quyền → đỏ · **gỡ dòng truyền opts trong `collectModel` → VẪN
+XANH**. Ca thứ ba chứng minh phép ghim mới chỉ canh *hàm dựng opts*, không canh *bộ sinh có gọi
+hàm đó không* — **đúng hình dạng lỗi vừa vá**. Đã ghi KHUNG-22 và **nói thẳng giới hạn ngay
+trong chú thích của phép kiểm**, để người sau không tưởng F13 đã phủ.
+
+**Kiểm chứng trên repo thật, không chỉ trên fixture:** nâng `n8n-orchestrator` lên 1.3.3, khai
+lại đúng hai thứ từng làm lệnh nổ. Đọc cấu hình thật của repo đó: `tools/render.py` → **được
+đếm**, `state/backlog.yaml` → **được đếm**, `views/BOARD.md` (máy sinh) → **không đếm**. Hai lớp
+chạy cùng lúc, đúng thiết kế.
+
+**Số:** repo nhà `npm test` **148 xanh, 0 đỏ** (145 → 148). Repo n8n: **53 phép xanh**, cổng đóng
+phiên **11/11 XANH**, cổng cấu trúc 0 đỏ. Bản `1.3.2` → `1.3.3`.
+
+**CÒN MỞ:** KHUNG-18 (mã việc tiền tố có số bị bỏ qua im lặng — `N8N-1` phải đổi thành `CP-1`)
+**chưa vá**; Đức chốt ba lỗi A/B/C, mục này không nằm trong đó.
