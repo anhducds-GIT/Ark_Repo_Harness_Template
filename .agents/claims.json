@@ -3,31 +3,31 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-dieu-phoi",
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Cam suite Assistant vao npm test, them hai lenh chay duoc, khai vao bang so tay",
-      "released_at": "2026-09-05",
-      "taken_from": "claude-so-migrate",
-      "taken_by": "claude-multiflow",
-      "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
-    },
-    "_docs": {
-      "owner": "claude-exec-promoteA2",
-      "ai": null,
-      "claimed_at": "2026-09-05",
-      "task": "Port so tay vai dieu phoi sang bo khung",
+      "task": "Khai ORCHESTRATOR.md vao ban do file + dong luot",
       "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
-    "_code": {
+    "_docs": {
       "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Thu pha state-check.mjs de chung minh suite Assistant co rang (hoan nguyen sau)",
-      "released_at": "2026-09-05",
+      "task": "Port so tay vai dieu phoi sang bo khung",
+      "released_at": "2026-09-05T16:20",
+      "taken_from": "claude-so-migrate",
+      "taken_by": "claude-multiflow",
+      "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
+    },
+    "_code": {
+      "owner": "claude-exec-crlf",
+      "ai": null,
+      "claimed_at": "2026-09-05",
+      "task": "Va loi phep kiem phu thuoc kieu xuong dong trong tests/assistant-smoke.mjs",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"

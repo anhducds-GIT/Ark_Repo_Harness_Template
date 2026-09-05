@@ -30,8 +30,25 @@ import {
 } from "../scripts/what-next.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const NGUON_STATE = readFileSync(join(ROOT, "scripts", "state-check.mjs"), "utf8");
-const NGUON_NEXT = readFileSync(join(ROOT, "scripts", "what-next.mjs"), "utf8");
+/* MỌI phép ghim tầng mã nguồn đọc qua ĐÚNG CỬA NÀY, và cửa chuẩn hoá xuống dòng về LF.
+ *
+ * VÌ SAO: repo không có `.gitattributes`, nên ở máy Windows bật `core.autocrlf` thì lượt
+ * `git checkout` trả file về CRLF, còn máy vừa GHI file thì để LF. Cùng MỘT commit, hai
+ * dạng byte — và `git status` nói SẠCH ở cả hai. Đo thật: bản vừa ghi 52 xanh, bản vừa
+ * checkout (tức bản mà BẤT KỲ AI clone repo này cũng nhận được) chết ở phép thứ 29.
+ *
+ * Những phép ghim này khẳng định về CẤU TRÚC MÃ — có mấy chỗ gọi tiến trình con, nhập từ
+ * `node:fs` những tên nào, còn đóng cứng tên khoá vùng không. Không phép nào trong số đó
+ * nói về kiểu xuống dòng. Nên chúng phải đọc CÙNG MỘT THỨ ở cả hai dạng file.
+ *
+ * Chuẩn hoá ở MỘT CHỖ, chứ không rắc `\r?` vào từng phép khẳng định: rắc từng chỗ thì chỗ
+ * thứ tám bị quên, và triệu chứng lại đúng là cái đã cắn một lần — "phép kiểm tự nhiên hỏng".
+ * Chuẩn hoá KHÔNG làm yếu phép nào: nó bỏ đi byte xuống dòng, không bỏ đi điều được khẳng định.
+ */
+const docNguon = (ten) => readFileSync(join(ROOT, "scripts", ten), "utf8")
+  .replace(/\r\n/g, "\n");
+const NGUON_STATE = docNguon("state-check.mjs");
+const NGUON_NEXT = docNguon("what-next.mjs");
 
 let so = 0;
 const kiem = (ten, fn) => { fn(); so += 1; console.log("  ok  " + ten); };
