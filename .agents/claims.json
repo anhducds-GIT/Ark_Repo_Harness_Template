@@ -3,31 +3,31 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-exec-harness-wire",
       "ai": null,
-      "claimed_at": "2026-09-04",
-      "task": "dong phien so migrate HTML: chay cong duoi dung nhan",
-      "released_at": "2026-09-04",
+      "claimed_at": "2026-09-05",
+      "task": "Cam suite Assistant vao npm test, them hai lenh chay duoc, khai vao bang so tay",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": null,
+      "owner": "claude-exec-promoteA2",
       "ai": null,
-      "claimed_at": "2026-09-04",
-      "task": "dong phien so migrate HTML",
-      "released_at": "2026-09-04",
+      "claimed_at": "2026-09-05",
+      "task": "Port so tay vai dieu phoi sang bo khung",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-exec-harness-wire",
       "ai": null,
-      "claimed_at": "2026-09-04",
-      "task": "dong phien so migrate HTML",
-      "released_at": "2026-09-04",
+      "claimed_at": "2026-09-05",
+      "task": "Thu pha state-check.mjs de chung minh suite Assistant co rang (hoan nguyen sau)",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
