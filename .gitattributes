@@ -1,0 +1,15 @@
+# KIỂU XUỐNG DÒNG DO REPO QUYẾT ĐỊNH, không do máy của người đang clone quyết định.
+#
+# Vì sao có file này — đo thật, không suy: máy Windows bật chế độ tự đổi kiểu xuống dòng, nên
+# `git checkout` trả file về CRLF trong khi máy vừa GHI file thì để LF. Cùng MỘT commit có hai
+# dạng byte, và `git status` nói SẠCH ở cả hai. Đo được ngay trước khi thêm file này: cùng một
+# cây làm việc, cùng một commit — 75 file LF và 21 file CRLF, cổng vẫn xanh.
+#
+# Hệ quả đã cắn thật: một phép kiểm đọc mã nguồn rồi cắt theo dòng XANH trên máy vừa ghi file
+# và ĐỎ với người vừa clone — 28 xanh rồi chết. Triệu chứng trông như "phép kiểm tự nhiên
+# hỏng", nên không ai đi tìm đúng chỗ. Bản vá hồi đó chỉ chặn ở một suite; file này chặn ở
+# TOÀN BỘ repo, tức chặn ở gốc bệnh.
+#
+# `eol=lf` chốt CẢ trong kho LẪN trong cây làm việc. Chốt một nửa — chỉ `text=auto` — thì kho
+# sạch mà cây làm việc vẫn CRLF, tức đúng cái bệnh này vẫn còn nguyên.
+* text=auto eol=lf
