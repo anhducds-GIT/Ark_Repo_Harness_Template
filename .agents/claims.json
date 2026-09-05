@@ -6,7 +6,7 @@
       "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
-      "task": "Them .gitattributes chot kieu xuong dong cho ca repo",
+      "task": "Cap nhat STATUS: viec o repo kia da xong",
       "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
