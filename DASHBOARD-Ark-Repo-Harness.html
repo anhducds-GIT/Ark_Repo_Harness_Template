@@ -156,7 +156,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   <div class="cu" data-sinh="2026-09-06"></div>
   <header>
     <div class="nhan-hang">
-      <span class="chip">v1.3.4</span>
+      <span class="chip">v1.3.6</span>
       <span>sinh ngày 2026-09-06</span>
     </div>
     <h1>Ark Repo Harness</h1>
@@ -456,6 +456,22 @@ git merge-base --is-ancestor &lt;sha-của-bạn&gt; &lt;sha-vừa-lấy&gt;</co
 <ol><li><code>npm run state-check</code> trả một trong ba mã thoát thật (<code>OK</code> / <code>MISMATCH</code> / <code>UNKNOWN</code>), không nổ.</li><li>Một phiên AI mở ở repo đích, đọc <code>AGENTS.md</code> → <code>HANDOFF.md</code>, **nhận được một khoá và làm được</li></ol>
 <p>   một việc nhỏ trọn vẹn tới lúc cổng xanh** — không cần ai ở bộ khung giải thích thêm.</p>
 <p>Phép 3 là phép duy nhất chứng minh được việc 3, và nó <strong>phải chạy thật</strong>, không suy từ hai phép trên. Hai lượt migrate 03/09 đều dừng ở mức cổng xanh, tức chưa lượt nào đi qua phép này.</p>
+<h3>BƯỚC 0 — AUDIT ĐỘC LẬP TRƯỚC KHI THẢ FILE NÀO</h3>
+<blockquote><strong>Thêm 2026-09-05, sau lượt trial trên <code>ALL_SKILL_MANAGEMENT</code>.</strong> Bước này đứng TRƯỚC cả bước đo, và nó tồn tại vì một lý do đo được: repo đích thường <strong>đã có sẵn file trùng tên</strong> với thứ bộ khung sắp thả vào.</blockquote>
+<p><strong>Đo thật ở <code>ALL_SKILL_MANAGEMENT</code>:</strong> bốn file trùng tên đang giữ <strong>1824 dòng nội dung riêng</strong> — <code>AGENTS.md</code> (26 luật riêng), <code>DASHBOARD.md</code> (viết tay, có bản mirror sang Google Sheet), <code>decisions.md</code> (sổ quyết định chỉ-thêm), <code>handoff.md</code> (<strong>1225 dòng</strong> nhật ký vận hành). Thả đè là mất sạch, và mất theo cách không ai nhận ra ngay.</p>
+<h4>Giao audit cho một AI KHÁC, không tự audit</h4>
+<pre class="code"><code>codex exec -s workspace-write -m &lt;model&gt; -c windows.sandbox='&quot;unelevated&quot;' - &lt; brief-audit.txt</code></pre>
+<p><strong>Chạy trên một bản clone trong thư mục tạm, không chạy trên repo thật.</strong> Tác nhân ngoài không có lý do gì được quyền ghi vào repo đang sống.</p>
+<p>Brief phải hỏi đủ sáu câu, và câu 6 là câu đắt nhất:</p>
+<ol><li>Repo này là gì — một đoạn cho người không đọc code.</li><li>Chia mấy <strong>khoá vùng</strong>, gồm thư mục nào, vì sao. Chỗ nào <strong>bắt buộc chung khoá</strong>.</li><li>File nào <strong>máy sinh</strong>, sinh bằng lệnh gì.</li><li><strong>Xung đột luật</strong> — repo đã có cơ chế phân quyền riêng chưa, nó chọi với khoá vùng ở đâu.</li><li>Một phiên AI mới <strong>sẽ vấp ở đâu</strong>.</li><li><strong>File nào trùng tên với thứ bộ khung sắp ghi vào, và trùng thì mất gì.</strong></li></ol>
+<h4>Luật cứng: BỐN FILE KHÔNG ĐƯỢC ĐÈ</h4>
+<p><code>AGENTS.md</code> · <code>DASHBOARD.md</code> · <code>decisions.md</code> · <code>handoff.md</code>/<code>HANDOFF.md</code>.</p>
+<p>Repo đích có sẵn thì <strong>THÊM VÀO, không thay thế</strong> — thêm một mục mới ở cuối, giữ nguyên phần cũ. Đo trước và sau bằng số dòng, <strong>không chỉ kiểm &quot;file còn tồn tại&quot;</strong>:</p>
+<pre class="code"><code>wc -l AGENTS.md DASHBOARD.md decisions.md handoff.md    # trước, ghi lại
+wc -l AGENTS.md DASHBOARD.md decisions.md handoff.md    # sau, phải &gt;= trước</code></pre>
+<p>Số dòng <strong>giảm</strong> ở bất kỳ file nào trong bốn = đã đè mất nội dung. Dừng, hoàn nguyên.</p>
+<h4>Kiểm chứng lại audit, đừng tin thẳng</h4>
+<p>Luật vàng số 4 áp cho cả audit của AI khác. Trial 05/09: Codex báo ba lệnh thoát mã <code>2/1/1</code> ở repo <code>n8n-orchestrator</code> — đo lại thì <strong>cả ba exit 0</strong>. Nếu tin thẳng thì đã đi sửa ba thứ không hỏng. Mỗi phát hiện phải tự chạy lại trước khi đưa vào kế hoạch migrate.</p>
 <h3>Sáu bước, theo đúng thứ tự</h3>
 <h4>1. Đo trước, và ghi lại con số</h4>
 <pre class="code"><code>node scripts/assess.mjs &lt;đường-dẫn-repo&gt;</code></pre>
@@ -846,13 +862,35 @@ npm run overview                  # sinh lại bảng HTML ở gốc repo, rồi
       lúc nào, và vì sao. Bảng này chỉ chiếu lại phần đó cho dễ nhìn; nó không phải nguồn sự thật
       thứ hai.</p>
       <div class="tw"><table><thead><tr><th>Mã</th><th>Việc</th><th>Ưu tiên lúc mở</th></tr></thead><tbody>
-      <tr><td><code>KHUNG-1</code></td><td>Mục đỏ &quot;Sự thật máy sinh còn tươi&quot; — MỘT bug, không phải hai</td><td>—</td></tr><tr><td><code>KHUNG-5</code></td><td>Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi</td><td>—</td></tr><tr><td><code>KHUNG-2</code></td><td>Hai quy trình migrate không đi theo bản trích</td><td>—</td></tr><tr><td><code>KHUNG-12</code></td><td>Lớp &quot;nghề nào đếm file nghề ấy&quot; chưa từng chạy ở luồng thật</td><td>—</td></tr><tr><td><code>KHUNG-19</code></td><td>Cổng đóng cứng vị trí &quot;Bản đồ file&quot; ở AGENTS.md</td><td>—</td></tr><tr><td><code>KHUNG-20</code></td><td><code>units.behaviour_globs</code> bị validator TỪ CHỐI, dù chú thích trong code dạy đúng trường đó</td><td>—</td></tr><tr><td><code>KHUNG-21</code></td><td><code>claim.mjs</code> crash khi một khoá có giá trị <code>null</code></td><td>—</td></tr>
+      <tr><td><code>KHUNG-1</code></td><td>Mục đỏ &quot;Sự thật máy sinh còn tươi&quot; — MỘT bug, không phải hai</td><td>P1</td></tr><tr><td><code>KHUNG-5</code></td><td>Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi</td><td>P1</td></tr><tr><td><code>KHUNG-2</code></td><td>Hai quy trình migrate không đi theo bản trích</td><td>P2</td></tr><tr><td><code>KHUNG-12</code></td><td>Lớp &quot;nghề nào đếm file nghề ấy&quot; chưa từng chạy ở luồng thật</td><td>P3</td></tr><tr><td><code>KHUNG-19</code></td><td>Cổng đóng cứng vị trí &quot;Bản đồ file&quot; ở AGENTS.md</td><td>P3</td></tr><tr><td><code>KHUNG-20</code></td><td><code>units.behaviour_globs</code> bị validator TỪ CHỐI, dù chú thích trong code dạy đúng trường đó</td><td>P3</td></tr><tr><td><code>KHUNG-21</code></td><td><code>claim.mjs</code> crash khi một khoá có giá trị <code>null</code></td><td>P3</td></tr>
       </tbody></table></div>
     </div>
   </section>
 
   <section class="tab" id="tab-nhat-ky" hidden>
     <details open>
+      <summary><strong>v1.3.6</strong><span class="ngay">2026-09-05</span><span class="tt">Bảng có tab &quot;Đã xong&quot;, và migrate có BƯỚC 0: audit trước khi thả file nào</span></summary>
+      <p><strong>Tab &quot;Đã xong&quot; trên bảng HTML.</strong> Bảng vốn chỉ chiếu thứ ĐANG mở — việc còn lại, nợ còn treo, chỗ chờ người chốt. Người chốt nhìn mãi một danh sách việc chưa xong thì không thấy repo đang tiến, chỉ thấy nó đang nợ. Việc đã đóng <strong>vốn nằm sẵn trong sổ nợ</strong>, chỉ là không ai chiếu ra. Đọc đúng dấu của sổ (<strong>mã bị gạch</strong>), cùng dấu mà <code>what-next.mjs</code> đọc — hai chỗ đọc một dấu thì không trôi khỏi nhau. Ghim kèm vế đối chứng: việc <strong>còn mở</strong> không được lọt, và một câu văn xuôi nói &quot;đã xong&quot; cũng <strong>không</strong> được tính.</p>
+<p><strong>BƯỚC 0 của quy trình migrate: audit độc lập TRƯỚC khi thả file nào.</strong> Bước này đứng trước cả bước đo, và nó ra đời từ một con số: trial trên <code>ALL_SKILL_MANAGEMENT</code> cho thấy repo đích đang giữ <strong>1824 dòng nội dung riêng</strong> trong bốn file <strong>trùng tên</strong> với thứ bộ khung sắp thả vào — <code>AGENTS.md</code> (26 luật riêng) · <code>DASHBOARD.md</code> (viết tay, có mirror sang Google Sheet) · <code>decisions.md</code> · <code>handoff.md</code> (<strong>1225 dòng</strong>).</p>
+<p><strong>Luật cứng: bốn file đó KHÔNG ĐƯỢC ĐÈ.</strong> Repo đích có sẵn thì THÊM VÀO, không thay thế. Và đo bằng <strong>số dòng trước/sau</strong>, không chỉ kiểm &quot;file còn tồn tại&quot; — một file bị ghi đè vẫn còn tồn tại, chỉ là rỗng ruột.</p>
+<p><strong>Audit giao cho AI khác, chạy trên bản clone trong thư mục tạm</strong> — tác nhân ngoài không có lý do gì được quyền ghi vào repo đang sống. Brief hỏi sáu câu; câu đắt nhất là câu 6: <em>file nào trùng tên, và trùng thì mất gì</em>.</p>
+<p><strong>Và luật vàng số 4 áp cho cả audit của AI khác.</strong> Trial 05/09: Codex báo ba lệnh thoát mã <code>2/1/1</code> ở repo <code>n8n-orchestrator</code> — đo lại thì <strong>cả ba exit 0</strong>. Tin thẳng thì đã đi sửa ba thứ không hỏng. Mỗi phát hiện phải tự chạy lại trước khi đưa vào kế hoạch.</p>
+<p><code>1.3.5</code> → <code>1.3.6</code>.</p>
+    </details><details>
+      <summary><strong>v1.3.5</strong><span class="ngay">2026-09-05</span><span class="tt">Bịt CỬA HẬU do chính bản 1.3.3 mở ra</span></summary>
+      <p><strong>Bản 1.3.3 cho repo khai <code>docs.file_map</code> — cần thiết, và nó mở một cửa hậu.</strong> Đường đọc bản đồ vốn có dòng <code>if (!existsSync(...)) continue</code>: an toàn khi nơi đặt bản đồ còn đóng cứng <code>AGENTS.md</code> (package con không có <code>AGENTS.md</code> là chuyện thường), thành <strong>cửa hậu ngay khi nơi đó khai được</strong>.</p>
+<p><strong>Đo thật:</strong> khai <code>file_map</code> trỏ tới một file không tồn tại, thêm một file mới chưa khai ở đâu cả → cổng báo <strong>XANH</strong>, <em>&quot;Mọi thứ mới đều đã khai&quot;</em>. <strong>Một dòng cấu hình vô hiệu hoá cả một cổng</strong>, không cảnh báo gì. Đúng loại lỗ mà luật vàng số 3 cấm. Chi tiết đáng ghi: file <strong>rỗng</strong> thì cổng ĐỎ đúng — chỉ file <strong>không tồn tại</strong> mới lọt. Hai đường đi khác nhau cho hai ca trông giống nhau.</p>
+<p>Nay tách hai ca: repo <strong>không</strong> khai thì giữ nguyên hành vi cũ (không làm đỏ hàng loạt repo đang chạy); repo <strong>có</strong> khai mà file không có thì <strong>ĐỎ</strong>, và nói thẳng đó là <em>khai sai</em>, không phải <em>thiếu bản đồ</em> — hai thứ có hai cách sửa khác hẳn. <strong>Ghim ở <code>tests/cong-do-that.mjs</code> khối 8</strong>, nơi dựng kho git thật, kèm vế đối chứng.</p>
+<p><strong>Ba chỗ nữa do audit độc lập Codex chỉ ra, đã kiểm chứng lại từng cái:</strong></p>
+<ul><li><strong><code>budget</code> sai kiểu lùi về mặc định IM LẶNG.</strong> <code>&quot;budget&quot;: &quot;rất lớn&quot;</code> hay <code>&quot;budget&quot;: 5</code> đều</li></ul>
+<p>  lặng lẽ thành &quot;không khai&quot;, và người viết tưởng ngân sách riêng đang có hiệu lực — trong khi   <code>CHANGELOG</code> 1.3.4 khẳng định nó bị từ chối. Nay từ chối thật.</p>
+<ul><li><strong>Ngân sách không có TRẦN.</strong> <code>1e300</code> hợp lệ, nên mọi chỉ số đều nằm dưới ngân sách và thước đo</li></ul>
+<p>  im lặng mất tác dụng. Nay trần = 100 lần mặc định: đủ rộng cho repo lớn thật, đủ hẹp để chặn   một con số vô nghĩa.</p>
+<ul><li><strong><code>F13</code> tự khai quá phạm vi.</strong> Tên khối nói &quot;ba lỗi&quot; trong khi thân chỉ kiểm hai. Một phép kiểm</li></ul>
+<p>  tự khai quá phạm vi là một lỗi riêng: người sau đọc tên rồi tin rằng vế thứ ba đã có ai canh.   Đổi tên cho khớp bằng chứng, và ghi rõ vế thứ ba nằm ở đâu.</p>
+<p><strong>Điều đáng nói nhất về lượt này:</strong> cửa hậu do <strong>tôi</strong> mở ở 1.3.3 khi vá một lỗi thật. Nó không lộ ra qua <code>npm test</code> — 149 phép đều xanh — mà lộ ra khi <strong>đi dựng lại đúng ca hỏng</strong>. Tối ưu và vá lỗi đều là lúc lớp bảo vệ dễ mất nhất, và cách duy nhất bắt được là tự tay dựng ca hỏng chứ không đọc lại diff.</p>
+<p><code>1.3.4</code> → <code>1.3.5</code>.</p>
+    </details><details>
       <summary><strong>v1.3.4</strong><span class="ngay">2026-09-05</span><span class="tt">Repo migrate nay được dọn theo, không chỉ được chuẩn theo</span></summary>
       <p>Bộ khung vốn phát ra <strong>luật</strong> và <strong>cổng kiểm</strong>, nhưng không phát ra <strong>nhịp dọn</strong>. Repo dựng từ khuôn nhận đủ thứ để làm ĐÚNG, không nhận gì để giữ RẺ — và mỗi repo tự phình theo cách riêng cho tới lúc người chốt phát hiện ra thì đã muộn.</p>
 <p><strong>Hai thứ nay đi theo bản trích:</strong> <code>scripts/can-nang.mjs</code> (thước đo) và <code>docs/BAO-TRI-DINH-KY.md</code> (sổ tay). Thiếu một trong hai thì &quot;dọn dẹp đều đặn&quot; là lời khuyên, không phải nhịp.</p>
@@ -1106,7 +1144,7 @@ npm run overview                  # sinh lại bảng HTML ở gốc repo, rồi
   </section>
 
   <footer>
-    <span>Ark Repo Harness v1.3.4</span>
+    <span>Ark Repo Harness v1.3.6</span>
     <span>sinh ngày 2026-09-06 — không gõ tay</span>
     <span>mọi con số đọc từ repo</span>
   </footer>
