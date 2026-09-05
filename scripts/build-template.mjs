@@ -73,7 +73,17 @@ const VERBATIM = [
   // CHẠY THẬT đúng cái nó phát cho người khác, và `--check` không cho hai bản trôi khỏi nhau.
   // Khối E của nó tự dựng một repo git thật có hình dạng khác hẳn, nên nó chứng minh được
   // "chạy ở repo lạ" ngay tại repo vừa dựng, không cần ai đi kiểm hộ.
-  ["tests/assistant-smoke.mjs", "tests/assistant-smoke.mjs"]
+  ["tests/assistant-smoke.mjs", "tests/assistant-smoke.mjs"],
+  // KIỂU XUỐNG DÒNG — phải đi theo, và đây là lý do đo được, không phải sở thích. Máy Windows
+  // tự đổi kiểu xuống dòng lúc lấy file ra khỏi kho, nên CÙNG MỘT COMMIT tồn tại ở hai dạng
+  // byte và `git status` nói SẠCH ở cả hai. Đo ở repo nhà ngay trước khi thêm: 75 file LF, 21
+  // file CRLF, cổng vẫn xanh. Hệ quả đã cắn thật: một phép kiểm đọc mã nguồn rồi cắt theo dòng
+  // XANH trên máy vừa ghi file và ĐỎ với người vừa clone — 28 lượt xanh rồi chết, và triệu
+  // chứng trông như "phép kiểm tự nhiên hỏng" nên không ai tìm đúng chỗ.
+  // Repo nhà vá 05/09; bản trích thì tới 05/09 mới mang theo, nên mọi repo dựng trước đó vẫn
+  // dính nguyên. Không nằm trong tầng máy (`scripts/` · `tests/`) nên KHÔNG đổi dấu vân tay
+  // bản phát — đã đo trước khi làm, chính vì thế lượt này không phải cắt bản mới.
+  [".gitattributes", ".gitattributes"]
 ];
 
 /* ADR-0000 CỐ Ý KHÔNG chép nguyên văn. Bản gốc kể lại lịch sử di trú của riêng repo gốc — ba
@@ -486,6 +496,7 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | **Sắp BÁO CÁO trạng thái cho người chốt — kiểm xem điều mình sắp nói có khớp nguồn thẩm quyền không** | \`npm run state-check\` — **không phải cổng đóng phiên**: cổng kia hỏi "việc tôi làm đẩy được chưa", cái này hỏi "điều tôi sắp nói có đúng không". Ba mã thoát, cố ý không gộp: \`OK\` · \`MISMATCH\` · \`UNKNOWN\` — không đọc được thì nói KHÔNG BIẾT, không nói OK. **Chỉ đọc, không đòi khoá nào** |
 | **Không biết làm gì tiếp, hoặc muốn biết việc nào chạy song song được ngay** | \`npm run what-next\` — bản đồ việc, giao ba nguồn: bảng quyền × sổ nợ từng đơn vị × sổ ý tưởng. Luật song song nó cưỡng chế chỉ một câu: hai việc song song được **khi và chỉ khi** thuộc hai khoá khác nhau và cả hai đang trống. **Chỉ đọc, không đòi khoá nào** |
 | **Là phiên ĐIỀU PHỐI: người chốt hỏi "đang có gì · làm gì tiếp · việc nào chạy song song được"** | [docs/protocols/ORCHESTRATOR.md](docs/protocols/ORCHESTRATOR.md) — sổ tay vai điều phối: luật mở phiên, **hàng rào vai cứng** (vai này KHÔNG code, KHÔNG debug, KHÔNG đề xuất bản vá), luật nạp báo cáo năm mục, lối ra bàn giao cho executor. **Đọc khối cảnh báo ở đầu file trước** |
+| **Một phép kiểm tự nhiên đỏ với người vừa clone mà xanh trên máy bạn** | [.gitattributes](.gitattributes) — chốt kiểu xuống dòng cho CẢ repo, cả trong kho lẫn trong cây làm việc. Không có nó thì máy Windows tự đổi lúc lấy file ra, một commit có hai dạng byte, và \`git status\` nói SẠCH ở cả hai. Chốt một nửa — chỉ \`text=auto\` — thì kho sạch mà cây làm việc vẫn CRLF, tức bệnh còn nguyên |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống · [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) — phép ghim của hai lệnh trên, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó. Chạy cả hai bằng \`npm test\` |
 | Biết luật riêng của NGHỀ repo bạn (không phải luật chung) | phụ lục nghề: [docs/ANNEX-tu-dong-hoa-trinh-duyet.md](docs/ANNEX-tu-dong-hoa-trinh-duyet.md) là bản mẫu có thật · viết cái của bạn theo [docs/_TEMPLATE-annex.md](docs/_TEMPLATE-annex.md) |
 

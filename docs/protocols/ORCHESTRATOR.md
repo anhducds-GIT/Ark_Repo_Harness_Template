@@ -35,9 +35,14 @@ khung**. Nên ở đây ba mục trên là **quy ước có lý do**, không ph�
 như thể máy đang canh — và nếu repo bạn dựa vào chúng thật thì việc đầu tiên đáng làm là viết
 phép kiểm cho chúng.
 
-**Hai lệnh ở mục 1b nằm trong repo bộ khung nhưng CHƯA nằm trong bản trích `template/`.** Repo
-dựng từ bản trích thì chưa có chúng. Chạy thử trước khi dạy người khác chạy: một sổ tay trỏ tới
-một lệnh không chạy được thì nó không phải luật, nó là chữ.
+**Hai lệnh ở mục 1b ĐÃ đi theo bản trích `template/` từ bản 1.3.0** — cả hai file lệnh, cả hai
+dòng khai trong `package.json`, và phép ghim `tests/assistant-smoke.mjs`. Repo dựng từ bản trích
+chạy được ngay, không phải sửa gì.
+Câu ở chỗ này trước đây nói ngược lại và **đã sai kể từ 1.3.0**; nó được sửa ngày 05/09 sau khi
+đo lại bản trích. Ghi ra vì đó là bài học lặp: một dòng cảnh báo đúng lúc viết sẽ tự hoá thành
+lời nói dối khi thứ nó cảnh báo được vá — mà không ai đi sửa lại lời cảnh báo.
+Luật vẫn giữ: chạy thử trước khi dạy người khác chạy. Một sổ tay trỏ tới một lệnh không chạy
+được thì nó không phải luật, nó là chữ.
 
 ## 0. Vai này là gì, và không là gì
 

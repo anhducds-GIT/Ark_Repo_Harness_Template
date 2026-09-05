@@ -12,12 +12,35 @@ ttl_days: 180
 
 ## Trạng thái của chính quy trình này
 
-**Chưa từng chạy trên một repo thật khác nghề.** Nó viết từ một lần dựng repo mới và từ bảy
-phiên chuẩn hoá chính repo này. Vài bước dưới đây **sẽ sai**, và lần chạy thật đầu tiên là để
-tìm ra chúng — không phải để nghiệm thu.
+**Đã chạy thật 2 lần, cùng ngày 2026-09-03, trên hai repo khác nghề** — bản khung lúc đó là
+`0.3.0`. Hồ sơ từng lượt ở [../migrations/](../migrations/), và **đọc hồ sơ trước khi đọc sáu
+bước dưới đây**: chỗ vấp thật nằm trong hồ sơ, không nằm trong quy trình.
 
-Ai chạy lần đầu: ghi lại chỗ vấp **ngay tại đây**, đừng ghi vào nhật ký phiên. Một quy trình
-không được sửa sau lần dùng đầu là một quy trình sẽ bị bỏ.
+| Repo | Nghề | Mức | Cổng | Lỗi tìm ra |
+|---|---|---|---|---|
+| NAV Platform V1 | Node + Python · chứng khoán | 1 → 3 | xanh toàn bộ | 9 |
+| Project 3 AI Agent Unify | Python · điều phối nhiều AI | 1 → 3 | 9 xanh 1 bỏ | 8 |
+
+**Bốn chỗ quy trình này tự mâu thuẫn, cả bốn do hai lượt đó lôi ra:**
+
+1. **Bước 4 bảo để `bootstrap.blocking` rỗng vì repo mới migrate sẽ đỏ — suite hạt giống lại
+   khẳng định cứng "0 đỏ".** Hai cửa đo cùng một thứ, hai kết quả.
+2. **`units.marker` bắt buộc phải là JSON, mà không dòng nào ở đây nói.** Khai một file `.md`
+   thì bộ sinh bảng **chết**, còn cổng cấu trúc thì không — hai công cụ nói hai đằng.
+3. **Cổng đóng phiên cứng `origin/main`.** Repo làm việc theo nhánh tính năng thì phép kiểm nhãn
+   lane không có mốc để so, nên nó **BỎ** chứ không xanh. Đúng thiết kế, nhưng quy trình không
+   báo trước, nên người chạy tưởng mình làm sai.
+4. **Quy trình đòi cổng xanh nhưng cấm dọn thứ làm cổng đỏ.** Lối ra đã dùng thật ở NAV: danh
+   sách **miễn trừ CÓ HẠN** — lý do · người chốt · ngày hết hạn. Không xoá (mất ý định), không
+   để đỏ triền miên (người ta thôi đọc suite).
+
+**Chưa đo lại ở bản khung hiện tại.** Hai lượt trên chạy ở `0.3.0`; bộ khung nay đã khác nhiều.
+Lượt migrate thứ ba nên coi bốn điểm trên là *đã biết*, và mọi thứ khác là *chưa kiểm lại*.
+
+Ai chạy lượt sau: ghi chỗ vấp **ngay tại đây**, đừng chỉ ghi vào hồ sơ lượt. Hồ sơ kể một lượt;
+mục này là thứ người sau đọc. Hai lượt đầu ghi hồ sơ đầy đủ nhưng **không ghi ngược lại vào đây**
+— nên suốt từ 03/09 tới 05/09 file này vẫn nói "chưa từng chạy" trong khi `AGENTS.md` ở gốc nói
+"đã chạy thật 2 lần". Đó chính là cái bẫy mục này tồn tại để chặn, và nó đã sập một lần rồi.
 
 ## Sáu bước, theo đúng thứ tự
 

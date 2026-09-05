@@ -872,3 +872,50 @@ mà người clone nhận được, rồi chạy suite → **52 xanh, 0 đỏ**.
    - **Bảng máy sinh không thể hội tụ bằng cách sinh lại.** Nó nhúng mã commit của HEAD, mà
      mỗi lượt commit bảng lại đổi HEAD — nên sinh-lại rồi commit thì lượt sinh sau vẫn khác
      đúng một mã. Không phải lỗi mới của lượt này; ghi ra để phiên sau đừng đuổi theo nó.
+
+
+## 2026-09-05 · `claude-dieu-phoi-0509` — bản trích nhận kiểu xuống dòng, và hai tài liệu thôi nói dối
+
+**Ba việc, một lượt, vì cùng một họ: bản trích thiếu đồ, và tài liệu nói sai về chính nó.**
+
+**(a) `.gitattributes` nay ĐI THEO bản trích.** Repo nhà vá từ lượt trước, nhưng bản trích thì
+không mang theo — nên **mọi repo dựng từ khuôn vẫn dính nguyên bệnh đã vá ở nhà**: máy Windows
+tự đổi kiểu xuống dòng lúc lấy file ra, cùng một commit có hai dạng byte, `git status` nói SẠCH
+ở cả hai. Bệnh này đã cắn thật một lần — một phép kiểm cắt mã nguồn theo dòng, xanh 28 lượt trên
+máy vừa ghi file, đỏ với người vừa clone.
+Thêm bằng khối `VERBATIM` của bộ sinh, kèm một dòng khai vào bảng tra của luật trong khuôn —
+không khai thì cổng cấu trúc của repo mới đếm nó là file không ai trỏ tới.
+**KHÔNG phải cắt bản mới, và đây là chỗ đã đo trước khi làm:** dấu vân tay bản phát chỉ băm key
+bắt đầu bằng `scripts/` hoặc `tests/` (`fileMay()` trong bộ sinh). `.gitattributes` nằm ở gốc bản
+trích nên không vào dấu vân tay — số phiên bản giữ **1.3.0**, sổ phát hành không đụng.
+
+**(b) `ORCHESTRATOR.md` dòng 38 đã nói dối kể từ 1.3.0.** Nguyên văn cũ: *"Hai lệnh ở mục 1b nằm
+trong repo bộ khung nhưng CHƯA nằm trong bản trích."* Sai — `state-check.mjs`, `what-next.mjs`,
+hai dòng khai trong `package.json` của bản trích và phép ghim `assistant-smoke.mjs` **đều đã đi
+theo** từ 1.3.0. Câu sai nằm ở **cả hai bản**, nên repo mới dựng ra đọc được một lời cảnh báo về
+một vấn đề không còn tồn tại. Đã thay bằng câu đúng + ghi rõ nó từng sai và vì sao.
+
+**(c) `CHUYEN-REPO-LEN-CHUAN.md` dòng 15 nói dối theo chiều ngược lại.** Nó vẫn tự khai *"Chưa
+từng chạy trên một repo thật khác nghề"*, trong khi `AGENTS.md` ở gốc nói *"đã chạy thật 2 lần"*
+— hai tài liệu trong cùng một repo mâu thuẫn nhau suốt từ 03/09. Đã thay bằng bảng hai lượt thật
+(NAV Platform: 1→3, cổng xanh toàn bộ, 9 lỗi · Project 3AI: 1→3, 9 xanh 1 bỏ, 8 lỗi) và **bốn
+chỗ quy trình tự mâu thuẫn** mà hai lượt đó lôi ra: blocking rỗng ↔ suite đòi 0 đỏ · `units.marker`
+bắt buộc JSON mà không ai nói · cổng đóng cứng `origin/main` · đòi cổng xanh nhưng cấm dọn thứ
+làm nó đỏ. Ghi thêm: hai lượt đó chạy ở bản khung **0.3.0**, chưa ai đo lại ở bản hiện tại.
+
+**Chỗ vấp của chính lượt này, ghi để phiên sau đỡ mất 5 phút:** dòng bảng tra chèn vào bộ sinh có
+dấu backtick, mà nó nằm trong một template literal của JS — bộ sinh **chết ngay** với
+`SyntaxError: Unexpected identifier 'git'`. Đây đúng cái bẫy khối `VERBATIM` đã ghi chú từ trước
+("nhúng một file JS vào template literal là mời gọi hỏng do backtick"), chỉ là lần này nó cắn ở
+chuỗi văn bản chứ không ở file JS. Escape rồi sinh lại sạch.
+
+**Số thật:** `npm test` **exit 0, không phép nào đỏ** · bản trích **28 file** (trước lượt: 27).
+
+**CÒN MỞ — không tự làm:**
+- **`docs/protocols/KIEM-MOT-REPO.md` và `CHUYEN-REPO-LEN-CHUAN.md` vẫn KHÔNG đi theo bản trích.**
+  Repo dựng từ khuôn nhận được `MULTIFLOW` và `ORCHESTRATOR`, nhưng không nhận được hai quy trình
+  migrate. Chưa quyết được là nên phát hay không: hai file đó nói về việc *đưa một repo lên chuẩn*,
+  tức việc của người CẦM bộ khung, chưa chắc là việc của repo ĐÃ dựng từ nó.
+- **Hai pilot migrate chưa đo lại ở bản khung hiện tại** (chúng chạy ở 0.3.0).
+- **Bảng máy sinh vẫn không hội tụ được** — nhúng mã commit của HEAD, nên sinh-lại-rồi-commit đổi
+  HEAD và lượt sau vẫn lệch đúng một mã. Không phải lỗi lượt này; đã ghi từ lượt trước.
