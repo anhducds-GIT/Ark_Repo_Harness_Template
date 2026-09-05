@@ -392,13 +392,18 @@ Khác cổng đóng phiên ở bốn chỗ, đừng lẫn: ai chạy (điều ph
 GHI CHÚ CHO NGƯỜI BẢO TRÌ — những gì đã BỎ khi đưa sổ này từ repo gốc sang bộ khung, và vì sao.
 Đọc phần này trước khi định "khôi phục cho đủ".
 
-1. Mọi mã việc và mã defect của repo gốc (dạng chữ-cái gạch số) — chúng là ví dụ, không phải hợp
-   đồng. Bài học giữ lại, số hiệu bỏ đi. Có một phép kiểm ở tầng mã nguồn canh chỗ này; nó bỏ
-   qua đúng khối chú thích HTML này, để lời giải thích vẫn được viết.
-2. Mọi tên gói sản phẩm và tên khoá vùng gõ cứng — bộ khung chạy ở repo khai vùng khác, một tên
-   gõ cứng ở đó trỏ vào hư không mà không ai phát hiện.
-3. Tên riêng của người chốt — thay bằng từ chỉ vai. Tài liệu không đọc được cấu hình, nên đừng
-   bịa ra một cơ chế thay thế.
+1. Mọi mã việc và mã defect của repo gốc — ví dụ: F-25, G-01, Y-13, ROLE-DRIFT-01,
+   STATE-DRIFT-01. Chúng là ví dụ, không phải hợp đồng. Bài học giữ lại, số hiệu bỏ đi.
+2. Mọi tên gói sản phẩm (duc-auto-gemini, duc-auto-chatgpt, duc-auto-gg-flow-video) và mọi tên
+   khoá vùng gõ cứng (_root, _docs, _code, _template) — bộ khung chạy ở repo khai vùng khác, một
+   tên gõ cứng ở đó trỏ vào hư không mà không ai phát hiện.
+3. Tên riêng của người chốt — repo gốc gọi thẳng là Đức; ở đây thay bằng từ chỉ vai. Tài liệu
+   không đọc được cấu hình, nên đừng bịa ra một cơ chế thay thế.
+
+Ba dòng trên **cố ý viết ra đúng những chuỗi bị cấm**. Phép kiểm ở tầng mã nguồn canh sổ tay này
+bỏ qua khối chú thích HTML trước khi dò — nếu chú thích không chứa chuỗi cấm nào thì nhánh "bỏ
+chú thích" không bao giờ chạy tới, và nó chỉ là đồ trang trí. Đột biến kiểm đã bắt đúng chỗ đó.
+Đừng "dọn cho sạch" ba dòng này.
 4. BỎ HẲN một mục: "địa bàn là hai repo". Mục đó nói về quan hệ giữa hai repo cụ thể và một
    quyết định kiến trúc của riêng chúng — bóc định danh đi thì không còn gì đứng được. Phần lõi
    duy nhất còn giá trị ở mọi repo (repo mà mọi thứ đều là hạ tầng thì biên hạ-tầng/sản-phẩm mất
