@@ -3,21 +3,21 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-roadmap-0509",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "khai ROADMAP-V2 vao bang tra + Log",
-      "released_at": null,
+      "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": "claude-roadmap-0509",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "cap nhat ROADMAP-V2 cho khop 12 muc no",
-      "released_at": null,
+      "released_at": "2026-09-05",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -33,11 +33,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "claude-roadmap-0509",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-05",
       "task": "sinh lai ban trich sau khi sua bang tra",
-      "released_at": null
+      "released_at": "2026-09-05"
     }
   }
 }
