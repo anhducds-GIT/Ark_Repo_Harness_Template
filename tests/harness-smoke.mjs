@@ -254,7 +254,25 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
   // Vùng bằng chứng vẫn không tính, và tài liệu cũng không.
   assert.equal(isBehaviourFile("evidence/run-1/a.json"), false);
   assert.equal(isBehaviourFile("docs/x.md"), false);
-  ok("san pham may sinh khong bi dem la code doi (va code that thi van bi dem)");
+
+  // CA HỎNG ĐÃ XẢY RA THẬT, 05/09 — ba file cứng ở trên KHÔNG đủ. Repo nhà sinh thêm hai trang
+  // `.html`, chúng lọt vào danh sách đuôi file hành vi, và cổng đóng phiên đỏ VĨNH VIỄN: mỗi
+  // commit sinh lại artifact tự làm artifact vừa sinh cũ đi, không thứ tự commit nào hội tụ.
+  // Danh sách ba file trên xanh suốt trong khi ca hỏng nằm ngay trong repo — phép kiểm không
+  // phân biệt được hai nhánh thì nó là đồ trang trí, dù nó xanh (luật vàng số 2).
+  //
+  // Tên hai file đó mang tên dự án, mà file này đi theo bản trích — nên chúng KHÔNG được đóng
+  // cứng ở đây. Repo tự khai qua `generated_files`; phép kiểm dựng khai báo giả để đo cơ chế.
+  const khai = { generatedFiles: ["DASHBOARD-Ten-Repo.html", "SO-MIGRATE-Ten-Repo.html"] };
+  for (const f of ["DASHBOARD-Ten-Repo.html", "SO-MIGRATE-Ten-Repo.html"]) {
+    assert.equal(isBehaviourFile(f, khai), false, `${f} da khai la may sinh, khong duoc dem`);
+    // VẾ THỨ HAI, và không có nó thì vế trên vô nghĩa: CHƯA khai thì vẫn phải đếm. Thiếu vế này
+    // thì một bản vá biến mọi `.html` thành không-đếm cũng qua được phép kiểm.
+    assert.equal(isBehaviourFile(f), true, `${f} chua khai thi PHAI van bi dem`);
+  }
+  // Khai một file không liên quan không được làm file khác thoát lưới.
+  assert.equal(isBehaviourFile("app/main.html", khai), true, "file khong khai PHAI van bi dem");
+  ok("san pham may sinh khong bi dem la code doi (ca ba file cung LAN file repo tu khai)");
 }
 
 /* ---- 7. Sửa vùng gốc mà không ghi Log thì phải ĐỎ ------------------------ */

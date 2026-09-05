@@ -18,7 +18,10 @@
 
 ## P1
 
-### KHUNG-1 · Mục đỏ "Sự thật máy sinh còn tươi" — MỘT bug, không phải hai
+### ~~KHUNG-1~~ · Mục đỏ "Sự thật máy sinh còn tươi" — MỘT bug, không phải hai
+
+**ĐÃ VÁ 05/09, bản 1.3.1.** Khối `generated_files` trong `.repo-structure.json` + bộ đếm đọc nó.
+Đức chốt cắt bản mới. Xem CHANGELOG 1.3.1.
 
 Cổng đóng phiên có **một mục đỏ vĩnh viễn**.
 
@@ -42,7 +45,9 @@ nhau"* — phải hỏi hai con số đó được đọc từ đâu trước kh
 Vá được bằng cách thêm hai trang HTML vào khối miễn trừ. Vùng: `_code`. **Sửa là đổi dấu vân tay
 tầng máy → buộc cắt 1.3.1 → chạm hai repo đang ghim bản khung. Cần người chốt trước khi làm.**
 
-### KHUNG-5 · Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi
+### ~~KHUNG-5~~ · Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi
+
+**ĐÃ VÁ 05/09, bản 1.3.1** — cùng lượt với KHUNG-1, kèm đột biến kiểm chứng minh nó đỏ được.
 
 `tests/core-contract.mjs` thử `isBehaviourFile()` với đúng ba file `repo-map.json`, `llms.txt`,
 `DASHBOARD.md` — **không thử hai trang HTML**, dù chúng được khai là máy sinh trong
@@ -52,12 +57,40 @@ KHUNG-1, sửa cùng lượt. Vùng: `_code`.
 
 ## P2
 
-### KHUNG-2 · Hai quy trình migrate không đi theo bản trích — chốt hướng, không phải chốt code
+### ~~KHUNG-2~~ · Hai quy trình migrate không đi theo bản trích
 
-`KIEM-MOT-REPO.md` và `CHUYEN-REPO-LEN-CHUAN.md` ở lại repo nhà; bản trích chỉ mang `MULTIFLOW`
-và `ORCHESTRATOR`. Đây là **câu hỏi thật, không phải chỗ sót**: hai file đó nói về việc *đưa một
-repo lên chuẩn* — việc của người **cầm** bộ khung, chưa chắc là việc của repo **đã dựng ra** từ
-nó. Chốt xong mới biết có việc để làm hay không. Vùng: `_docs` + `_code`.
+**ĐỨC CHỐT 05/09, xem [decisions.md](decisions.md):** migrate là việc của người **cầm** bộ khung,
+nên hai quy trình đó **ở lại nhà**. Nhưng lượt migrate nay gồm **ba** việc chứ không một —
+migrate + audit + bring assistant onboard — và checklist tính năng đã viết vào
+`docs/protocols/CHUYEN-REPO-LEN-CHUAN.md`. Việc còn lại tách thành KHUNG-13.
+
+### KHUNG-13 · Bản trích phát đi luật bắt dùng HAI file mà nó không mang theo
+
+**Đo 05/09, chưa vá.** `template/AGENTS.md:11` bắt ghi việc ngoài phạm vi vào `BACKLOG.md`;
+`template/AGENTS.md:175` bắt ghi quyết định vào `decisions.md`. **Bản trích không mang file nào
+trong hai.**
+
+Nên **mọi repo dựng từ khuôn sinh ra đã mang sẵn** đúng bệnh repo nhà vừa vá cùng ngày (KHUNG-7,
+và chính `BACKLOG.md` này): luật trỏ tới thứ không tồn tại · `what-next` báo *"0 việc mở"* vĩnh
+viễn · quyết định của người chốt không có chỗ hạ cánh.
+
+Đây là **lần thứ TƯ** cùng hình dạng lỗi, và lần này nó **được nhân bản sang mọi repo đích** —
+nặng hơn ba lần trước cộng lại. Bản vá: bản trích mang theo hạt giống hai file đó, mỗi file một
+dòng tiêu đề và quy ước sổ là đủ. **Không nằm trong `scripts/` hay `tests/` nên không buộc cắt
+bản mới** — cùng cơ chế đã đo khi thêm `.gitattributes`.
+
+Lối đi tạm cho ai migrate trước khi vá: thả tay hai file vào repo đích; đã ghi ngay trong quy
+trình migrate, chỗ người migrate thật sự đọc. Vùng: `_code` (bộ sinh) + `_template`.
+
+### KHUNG-14 · Chưa lượt migrate nào đi qua phép thử "assistant onboard"
+
+Đức chốt 05/09: lượt migrate **không xong khi cổng xanh**, mà xong khi một phiên AI ở repo đích
+nhận được khoá và làm trọn một việc nhỏ tới lúc cổng xanh, không cần ai ở bộ khung giải thích.
+
+Hai lượt 03/09 (`nav_platform_main`, `Project 3 AI Agent Unify`) đều **dừng ở mức cổng xanh** —
+tức theo định nghĩa mới thì **cả hai chưa xong việc thứ ba**. Ba phép thử đã viết trong quy trình
+migrate; chưa lượt nào chạy chúng. Gắn với KHUNG-3 (đo lại hai pilot ở bản hiện tại): làm cùng
+lượt thì rẻ hơn hai lượt. Vùng: *(chạy ở repo đích, không đòi khoá của bộ khung)*.
 
 ### KHUNG-3 · Hai pilot migrate chưa đo lại ở bản khung hiện tại
 
@@ -142,3 +175,15 @@ chậm tới mức người ta ngại chạy là phép kiểm sắp bị bỏ qu
 
 Bớt cái gì thì cần Đức chốt hướng — đây là tài liệu của repo, không phải code thừa. Vùng:
 `_docs` + `_root`.
+
+### KHUNG-12 · Lớp "nghề nào đếm file nghề ấy" chưa từng chạy ở luồng thật
+
+Phát hiện khi vá KHUNG-1. `isBehaviourFile()` nhận `opts.behaviourGlobs` để repo Python khai
+`**/*.py` mà đếm cho đúng — nhưng trước bản 1.3.1, `changedCommitCount()` gọi nó **không kèm
+tham số nào**. Tức lớp đó chưa bao giờ chạy ở luồng thật: repo Python vẫn bị đo là "code không
+đổi", đúng cái mà chú thích của chính lớp đó nói là đã chữa. Và repo 3AI migrate 03/09 **chính
+là Python**.
+
+Bản 1.3.1 đã nối đường truyền tham số (`behaviourOpts`), nên chỗ vá sẵn sàng. Còn thiếu hai vế:
+**khai `behaviour_globs`** ở nơi cần, và **một phép ghim dựng nổi ca hỏng** cho nó — không thì
+lại đúng bệnh KHUNG-5. Vùng: `_code`.

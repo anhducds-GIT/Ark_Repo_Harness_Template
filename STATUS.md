@@ -9,10 +9,10 @@ last_verified_how: "npm test 145/145 xanh · bản trích nay mang .gitattribute
 evidence_ref: HANDOFF.md
 owner: harness-vong2
 priority_rank: 1
-next_step: "Đức chốt KHUNG-1 trong BACKLOG.md: có cắt bản 1.3.1 để vá mục đỏ vĩnh viễn của cổng đóng phiên hay không. Nguyên nhân đã xác định và chỉ có một — khối miễn trừ trong build-dashboard.mjs sót hai trang HTML do chính bộ sinh viết ra, nên mỗi lượt sinh artifact tự làm artifact đó cũ đi. Vá nằm trong scripts/, tức đổi dấu vân tay bản phát, tức chạm hai repo đang ghim bản khung — nên không tự làm."
+next_step: "KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới."
 version_source: package.json
-current_focus: "Bản 1.3.0: repo dựng mới nhận luôn hai lệnh của vai điều phối, sổ tay và 52 phép ghim — chạy được ngay, không phải sửa gì"
-human_action: "CÓ — hai việc chờ Đức chốt: KHUNG-1 (cắt 1.3.1 để vá mục đỏ của cổng?) và KHUNG-2 (hai quy trình migrate có nên đi theo bản trích không?). Xem BACKLOG.md."
+current_focus: "Bản 1.3.1 · migrate nay là BA việc trong một (migrate + audit + bring AI assistant onboard), Đức chốt 05/09 — xong không còn nghĩa là cổng xanh"
+human_action: "CÓ — KHUNG-11: bớt cái gì trong 998 dòng tài liệu vượt ngân sách. Mọi việc còn lại đều THÊM chữ, nên chốt càng muộn càng vượt xa. Xem BACKLOG.md."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---
@@ -40,6 +40,11 @@ git clone --branch v1.2.17 https://github.com/anhducds-GIT/Ark_Repo_Harness_Temp
 cắt — bộ khung sẽ **từ chối phát** (`NHAN_CHUNG_HONG`). Đã thử thật 04/09, và nó từ chối đúng.
 Clone xong bạn đứng ở `detached HEAD`; không sao, vì từ bản sao này bạn chỉ **phát đi**, không
 đẩy lên.
+
+**Bản 1.3.1 (05/09):** cổng đóng phiên **hết mục đỏ vĩnh viễn**. Bộ đếm "code đã đổi sau lần
+kiểm chứng" từng đếm luôn hai trang HTML do chính bộ sinh viết ra, nên artifact vừa commit là
+lập tức cũ — không thứ tự commit nào hội tụ. Nay repo tự khai `generated_files` trong
+`.repo-structure.json`. Chi tiết và bài học ở [CHANGELOG](CHANGELOG.md).
 
 **Bản 1.3.0 (05/09):** bộ khung nay **phát hành gói điều phối** — hai lệnh (kiểm trạng thái
 trước khi báo cáo, và bản đồ việc), sổ tay vai điều phối, và 52 phép ghim đi kèm. Repo dựng mới

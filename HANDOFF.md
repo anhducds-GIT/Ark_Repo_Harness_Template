@@ -1046,3 +1046,78 @@ phải hỏi hai con số ấy được đọc từ đâu trước khi kết lu�
 `CHANGELOG` nói CI chưa chặn merge và chưa quét secret) — **chưa kiểm chứng**, vì kiểm nó cần đọc
 cấu hình branch protection trên GitHub, việc mà phiên này không làm. Không ghi thành mục nợ khi
 chưa tự đo; ghi ở đây để phiên sau đi đo.
+
+## 2026-09-05 · `claude-dieu-phoi-0509` (tiếp) — BẢN 1.3.1: cổng hết mục đỏ vĩnh viễn
+
+**Đức chốt: cắt 1.3.1, vá KHUNG-1 + KHUNG-5.** Đã làm, cả hai đóng.
+
+**Vá gì.** Bộ đếm *"code đã đổi sau lần kiểm chứng"* miễn trừ ba file máy sinh bằng danh sách
+cứng trong code. Repo nhà sinh thêm hai trang `.html` — chúng lọt vào danh sách đuôi file hành
+vi và bị đếm là code đổi, nên mỗi commit sinh lại artifact tự cộng thêm một vào chính con số mà
+artifact vừa sinh phải khớp.
+
+**Cách vá, và vì sao KHÔNG chọn cách rẻ hơn.** Cách rẻ nhất là thêm hai tên file vào danh sách
+cứng — **không chọn**, vì tên chúng mang tên dự án mà bộ đếm ĐI THEO BẢN TRÍCH sang mọi repo:
+làm thế là phát tên repo gốc đi khắp nơi, và lặp đúng bệnh *"đo được đúng một nghề"* mà lớp
+`behaviour_globs` sinh ra để chữa. Cách rẻ thứ hai là dò theo mẫu tên (`DASHBOARD-*.html`) —
+cũng không, vì đó vẫn là đóng cứng quy ước đặt tên của repo nhà vào code portable.
+Chọn: khối `generated_files` trong `.repo-structure.json`. `generators` trả lời *"chạy lệnh nào
+để sinh lại"*; khối mới trả lời *"lệnh đó đẻ ra file nào"*. Khác một chữ, và chỗ khác đó là bẫy.
+
+**KHUNG-5 — phép ghim xanh suốt trong khi ca hỏng nằm ngay trong repo.** Khối kiểm cũ thử đúng
+ba file cứng. Nay thêm ca cho file repo tự khai, **kèm vế thứ hai**: file CHƯA khai thì vẫn phải
+bị đếm. Thiếu vế đó, một bản vá biến mọi `.html` thành không-đếm cũng qua được.
+
+**ĐỘT BIẾN KIỂM — bắt buộc, và đã chạy:** bỏ đúng dòng vừa thêm khỏi bộ đếm → suite **đỏ đúng
+chỗ** (`DASHBOARD-Ten-Repo.html da khai la may sinh, khong duoc dem`, exit 1). Hoàn nguyên bằng
+**ghi lại byte gốc**, không bằng `git checkout` — chính lệnh đó là cái bẫy `.gitattributes` vá.
+Sau hoàn nguyên: 13/13 xanh.
+
+**Bản phát:** `1.3.0` → `1.3.1`, dấu vân tay tầng máy `5b2b74c0eee8e3b6`, sổ phát hành đã ghi.
+Bản trích 28 file. Hai repo đang ghim bản khung nhận vá bằng `npm run upgrade`, **chưa chạy** —
+đó là việc riêng, cần Đức chốt thời điểm.
+
+**CÒN MỞ — phát hiện thêm khi vá, KHÔNG tự làm:** `opts.behaviourGlobs` (lớp "nghề nào đếm file
+nghề ấy") **chưa từng được truyền vào ở luồng thật** — trước lượt này `changedCommitCount()` gọi
+`isBehaviourFile` không kèm tham số nào. Tức repo Python vẫn bị đo là "code không đổi", đúng cái
+mà chú thích của chính lớp đó nói là đã chữa. Lượt này nối được đường truyền tham số nên chỗ vá
+đã sẵn sàng, nhưng **chưa khai `behaviour_globs` và chưa có phép ghim** — cần một mục nợ riêng.
+
+## 2026-09-05 · `claude-dieu-phoi-0509` (tiếp) — ĐỨC ĐỔI ĐỊNH NGHĨA "MIGRATE XONG"
+
+**Quyết định, ghi vào `decisions.md`** — file mà `AGENTS.md` mục 7 bắt dùng từ đầu nhưng chưa
+từng tồn tại (KHUNG-7). Dựng đúng lúc có nhu cầu thật, không dựng sẵn chờ.
+
+**Migrate là BA việc trong một:** migrate + **audit** + **bring AI assistant onboard**. Lý do
+Đức nêu: Đức làm việc với từng repo **qua assistant của repo đó** để dọn dần nợ. Một repo nhận
+đủ cấu trúc nhưng không có assistant biết dùng cấu trúc ấy thì migrate xong vẫn không làm được
+việc. **Trách nhiệm cho việc thứ ba thuộc bộ khung này**, không đẩy sang repo đích.
+
+**Định nghĩa "xong" đổi:** không phải cổng xanh, mà là **một phiên AI ở repo đích nhận được khoá
+và làm trọn một việc nhỏ tới lúc cổng xanh, không cần ai ở bộ khung giải thích thêm.**
+
+**Đã viết vào quy trình migrate:** checklist **28 file, bốn nhóm** (Luật · Máy 8 lệnh · Trạng
+thái · Sổ tay + ghim), mỗi nhóm kèm câu *"thiếu thì hỏng ra sao"*, cộng ba phép thử cho việc thứ
+ba. Đặt trong `CHUYEN-REPO-LEN-CHUAN.md` chứ **không tạo file thứ ba** — repo đang vượt ngân sách
+tài liệu 45%, thêm file là làm tệ hơn.
+
+**LẬP CHECKLIST THÌ LỘ RA MỘT CHỖ HỎNG THẬT — KHUNG-13.** `template/AGENTS.md:11` bắt ghi việc
+ngoài phạm vi vào `BACKLOG.md`; dòng 175 bắt ghi quyết định vào `decisions.md`. **Bản trích không
+mang file nào trong hai.** Nên mọi repo dựng từ khuôn **sinh ra đã mang sẵn** đúng bệnh repo nhà
+vừa vá cùng ngày. **Lần thứ TƯ** cùng hình dạng lỗi, và lần này nó **nhân bản sang mọi repo
+đích** — nặng hơn ba lần trước cộng lại. Không tự vá (chạm bộ sinh, và vai điều phối không code);
+đã ghi **lối đi tạm ngay trong quy trình migrate**, chỗ người migrate thật sự đọc.
+
+**KHUNG-14:** theo định nghĩa mới, **cả hai pilot 03/09 chưa xong việc thứ ba** — chúng dừng ở
+mức cổng xanh. Gộp với KHUNG-3 (đo lại hai pilot) thì rẻ hơn hai lượt.
+
+**KHUNG-2 đóng:** Đức chốt hai quy trình migrate **ở lại nhà** — migrate là việc của người cầm
+bộ khung. Phần còn lại tách thành KHUNG-13.
+
+**Roadmap V2** (`docs/ROADMAP-V2.md`, 84 dòng): 10 mục nợ xếp thành 4 đợt, phân luồng theo khoá.
+Cố ý không có ngày tháng, không có bản vá kỹ thuật, không chép lại nội dung mục nợ.
+
+**Một chỗ vấp đáng ghi:** `overview-smoke` đỏ ở phép *"tab đầu không được chứa tên file mã
+nguồn"*. Không phải lỗi mới — trang overview **suy hoàn toàn từ HEAD**, nên nó chiếu `next_step`
+bản CŨ (còn nhắc `build-dashboard.mjs`) trong khi bản trên đĩa đã sửa. Sinh lại sau khi commit là
+hết. Ghi ra vì nó trông y hệt một phép kiểm tự nhiên hỏng.

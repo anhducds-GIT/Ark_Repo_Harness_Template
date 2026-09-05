@@ -42,6 +42,59 @@ mục này là thứ người sau đọc. Hai lượt đầu ghi hồ sơ đầy
 — nên suốt từ 03/09 tới 05/09 file này vẫn nói "chưa từng chạy" trong khi `AGENTS.md` ở gốc nói
 "đã chạy thật 2 lần". Đó chính là cái bẫy mục này tồn tại để chặn, và nó đã sập một lần rồi.
 
+## Migrate là BA việc trong một — Đức chốt 2026-09-05
+
+Xem [decisions.md](../../decisions.md). Một lượt migrate gồm:
+
+| # | Việc | Xong nghĩa là gì |
+|---|---|---|
+| 1 | **Migrate** | bộ khung nằm trong repo đích, hình dạng repo đã khai, cổng chạy được |
+| 2 | **Audit** | đã **quét và rà soát** repo đích, nợ tìm được đã nằm trong sổ nợ của nó |
+| 3 | **Bring AI assistant onboard** | một phiên AI ở repo đích **chạy được vòng làm việc của nó ngay** |
+
+**Lượt migrate KHÔNG xong khi cổng xanh.** Xong là khi việc 3 đạt — vì Đức làm việc với từng repo
+*qua assistant của repo đó*. Cấu trúc đúng mà không ai vận hành được thì migrate chưa tạo ra giá
+trị nào.
+
+**Trách nhiệm cho việc 3 thuộc bộ khung này**, không đẩy sang repo đích.
+
+## Checklist tính năng mang sang — 28 file, bốn nhóm
+
+Sinh bằng `npm run template`. Đối chiếu sau khi thả: `npm run template -- --check`.
+
+| Nhóm | Mang gì | Thiếu thì hỏng ra sao |
+|---|---|---|
+| **Luật** | `AGENTS.md` · `CLAUDE.md` · `.repo-structure.json` | Không có bảng `areas` thì mọi đường dẫn quy về một khoá, và lớp chống giẫm chân thành hình nền |
+| **Máy** (8 lệnh) | `claim` · `repo-structure` · `session-check` · `safe-push` · `check-bootstrap` · `build-dashboard` · `state-check` · `what-next` | Thiếu `claim` thì luật mục 1 trỏ vào khoảng không — đã xảy ra thật 03/09 |
+| **Trạng thái** | `STATUS.md` · `HANDOFF.md` · `.agents/claims.json` · `STATUS.template.md` | Không khai `scripts.test` thì cổng **báo xanh mà không chạy dòng nào** |
+| **Sổ tay + ghim** | `MULTIFLOW` · `ORCHESTRATOR` · 4 bản mẫu · ADR-0000 · `.gitattributes` · 2 suite ghim | Công cụ không kèm hàng rào thì hàng rào là thứ đầu tiên mất |
+
+### HAI FILE LUẬT BẮT DÙNG MÀ BẢN TRÍCH KHÔNG MANG — đo 05/09, chưa vá
+
+`template/AGENTS.md` dòng 11 bắt ghi việc ngoài phạm vi vào **`BACKLOG.md`**; dòng 175 bắt ghi
+quyết định vào **`decisions.md`**. Bản trích **không mang file nào trong hai**.
+
+Nên **mọi repo dựng từ khuôn sinh ra đã mang sẵn** đúng bệnh mà repo nhà vừa vá cùng ngày: luật
+trỏ tới thứ không tồn tại, `npm run what-next` báo *"0 việc mở"* vĩnh viễn, và quyết định của
+người chốt không có chỗ hạ cánh.
+
+**Ai chạy lượt migrate trước khi chỗ này được vá: thả tay hai file đó vào repo đích**, mỗi file
+một dòng tiêu đề là đủ. Đừng chờ bản vá. Ghi ở đây thay vì chỉ ghi vào sổ nợ, vì người cần biết
+là người đang migrate, và họ đọc file này chứ không đọc sổ nợ của bộ khung.
+
+### Việc 3 — bring assistant onboard, ba phép thử
+
+Làm xong ba phép này ở repo đích thì việc 3 đạt. Chưa làm thì **chưa xong lượt migrate**:
+
+1. `npm run what-next` chạy được, và **kể đúng** việc đang mở của repo đó — không phải in ra bảng
+   rỗng vì chưa có sổ nợ.
+2. `npm run state-check` trả một trong ba mã thoát thật (`OK` / `MISMATCH` / `UNKNOWN`), không nổ.
+3. Một phiên AI mở ở repo đích, đọc `AGENTS.md` → `HANDOFF.md`, **nhận được một khoá và làm được
+   một việc nhỏ trọn vẹn tới lúc cổng xanh** — không cần ai ở bộ khung giải thích thêm.
+
+Phép 3 là phép duy nhất chứng minh được việc 3, và nó **phải chạy thật**, không suy từ hai phép
+trên. Hai lượt migrate 03/09 đều dừng ở mức cổng xanh, tức chưa lượt nào đi qua phép này.
+
 ## Sáu bước, theo đúng thứ tự
 
 ### 1. Đo trước, và ghi lại con số

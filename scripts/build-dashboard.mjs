@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { DEFAULT_UNITS, profileFrom, repoIdentityFrom, STRUCTURE_FILE, unitsFrom } from "./repo-structure.mjs";
+import { DEFAULT_UNITS, generatedFilesFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, unitsFrom } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -430,12 +430,15 @@ function duoiTuGlob(globs) {
 export function isBehaviourFile(file, opts = {}) {
   const normalized = String(file).replaceAll("\\", "/");
   if (MAY_SINH.has(normalized)) return false;
+  // Sản phẩm của bộ sinh do REPO tự khai (`generated_files`). Ba file cứng ở `MAY_SINH` là mặc
+  // định cho repo chưa khai gì; repo nào sinh thêm trang thì khai thêm, đừng sửa code.
+  if (Array.isArray(opts.generatedFiles) && opts.generatedFiles.includes(normalized)) return false;
   const duoi = (Array.isArray(opts.behaviourGlobs) && duoiTuGlob(opts.behaviourGlobs)) || BEHAVIOUR_EXTENSIONS;
   return !EVIDENCE_ZONE.test(normalized) && duoi.has(path.posix.extname(normalized).toLowerCase());
 }
 
-function changedCommitCount(commits) {
-  return commits.filter((commit) => commit.files.some(isBehaviourFile)).length;
+function changedCommitCount(commits, opts = {}) {
+  return commits.filter((commit) => commit.files.some((f) => isBehaviourFile(f, opts))).length;
 }
 
 // Tách riêng ra để test ghim được. `git status --porcelain` bình thường đã được gọi kèm
@@ -491,6 +494,7 @@ export function collectModel(deps = createDefaultDeps(), { tolerant = false } = 
   const tracked = trackedIndex(deps);
   const units = readUnits(deps);
   const structure = deps.fileExists(STRUCTURE_FILE) ? readJson(deps, STRUCTURE_FILE) : {};
+  const behaviourOpts = { generatedFiles: generatedFilesFrom(structure) };
   const repo = repoIdentityFrom(structure);
   const profile = profileFrom(structure);
   // Ở chế độ tolerant, một `manifest.json` thiếu/hỏng không được phép giết cả lượt chạy —
@@ -562,7 +566,7 @@ export function collectModel(deps = createDefaultDeps(), { tolerant = false } = 
     const manifestPath = item.fm?.version_source ?? item.manifestPath;
     const measured = item.measured ?? measure(item.dirRelPath, manifestPath);
     const changedCount = item.fm?.last_verified_commit
-      ? changedCommitCount(deps.git.changedFilesSince(item.fm.last_verified_commit, item.dirRelPath))
+      ? changedCommitCount(deps.git.changedFilesSince(item.fm.last_verified_commit, item.dirRelPath), behaviourOpts)
       : 0;
     return {
       key: item.dirRelPath,
@@ -616,7 +620,7 @@ export function collectModel(deps = createDefaultDeps(), { tolerant = false } = 
     lastVerifiedHow: rootFm?.last_verified_how ?? "",
     evidenceRef: rootFm?.evidence_ref ?? "",
     changedCount: rootFm?.last_verified_commit
-      ? changedCommitCount(deps.git.changedFilesSince(rootFm.last_verified_commit, "."))
+      ? changedCommitCount(deps.git.changedFilesSince(rootFm.last_verified_commit, "."), behaviourOpts)
       : 0,
     currentFocus: rootFm?.current_focus ?? "Chưa khai STATUS; đây là một việc đang mở.",
     owner: rootFm?.owner ?? "",
@@ -1295,7 +1299,7 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
         output.log(`Nợ điều hướng [ĐO]: chưa khai STATUS ${model.health.units_without_status} · link chết ${model.health.dead_links} · thư mục chưa khai chủ ${model.health.undeclared_dirs} · tài liệu quá hạn ${model.health.draft_debt}. Chi tiết ở Khối D của ${DASHBOARD_FILE}.`);
       }
       for (const row of model.rows.filter((item) => item.key !== "_root")) {
-        const dirtyCount = (deps.git.dirtyFiles?.(row.key) ?? []).filter(isBehaviourFile).length;
+        const dirtyCount = (deps.git.dirtyFiles?.(row.key) ?? []).filter((f) => isBehaviourFile(f, behaviourOpts)).length;
         if (dirtyCount > 0) {
           output.log(`CẢNH BÁO: ${row.key} đang có ${dirtyCount} file .js sửa dở chưa commit. Trang này dựng HOÀN TOÀN TỪ HEAD, nên phần đang sửa KHÔNG có ở đây — commit trước rồi sinh lại.`);
         }

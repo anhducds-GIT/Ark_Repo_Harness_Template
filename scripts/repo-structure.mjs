@@ -465,6 +465,32 @@ export function profileFrom(parsed) {
    cổng cấu trúc. */
 export const DEFAULT_GENERATORS = Object.freeze(["build-dashboard.mjs", "feature-parity.mjs"]);
 
+/* FILE DO BỘ SINH VIẾT RA — khác `generators` (tên SCRIPT) một chữ, và chính chỗ khác đó là
+ * cái bẫy. `generators` trả lời "chạy lệnh nào để sinh lại"; khối này trả lời "lệnh đó ĐẺ RA
+ * file nào". Không có vế thứ hai thì bộ đếm "code đã đổi sau lần kiểm chứng" đếm luôn sản phẩm
+ * của chính bộ sinh — và một commit sinh lại artifact tự làm artifact vừa sinh cũ đi ngay.
+ *
+ * ĐO THẬT 05/09, đó là lý do khối này ra đời: `DASHBOARD-<repo>.html` và `SO-MIGRATE-<repo>.html`
+ * mang đuôi `.html` nên lọt vào danh sách đuôi file hành vi. Cổng đóng phiên có một mục đỏ
+ * VĨNH VIỄN, không thứ tự commit nào hội tụ được.
+ *
+ * KHAI Ở CẤU HÌNH, KHÔNG ĐÓNG CỨNG TRONG CODE — tên hai file đó mang tên dự án, mà file này đi
+ * theo bản trích sang mọi repo. Đóng cứng là phát tên repo gốc đi khắp nơi, và là đúng cái bệnh
+ * "đo được đúng một nghề" mà `duoiTuGlob()` phía dưới sinh ra để chữa. */
+export function generatedFilesFrom(parsed) {
+  const value = parsed?.generated_files;
+  if (value === undefined) return Object.freeze([]);
+  if (!Array.isArray(value)) {
+    throw new Error("GENERATED_FILES_HONG: `generated_files` phải là mảng đường dẫn tương đối tính từ gốc repo (hoặc bỏ hẳn).");
+  }
+  for (const name of value) {
+    if (typeof name !== "string" || name === "") {
+      throw new Error(`GENERATED_FILES_HONG: mỗi phần tử phải là một đường dẫn. Đang là: ${JSON.stringify(name)}`);
+    }
+  }
+  return Object.freeze(value.map((n) => n.replaceAll("\\", "/")));
+}
+
 export function generatorsFrom(parsed) {
   const value = parsed?.generators;
   if (value === undefined) return DEFAULT_GENERATORS;
