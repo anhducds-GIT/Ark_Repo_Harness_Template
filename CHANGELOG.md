@@ -3,6 +3,38 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.4 — 2026-09-05 — Repo migrate nay được dọn theo, không chỉ được chuẩn theo
+
+Bộ khung vốn phát ra **luật** và **cổng kiểm**, nhưng không phát ra **nhịp dọn**. Repo dựng từ
+khuôn nhận đủ thứ để làm ĐÚNG, không nhận gì để giữ RẺ — và mỗi repo tự phình theo cách riêng
+cho tới lúc người chốt phát hiện ra thì đã muộn.
+
+**Hai thứ nay đi theo bản trích:** `scripts/can-nang.mjs` (thước đo) và `docs/BAO-TRI-DINH-KY.md`
+(sổ tay). Thiếu một trong hai thì "dọn dẹp đều đặn" là lời khuyên, không phải nhịp.
+
+**Hai số đo mới, và chúng đo đúng thứ tốn tiền:**
+- **`Nhật ký bàn giao`** — `HANDOFF.md`. Phình nhanh nhất cả repo và **chưa từng có nhịp dọn**.
+  Đo ở repo nhà: **1237/600 dòng**.
+- **`Mục nợ ĐÃ ĐÓNG còn nằm trong sổ`** — sổ nợ là thứ vai điều phối đọc **mỗi lượt**; nửa sổ là
+  việc đã xong thì mỗi lượt trả tiền cho phần không còn dùng.
+
+Vì sao hai số này chứ không phải kích thước repo: chúng đo thứ **mọi phiên phải nạp, ở mọi repo**,
+nên tiết kiệm ở đây nhân lên theo **(số repo × số phiên)**. Tài liệu tra cứu chỉ đọc khi cần —
+cắt 300 dòng ở đó rẻ hơn cắt 30 dòng ở `AGENTS.md`.
+
+**Luật DỜI CHỖ, không phải XOÁ.** *"Chỉ thêm dòng, không sửa dòng cũ"* cấm **viết lại lịch sử**,
+không cấm **cất gọn** nó. Ba điều kiện, thiếu một là thành xoá lịch sử: giữ nguyên chữ (không
+tóm tắt — tóm tắt là diễn giải, và diễn giải của người dọn thay thế lời người viết) · để lại một
+dòng trỏ sang kho lưu · khai kho lưu vào Bản đồ file.
+
+**Ngân sách nay khai được** ở `budget` trong `.repo-structure.json` — repo khác có kích thước
+khác, ép chúng theo số của một bộ khung 3000 dòng là bắt chúng im lặng chịu đỏ. Gõ sai tên mục
+ngân sách thì **bị từ chối kèm danh sách hợp lệ**, không im lặng bỏ qua: một ngân sách gõ sai tên
+là một lớp bảo vệ biến mất mà không ai biết — đúng ca đã xảy ra thật ở repo này 03/09.
+
+**Đột biến kiểm, ba ca, cả ba đỏ đúng chỗ:** bỏ thước khỏi bản trích · bỏ sổ tay khỏi bản trích ·
+bỏ hàng kiểm gõ sai tên ngân sách. `1.3.3` → `1.3.4`, bản trích **32 file**.
+
 ## 1.3.3 — 2026-09-05 — Ba lỗi mà bảy phiên ở repo nhà không tìm ra, một lượt migrate thật lôi ra hết
 
 Bản này không sửa gì do đọc lại code mà thấy. **Cả ba lỗi đều do lắp bộ khung vào một repo thật

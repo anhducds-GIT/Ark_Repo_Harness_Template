@@ -43,7 +43,13 @@ const PORTABLE_SCRIPTS = [
   // đơn vị con · thiếu cả ba sổ · không remote). Suite ghim đi kèm là `tests/assistant-smoke.mjs`
   // ở khối VERBATIM bên dưới — phát một lệnh mà không phát phép ghim của nó là phát một lời hứa.
   "state-check.mjs",
-  "what-next.mjs"
+  "what-next.mjs",
+  // CÂN NẶNG — phải đi theo, vì "clean up đều đặn" mà không có thước thì là lời khuyên, không
+  // phải nhịp. Đo được ở repo nhà 05/09: `HANDOFF.md` 1237/600 dòng, tổng tài liệu 3462/2200 —
+  // và không ai biết cho tới khi có lệnh đo. Repo migrate thừa hưởng đúng bệnh đó nếu không
+  // mang theo thước. Ngân sách khai được trong `.repo-structure.json` nên repo khác kích thước
+  // không bị ép theo số của bộ khung.
+  "can-nang.mjs"
 ];
 
 /* Chép nguyên văn, không đổi một ký tự. */
@@ -69,6 +75,10 @@ const VERBATIM = [
   // `what-next`) nhưng trước 1.3.0 không phát ra tài liệu nào nói vai đó ĐƯỢC LÀM GÌ và KHÔNG
   // được làm gì. Công cụ không kèm hàng rào thì hàng rào là thứ đầu tiên mất.
   ["docs/protocols/ORCHESTRATOR.md", "docs/protocols/ORCHESTRATOR.md"],
+  // BẢO TRÌ ĐỊNH KỲ — ba nhịp giữ repo ĐÚNG, cộng một nhịp giữ repo RẺ (mục "Nhịp DỌN").
+  // Không phát cái này thì mỗi repo migrate tự phình theo cách riêng, và người chốt phát hiện
+  // ra khi đã muộn — lúc mỗi phiên AI phải nạp một đống chữ đã hết việc.
+  ["docs/BAO-TRI-DINH-KY.md", "docs/BAO-TRI-DINH-KY.md"],
   // PHÉP GHIM CỦA GÓI ASSISTANT — chép nguyên văn, cùng lý do như suite hạt giống: repo gốc
   // CHẠY THẬT đúng cái nó phát cho người khác, và `--check` không cho hai bản trôi khỏi nhau.
   // Khối E của nó tự dựng một repo git thật có hình dạng khác hẳn, nên nó chứng minh được
@@ -214,6 +224,16 @@ const GENERIC = [
 function genericize(rel, text) {
   let out = text;
   for (const [from, to] of GENERIC) out = out.split(from).join(to);
+  /* LỆNH CHỈ CÓ Ở REPO NHÀ phải bị gỡ khỏi bản trích, không chỉ đổi tên.
+     `npm run overview` sinh trang HTML — công cụ NHÀ, cố ý không đi theo bản trích (ADR-0002).
+     Sổ tay bảo trì dạy nó ở mục "một tháng nữa mới quay lại"; chép nguyên văn sang bản trích là
+     phát đi một lệnh repo đích KHÔNG CÓ. Phép ghim của bộ trích bắt đúng chỗ này 05/09 —
+     "dạy `npm run overview` nhưng bản trích KHÔNG khai lệnh đó". */
+  if (rel === "docs/BAO-TRI-DINH-KY.md") {
+    out = out.split(String.fromCharCode(10))
+      .filter((l) => !l.includes("npm run overview"))
+      .join(String.fromCharCode(10));
+  }
   return out;
 }
 
@@ -494,6 +514,7 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) — bốn cơ chế (bảng chủ sở hữu · nhãn \`Lane:\` · cổng đóng phiên · cổng xuất bản), một ngày làm việc 5 bước, **năm bất biến kèm lý do từng cái**, và quy trình đổi cơ chế có **đột biến kiểm bắt buộc**. Mục 1–3 viết cho người không code. **Cố ý không chứa số đo, không kiểm kê chốt, không bảng mã lỗi** — ba thứ đó khác nhau ở từng repo và mục nhanh hơn ai kịp sửa, nên nó chỉ đưa câu lệnh để tự đo |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy \`npm run bootstrap\` |
+| **Đến hạn bảo trì · repo im ắng lâu ngày · muốn biết repo đang NẶNG bao nhiêu** | [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md) — ba nhịp giữ repo đúng, cộng **nhịp DỌN** giữ repo rẻ. Đo bằng \`npm run can-nang\`; ngân sách khai được ở \`budget\` trong \`.repo-structure.json\` |
 | **Phát sinh việc ngoài phạm vi phiên mình — chỗ ghi nợ, luật mục 0 bắt** | [BACKLOG.md](BACKLOG.md) — nhóm \`## P<n>\`, mỗi mục \`### <MÃ>-<số> · <tiêu đề>\`, đóng thì **gạch mã** chứ đừng xoá. \`npm run what-next\` đọc thẳng file này; sai quy ước một ký tự là mục biến mất khỏi bản đồ việc |
 | **Sắp BÁO CÁO trạng thái cho người chốt — kiểm xem điều mình sắp nói có khớp nguồn thẩm quyền không** | \`npm run state-check\` — **không phải cổng đóng phiên**: cổng kia hỏi "việc tôi làm đẩy được chưa", cái này hỏi "điều tôi sắp nói có đúng không". Ba mã thoát, cố ý không gộp: \`OK\` · \`MISMATCH\` · \`UNKNOWN\` — không đọc được thì nói KHÔNG BIẾT, không nói OK. **Chỉ đọc, không đòi khoá nào** |
 | **Không biết làm gì tiếp, hoặc muốn biết việc nào chạy song song được ngay** | \`npm run what-next\` — bản đồ việc, giao ba nguồn: bảng quyền × sổ nợ từng đơn vị × sổ ý tưởng. Luật song song nó cưỡng chế chỉ một câu: hai việc song song được **khi và chỉ khi** thuộc hai khoá khác nhau và cả hai đang trống. **Chỉ đọc, không đòi khoá nào** |
@@ -787,6 +808,7 @@ function packageJson(version) {
       // bảng "Lệnh chạy được" đọc thẳng khối này, nên lệnh không khai = lệnh không ai thấy.
       "state-check": "node scripts/state-check.mjs",
       "what-next": "node scripts/what-next.mjs",
+    "can-nang": "node scripts/can-nang.mjs",
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.

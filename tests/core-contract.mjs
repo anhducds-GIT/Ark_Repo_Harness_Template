@@ -24,6 +24,7 @@ import { VONG_DOI } from "../scripts/build-overview.mjs";
 import { blockingCodes, checkB10, createBootstrapDeps } from "../scripts/check-bootstrap.mjs";
 import { behaviourGlobsFrom, kiemKhoaLa } from "../scripts/repo-structure.mjs";
 import { readClaims } from "../scripts/claim.mjs";
+import { nganSachTu, NGAN_SACH_MAC_DINH } from "../scripts/can-nang.mjs";
 
 const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -491,6 +492,44 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   } finally { rmSync(thu, { recursive: true, force: true }); }
 
   ok("F13 - ba loi pilot: behaviour_globs khai duoc va doi hanh vi - bang quyen null noi ro thay vi no");
+}
+
+/* ---- F14. NGAN SACH CAN NANG: khai duoc, va tu choi dau vao hong ----------
+ *
+ * VI SAO CAN: "clean up deu dan" ma khong co thuoc thi la loi khuyen, khong phai nhip. Do that
+ * o repo nha 05/09: HANDOFF.md 1237/600 dong, tong tai lieu 3462/2200 — va khong ai biet cho toi
+ * khi co lenh do. Repo migrate thua huong dung benh do neu ban trich khong mang theo thuoc.
+ *
+ * NGAN SACH PHAI KHAI DUOC, vi repo khac co kich thuoc khac. Nhung khai SAI thi phai NOI RO,
+ * khong im lang bo qua — mot ngan sach go sai ten la mot lop bao ve bien mat ma khong ai biet. */
+{
+  assert.deepEqual(nganSachTu({}), NGAN_SACH_MAC_DINH, "khong khai -> dung mac dinh");
+  assert.deepEqual(nganSachTu(null), NGAN_SACH_MAC_DINH, "cau truc rong -> dung mac dinh");
+
+  const ns = nganSachTu({ budget: { soNhatKy: 1200 } });
+  assert.equal(ns.soNhatKy, 1200, "khai roi thi phai lay so da khai");
+  assert.equal(ns.tongTaiLieu, NGAN_SACH_MAC_DINH.tongTaiLieu,
+    "muc KHONG khai phai giu mac dinh, khong bi xoa");
+
+  // GO SAI TEN -> NOI RO. Day la ca da tung lam MAT lop bao ve o cho khac trong repo nay
+  // (audit 03/09: go sai ten truong cau hinh, lop bao ve bien mat, khong bao gi).
+  assert.throws(() => nganSachTu({ budget: { soNhatKi: 1200 } }), /BUDGET_HONG/,
+    "go sai ten muc ngan sach phai bi tu choi, khong duoc im lang bo qua");
+  assert.throws(() => nganSachTu({ budget: { soNhatKy: 0 } }), /BUDGET_HONG/, "so <= 0 khong hop le");
+  assert.throws(() => nganSachTu({ budget: { soNhatKy: "nhieu" } }), /BUDGET_HONG/, "phai la so");
+
+  // Chu thich `_doc` trong khoi budget khong duoc tinh la go sai ten.
+  assert.doesNotThrow(() => nganSachTu({ budget: { _doc: "ghi chu", soNhatKy: 800 } }));
+
+  // BAN TRICH PHAI MANG CA THUOC LAN SO TAY. Thieu mot trong hai thi repo migrate khong don duoc.
+  const files = buildTemplateFiles();
+  assert.ok(files.has("scripts/can-nang.mjs"), "ban trich phai mang THUOC do can nang");
+  assert.ok(files.has("docs/BAO-TRI-DINH-KY.md"), "ban trich phai mang SO TAY bao tri");
+  assert.match(files.get("package.json"), /can-nang/, "ban trich phai khai lenh `npm run can-nang`");
+  assert.match(files.get("docs/BAO-TRI-DINH-KY.md"), /Nhip DON|Nhịp DỌN/,
+    "so tay bao tri phai co muc nhip DON — phan giu repo RE, khong chi giu repo DUNG");
+
+  ok("F14 - ngan sach can nang khai duoc, tu choi go sai ten; ban trich mang ca thuoc lan so tay");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
