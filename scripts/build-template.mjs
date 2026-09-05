@@ -497,7 +497,37 @@ thì **4 file** rơi ra ngoài bản đồ, kể cả chính \`README.md\`.
 **Luật vàng số 4 áp ở đây:** thêm file hoặc thư mục mới thì phải khai một dòng vào bảng này.
 Không khai = không tồn tại. Cổng đóng phiên có phép kiểm này.
 `;
-  return text.slice(0, start) + replacement + text.slice(end);
+  // Mục 8 dạy đo cân nặng bằng một lệnh của repo NHÀ, mà công cụ đó Ở LẠI đây (ADR-0002).
+  // Để nguyên thì bản trích phát đi một luật trỏ tới lệnh KHÔNG TỒN TẠI — cùng bệnh đã bắt được
+  // ở `claim.mjs` hồi 03/09, và luật trỏ tới lệnh không chạy được thì nó là chữ, không phải luật.
+  // Ném chứ không bỏ qua: mục 8 bị viết lại lời mà phép thay trượt thì phải biết ngay, không
+  // được âm thầm phát đi bản cũ.
+  // Ghép từ mảng chứ không viết một chuỗi nhiều dòng: khối cũ CHỨA dấu huyền ba lần (rào
+  // ```bash), nên template literal là đường thẳng tới lỗi cú pháp.
+  const XUONG_DONG = String.fromCharCode(10);
+  const CAN_NANG_CU = [
+    'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu":',
+    "",
+    "```bash",
+    "npm run can-nang",
+    "```",
+    ""
+  ].join(XUONG_DONG);
+  const CAN_NANG_MOI = [
+    'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu".',
+    "Bộ khung KHÔNG mang theo công cụ đo, vì ngân sách là con số của RIÊNG repo bạn: chốt lấy vài",
+    "ngưỡng (số luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá ngưỡng thì",
+    "phải BỚT trước khi nghĩ tới nới.",
+    ""
+  ].join(XUONG_DONG);
+  const daThay = text.slice(0, start) + replacement + text.slice(end);
+  if (daThay.split(CAN_NANG_CU).length !== 2) {
+    throw new Error(
+      "TRICH_HONG: không tìm thấy ĐÚNG MỘT khối đo cân nặng ở mục 8 của AGENTS.md. Mục đó đã bị viết " +
+      "lại lời, nên phép thay trượt. Sửa phép thay cho khớp, đừng để bản trích âm thầm phát đi một lệnh không có thật."
+    );
+  }
+  return daThay.split(CAN_NANG_CU).join(CAN_NANG_MOI);
 }
 
 /* ---- các file sinh mới ---------------------------------------------------- */

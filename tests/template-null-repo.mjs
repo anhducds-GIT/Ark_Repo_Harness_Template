@@ -162,6 +162,52 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
   ok("khong mang theo trang may sinh, khong mang theo bang chung");
 }
 
+/* ---- 2b0. BẢN TRÍCH PHẢI KHAI ĐỦ LỆNH, không chỉ mang đủ file ------------- */
+/* Đo thật 05/09, và đây là ca hỏng đã dựng được TRƯỚC khi viết phép kiểm này: bỏ một **script**
+   khỏi bản trích thì cổng đỏ (dấu vân tay tầng máy đổi → sổ phát hành bắt). Bỏ một **dòng khai
+   lệnh** trong `package.json` mà bản trích sinh ra thì KHÔNG cổng nào đỏ — `--check` vẫn nói
+   *khớp bản gốc*, sổ phát hành vẫn khớp, `npm test` vẫn xanh toàn bộ. Repo mới dựng từ khuôn
+   im lặng thôi chạy nguyên một suite, và người dựng repo đó không có cách nào biết.
+
+   Ba vế, cả ba SUY TỪ chính bản trích chứ không gõ sẵn danh sách. Gõ sẵn là thêm một chỗ phải
+   nhớ cập nhật, mà chỗ nào phải nhớ thì chỗ đó sẽ quên — đúng cái bệnh đang đi chữa. */
+{
+  const pkg = JSON.parse(files.get("package.json"));
+  const lenh = pkg.scripts || {};
+
+  // (1) Suite nào bản trích MANG THEO thì chuỗi `test` phải GỌI nó. Đây là lỗ đã đo được.
+  const suite = [...files.keys()].filter((f) => f.startsWith("tests/") && f.endsWith(".mjs"));
+  assert.ok(suite.length > 0, "ban trich khong mang mot suite nao — phep kiem nay mat doi tuong, sua no dung cach");
+  for (const f of suite) {
+    assert.ok(String(lenh.test || "").includes(f),
+      "ban trich mang `" + f + "` nhung chuoi `test` khong goi no — repo moi se IM LANG thoi chay suite do");
+  }
+
+  // (2) Chiều ngược lại: lệnh trỏ tới file nào thì file đó phải có mặt. Không có vế này thì
+  // khai một lệnh trỏ vào hư không vẫn xanh, và repo mới chết ở `Cannot find module`.
+  const troToi = [...new Set(Object.values(lenh).join(" ").match(/(?:scripts|tests)\/[A-Za-z0-9._-]+\.mjs/g) || [])];
+  assert.ok(troToi.length > 0, "khong doc ra duoc duong dan nao tu khoi `scripts` — mau do da hong");
+  for (const f of troToi) {
+    assert.ok(files.has(f), "lenh trong `package.json` tro toi `" + f + "` ma ban trich khong mang file do");
+  }
+
+  // (3) Tài liệu ĐI THEO bản trích dạy chạy `npm run X` thì X phải là một lệnh đã khai.
+  // Luật trỏ tới một lệnh không chạy được thì nó không phải luật, nó là chữ — cùng câu đã viết
+  // cho `claim.mjs` trong `PORTABLE_SCRIPTS`. Vế này bắt được một chỗ có thật ngay lượt đầu:
+  // mục 8 của luật dạy đo cân nặng bằng một lệnh mà bản trích không mang theo.
+  for (const [rel, text] of files) {
+    if (!rel.endsWith(".md")) continue;
+    for (const m of text.match(/npm run [a-z][a-z0-9-]*/g) || []) {
+      const ten = m.slice("npm run ".length);
+      assert.ok(Object.prototype.hasOwnProperty.call(lenh, ten),
+        rel + " day chay `" + m + "` nhung ban trich KHONG khai lenh do");
+    }
+  }
+  ok("ban trich khai du lenh: " + suite.length + " suite deu nam trong chuoi `test`, "
+    + troToi.length + " duong dan lenh deu co file, moi `npm run` trong tai lieu deu duoc khai");
+}
+
+
 /* ---- 2b. Mốc cắt mục 6 phải là TIÊU ĐỀ THẬT và DUY NHẤT ------------------ */
 /* Phiên K1 chỉ ra 02/09, mục (d). Bản cũ dùng `indexOf("\n## 6.")` — lấy lần khớp ĐẦU TIÊN,
    không kiểm gì. Một dòng văn hay khối trích dẫn nhắc `## 6.` nằm TRƯỚC tiêu đề thật là cắt
