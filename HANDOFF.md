@@ -648,3 +648,41 @@ gốc):**
 - Chưa khai `docs/protocols/ORCHESTRATOR.md` vào bảng tra của `AGENTS.md` — cần khoá gốc. Hệ
   quả hôm nay: B6 (cảnh báo, **không chặn**) sẽ gắn cờ nó là chưa ai trỏ tới.
 - `PROMPTS.md` chưa có ở bộ khung — mục "mở phiên điều phối" chưa viết được. Cần khoá gốc.
+
+ - **2026-09-05 · `claude-exec-harness-wire` · Cắm suite Assistant vào cổng — 52 phép ghim từ
+   "xanh" thành "được cưỡng chế"** — Gói Assistant (`scripts/state-check.mjs` ·
+   `scripts/what-next.mjs` · `tests/assistant-smoke.mjs`) đã vào HEAD từ chặng A và xanh, nhưng
+   `scripts.test` liệt kê 10 suite và **không có nó**. Tức 52 phép ghim đó xanh mà không cổng nào
+   chạy: ai làm hỏng hai lệnh kia thì không gì bắt được. Đúng câu mục 7 của luật — luật máy không
+   kiểm được thì sớm muộn bị bỏ qua.
+   **Ba việc, không hơn:** (1) thêm `tests/assistant-smoke.mjs` vào `scripts.test`, đặt cạnh các
+   suite smoke khác; (2) thêm hai lệnh `state-check` và `what-next` vào `scripts` — bảng "Lệnh
+   chạy được" đọc thẳng từ đó nên **không phải sửa bộ sinh nào**; (3) hai dòng vào bảng tra của
+   `AGENTS.md` mục 6, để người tìm ra được chúng.
+   **Số thật:** `npm test` **143 phép kiểm, 0 đỏ** (trước là 91 — đúng 52 phép mới được nối vào).
+   **THỬ PHÁ, và đây mới là điểm của lượt này:** sửa `state-check.mjs` cho `UNKNOWN` rơi vào
+   nhánh `OK`. `npm test` **ĐỎ**, dừng đúng ở suite Assistant, đúng khẳng định "vắng remote phải
+   ra UNKNOWN chứ không ra OK" (`actual: 'STATE OK'` vs `expected: 'STATE UNKNOWN'`). Cùng lượt
+   chạy đó, phép kiểm bản trích vẫn **xanh** — nên cái đỏ là do suite, không phải do sổ phát
+   hành. Hoàn nguyên, chạy lại: **143 xanh**.
+   **KHÔNG chạm chặng B:** `template/` · `RELEASE-LEDGER.json` · `CHANGELOG.md` không đụng, số
+   phiên bản giữ nguyên **1.2.20**, `build-template.mjs --check` vẫn nói *khớp sổ phát hành*.
+   Lý do an toàn, đã kiểm chứ không đoán: dấu vân tay chỉ tính file trong **bản trích** dưới
+   `scripts/`+`tests/`, mà ba file của gói Assistant chưa nằm trong bản trích; còn
+   `template/package.json` do một hàm riêng sinh ra, không chép từ `package.json` gốc.
+   **BẪY MỚI, ghi ra để đừng ai dò lại:** hoàn nguyên đột biến bằng `git checkout -- <file>` trên
+   Windows **làm suite đỏ tiếp** — repo không có `.gitattributes` và `core.autocrlf` bật, nên
+   lượt checkout trả file về với xuống dòng CRLF, trong khi `assistant-smoke.mjs` có một phép
+   khẳng định cấu trúc cắt theo LF. Tệ hơn: `git status` và `git diff` đều nói **sạch**, nên
+   triệu chứng trông như "phép kiểm tự nhiên hỏng". Cách hoàn nguyên đúng là ghi lại nội dung
+   `git show HEAD:<file>` sau khi bỏ CR. **Chưa sửa** — sửa nó phải chạm `tests/`, ngoài phạm vi
+   lượt này.
+   **CHƯA ĐẨY, và không phải lỗi ai:** phiên `claude-exec-promoteA2` đã chồng **4 commit** lên
+   trên commit của tôi trong cùng thư mục làm việc, nên `safe-push` của tôi sẽ cuốn theo việc
+   chưa duyệt của họ — luật mục 2 hàng 2 cấm, và `--carry` phải hỏi Đức. Việc của tôi đã commit
+   trọn vẹn, cây làm việc phần của tôi sạch. Phiên kia đẩy trước thì commit của tôi đi kèm theo
+   một cách hợp lệ.
+   **Cho `claude-exec-promoteA2` biết:** tôi giữ `_root` và `_code`, và **trả ngay sau lượt
+   này** — hai việc bạn đang chờ (khai `docs/protocols/ORCHESTRATOR.md` vào bảng tra `AGENTS.md`,
+   và cắm phép ghim tầng mã nguồn vào `tests/assistant-smoke.mjs`) tôi **cố ý không làm hộ**,
+   vì chúng ngoài phạm vi lượt này.
