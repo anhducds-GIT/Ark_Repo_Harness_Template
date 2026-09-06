@@ -3,6 +3,45 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.11 — 2026-09-06 — Bộ khung thôi bắt chủ nhà dọn phòng, và bản trích mang đủ hai file repo mới cần nhất
+
+Hai lỗi do lượt migrate `ALL_SKILL_MANAGEMENT` lôi ra hôm qua, vá cả hai.
+
+### Ba artifact máy sinh nay KHAI TÊN ĐƯỢC
+
+```json
+"generated_names": { "dashboard": "BANG-MAY-SINH.md", "llms": "cong-vao.txt", "repo_map": "ban-do.json" }
+```
+
+Trước bản này, `DASHBOARD.md` · `llms.txt` · `repo-map.json` đóng cứng trong code. Repo
+đích đã có file trùng tên thì chạy bộ sinh **một lần** là đè mất — và đè **im lặng**.
+Vấp thật: `ALL_SKILL_MANAGEMENT` có một bảng theo dõi **viết tay 123 dòng**, có mirror
+sang Google Sheet, được ba file khác trỏ tới. Cách duy nhất là đổi tên file của repo đích,
+tức **bộ khung là khách mà bắt chủ nhà dọn phòng**.
+
+Khai thiếu khoá nào thì khoá đó dùng mặc định. Đầu vào sai **bị từ chối thẳng**, không
+lùi về mặc định im lặng — đúng cái lỗ `budget` đã mắc và đã vá 05/09: gõ sai tên khoá, để
+dấu gạch chéo, hay khai hai artifact trùng tên đều đỏ ngay lúc đọc cấu hình.
+
+`F17` dựng một **repo git thật**, khai ba tên riêng, trồng một file viết tay mang tên cũ,
+rồi đòi bộ sinh ghi đúng ba tên đã khai **và** file viết tay không suy suyển. Vế đối chứng
+quan trọng nhất: repo **không** khai thì hành vi cũ y nguyên — không có vế đó thì bản vá
+này có thể làm đỏ hàng loạt repo đang chạy bình thường.
+
+### Bản trích mang `LEGEND.md` và `HUONG-DAN.md`
+
+Hai file **repo mới cần nhất** — một cuốn từ điển cho `gate` · `claim` · `lane` ·
+`fail-closed`, và một bản hướng dẫn cho phiên AI đầu tiên. Repo vừa lắp bộ khung là lúc
+cần nhất, và trước bản này là **lúc duy nhất không có**.
+
+`LEGEND.md` chép nguyên văn. `HUONG-DAN.md` qua một bộ lọc **cắt theo KHỐI, không theo
+dòng**: bỏ một dòng lệnh mà để lại tiêu đề với bảng giải thích thì người đọc thấy một mục
+cụt, còn khó hiểu hơn là không có mục nào. Ba thứ bị cắt vì repo đích không có:
+`npm run assess` · khoá vùng `_template` · câu tự giới thiệu "bộ khung này".
+
+`F18` ghim cả hai chiều, kèm vế đối chứng *"bộ lọc cắt quá tay"*.
+
+
 ## 1.3.10 — 2026-09-06 — Cổng KHUNG-25 thôi bắt oan dòng chỉ ĐỔI CHỖ trong file
 
 Bản 1.3.8 cho `HANDOFF.md` xoá dòng khi có bản khớp byte trong kho lưu trữ. Chạy thật

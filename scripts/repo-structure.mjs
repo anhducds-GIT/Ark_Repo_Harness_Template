@@ -487,6 +487,52 @@ export function behaviourGlobsFrom(parsed) {
   return Object.freeze([...value]);
 }
 
+/* TÊN BA ARTIFACT MÁY SINH — repo khai được, không đóng cứng trong code.
+
+   VÌ SAO CÓ. Vấp thật 06/09, lượt migrate `ALL_SKILL_MANAGEMENT`: repo đó có một bảng theo
+   dõi VIẾT TAY tên `DASHBOARD.md`, có mirror sang Google Sheet, 123 dòng. Bộ khung đóng cứng
+   đúng cái tên đó cho bản máy sinh, nên chạy bộ sinh MỘT LẦN là đè mất — và đè im lặng.
+   Phải đổi tên file của repo đích để nhường bộ sinh, tức bộ khung là khách mà bắt chủ nhà
+   dọn phòng.
+
+   Khai thiếu một khoá thì khoá đó dùng mặc định — repo chỉ vướng một tên không phải khai cả ba.
+
+   FAIL CLOSED với đầu vào sai: khai `"generated_names": "khac"` mà lặng lẽ lùi về mặc định thì
+   người viết tưởng tên riêng đang có hiệu lực, còn bộ sinh vẫn ghi đè file cũ. Đúng cái lỗ
+   `budget` đã mắc và đã vá 05/09. */
+export const TEN_MAY_SINH_MAC_DINH = Object.freeze({
+  dashboard: "DASHBOARD.md",
+  llms: "llms.txt",
+  repo_map: "repo-map.json"
+});
+
+export function tenMaySinhFrom(parsed) {
+  const khai = parsed?.generated_names;
+  if (khai === undefined) return TEN_MAY_SINH_MAC_DINH;
+  if (khai === null || typeof khai !== "object" || Array.isArray(khai)) {
+    throw new Error(`TEN_MAY_SINH_HONG: \`generated_names\` phải là object dạng {"dashboard": "...", "llms": "...", "repo_map": "..."}. Đang là: ${Array.isArray(khai) ? "mảng" : typeof khai}`);
+  }
+  const ra = { ...TEN_MAY_SINH_MAC_DINH };
+  for (const [k, v] of Object.entries(khai)) {
+    if (k.startsWith("_")) continue;                   // chú thích `_doc` không tính là gõ sai
+    if (!(k in TEN_MAY_SINH_MAC_DINH)) {
+      throw new Error(`TEN_MAY_SINH_HONG: không có khoá \`${k}\`. Chỉ nhận: ${Object.keys(TEN_MAY_SINH_MAC_DINH).join(", ")}. Gõ sai tên khoá mà lặng lẽ bỏ qua thì người viết tưởng đã khai.`);
+    }
+    if (typeof v !== "string" || !v.trim() || v.includes("/") || v.includes("\\")) {
+      throw new Error(`TEN_MAY_SINH_HONG: \`${k}\` phải là TÊN FILE ở gốc repo, không có dấu gạch chéo. Đang là: ${JSON.stringify(v)}`);
+    }
+    ra[k] = v.trim();
+  }
+  /* HAI ARTIFACT TRÙNG TÊN NHAU LÀ TỰ ĐÈ CHÍNH MÌNH — bộ sinh ghi ba file theo thứ tự, nên
+     khai trùng thì file ghi sau nuốt file ghi trước và cổng "còn tươi" đỏ vĩnh viễn mà không
+     ai hiểu vì sao. Bắt ngay lúc đọc cấu hình, chỗ người ta còn đang nhìn cái tên mình vừa gõ. */
+  const ten = Object.values(ra);
+  if (new Set(ten).size !== ten.length) {
+    throw new Error(`TEN_MAY_SINH_HONG: ba artifact phải có ba tên KHÁC nhau. Đang là: ${JSON.stringify(ra)}`);
+  }
+  return Object.freeze(ra);
+}
+
 export function generatorsFrom(parsed) {
   const value = parsed?.generators;
   if (value === undefined) return DEFAULT_GENERATORS;

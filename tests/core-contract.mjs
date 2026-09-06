@@ -11,9 +11,9 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, cpSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, cpSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readStructureFromDisk, unitsFrom, stewardOf, claimPrefixesFrom } from "../scripts/repo-structure.mjs";
@@ -624,6 +624,131 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     "muc da gach ngang la DUNG quy uoc — keu oan thi canh bao thanh tieng on va bi bo qua");
 
   ok("F16 - ma viec nhan tien to co so, va dong `###` la bi neu ten thay vi bien mat im lang");
+}
+
+/* F17 — TEN BA ARTIFACT KHAI DUOC (KHUNG-26).
+   Vap that 06/09, luot migrate ALL_SKILL_MANAGEMENT: repo do co mot bang theo doi VIET TAY
+   ten DASHBOARD.md, 123 dong, co mirror sang Google Sheet. Bo khung dong cung dung cai ten
+   do cho ban may sinh, nen chay bo sinh MOT LAN la de mat — va de IM LANG.
+   Phai doi ten file cua repo dich de nhuong bo sinh: bo khung la khach ma bat chu nha don phong. */
+{
+  const { tenMaySinhFrom, TEN_MAY_SINH_MAC_DINH } = await import("../scripts/repo-structure.mjs");
+
+  // VE DOI CHUNG QUAN TRONG NHAT: repo KHONG khai thi hanh vi cu phai y nguyen. Khong co ve
+  // nay thi ban va co the lam do hang loat repo dang chay binh thuong.
+  assert.deepEqual(tenMaySinhFrom({}), TEN_MAY_SINH_MAC_DINH,
+    "repo khong khai `generated_names` thi phai giu nguyen ba ten mac dinh");
+  assert.equal(TEN_MAY_SINH_MAC_DINH.dashboard, "DASHBOARD.md", "mac dinh khong duoc doi");
+
+  // KHAI MOT KHOA thi hai khoa con lai van mac dinh — repo chi vuong mot ten khong phai khai ca ba.
+  const mot = tenMaySinhFrom({ generated_names: { dashboard: "BANG-MAY-SINH.md" } });
+  assert.equal(mot.dashboard, "BANG-MAY-SINH.md");
+  assert.equal(mot.llms, TEN_MAY_SINH_MAC_DINH.llms, "khoa khong khai phai giu mac dinh");
+
+  /* FAIL CLOSED voi dau vao sai. Lui ve mac dinh im lang thi nguoi viet tuong ten rieng dang
+     co hieu luc, con bo sinh VAN ghi de file cu — dung cai lo `budget` da mac va da va 05/09. */
+  for (const sai of ["khac", 5, [], null]) {
+    assert.throws(() => tenMaySinhFrom({ generated_names: sai }), /TEN_MAY_SINH_HONG/,
+      `generated_names = ${JSON.stringify(sai)} phai bi tu choi, khong duoc lui ve mac dinh im lang`);
+  }
+  // Go SAI TEN KHOA phai bi bat: bo qua im lang thi nguoi viet tuong da khai.
+  assert.throws(() => tenMaySinhFrom({ generated_names: { dashbaord: "x.md" } }), /TEN_MAY_SINH_HONG/);
+  // Duong dan co dau gach cheo KHONG phai ten file o goc repo.
+  assert.throws(() => tenMaySinhFrom({ generated_names: { dashboard: "docs/x.md" } }), /TEN_MAY_SINH_HONG/);
+  // HAI ARTIFACT TRUNG TEN la tu de chinh minh: bo sinh ghi ba file theo thu tu, nen file ghi
+  // sau nuot file ghi truoc va cong "con tuoi" do vinh vien ma khong ai hieu vi sao.
+  assert.throws(() => tenMaySinhFrom({ generated_names: { llms: "DASHBOARD.md" } }), /TEN_MAY_SINH_HONG/);
+  // Chu thich `_doc` trong khoi khong duoc tinh la go sai ten.
+  assert.doesNotThrow(() => tenMaySinhFrom({ generated_names: { _doc: "ghi chu", dashboard: "B.md" } }));
+
+  /* VE NANG NHAT: khai ten rieng thi BO SINH PHAI GHI DUNG TEN DO. Kiem bang mot repo THAT,
+     khong bang chuoi — vi cho hong that nam o duong tu `.repo-structure.json` toi `deps.writeFile`,
+     va mot phep kiem chi goi ham doc cau hinh thi khong phan biet duoc "doc duoc" voi "co dung". */
+  const cha = mkdtempSync(join(tmpdir(), "ten-may-sinh-"));
+  const kho = join(cha, "kho");
+  try {
+    cpSync(ROOT, kho, {
+      recursive: true,
+      filter: (src) => !src.includes(`${sep}node_modules`) && !src.includes(`${sep}.git${sep}`) && !src.endsWith(`${sep}.git`)
+    });
+    const at = (...a) => execFileSync("git", a, { cwd: kho, encoding: "utf8" });
+    at("init", "-q", "-b", "main");
+    at("config", "user.name", "t");
+    at("config", "user.email", "t@e.invalid");
+
+    const ct = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+    ct.generated_names = { dashboard: "BANG-MAY-SINH.md", llms: "cong-vao.txt", repo_map: "ban-do.json" };
+    ct.generated = ["BANG-MAY-SINH.md", "cong-vao.txt", "ban-do.json"];
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(ct, null, 2) + "\n", "utf8");
+    // File viet tay mang ten CU: day chinh la ca da lam mat 123 dong o repo that.
+    writeFileSync(join(kho, "DASHBOARD.md"), "# Bang VIET TAY cua repo — dung de mat\n", "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "khai ten rieng" + "\n\n" + "Lane: thu");
+    /* `last_verified_commit` cua repo nha tro toi mot commit KHONG co trong kho vua `git init`,
+       nen bo sinh dung lai truoc khi cham toi ten file. Ghi de bang HEAD moi — day la ha tang
+       cua fixture, khong phai thu dang duoc kiem. */
+    const head = at("rev-parse", "HEAD").trim();
+    const st = join(kho, "STATUS.md");
+    writeFileSync(st, readFileSync(st, "utf8").replace(/last_verified_commit:.*/, `last_verified_commit: "${head}"`), "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "ghim moc kiem chung theo HEAD cua kho thu");
+
+    execFileSync(process.execPath, [join(kho, "scripts", "build-dashboard.mjs")], { cwd: kho, encoding: "utf8" });
+
+    for (const f of ["BANG-MAY-SINH.md", "cong-vao.txt", "ban-do.json"]) {
+      assert.ok(existsSync(join(kho, f)), `bo sinh phai ghi dung ten da khai: thieu ${f}`);
+    }
+    assert.equal(readFileSync(join(kho, "DASHBOARD.md"), "utf8"), "# Bang VIET TAY cua repo — dung de mat\n",
+      "FILE VIET TAY MANG TEN CU KHONG DUOC BI DE — day la toan bo ly do KHUNG-26 ton tai");
+    assert.match(readFileSync(join(kho, "cong-vao.txt"), "utf8"), /Ark|repo/i, "cong vao phai co noi dung that");
+    // Ban do may doc phai TU KHAI ten cong vao moi, khong tro nguoc ve `llms.txt` cu.
+    assert.equal(JSON.parse(readFileSync(join(kho, "ban-do.json"), "utf8")).entry_point, "cong-vao.txt",
+      "ban do may doc phai tro toi ten cong vao DA KHAI, khong phai ten mac dinh");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+
+  ok("F17 - ten ba artifact khai duoc, bo sinh ghi dung ten do, file viet tay ten cu KHONG bi de");
+}
+
+/* F18 — BAN TRICH MANG TU DIEN THUAT NGU VA BAN HUONG DAN (KHUNG-27).
+   Vap that 06/09: viet Ban do file cho repo dich tro toi hai file nay vi repo nha co, kiem
+   lai thi CA HAI KHONG TON TAI — dung hinh dang loi "luat tro toi mot thu khong ton tai".
+   Tro treu o cho day la hai file repo MOI CAN NHAT, va truoc ban nay la luc duy nhat khong co. */
+{
+  const files = buildTemplateFiles();
+  for (const f of ["docs/LEGEND.md", "docs/HUONG-DAN.md"]) {
+    assert.ok(files.has(f), `ban trich phai mang ${f}`);
+    assert.ok(files.get(f).trim().length > 200, `${f} trong ban trich khong duoc rong`);
+  }
+
+  /* BAN HUONG DAN KHONG DUOC DAY THU REPO DICH KHONG CO. Cung cai bay ma bo loc
+     BAO-TRI-DINH-KY.md da bit: day mot lenh go vao se bao loi. */
+  const hd = files.get("docs/HUONG-DAN.md");
+  assert.doesNotMatch(hd, /npm run assess/,
+    "`npm run assess` la lenh CUA RIENG repo bo khung — ban trich khong khai no");
+  assert.doesNotMatch(hd, /_template/,
+    "khoa vung `_template` chi ton tai o repo bo khung");
+
+  /* VE DOI CHUNG: cat theo KHOI chu khong theo DONG. Bo mot dong lenh ma de lai tieu de voi
+     bang giai thich thi nguoi doc thay mot muc cut — con kho hieu hon la khong co muc nao. */
+  assert.doesNotMatch(hd, /Repo kia còn cách chuẩn bao xa/,
+    "bo lenh thi phai bo ca TIEU DE cua muc do, khong de lai muc cut");
+  // Va phan con lai phai NGUYEN VEN, neu khong bo loc dang cat qua tay.
+  for (const muc of ["Mở phiên, đúng thứ tự", "Đóng phiên", "Không bao giờ"]) {
+    assert.ok(hd.includes(muc), `bo loc cat qua tay: mat muc "${muc}"`);
+  }
+
+  // TU DIEN la file THUAN, khong nhac gi rieng cua repo nha — chep nguyen van, dung loc.
+  assert.equal(files.get("docs/LEGEND.md"),
+    readFileSync(join(ROOT, "docs/LEGEND.md"), "utf8"),
+    "LEGEND.md khong co gi rieng cua repo nha nen phai chep NGUYEN VAN, khong loc");
+
+  // BAN DO CUA BAN TRICH PHAI TRO TOI CA HAI — file khong ai tro toi thi coi nhu khong co.
+  const luat = files.get("AGENTS.md");
+  for (const f of ["docs/LEGEND.md", "docs/HUONG-DAN.md"]) {
+    assert.ok(luat.includes(f), `Ban do file cua ban trich phai tro toi ${f}`);
+  }
+
+  ok("F18 - ban trich mang LEGEND + HUONG-DAN, da loc thu repo dich khong co, va Ban do tro toi ca hai");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

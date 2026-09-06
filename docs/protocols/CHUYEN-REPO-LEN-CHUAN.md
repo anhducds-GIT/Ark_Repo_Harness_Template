@@ -168,6 +168,29 @@ sống bằng bằng chứng.
 **Mỗi lượt thi hành ở từng repo vẫn phải hỏi người chốt riêng.** Luật ở đây nói *đi hướng nào*,
 không nói *được đi mà không xin phép*.
 
+### Repo đích ĐÃ CÓ `DASHBOARD.md` viết tay — khai tên khác, đừng đổi tên file của họ
+
+Từ bản **1.3.11**, ba artifact máy sinh khai tên được. Repo đích đã có file trùng tên thì
+**bộ khung nhường**, không phải ngược lại:
+
+```json
+"generated_names": { "dashboard": "BANG-MAY-SINH.md", "llms": "cong-vao.txt", "repo_map": "ban-do.json" }
+```
+
+Khai thiếu khoá nào thì khoá đó dùng mặc định — vướng một tên không phải khai cả ba.
+
+**Vì sao quan trọng:** vấp thật 06/09 ở `ALL_SKILL_MANAGEMENT` — repo đó có một bảng theo dõi
+**viết tay 123 dòng**, có mirror sang Google Sheet, được ba file khác trỏ tới. Chạy bộ sinh MỘT
+LẦN là đè mất, và đè **im lặng**. Trước 1.3.11 cách duy nhất là đổi tên file của repo đích, tức
+bộ khung là khách mà bắt chủ nhà dọn phòng.
+
+**Kiểm trước khi chạy bộ sinh lần đầu, ba tên:**
+
+```bash
+ls DASHBOARD.md llms.txt repo-map.json 2>/dev/null   # có file nào là phải khai tên khác
+```
+
+
 ### Kiểm chứng lại audit, đừng tin thẳng
 
 Luật vàng số 4 áp cho cả audit của AI khác. Trial 05/09: Codex báo ba lệnh thoát mã `2/1/1` ở

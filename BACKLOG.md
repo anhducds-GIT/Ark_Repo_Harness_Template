@@ -436,7 +436,7 @@ Ca hỏng phải dựng nổi trước khi vá — ba vế, thiếu vế nào th
 chỉ đọc khi cần. Hiện 1.310 dòng và chỉ có một chiều: tăng. Vùng: `_code` + luật.
 
 
-### KHUNG-26 · Bộ khung ĐÓNG CỨNG tên `DASHBOARD.md` — repo nào đã có bảng viết tay đều phải nhường
+### ~~KHUNG-26~~ · ĐÓNG 06/09 · Bộ khung ĐÓNG CỨNG tên `DASHBOARD.md` — repo nào đã có bảng viết tay đều phải nhường
 
 **Vấp thật 06/09, lượt migrate `ALL_SKILL_MANAGEMENT`.** Repo đó có một bảng theo dõi **viết
 tay 123 dòng**, có mirror sang Google Sheet, được `HANDOFF.md` · `decisions.md` ·
@@ -451,12 +451,24 @@ repo sau có `DASHBOARD.md` viết tay đều dính lại.
 
 Ba tên còn lại cùng bệnh: `llms.txt` · `repo-map.json` · `HANDOFF.md`.
 
-**Cách sửa:** cho khai trong `.repo-structure.json`, cùng chỗ với `generated` — ví dụ
-`"generated_names": { "dashboard": "BANG-MAY-SINH.md" }`. Ca hỏng phải dựng nổi: repo khai tên
-khác thì bộ sinh ghi đúng tên đó **và** cổng "sự thật máy sinh còn tươi" đối chiếu đúng file đó;
-repo không khai thì hành vi cũ giữ nguyên. Vùng: `_code`.
+**ĐÃ VÁ 06/09, bản 1.3.11.** Khai `generated_names` trong `.repo-structure.json`:
 
-### KHUNG-27 · Bản trích KHÔNG mang `docs/LEGEND.md` và `docs/HUONG-DAN.md` — hai file repo mới cần nhất
+```json
+"generated_names": { "dashboard": "BANG-MAY-SINH.md", "llms": "cong-vao.txt", "repo_map": "ban-do.json" }
+```
+
+Khai thiếu khoá nào thì khoá đó dùng mặc định. Đầu vào sai bị **từ chối thẳng**, không lùi về
+mặc định im lặng — gõ sai tên khoá, để dấu gạch chéo, hay khai hai artifact trùng tên đều đỏ.
+
+Ghim ở `F17` (`tests/core-contract.mjs`): dựng một **repo git thật**, khai ba tên riêng, trồng
+một file viết tay mang tên cũ, rồi đòi bộ sinh ghi đúng ba tên đã khai **và** file viết tay
+không suy suyển. Vế đối chứng: repo không khai thì hành vi cũ y nguyên.
+
+**Còn một việc nhỏ, không gấp:** `ALL_SKILL_MANAGEMENT` vẫn đang mang cách lách cũ
+(`DASHBOARD-THU-CONG.md`). Nâng repo đó lên 1.3.11 rồi khai `generated_names` là trả được tên
+`DASHBOARD.md` về cho bảng viết tay. Không ai bị chặn, nên chưa làm.
+
+### ~~KHUNG-27~~ · ĐÓNG 06/09 · Bản trích KHÔNG mang `docs/LEGEND.md` và `docs/HUONG-DAN.md` — hai file repo mới cần nhất
 
 **Vấp thật 06/09.** Viết bản đồ file cho repo đích, trỏ tới hai file đó vì repo nhà có. Kiểm lại
 trước khi commit thì **cả hai không tồn tại** ở repo đích.
@@ -470,9 +482,13 @@ thuật ngữ — gate · claim · lane · fail-closed; `HUONG-DAN.md` (148 dòn
 người mới và cho phiên AI mới. Repo vừa lắp bộ khung là lúc **cần nhất** hai thứ đó, và là lúc
 duy nhất không có.
 
-**Cách sửa:** thêm cả hai vào `VERBATIM` của `build-template.mjs`. Cần soi trước: `LEGEND.md`
-nhắc tên repo nhà 2 chỗ, `HUONG-DAN.md` 1 chỗ — phải qua `genericize()` hoặc lọc như đã làm với
-`docs/BAO-TRI-DINH-KY.md`. Cổng chặn tên dự án gốc sẽ bắt nếu quên. Vùng: `_template`.
+**ĐÃ VÁ 06/09, bản 1.3.11.** Cả hai vào `VERBATIM`. `LEGEND.md` chép **nguyên văn** (không có
+gì riêng của repo nhà). `HUONG-DAN.md` qua một bộ lọc **cắt theo KHỐI, không theo dòng**: bỏ
+một dòng lệnh mà để lại tiêu đề với bảng giải thích thì người đọc thấy một mục cụt, còn khó
+hiểu hơn là không có mục nào. Ba thứ bị cắt: `npm run assess` · khoá vùng `_template` · câu tự
+giới thiệu "bộ khung này".
+
+Ghim ở `F18`, kèm vế đối chứng *"bộ lọc cắt quá tay"* — ba mục phải còn nguyên sau khi lọc.
 
 
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ

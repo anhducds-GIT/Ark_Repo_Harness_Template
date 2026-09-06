@@ -80,6 +80,15 @@ const VERBATIM = [
   // Không phát cái này thì mỗi repo migrate tự phình theo cách riêng, và người chốt phát hiện
   // ra khi đã muộn — lúc mỗi phiên AI phải nạp một đống chữ đã hết việc.
   ["docs/BAO-TRI-DINH-KY.md", "docs/BAO-TRI-DINH-KY.md"],
+  // TỪ ĐIỂN THUẬT NGỮ + BẢN HƯỚNG DẪN CHO NGƯỜI MỚI. Thiếu ở bản trích tới tận 06/09, và
+  // vấp thật lượt migrate `ALL_SKILL_MANAGEMENT`: viết Bản đồ file cho repo đích trỏ tới hai
+  // file này vì repo nhà có, kiểm lại thì CẢ HAI KHÔNG TỒN TẠI — đúng hình dạng lỗi "luật trỏ
+  // tới một thứ không tồn tại" đã đếm năm lần.
+  // Trớ trêu: đây là hai file repo mới CẦN NHẤT — một cuốn từ điển cho `gate` · `claim` · `lane`
+  // · `fail-closed`, và một bản hướng dẫn cho phiên AI đầu tiên. Repo vừa lắp bộ khung là lúc
+  // cần nhất, và trước bản này là lúc duy nhất không có.
+  ["docs/LEGEND.md", "docs/LEGEND.md"],
+  ["docs/HUONG-DAN.md", "docs/HUONG-DAN.md"],
   // PHÉP GHIM CỦA GÓI ASSISTANT — chép nguyên văn, cùng lý do như suite hạt giống: repo gốc
   // CHẠY THẬT đúng cái nó phát cho người khác, và `--check` không cho hai bản trôi khỏi nhau.
   // Khối E của nó tự dựng một repo git thật có hình dạng khác hẳn, nên nó chứng minh được
@@ -234,6 +243,26 @@ function genericize(rel, text) {
     out = out.split(String.fromCharCode(10))
       .filter((l) => !l.includes("npm run overview"))
       .join(String.fromCharCode(10));
+  }
+
+  /* BẢN HƯỚNG DẪN nhắc ba thứ CHỈ repo bộ khung có: `npm run assess` (đo một repo khác cách
+     chuẩn bao xa), khoá vùng `_template`, và câu tự giới thiệu "bộ khung này". Repo đích không
+     có lệnh đó, không có thư mục đó — dạy nó là phát đi một lệnh gõ vào sẽ báo lỗi, đúng cái
+     bẫy mà bộ lọc `BAO-TRI-DINH-KY.md` ngay trên đã bịt.
+     Cắt theo KHỐI, không cắt theo dòng: bỏ một dòng lệnh mà để lại tiêu đề với bảng giải thích
+     thì người đọc thấy một mục cụt, còn khó hiểu hơn là không có mục nào. */
+  if (rel === "docs/HUONG-DAN.md") {
+    const NL = String.fromCharCode(10);
+    const dong = out.split(NL);
+    const ra = [];
+    let boQua = false;
+    for (const d of dong) {
+      if (/^#{2,4} /.test(d)) boQua = d.includes("Repo kia còn cách chuẩn bao xa");
+      if (boQua) continue;
+      if (d.includes("_template")) continue;
+      ra.push(d.replace("bộ khung này để làm gì", "repo này để làm gì"));
+    }
+    out = ra.join(NL);
   }
   return out;
 }
@@ -501,8 +530,7 @@ function lawForTemplate() {
 > nó mang theo — vừa để repo mới xanh ngay, vừa làm mẫu cho định dạng. **Thêm dòng của bạn vào
 > đây; đừng xoá cái đang đúng.**
 
-Luật chung nằm ở các mục trên. Chi tiết kỹ thuật thì nằm ở các file mà bảng dưới trỏ tới —
-không đọc trước, tới việc nào thì mở sổ tay đó.
+Luật chung ở các mục trên; chi tiết kỹ thuật ở các file bảng dưới trỏ tới — đừng đọc trước cả bảng, tới việc nào thì mở sổ tay đó.
 
 | Khi bạn sắp… | Mở file |
 |---|---|
@@ -516,6 +544,7 @@ không đọc trước, tới việc nào thì mở sổ tay đó.
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy \`npm run bootstrap\` |
 | **Đến hạn bảo trì · repo im ắng lâu ngày · muốn biết repo đang NẶNG bao nhiêu** | [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md) — ba nhịp giữ repo đúng, cộng **nhịp DỌN** giữ repo rẻ. Đo bằng \`npm run can-nang\`; ngân sách khai được ở \`budget\` trong \`.repo-structure.json\` |
+| **Mới vào, hoặc cần tra một thuật ngữ** (gate · claim · lane · fail-closed…) | [docs/HUONG-DAN.md](docs/HUONG-DAN.md) — hai phần: cho người, và cho phiên AI; đọc trước mọi sổ tay khác · [docs/LEGEND.md](docs/LEGEND.md) — từ điển, thuật ngữ **giữ nguyên tiếng Anh** vì dịch sang tiếng Việt thì tra cứu mất |
 | **Phát sinh việc ngoài phạm vi phiên mình — chỗ ghi nợ, luật mục 0 bắt** | [BACKLOG.md](BACKLOG.md) — nhóm \`## P<n>\`, mỗi mục \`### <MÃ>-<số> · <tiêu đề>\`, đóng thì **gạch mã** chứ đừng xoá. \`npm run what-next\` đọc thẳng file này; sai quy ước một ký tự là mục biến mất khỏi bản đồ việc |
 | **Sắp BÁO CÁO trạng thái cho người chốt — kiểm xem điều mình sắp nói có khớp nguồn thẩm quyền không** | \`npm run state-check\` — **không phải cổng đóng phiên**: cổng kia hỏi "việc tôi làm đẩy được chưa", cái này hỏi "điều tôi sắp nói có đúng không". Ba mã thoát, cố ý không gộp: \`OK\` · \`MISMATCH\` · \`UNKNOWN\` — không đọc được thì nói KHÔNG BIẾT, không nói OK. **Chỉ đọc, không đòi khoá nào** |
 | **Không biết làm gì tiếp, hoặc muốn biết việc nào chạy song song được ngay** | \`npm run what-next\` — bản đồ việc, giao ba nguồn: bảng quyền × sổ nợ từng đơn vị × sổ ý tưởng. Luật song song nó cưỡng chế chỉ một câu: hai việc song song được **khi và chỉ khi** thuộc hai khoá khác nhau và cả hai đang trống. **Chỉ đọc, không đòi khoá nào** |

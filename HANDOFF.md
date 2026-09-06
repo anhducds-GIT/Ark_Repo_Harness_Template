@@ -554,3 +554,30 @@ không nửa nào thừa.
 Đây là lần thứ **ba trong một ngày** cùng một bài học: bản vá viết xong, test xanh, rồi **chạy
 trên dữ liệu thật mới lộ**. Ba lần đó là — vòng lặp chết trong `don.mjs` · tên file lưu trữ và
 ghi đè im lặng · và lần này.
+
+## 2026-09-06 · `claude-1.3.11` — BỘ KHUNG THÔI BẮT CHỦ NHÀ DỌN PHÒNG
+
+**Làm gì:** vá KHUNG-26 và KHUNG-27 — hai lỗi do lượt migrate `ALL_SKILL_MANAGEMENT` lôi ra.
+
+**Kết quả số:** `npm test` **exit 0** · `core-contract` **18 xanh** (thêm F17, F18) · cả hai
+qua đột biến kiểm, mỗi bản vá phá riêng từng nửa.
+
+**KHUNG-26 — ba artifact máy sinh nay khai tên được** (`generated_names` trong
+`.repo-structure.json`). Trước đó `DASHBOARD.md` · `llms.txt` · `repo-map.json` đóng cứng trong
+code, nên repo đích có file trùng tên là bị đè **im lặng** ngay lần chạy bộ sinh đầu tiên.
+
+**KHUNG-27 — bản trích mang `LEGEND.md` và `HUONG-DAN.md`.** `HUONG-DAN.md` qua bộ lọc cắt theo
+KHỐI: bỏ một dòng lệnh mà để lại tiêu đề với bảng giải thích thì người đọc thấy một mục cụt.
+
+**BA BẪY GẶP LẠI TRONG LƯỢT NÀY, cả ba đều đã gặp trước đó — ghi lại vì rõ ràng chúng sẽ còn quay lại:**
+
+1. **Dấu backtick trong template literal của `lawForTemplate()`** — thêm một dòng bản đồ có
+   `` `gate` `` là `SyntaxError` ngay. Phải thoát thành `` \` ``. Lần thứ ba mắc.
+2. **Fixture dựng repo git mới thì `last_verified_commit` cũ không resolve được**, và bộ sinh
+   dừng trước khi chạm tới thứ đang được kiểm. Phải ghi đè mốc bằng HEAD của kho thử.
+3. **`python` trong heredoc không thấy `/tmp` của Git Bash** — phải dùng thư mục nháp.
+
+**Còn mở, không mục nào chặn ai và không mục nào chờ Đức:**
+- `ALL_SKILL_MANAGEMENT` vẫn mang cách lách cũ (`DASHBOARD-THU-CONG.md`). Nâng repo đó lên
+  1.3.11 rồi khai `generated_names` là trả được tên `DASHBOARD.md` về cho bảng viết tay.
+- KHUNG-11 phần đuôi · thời gian chạy phép kiểm vượt trần.

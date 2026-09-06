@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { behaviourGlobsFrom, DEFAULT_UNITS, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, unitsFrom } from "./repo-structure.mjs";
+import { behaviourGlobsFrom, DEFAULT_UNITS, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, tenMaySinhFrom, unitsFrom } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -33,6 +33,10 @@ const compareText = (left, right) => left < right ? -1 : left > right ? 1 : 0;
    Ba file GENERATED, sinh cùng một lượt từ CÙNG một model. Nếu tách ra sinh
    riêng thì sớm muộn ba file sẽ nói ba điều khác nhau — đúng thứ tầng
    GENERATED sinh ra để chống. */
+/* TÊN MẶC ĐỊNH của ba artifact. Repo khai tên khác được ở `generated_names` — xem
+   `tenMaySinhFrom` trong `repo-structure.mjs`. Ba hằng số này CHỈ còn là mặc định và là
+   lưới hứng cho `isBehaviourFile` ở repo chưa khai gì; mọi chỗ SINH và SO đều lấy tên từ
+   `model.ten`, vì bộ sinh vừa ghi ba file vừa nhắc tên chúng trong nội dung trang. */
 export const LLMS_FILE = "llms.txt";
 export const REPO_MAP_FILE = "repo-map.json";
 export const DASHBOARD_FILE = "DASHBOARD.md";
@@ -524,6 +528,10 @@ export function collectModel(deps = createDefaultDeps(), { tolerant = false } = 
   // chi khac muc dich su dung (mien nhan quyen). Hai ten cho mot khai niem la hai cho phai
   // nho cap nhat, va cho thu hai se bi quen.
   const behaviourOpts = behaviourOptsFrom(structure);
+  /* TÊN ba artifact — repo khai được (KHUNG-26). Đặt vào MODEL chứ không đọc lại ở từng chỗ
+     dùng: bộ sinh vừa GHI ba file vừa NHẮC TÊN chúng trong nội dung trang, nên hai chỗ đó phải
+     lấy tên từ cùng một nguồn. Đọc hai lần là hai lần có thể lệch nhau. */
+  const ten = tenMaySinhFrom(structure);
   const repo = repoIdentityFrom(structure);
   const profile = profileFrom(structure);
   // Ở chế độ tolerant, một `manifest.json` thiếu/hỏng không được phép giết cả lượt chạy —
@@ -664,6 +672,7 @@ export function collectModel(deps = createDefaultDeps(), { tolerant = false } = 
   const claims = readClaims(deps);
   const sortedRows = rows.sort((a, b) => compareText(a.key, b.key));
   const model = {
+    ten,
     shortHead: deps.git.shortHead(),
     headDate,
     rows: sortedRows,
@@ -963,9 +972,9 @@ function daysBetween(from, to) {
 function gatewayLinks(model, deps) {
   const entries = [
     { label: "AGENTS.md", path: "AGENTS.md", note: "hiến pháp repo — luật chung, đọc trước tiên" },
-    { label: "DASHBOARD.md", path: DASHBOARD_FILE, note: "bảng trạng thái máy sinh: có extension gì, cái nào sống, việc đang mở" },
+    { label: model.ten.dashboard, path: model.ten.dashboard, note: "bảng trạng thái máy sinh: có extension gì, cái nào sống, việc đang mở" },
     { label: "HANDOFF.md", path: "HANDOFF.md", note: "phiên gần nhất ở gốc repo làm gì, còn gì mở" },
-    { label: REPO_MAP_FILE, path: REPO_MAP_FILE, note: "bản đồ máy đọc — hệ điều phối cấp cao chỉ cần đọc file này" }
+    { label: model.ten.repo_map, path: model.ten.repo_map, note: "bản đồ máy đọc — hệ điều phối cấp cao chỉ cần đọc file này" }
   ];
   for (const row of model.rows) {
     if (!row.statusPath) continue;
@@ -975,7 +984,7 @@ function gatewayLinks(model, deps) {
   // Không miễn trừ thì lần chạy đầu (khi file chưa có trên đĩa) sẽ tự khai mình là
   // link chết, và nội dung sinh ra phụ thuộc vào việc chính nó đã chạy lần nào chưa
   // — artifact máy sinh mà không tất định thì cổng kiểm HEAD-vs-HEAD hết tin được.
-  const selfProduced = new Set([DASHBOARD_FILE, LLMS_FILE, REPO_MAP_FILE]);
+  const selfProduced = new Set([model.ten.dashboard, model.ten.llms, model.ten.repo_map]);
   // `isFile` chứ không phải `fileExists`: một thư mục trùng tên vẫn "tồn tại"
   // nhưng bấm vào link thì không mở ra tài liệu nào.
   const probe = (relPath) => deps.isFile ? deps.isFile(relPath) : deps.fileExists(relPath);
@@ -1065,7 +1074,7 @@ function blockA(model) {
     "",
     `1. **Việc ưu tiên #1** — ${priorityLine}`,
     `2. **Phiên gần nhất** — ${model.headDate} · ${link("HANDOFF.md", "HANDOFF.md")}`,
-    `3. **Luật phải đọc trước khi sửa gì** — ${link("AGENTS.md", "AGENTS.md")} · cổng vào cho AI: ${link(LLMS_FILE, LLMS_FILE)}`,
+    `3. **Luật phải đọc trước khi sửa gì** — ${link("AGENTS.md", "AGENTS.md")} · cổng vào cho AI: ${link(model.ten.llms, model.ten.llms)}`,
     `4. **Ai đang giữ package nào** — \`.agents/claims.json\` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)`,
     ""
   ];
@@ -1075,7 +1084,7 @@ function blockA(model) {
 function blockD(model) {
   const rows = [
     ["Đơn vị chưa khai STATUS", model.health.units_without_status, "mỗi dòng là một câu hỏi AI sẽ phải hỏi Đức"],
-    ["Link chết trong file cổng", model.health.dead_links, `kiểm ${model.gatewayLinks.length} link ở ${LLMS_FILE} và bảng B`],
+    ["Link chết trong file cổng", model.health.dead_links, `kiểm ${model.gatewayLinks.length} link ở ${model.ten.llms} và bảng B`],
     ["Thư mục top-level chưa khai chủ", model.health.undeclared_dirs, "chưa khai trong khối `areas` của `.repo-structure.json`"],
     ["Tài liệu quá hạn chưa rà", model.health.draft_debt, "`status: active` mà quá `ttl_days` tính từ commit cuối chạm vào"]
   ];
@@ -1158,7 +1167,7 @@ export function buildRepoMap(model) {
     schema_version: REPO_MAP_SCHEMA_VERSION,
     generated_at: model.headDate,
     profile: model.profile,
-    entry_point: LLMS_FILE,
+    entry_point: model.ten.llms,
     law_files: ["AGENTS.md", "CLAUDE.md"],
     top_level: model.topLevel,
     units: model.rows.map((row) => ({
@@ -1253,7 +1262,7 @@ export function compareRepoMap(expected, actual) {
     return { value: parsed };
   };
   const left = strip(expected, "bản sinh ra");
-  const right = strip(actual, REPO_MAP_FILE);
+  const right = strip(actual, "bản đồ máy đọc trên đĩa");
   if (right.broken) return { matches: false, reason: right.broken };
   if (left.broken) return { matches: false, reason: left.broken };
   const a = JSON.stringify(left.value, null, 2);
@@ -1304,10 +1313,10 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
     const generatedLlms = buildLlmsTxt(model);
     const generatedMap = buildRepoMap(model);
     if (!check) {
-      deps.writeFile(DASHBOARD_FILE, generated);
-      deps.writeFile(LLMS_FILE, generatedLlms);
-      deps.writeFile(REPO_MAP_FILE, generatedMap);
-      output.log(`Đã sinh ${DASHBOARD_FILE}, ${LLMS_FILE} và ${REPO_MAP_FILE} thành công.`);
+      deps.writeFile(model.ten.dashboard, generated);
+      deps.writeFile(model.ten.llms, generatedLlms);
+      deps.writeFile(model.ten.repo_map, generatedMap);
+      output.log(`Đã sinh ${model.ten.dashboard}, ${model.ten.llms} và ${model.ten.repo_map} thành công.`);
       // BẪY THỨ TỰ, phải nói to. Bộ sinh đọc HOÀN TOÀN từ HEAD. Nếu bạn vừa sửa
       // STATUS/manifest mà CHƯA commit rồi chạy lệnh này, artifact sinh ra phản ánh
       // HEAD CŨ — rồi bạn commit dữ liệu mới nằm cạnh artifact cũ, và cổng kiểm đỏ.
@@ -1322,7 +1331,7 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
       const debt = model.health.units_without_status + model.health.dead_links
         + model.health.undeclared_dirs + model.health.draft_debt;
       if (debt > 0) {
-        output.log(`Nợ điều hướng [ĐO]: chưa khai STATUS ${model.health.units_without_status} · link chết ${model.health.dead_links} · thư mục chưa khai chủ ${model.health.undeclared_dirs} · tài liệu quá hạn ${model.health.draft_debt}. Chi tiết ở Khối D của ${DASHBOARD_FILE}.`);
+        output.log(`Nợ điều hướng [ĐO]: chưa khai STATUS ${model.health.units_without_status} · link chết ${model.health.dead_links} · thư mục chưa khai chủ ${model.health.undeclared_dirs} · tài liệu quá hạn ${model.health.draft_debt}. Chi tiết ở Khối D của ${model.ten.dashboard}.`);
       }
       for (const row of model.rows.filter((item) => item.key !== "_root")) {
         const dirtyCount = (deps.git.dirtyFiles?.(row.key) ?? []).filter((f) => isBehaviourFile(f, behaviourOpts)).length;
@@ -1336,9 +1345,9 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
     // Kiểm CẢ BA file. Chỉ kiểm DASHBOARD thì llms.txt và repo-map.json có thể mục
     // âm thầm — mà đó lại đúng là hai file một phiên AI mới đọc đầu tiên.
     const targets = [
-      { file: DASHBOARD_FILE, generated, compare: compareDashboard },
-      { file: LLMS_FILE, generated: generatedLlms, compare: compareDashboard },
-      { file: REPO_MAP_FILE, generated: generatedMap, compare: compareRepoMap }
+      { file: model.ten.dashboard, generated, compare: compareDashboard },
+      { file: model.ten.llms, generated: generatedLlms, compare: compareDashboard },
+      { file: model.ten.repo_map, generated: generatedMap, compare: compareRepoMap }
     ];
     const problems = [];
     for (const target of targets) {
@@ -1355,7 +1364,7 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
       problems.push(`${target.file} lệch tại dòng ${comparison.line}. - Đang có: ${comparison.actual} | - Cần có: ${comparison.expected}`);
     }
     if (problems.length === 0) {
-      output.log(`${DASHBOARD_FILE}, ${LLMS_FILE} và ${REPO_MAP_FILE} đang khớp với repo.`);
+      output.log(`${model.ten.dashboard}, ${model.ten.llms} và ${model.ten.repo_map} đang khớp với repo.`);
       return 0;
     }
     for (const problem of problems) output.error(problem);
