@@ -162,7 +162,7 @@ Chú ý mục thứ ba: đó chính là mục đang đỏ vĩnh viễn (KHUNG-1)
 là đỏ-thật-được, vừa đang đỏ thật — và không ai bắt được sự trớ trêu đó cho tới khi audit ngoài
 vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng chứng. Vùng: `_docs`.
 
-### KHUNG-11 · Repo đã vượt ngân sách cân nặng của chính nó — ĐÃ DỌN MỘT VÒNG 06/09, CÒN VƯỢT 799
+### KHUNG-11 · Repo vượt ngân sách — nay có CƠ CHẾ dọn, không còn là việc làm tay
 
 > **Đức chốt 06/09:** cắt gọn + dời sang lưu trữ, KHÔNG xoá. Đã làm một vòng, mỗi bước có md5
 > chứng minh không mất byte: `HANDOFF.md` 1.273→415 · `CHANGELOG.md` 806→241 · `ROADMAP-V1`
@@ -170,7 +170,12 @@ vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng c
 > `can-nang.mjs`: nó bảo dời sang `docs/archive/` trong khi vẫn quét đệ quy cả `docs/` — làm
 > đúng lời khuyên thì tổng TĂNG. Nay `docs/archive/` được miễn.
 >
-> **CHỜ NGƯỜI CHỐT:** vòng hai — còn vượt **799 dòng**, và lối duy nhất còn lại là gọt
+> **ĐỨC CHỐT 06/09 — vòng hai: cần CƠ CHẾ dọn, không phải một lượt dọn.** *"Nội dung sẽ luôn
+> bị phình sau 1 quá trình."* Đã dựng `scripts/don.mjs` (`npm run don`) và cho đi theo bản trích,
+> nên mọi repo migrate cũng dọn được. Ghim ở `tests/don-smoke.mjs`, **bốn vế**, cả bốn qua đột
+> biến kiểm. `HANDOFF.md` 1.311 → 598 · `CHANGELOG.md` 335 → 262, không mất byte nào.
+>
+> **Còn treo, và KHÔNG chặn ai:** còn vượt **799 dòng**, và lối duy nhất còn lại là gọt
 > `docs/protocols/ORCHESTRATOR.md` (426 dòng). Tôi KHÔNG tự gọt: mỗi mục trong đó gắn một sự
 > cố có thật, khối chú thích cuối file bị `tests/template-null-repo.mjs` ghim, và gọt hết 276
 > dòng cũng chỉ còn 2.723 — **vẫn vượt**. Tức 2.200 là con số đặt theo mong muốn, chưa từng
@@ -386,9 +391,11 @@ CP-1 ở repo n8n, nhưng nặng hơn vì repo này lấy chính việc điều 
 > còn hiệu lực từ 06/09" lên đầu `authority_matrix.md` và `discussion_protocol.md`. Mỗi lượt
 > thi hành vẫn phải hỏi Đức riêng.
 
-### KHUNG-25 · Sổ tay bảo trì bảo DỌN nhật ký, cổng đóng phiên CẤM — thử thật, cổng thắng
+### ~~KHUNG-25~~ · ĐÓNG 06/09 · Sổ tay bảo trì bảo DỌN nhật ký, cổng đóng phiên CẤM — thử thật, cổng thắng
 
-> **CHỜ NGƯỜI CHỐT:** bản vá này đổi một luật an toàn (`AGENTS.md` mục 2 hàng 6), nên không AI nào tự làm được.
+> **ĐÃ CHỐT 06/09 — Đức duyệt bản vá.** Cổng nay CHO xoá dòng khỏi `HANDOFF.md` **khi và chỉ khi**
+> từng dòng bị xoá có bản khớp BYTE trong `*/archive/*`. Xoá mà không có bản lưu trữ khớp thì
+> vẫn ĐỎ, và sửa dòng cũ tại chỗ cũng vẫn ĐỎ. Ghim ở `tests/cong-do-that.mjs` khối 9, **năm vế**.
 
 **Đo thật 06/09, không phải suy luận.**
 

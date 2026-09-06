@@ -3,31 +3,31 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-1.3.8",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "decisions.md + BACKLOG + CHANGELOG",
-      "released_at": "2026-09-06",
+      "task": "so no, so quyet dinh, nhat ky",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": null,
+      "owner": "claude-1.3.8",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "KHUNG-11 + luat hoa giai hai he khoa",
-      "released_at": "2026-09-06",
+      "task": "KHUNG-11: co che don dinh ky",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-1.3.8",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "KHUNG-16 + KHUNG-18: bo ma commit khoi trang, nhan tien to co so",
-      "released_at": "2026-09-06",
+      "task": "KHUNG-25: cong cho doi nhat ky sang luu tru khi khop byte",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"

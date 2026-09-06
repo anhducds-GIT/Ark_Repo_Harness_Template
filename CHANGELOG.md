@@ -3,6 +3,70 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.8 — 2026-09-06 — Repo có NHỊP DỌN, và cổng thôi cấm chính việc nó bảo phải làm
+
+Hai luật của repo cắn nhau — sổ tay bảo trì bắt **dời** nhật ký cũ đi, cổng đóng phiên
+**cấm** `HANDOFF.md` xoá dòng nào. Bản 1.3.7 phát hiện, hoàn nguyên và ghi nợ. Bản này
+Đức chốt cả hai vế: vá cổng, và dựng cơ chế dọn.
+
+### Cổng KIỂM CHỨNG luật "dời chỗ chứ không xoá", thay vì cấm cả hai
+
+Cổng nay cho `HANDOFF.md` xoá dòng **khi và chỉ khi** từng dòng bị xoá có bản khớp **BYTE**
+trong `*/archive/*`. Đây là **siết**, không phải nới: trước đây cổng *giả định* việc dời chỗ
+không xảy ra được; nay nó *kiểm chứng*. Xoá mà không có bản lưu trữ khớp thì vẫn ĐỎ.
+
+Kèm theo, phần miễn trừ tự nó biến mất: cổng nay so **toàn bộ** dòng thay vì bỏ qua hai dòng.
+
+Ghim ở [tests/cong-do-that.mjs](tests/cong-do-that.mjs) khối 9, **năm vế** — thiếu vế nào thì
+bản vá là đồ trang trí:
+
+| Vế | Đòi |
+|---|---|
+| Xoá, không có kho lưu trữ | **ĐỎ** |
+| Xoá, có kho nhưng **lệch một ký tự** | **ĐỎ** ← vế quan trọng nhất |
+| Xoá, kho khớp byte | XANH, và nói rõ "đã DỜI" |
+| Sửa một dòng CŨ tại chỗ | **ĐỎ** — luật gốc còn nguyên răng |
+| Không thêm dòng nào | **ĐỎ**, với lý do KHÁC hẳn |
+
+Vế 2 là toàn bộ giá trị của bản vá: nó phân biệt *"có một file trong archive"* với *"nội dung
+thật sự còn nguyên"*. Không có nó thì ai cũng qua cổng bằng cách tạo một file rỗng.
+
+### `npm run don` — dọn là một NHỊP, không phải một lượt
+
+Đức chốt: *"nội dung sẽ luôn bị phình sau 1 quá trình"*. Nên [scripts/don.mjs](scripts/don.mjs)
+là một lệnh, không phải một lần dọn tay.
+
+```bash
+npm run don                # xem trước, KHÔNG ghi gì
+npm run don -- --apply     # ghi thật
+```
+
+Nó dời khối cũ của `HANDOFF.md` và `CHANGELOG.md` sang `docs/archive/`, **tự đối chiếu byte
+trước khi ghi** — lệch một byte thì dừng, không chạm file nào. **Đi theo bản trích**, nên repo
+migrate cũng dọn được.
+
+Kết quả ở repo nhà: `HANDOFF.md` **1.311 → 598** · `CHANGELOG.md` **335 → 262**, không mất byte.
+
+### Ba lỗi thật lúc dựng lệnh, cả ba nay là phép kiểm
+
+1. **Sai chiều.** `CHANGELOG.md` xếp mới-nhất-ở-trên, `HANDOFF.md` xếp ngược. Bản đầu chỉ biết
+   một chiều nên nó định cất đi **bản vừa phát** và giữ lại bản cũ nhất. Lệnh vẫn chạy, vẫn báo
+   thành công, không gì đỏ — loại lỗi tệ nhất.
+2. **Không có điểm dừng.** Lượt đầu để lại vài dòng của chính nó nên file vẫn nhỉnh trên ngân
+   sách; lượt sau lại cắt thêm một khối. Đo thật: hai lượt liên tiếp cất đi hai bản phát khác nhau.
+3. **Dấu chân bị cuốn vào kho.** Dòng trỏ sang kho lưu trữ của lượt trước bị coi là nội dung
+   thật, nên sau n lượt người đọc phải lần theo n file. Nay dòng đó trỏ vào **thư mục** chứ
+   không vào một file, nên nó ổn định và lượt sau nhận ra được.
+
+### Một vòng lặp bị BỎ vì đột biến kiểm chứng minh nó là code chết
+
+Bản đầu ước lượng số dòng lệnh tự thêm, rồi bọc một vòng lặp để hứng phần ước lượng sai. Phá
+vòng lặp đó đi thì **không phép kiểm nào đỏ** — nó chưa từng chạy tới. Đã bỏ, và lấy đúng độ
+dài thật của phần đuôi: sai số bằng không **theo cấu trúc**, chứ không bằng một lớp hứng đặt thêm.
+
+Một nhánh không thể chạy tới và một nhánh đúng trông giống hệt nhau trên bảng.
+
+
 ## 1.3.7 — 2026-09-06 — Bốn quyết định treo được chốt, và cổng thôi tự làm mình đỏ
 
 Đức chốt bốn mục đang chờ trong một lượt. Ba mục thi hành được ngay, mục thứ tư
@@ -256,79 +320,6 @@ khiến phép ghim này không thể xanh giả.
 **Bản trích cũng nhận:** hạt giống sổ nợ nay **dạy luôn quy ước cờ**, nên repo dựng từ khuôn
 không phải phát minh lại. `1.3.1` → `1.3.2`, dấu vân tay `f2344159c4e3c28e`.
 
-## 1.3.1 — 2026-09-05 — Bộ đếm "code đã đổi" thôi đếm sản phẩm của chính bộ sinh
-
-Cổng đóng phiên có **một mục đỏ vĩnh viễn**: *"Sự thật máy sinh còn tươi"*. Không thứ tự commit
-nào hội tụ được, và nó đã đỏ suốt nhiều phiên trước khi ai đó đuổi tới gốc.
-
-**Nguyên nhân, đúng một cái.** Bộ đếm *"code đã đổi sau lần kiểm chứng"* miễn trừ ba file máy
-sinh bằng một danh sách cứng trong code: `llms.txt`, `repo-map.json`, `DASHBOARD.md`. Repo nhà
-sinh thêm **hai trang HTML** — chúng mang đuôi `.html` nên lọt vào danh sách đuôi file hành vi và
-**bị đếm là code đã đổi**. Nên mỗi commit sinh lại artifact tự cộng thêm một vào chính con số mà
-artifact vừa sinh phải khớp: artifact vừa commit xong là lập tức cũ.
-
-Đây đúng vòng lặp mà chú thích ngay trên khối đó mô tả và tin là đã chặn — chặn cho ba file, sót
-hai file thêm vào sau. Bản vá cũ chữa **triệu chứng ở ba file cụ thể**; bản này chữa **hình dạng
-lỗi**.
-
-**Khai ở cấu hình, không đóng cứng trong code.** Khối mới `generated_files` trong
-`.repo-structure.json`: `generators` trả lời *"chạy lệnh nào để sinh lại"*, khối này trả lời
-*"lệnh đó đẻ ra file nào"*. Khác nhau một chữ, và chính chỗ khác đó là cái bẫy. Đóng cứng tên hai
-trang kia vào code là không được: tên chúng mang tên dự án, mà bộ đếm đi theo bản trích sang mọi
-repo — làm thế là phát tên repo gốc đi khắp nơi, và lặp lại đúng bệnh *"đo được đúng một nghề"*
-mà lớp `behaviour_globs` sinh ra để chữa.
-
-**Một chẩn đoán sai bị bác, ghi lại vì bài học đáng hơn bản vá.** Phiên đuổi lỗi này ban đầu kết
-luận có **hai** bug xếp chồng, cái thứ hai là *"bộ sinh và bộ kiểm bất đồng đúng một đơn vị —
-sinh ra 11, cổng đòi 12"*. Audit độc lập bác, và đo lại xác nhận: `11` là con số nằm trong **file
-đã commit**, `12` là con số **sinh lại tại HEAD**. Một bộ đếm, hai thời điểm.
-*"Hai con số khác nhau"* chưa phải *"hai bộ đếm khác nhau"* — phải hỏi hai con số ấy đọc từ đâu
-trước khi kết luận.
-
-**Phép ghim cũng vá, vì nó xanh suốt trong khi ca hỏng nằm ngay trong repo.** Khối kiểm cũ thử
-đúng ba file cứng — không thử hai file đang gây lỗi. Nay thêm ca cho file repo tự khai, **kèm vế
-thứ hai**: file **chưa** khai thì vẫn phải bị đếm. Thiếu vế đó thì một bản vá biến mọi `.html`
-thành không-đếm cũng qua được phép kiểm.
-**Đột biến kiểm:** bỏ đúng dòng vừa thêm khỏi bộ đếm → suite **đỏ đúng chỗ**
-(`DASHBOARD-Ten-Repo.html da khai la may sinh, khong duoc dem`), hoàn nguyên → xanh lại.
-
-**Tầng máy đổi nên bản phát tăng:** `1.3.0` → `1.3.1`, dấu vân tay `5b2b74c0eee8e3b6` đã ghi vào
-sổ phát hành. Repo đang ghim bản khung nhận bản vá bằng `npm run upgrade`, không chép tay.
-
-## 1.3.0 — 2026-09-05 — Repo mới nhận luôn hai lệnh của vai điều phối, kèm sổ tay và phép ghim
-
-Trước bản này, một repo vừa dựng từ bộ khung nhận được bộ máy chống hai AI giẫm chân nhau, nhưng
-**không nhận được gì để trả lời hai câu hỏi mà người chốt hỏi mỗi ngày**: *đang có gì* và *làm gì
-tiếp*. Ai muốn có thì phải tự viết lại — tức mỗi repo một bản, và các bản trôi khỏi nhau.
-
-Bản này đóng gói bốn thứ đi cùng nhau, cố ý không tách:
-
-- **Lệnh kiểm trạng thái trước khi báo cáo.** Nó hỏi *"điều tôi sắp nói có đúng với nguồn thẩm
-  quyền không"*, khác hẳn cổng đóng phiên vốn hỏi *"việc tôi làm đẩy được chưa"*. Ba câu trả lời,
-  cố ý không gộp: khớp · lệch · **không biết**. Không đọc được thì nói không biết — gộp nó vào
-  "khớp" là biến mất mạng thành tin tốt.
-- **Lệnh bản đồ việc.** Giao ba nguồn vốn không giao được với nhau: ai đang giữ vùng nào · từng
-  đơn vị còn nợ gì · sổ ý tưởng. Nó cưỡng chế đúng một câu về làm song song: hai việc chạy cùng
-  lúc được **khi và chỉ khi** thuộc hai vùng khác nhau và cả hai đang trống chủ.
-- **Sổ tay vai điều phối.** Công cụ mà không kèm hàng rào thì hàng rào là thứ đầu tiên mất: sổ
-  này ghi rõ vai điều phối **không** viết mã, **không** gỡ lỗi, **không** kê bản vá.
-- **Phép ghim của cả gói** — 52 phép. Khối cuối tự dựng một repo thật có hình dạng **khác hẳn**
-  repo phát hành (tên vùng khác · không có đơn vị con · thiếu cả ba quyển sổ · không có nơi đối
-  chiếu từ xa) rồi chạy thật trong đó. Chạy được ở repo giống nhà thì mới là chép, chưa phải mang
-  đi được.
-
-**Hai lệnh này CHỈ ĐỌC.** Chúng không nhận vùng, không sửa file, không tự chữa. Thấy lệch thì báo
-và in ra câu lệnh cho người chạy — tuyệt đối không tự đẩy, không tự đóng dấu lại bảng quyền,
-không tự sinh lại rồi commit. Điều đó được ghim bằng **cấu trúc**, không bằng lời hứa: mọi lệnh
-chạm kho mã đi qua đúng một cửa chỉ-đọc, và cả file chỉ được phép sinh đúng một tiến trình con.
-
-Hai chỗ phải đổi vì cổng bắt, ghi ra để đừng ai "dọn cho gọn" rồi làm bản sau không phát được:
-bộ trích từ chối mọi file mang tên dự án gốc, nên một danh sách cấm trong phép ghim nay **ghép
-tên từ mảnh** thay vì viết liền, và sổ tay thôi kể thẳng ba tên gói cũ.
-
-Repo dựng từ bản này chạy được cả hai lệnh **ngay, không sửa gì**, và bộ kiểm của nó xanh từ
-ngày đầu.
-
 ---
 
-**Bản 1.2.20 trở về trước đã dời sang** [docs/archive/CHANGELOG-0.1.0-1.2.20.md](docs/archive/CHANGELOG-0.1.0-1.2.20.md) — chữ giữ nguyên từng dòng.
+**Bản cũ hơn đã dời sang** [docs/archive/CHANGELOG-1.3.1.md](docs/archive/CHANGELOG-1.3.1.md) — chữ giữ nguyên từng dòng.

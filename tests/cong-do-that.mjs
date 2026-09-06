@@ -281,4 +281,102 @@ function docMuc(kho, ten, as = "thu") {
 }
 
 
+/* ---- 9. Doi nhat ky sang kho luu tru: XANH khi khop byte, DO khi khong ---- */
+{
+  /* KHUNG-25, Duc chot 06/09. HAI LUAT CUA REPO CAN NHAU, do that chu khong suy luan:
+   *   · so tay bao tri: nhat ky qua ngan sach thi PHAI doi phan cu sang kho luu tru
+   *   · cong dong phien: HANDOFF.md xoa bat ky dong nao la viet lai lich su -> chan
+   * Lam dung luat thu nhat thi VINH VIEN khong dong duoc phien. Da thu that o repo nha 06/09:
+   * cat 1273 -> 455 dong, cong DO; them mot commit CHI-THEM cung khong cuu duoc, vi phep do
+   * cong don ca dai chua day chu khong doc rieng commit cuoi.
+   *
+   * Ban va SIET chu khong noi: cong thoi GIA DINH "khong doi duoc", va bat dau KIEM CHUNG luat
+   * *doi cho chu khong xoa*. Ba ve duoi la ly do tin duoc dieu do — thieu ve nao thi ban va
+   * chi la do trang tri. Ve 2 la ve quan trong nhat: no phan biet "co file luu tru" voi
+   * "noi dung THAT SU con nguyen", va do la toan bo gia tri cua ban va nay. */
+  const { cha, kho, at } = khoNen();
+  try {
+    const CU = Array.from({ length: 12 }, (_, i) => `luot cu so ${i + 1} — chu phai giu nguyen`);
+    const nhatKy = (dong) => dong.join(NL) + NL;
+
+    // Nen: HANDOFF.md day du, da day len remote. Day la MOC de so.
+    writeFileSync(join(kho, "HANDOFF.md"), nhatKy(["# HANDOFF", "", ...CU]), "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "nhat ky day du" + NL + NL + "Lane: thu");
+    at("push", "-q", "origin", "main");
+
+    // Cham mot file ngoai HANDOFF, neu khong thi phep kiem khong co viec gi de soi.
+    const chamViec = () => writeFileSync(join(kho, "docs", "a.md"), "# a" + NL + Math.random() + NL, "utf8");
+
+    // Cat 10 luot cu, ghi Log moi. GIONG NHAU o ca ba ve — chi khac cai kho luu tru.
+    const catVaGhiLog = () => {
+      writeFileSync(join(kho, "HANDOFF.md"), nhatKy(["# HANDOFF", "", ...CU.slice(10), "", "## luot moi — Log cua phien nay"]), "utf8");
+      chamViec();
+    };
+
+    // --- VE 1: xoa ma KHONG co kho luu tru nao -> phai DO ---
+    catVaGhiLog();
+    at("add", "-A");
+    at("commit", "-q", "-m", "cat nhat ky, khong luu tru" + NL + NL + "Lane: thu");
+    let m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "ĐỎ",
+      `xoa dong ma khong co ban luu tru phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+    assert.match(m.chiTiet, /kho lưu trữ/,
+      "loi nhan phai chi dung cho phai sua (kho luu tru), khong noi chung chung");
+
+    // --- VE 2 (QUAN TRONG NHAT): co file luu tru nhung LECH MOT KY TU -> van phai DO ---
+    // Khong co ve nay thi phep kiem chi do "co ton tai mot file trong archive/", tuc bat ky ai
+    // cung qua duoc bang cach tao mot file rong — dung loai phep kiem khong phan biet duoc hai
+    // nhanh ma luat vang so 2 goi la do trang tri.
+    mkdirSync(join(kho, "docs", "archive"), { recursive: true });
+    writeFileSync(join(kho, "docs", "archive", "cu.md"),
+      nhatKy(CU.slice(0, 10).map((d, i) => i === 3 ? d.replace("chu", "chU") : d)), "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "luu tru lech mot ky tu" + NL + NL + "Lane: thu");
+    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "ĐỎ",
+      `ban luu tru lech MOT KY TU phai van DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+
+    // --- VE 3: ban luu tru KHOP BYTE -> XANH ---
+    writeFileSync(join(kho, "docs", "archive", "cu.md"), nhatKy(CU.slice(0, 10)), "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "luu tru khop byte" + NL + NL + "Lane: thu");
+    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "XANH",
+      `doi cho co doi chieu khop byte phai XANH, dang: ${m.trangThai} — ${m.chiTiet}`);
+    assert.match(m.chiTiet, /DỜI/,
+      "phai NOI RO la da doi cho, de nguoi doc biet cong da kiem chuyen do chu khong bo qua");
+
+    // --- VE 4: luat cu VAN CON RANG. Sua mot dong CU (co that tren MOC) tai cho -> DO ---
+    // Ban va KHUNG-25 khong duoc lam mat phep kiem goc: viet lai lich su van phai bi chan.
+    // Phai sua mot dong CON NAM TRONG file va CO TREN MOC. Ban dau toi sua dong Log vua them
+    // trong luot nay — dong do khong co tren MOC nen no la dong MOI ca truoc lan sau, va phep
+    // kiem xanh DUNG. Ca kiem sai, khong phai code sai. Ghi lai vi bay nay de mac lai.
+    const CU_SUA = [...CU.slice(10)];
+    CU_SUA[0] = CU_SUA[0].replace("giu nguyen", "DA BI SUA");
+    writeFileSync(join(kho, "HANDOFF.md"),
+      nhatKy(["# HANDOFF", "", ...CU_SUA, "", "## luot moi — Log cua phien nay", "", "## luot moi hon"]), "utf8");
+    chamViec();
+    at("add", "-A");
+    at("commit", "-q", "-m", "sua dong cu tai cho" + NL + NL + "Lane: thu");
+    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "ĐỎ",
+      `sua dong CU tai cho van phai DO — ban va KHUNG-25 khong duoc lam mat phep kiem goc, dang: ${m.chiTiet}`);
+
+    // --- VE 5: xoa ma KHONG them dong nao -> DO, va noi DUNG ly do do ---
+    // Hai ly do do khac nhau phai cho ra hai loi nhan khac nhau, neu khong nguoi doc di sua
+    // nham cho: mot ben la "chua ghi Log", mot ben la "xoa mat chu".
+    writeFileSync(join(kho, "HANDOFF.md"), nhatKy(["# HANDOFF", "", ...CU.slice(10)]), "utf8");
+    chamViec();
+    at("add", "-A");
+    at("commit", "-q", "-m", "xoa sach khong them gi" + NL + NL + "Lane: thu");
+    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "ĐỎ", `khong them dong nao phai DO, dang: ${m.chiTiet}`);
+    assert.match(m.chiTiet, /KHÔNG thêm dòng nào/,
+      "phai noi dung ly do: chua ghi Log — khac han ly do 'xoa mat chu'");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("9 · dời nhật ký sang kho lưu trữ: khớp byte thì XANH · lệch một ký tự vẫn ĐỎ · sửa dòng cũ tại chỗ vẫn ĐỎ");
+}
+
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

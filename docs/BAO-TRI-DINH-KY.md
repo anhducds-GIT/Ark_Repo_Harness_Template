@@ -75,6 +75,34 @@ Ai mở phiên đầu tiên trong tuần thì làm, ghi một dòng vào `HANDOF
 > một repo có thể hoàn toàn đúng mà vẫn đắt, vì mỗi phiên AI phải nạp lại một đống chữ đã hết
 > việc.
 
+### Dọn bằng LỆNH, đừng dọn bằng tay — Đức chốt 2026-09-06
+
+```bash
+npm run don                # xem trước, KHÔNG ghi gì
+npm run don -- --apply     # ghi thật
+```
+
+Lý do có lệnh riêng thay vì "nhớ dọn": *nội dung sẽ luôn phình lại sau mỗi quá trình*. Dọn tay
+là dọn **một lần**; lượt sau lại đầy. `HANDOFF.md` và `CHANGELOG.md` chỉ có **một chiều — tăng**,
+vì luật cấm sửa hay xoá dòng cũ.
+
+**Lệnh không xoá gì.** Nó dời khối cũ sang `docs/archive/`, giữ nguyên từng chữ, và **tự đối
+chiếu byte trước khi ghi** — lệch một byte thì dừng, không chạm file nào. Cổng đóng phiên kiểm
+lại điều đó **một lần nữa, độc lập**: dòng nào biến mất khỏi `HANDOFF.md` mà không có bản khớp
+byte trong kho lưu trữ thì cổng ĐỎ. Hai lớp là cố ý — lệnh có thể bị chạy sai, cổng thì không.
+
+**Ba thói quen, cả ba đều từ lỗi thật lúc dựng lệnh:**
+
+| Thói quen | Vì sao |
+|---|---|
+| Chạy `npm run don` (không `--apply`) trước, đọc rồi mới ghi | Lệnh dọn tự ghi ngay lần đầu là lệnh không ai dám chạy |
+| **Commit phần dọn và phần ghi Log bằng HAI commit riêng** | Cổng đọc cả dải chưa đẩy; gộp một commit thì nó không phân biệt được "dời chỗ" với "xoá" |
+| Khai file lưu trữ mới vào Bản đồ file | Luật mục 6 — không khai thì cổng bắt |
+
+**Đừng sửa file trong `docs/archive/`.** Nó là lịch sử, và cổng đối chiếu từng byte với chỗ đã
+cắt ra: sửa một ký tự trong đó là lần sau dọn sẽ đỏ mà không ai hiểu vì sao.
+
+
 **Đo trước, đừng cảm tính:**
 
 ```bash

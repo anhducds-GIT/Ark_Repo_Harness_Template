@@ -49,7 +49,8 @@ const PORTABLE_SCRIPTS = [
   // và không ai biết cho tới khi có lệnh đo. Repo migrate thừa hưởng đúng bệnh đó nếu không
   // mang theo thước. Ngân sách khai được trong `.repo-structure.json` nên repo khác kích thước
   // không bị ép theo số của bộ khung.
-  "can-nang.mjs"
+  "can-nang.mjs",
+  "don.mjs"
 ];
 
 /* Chép nguyên văn, không đổi một ký tự. */
@@ -809,6 +810,7 @@ function packageJson(version) {
       "state-check": "node scripts/state-check.mjs",
       "what-next": "node scripts/what-next.mjs",
     "can-nang": "node scripts/can-nang.mjs",
+    "don": "node scripts/don.mjs",
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.

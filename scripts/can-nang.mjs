@@ -40,7 +40,8 @@ export const NGAN_SACH_MAC_DINH = {
   soPhepKiem: 30,      // tổng phép kiểm hai cổng
   giayDongPhien: 180,  // giây để chạy trọn bộ kiểm khi đóng phiên
   soNhatKy: 600,       // dòng HANDOFF.md — thứ phình nhanh nhất và chưa từng có nhịp dọn
-  tiLeDaDong: 50       // % mục nợ đã đóng còn nằm trong sổ; quá thì chuyển sang kho lưu
+  tiLeDaDong: 50,      // % mục nợ đã đóng còn nằm trong sổ; quá thì chuyển sang kho lưu
+  soPhatHanh: 300      // dòng CHANGELOG.md — sổ chỉ-thêm, không bao giờ nhỏ lại
 };
 
 /* NGÂN SÁCH KHAI ĐƯỢC, vì repo khác có kích thước khác. Repo nhỏ mà bắt theo ngân sách của một

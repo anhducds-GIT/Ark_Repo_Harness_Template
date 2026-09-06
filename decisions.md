@@ -140,3 +140,39 @@ cách dọn; nó là con số đặt theo mong muốn, chưa từng đặt theo 
 `### 2026-09 · …` không nhận, để một mốc ngày không bị đọc thành mã việc). Và mọi dòng `###`
 không đọc ra mã việc đều **bị nêu tên kèm tên sổ**, thay vì biến mất im lặng — đó mới là gốc
 bệnh: nới regex chỉ chữa ca đã vấp, hình dạng lạ lần sau vẫn sẽ mất tăm.
+
+---
+
+## 2026-09-06 (chiều) · Đức chốt KHUNG-25, và đổi hướng KHUNG-11
+
+### KHUNG-25 · Duyệt bản vá cổng — ĐỔI MỘT LUẬT AN TOÀN
+
+Đây là lần đầu một luật an toàn của repo được đổi, nên ghi kỹ.
+
+**Vấn đề:** sổ tay bảo trì bắt dời nhật ký cũ đi khi quá ngân sách; cổng đóng phiên đòi
+`HANDOFF.md` xoá đúng 0 dòng. Làm đúng luật thứ nhất thì **vĩnh viễn không đóng được phiên**.
+Đã thử thật ở bản 1.3.7 và phải hoàn nguyên.
+
+**Đức chốt:** vá cổng theo hướng đã đề xuất.
+
+**Bản vá SIẾT, không nới — đây là chỗ dễ hiểu nhầm nhất.** Cổng cũ *giả định* việc dời chỗ
+không xảy ra được nên cấm mọi thao tác xoá. Cổng mới *kiểm chứng*: cho xoá **khi và chỉ khi**
+từng dòng bị xoá có bản khớp BYTE trong `*/archive/*`. Xoá mà không có bản lưu trữ khớp thì
+vẫn ĐỎ; sửa một dòng cũ tại chỗ cũng vẫn ĐỎ. Tức khả năng viết lại lịch sử **không** mở ra
+thêm chút nào — chỉ khả năng **cất gọn** lịch sử là mở ra.
+
+**Luật vàng 3 (không làm yếu lớp bảo vệ để test xanh) được giữ**, và giữ bằng bằng chứng chứ
+không bằng lời: năm vế ở `tests/cong-do-that.mjs` khối 9, trong đó vế *"kho lưu trữ lệch một
+ký tự vẫn phải ĐỎ"* là vế phân biệt bản vá thật với đồ trang trí.
+
+### KHUNG-11 · Đức đổi hướng: cần CƠ CHẾ dọn, không phải một lượt dọn
+
+Nguyên văn: *"KHUNG-11 có thể cần thêm cơ chế clean, vì nội dung sẽ luôn bị phình sau 1 quá trình."*
+
+Đúng, và nó bác đúng cách tôi đang làm: bản 1.3.7 dọn bằng tay từng file. Dọn tay là dọn một
+lần. Đã dựng `scripts/don.mjs` (`npm run don`) và cho **đi theo bản trích**, nên mọi repo
+migrate cũng có nhịp dọn chứ không chỉ repo nhà.
+
+**Câu hỏi cũ của KHUNG-11 — "bớt cái gì trong phần vượt ngân sách" — nay không còn chặn ai**,
+vì phần phình nhanh nhất đã có lệnh xử. Phần còn lại (`ORCHESTRATOR.md` 426 dòng) vẫn treo,
+nhưng nó không chặn phiên nào.

@@ -573,7 +573,10 @@ check("File mới đã khai vào Bản đồ file", () => {
  * thứ CHỈ ĐƯỢC THÊM, nên bằng chứng đúng phải là CÓ DÒNG MỚI. Đo bằng `--numstat`; đo không
  * được thì hạ về phép cũ và nói rõ là chỉ đo được tới đó — chứ không im lặng coi như đạt. */
 const laHandoff = (f) => /(^|\/)HANDOFF\.md$/i.test(f);
-const coDongMoi = (rel) => {
+
+/* Đếm dòng thêm / dòng xoá của một file, so cây làm việc với MỐC.
+   Trả `{ them, xoa }`, hoặc `null` khi KHÔNG ĐO ĐƯỢC — null không phải "không có gì". */
+const doThemXoa = (rel) => {
   // Cộng cả phần đã commit chưa push lẫn phần còn trong cây làm việc. Thiếu vế nào cũng sai:
   // ghi Log rồi commit thì cây làm việc sạch; ghi mà chưa commit thì diff với remote lại rỗng.
   let them = 0;
@@ -591,38 +594,112 @@ const coDongMoi = (rel) => {
       if (Number.isFinite(Number(a))) { them += Number(a); xoa += Number(b) || 0; doDuoc = true; }
     }
   }
+  return doDuoc ? { them, xoa } : null;
+};
+
+/* THƯ MỤC LƯU TRỮ. Cùng quy ước với `can-nang.mjs`: một đoạn đường dẫn tên `archive`.
+   Không đóng cứng `docs/archive` — repo khác có thể để chỗ khác, miễn tên đoạn đúng. */
+const LA_LUU_TRU = /(^|\/)archive\//;
+
+/* Mọi dòng đang nằm trong kho lưu trữ, đọc từ CÂY LÀM VIỆC.
+   Đọc lười (chỉ dựng khi thật sự có dòng bị xoá) vì nó quét file. */
+let _kholuu = null;
+const khoLuuTru = () => {
+  if (_kholuu) return _kholuu;
+  _kholuu = new Set();
+  const ra = git("ls-files");
+  if (!ra) return _kholuu;
+  for (const f of ra.split("\n").filter((x) => LA_LUU_TRU.test(x))) {
+    try {
+      for (const d of fs.readFileSync(path.join(ROOT, f), "utf8").replace(/\r\n?/g, "\n").split("\n")) {
+        _kholuu.add(d);
+      }
+    } catch { /* file vừa bị xoá khỏi cây: bỏ qua, vế dưới sẽ báo thiếu */ }
+  }
+  return _kholuu;
+};
+
+/* Dòng nào bị xoá khỏi `rel` mà KHÔNG tìm thấy nguyên văn trong kho lưu trữ.
+   Trả mảng (rỗng = mọi dòng xoá đều đã được dời chỗ), hoặc `null` khi không đo được.
+
+   VÌ SAO CÓ HÀM NÀY — Đức chốt 2026-09-06 (KHUNG-25). Hai luật của repo cắn nhau: sổ tay bảo
+   trì bắt DỜI nhật ký cũ đi khi quá ngân sách, còn phép kiểm này cấm `HANDOFF.md` xoá bất kỳ
+   dòng nào. Làm đúng luật thứ nhất thì VĨNH VIỄN không đóng được phiên — đã thử thật.
+
+   Bản vá SIẾT chứ không nới: cổng thôi GIẢ ĐỊNH "không dời được", và bắt đầu KIỂM CHỨNG luật
+   *dời chỗ chứ không xoá*. Xoá mà không có bản sao khớp BYTE trong kho lưu trữ thì vẫn đỏ —
+   nên nó không hề mở đường cho việc viết lại lịch sử, chỉ mở đường cho việc cất gọn nó. */
+const dongXoaChuaLuuTru = (rel) => {
+  const args = originMainResolves ? ["diff", "-U0", MOC, "--", rel] : ["diff", "-U0", "HEAD", "--", rel];
+  const ra = git(...args);
+  if (ra === null || ra === undefined) return null;
+  const kho = khoLuuTru();
+  const thieu = [];
+  for (const dong of ra.replace(/\r\n?/g, "\n").split("\n")) {
+    if (!dong.startsWith("-") || dong.startsWith("---")) continue;
+    const noiDung = dong.slice(1);
+    if (!kho.has(noiDung)) thieu.push(noiDung);
+  }
+  return thieu;
+};
+
+/* `true` = đã ghi Log đúng luật · `false` = chưa · `null` = không đo được.
+   Chuỗi trả về = lý do cụ thể khi `false`, để lời nhắn dẫn đúng chỗ chứ không nói chung chung. */
+const coDongMoi = (rel) => {
+  const so = doThemXoa(rel);
+  if (!so) return null;   // null = khong do duoc, khong phai "khong co"
   // THEM DONG, chu khong phai "co dung vao". Sua mot chu trong dong Log CU cho ra `1 them /
-  // 1 xoa` — van la `them > 0`, nen ban dau cham dat. Nhung Log la thu CHI DUOC THEM: viet lai
-  // dong cu la viet lai lich su cua phien truoc. Nen doi xoa = 0.
-  return doDuoc ? (them > 0 && xoa === 0) : null;   // null = khong do duoc, khong phai "khong co"
+  // 1 xoa` — van la `them > 0`, nen ban dau cham dat.
+  if (so.them === 0) return { ok: false, vi: "KHÔNG thêm dòng nào — Log là thứ chỉ được THÊM" };
+  if (so.xoa === 0) return { ok: true };
+  const thieu = dongXoaChuaLuuTru(rel);
+  if (thieu === null) return null;
+  if (thieu.length === 0) return { ok: true, doiCho: so.xoa };
+  const mau = thieu.find((d) => d.trim()) ?? thieu[0];
+  return {
+    ok: false,
+    vi: `xoá ${so.xoa} dòng mà ${thieu.length} dòng KHÔNG có bản khớp byte trong kho lưu trữ (\`*/archive/*\`)`
+      + `, ví dụ: "${mau.slice(0, 60)}". Dời chỗ thì được, xoá thì không`
+  };
 };
 
 check("HANDOFF đã ghi Log phiên này", () => {
   const thieu = [];
   const chiSuaChoCu = [];
+  let daDoiCho = 0;
+
+  const soi = (file, nhan) => {
+    const kq = coDongMoi(file);
+    if (!kq) return;                       // null = khong do duoc, de mac
+    if (kq.ok) { daDoiCho += kq.doiCho || 0; return; }
+    chiSuaChoCu.push(`${nhan}: ${kq.vi}`);
+  };
 
   for (const pkg of myPackages) {
     const codeChanged = touched.some((f) => f.startsWith(pkg + "/") && !laHandoff(f));
     if (!codeChanged) continue;
     const file = pkg + "/HANDOFF.md";
     if (!touched.some((f) => f.startsWith(pkg + "/") && laHandoff(f))) { thieu.push(file); continue; }
-    if (coDongMoi(file) === false) chiSuaChoCu.push(file);
+    soi(file, file);
   }
 
   // Vùng gốc: một file bất kỳ ngoài package, thuộc vùng mình đang giữ.
   const chamGoc = touched.some((f) => !laHandoff(f) && !myPackages.some((p) => f.startsWith(p + "/")));
   if (myRootAreas.length > 0 && chamGoc) {
     if (!touched.some((f) => f === "HANDOFF.md")) thieu.push("HANDOFF.md (gốc repo)");
-    else if (coDongMoi("HANDOFF.md") === false) chiSuaChoCu.push("HANDOFF.md (gốc repo)");
+    else soi("HANDOFF.md", "HANDOFF.md (gốc repo)");
   }
 
   if (thieu.length) {
     return { ok: false, msg: "Đã sửa nhưng chưa ghi Log vào: " + thieu.join(", ") + ". Phiên sau sẽ mù." };
   }
   if (chiSuaChoCu.length) {
-    return { ok: false, msg: "Có chạm " + chiSuaChoCu.join(", ") + " nhưng KHÔNG thêm dòng nào — Log là thứ chỉ được THÊM. Sửa dòng cũ không phải là ghi Log." };
+    return { ok: false, msg: chiSuaChoCu.join(" · ") + ". Sửa dòng cũ không phải là ghi Log." };
   }
   const coViec = myPackages.length > 0 || (myRootAreas.length > 0 && chamGoc);
+  if (daDoiCho) {
+    return { ok: true, msg: `Đã ghi Log, và ${daDoiCho} dòng cũ được DỜI sang kho lưu trữ (đã đối chiếu khớp byte, không dòng nào mất).` };
+  }
   return { ok: true, msg: coViec ? "Đã ghi Log." : "Không có gì phải ghi." };
 });
 
