@@ -702,13 +702,16 @@ export function khoiCanDuc(canDuc, tenNguoi) {
 export function khoiDangLamGi(khoa, ngay) {
   const giu = khoa.filter((k) => k.owner);
   const than = giu.length
-    ? giu.map((k) => '<div class="kh"><span class="t">' + esc(k.owner)
+    ? giu.map((k) => NHAN_KHOA + '<div class="kh"><span class="t">' + esc(k.owner)
         + '<small>' + esc(k.task || "chưa khai đang làm gì") + ' · giữ khoá <code>' + esc(k.khoa)
         + '</code>' + (k.tu ? ' từ ' + esc(k.tu) : "") + '</small></span>'
-        + '<span class="hieu ban">ĐANG GIỮ</span></div>').join("")
-    : '<p>Không luồng nào đang giữ vùng trong repo này.</p>';
-  return '<div class="the"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · ' + giu.length + ' luồng</h2>'
-    + than
+        + '<span class="hieu ban">ĐANG GIỮ</span></div>').join(NL)
+    : NHAN_KHOA + '<p>Không luồng nào đang giữ vùng trong repo này.</p>';
+  /* MỖI DÒNG MỘT KHOÁ, và mỗi dòng mang nhãn. Nối chúng bằng xuống dòng chứ không nối liền:
+   * bộ lọc làm việc theo DÒNG, nên hai khoá nằm chung một dòng thì hoặc lọt cả hai hoặc lọc
+   * cả hai — không có cách nào đúng. */
+  return NHAN_KHOA + '<div class="the"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · ' + giu.length + ' luồng</h2>' + NL
+    + than + NL
     + '<p class="ghi"><strong>Khối này không thấy hai thứ.</strong> Một: <em>luồng đang chạy ở '
     + 'repo khác</em> — bảng của repo này chỉ thấy repo của nó. Hai: <em>luồng vừa được giao mà '
     + 'chưa kịp nhận vùng</em> — lúc đó nó chưa để lại dấu vết nào trong repo. Nên dòng "không '
@@ -720,12 +723,12 @@ export function khoiDangLamGi(khoa, ngay) {
 /* "Còn mấy chỗ trống để giao việc song song?" — cố ý KHÔNG kể ai giữ, khối trên đã kể rồi. */
 export function khoiKhoa(khoa) {
   const mo = khoa.filter((k) => !k.owner).length;
-  const dong = khoa.map((k) => '<div class="kh"><span class="t">' + esc(k.khoa) + '</span>'
+  const dong = khoa.map((k) => NHAN_KHOA + '<div class="kh"><span class="t">' + esc(k.khoa) + '</span>'
     + '<span class="hieu ' + (k.owner ? "ban" : "mo") + '">' + (k.owner ? "BẬN" : "MỞ")
-    + '</span></div>').join("");
-  return '<details class="the"><summary>Khoá làm việc — ' + khoa.length + ' khoá, ' + mo
-    + ' đang mở<span class="tt">mở ra khi cần giao việc song song</span></summary>'
-    + '<div class="in">' + dong
+    + '</span></div>').join(NL);
+  return NHAN_KHOA + '<details class="the"><summary>Khoá làm việc — ' + khoa.length + ' khoá, ' + mo
+    + ' đang mở<span class="tt">mở ra khi cần giao việc song song</span></summary>' + NL
+    + '<div class="in">' + NL + dong + NL
     + '<p class="ghi">Bảng này trả lời đúng một câu: <strong>còn mấy chỗ trống để giao việc song '
     + 'song</strong>. Hai việc chạy song song được <strong>khi và chỉ khi</strong> chúng thuộc hai '
     + 'khoá khác nhau và cả hai đang MỞ. Khoá BẬN thì chỉ đọc, đừng giao thêm.</p></div></details>';
@@ -1401,6 +1404,31 @@ export function gomDuLieu() {
  * và cổng sẽ đỏ với một câu không nói gì về nguyên nhân thật. */
 export const TRANG_FILE = "DASHBOARD-Ark-Repo-Harness.html";
 
+/* DÒNG BIẾN ĐỘNG — và vì sao phải có khối này, đo được ngay lượt đầu.
+ *
+ * Bảng chủ sở hữu đổi **mỗi lần một phiên nhận hoặc trả khoá**, tức nhiều lần một ngày. Từ lúc
+ * bảng chiếu nó ra, trang máy sinh đổi theo — mà trang nằm trong khối `generators`, nên cổng
+ * so nó với HEAD mỗi phiên. Hệ quả đo được ngay lượt đầu: **trả khoá xong là trang lệch HEAD**,
+ * và phiên tiếp theo bị chặn đẩy vì một thứ nó không hề đụng tới.
+ *
+ * Lối ra KHÔNG phải bỏ khối bảng quyền khỏi trang — đó là khối Đức hỏi tới đầu tiên. Lối ra là
+ * đánh dấu những dòng ấy rồi **bỏ qua chúng ở phép SO**, chứ không bỏ qua ở phép GHI.
+ *
+ * Bộ lọc chỉ nằm ở vế SO, cố ý. Ghi thì ghi vô điều kiện, nên trang luôn hiện trạng thái mới
+ * nhất; chỉ có câu hỏi *"trang này có cũ không"* là không tính mấy dòng đó. Lọc cả hai vế thì
+ * trang sẽ đứng yên ở một quá khứ nào đó mà cổng vẫn báo xanh — tệ hơn hẳn. */
+export const NHAN_KHOA = "<!--khoa-->";
+
+export function soSanhTrang(mongDoi, dangCo) {
+  const loc = (t) => String(t).split(/\r\n?/).join("\n").split("\n")
+    .filter((d) => !d.trimStart().startsWith(NHAN_KHOA));
+  const a = loc(mongDoi);
+  const b = loc(dangCo);
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) return false;
+  return true;
+}
+
 const THIS = fileURLToPath(import.meta.url);
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   const args = process.argv.slice(2);
@@ -1413,7 +1441,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
       console.error(`THIEU_TRANG: ${TRANG_FILE} chưa có trong HEAD. Sinh rồi commit: node scripts/build-overview.mjs`);
       process.exit(1);
     }
-    if (trang(gomDuLieu()) !== dangCo) {
+    if (!soSanhTrang(trang(gomDuLieu()), dangCo)) {
       console.error(`TRANG_CU: ${TRANG_FILE} đã commit không khớp với HEAD. Sinh lại rồi commit: node scripts/build-overview.mjs`);
       process.exit(1);
     }

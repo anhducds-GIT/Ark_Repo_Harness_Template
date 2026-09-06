@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import {
   BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readIdeas, readKhoa, readNo
 } from "../scripts/overview-doc.mjs";
+import { NHAN_KHOA, soSanhTrang } from "../scripts/build-overview.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -144,6 +145,33 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   assert.notEqual(noiTuoi(null), noiTuoi(0));
   assert.match(noiTuoi(null), /chưa đo được/);
   ok("tuổi: không đo được là null, và null nói khác 0");
+}
+
+/* ---- 9. Dòng bảng quyền KHÔNG được làm trang lệch HEAD ------------------ */
+{
+  /* ĐO ĐƯỢC NGAY LƯỢT ĐẦU, và nó chặn cả repo: bảng chủ sở hữu đổi mỗi lần một phiên nhận hay
+   * trả khoá — nhiều lần một ngày. Trang máy sinh nằm trong khối `generators`, nên cổng so nó
+   * với HEAD mỗi phiên. Không có bộ lọc này thì **trả khoá xong là trang lệch**, và phiên tiếp
+   * theo bị chặn đẩy vì một thứ nó không hề đụng tới.
+   *
+   * Vế này ghim CẢ HAI chiều. Chỉ ghim chiều "bỏ qua" thôi thì một bộ lọc bỏ qua TẤT CẢ cũng
+   * xanh — và lúc đó trang đứng yên ở một quá khứ nào đó mà cổng vẫn báo sạch. */
+  const goc = ["<h1>x</h1>", NHAN_KHOA + "<div>ai-mot ĐANG GIỮ</div>", "<p>chữ thường</p>"].join(NL);
+  const doiKhoa = ["<h1>x</h1>", NHAN_KHOA + "<div>ai-hai KHÁC HẲN</div>", "<p>chữ thường</p>"].join(NL);
+  const doiThuong = ["<h1>x</h1>", NHAN_KHOA + "<div>ai-mot ĐANG GIỮ</div>", "<p>chữ ĐÃ ĐỔI</p>"].join(NL);
+  const themDong = goc + NL + "<p>dòng mới</p>";
+
+  assert.equal(soSanhTrang(goc, doiKhoa), true, "đổi dòng bảng quyền KHÔNG được tính là trang cũ");
+  assert.equal(soSanhTrang(goc, doiThuong), false, "đổi dòng thường PHẢI tính là trang cũ");
+  assert.equal(soSanhTrang(goc, themDong), false, "thêm một dòng PHẢI tính là trang cũ");
+  assert.equal(soSanhTrang(goc, goc), true);
+
+  // Và trang thật phải THẬT SỰ mang nhãn — bộ lọc đúng mà không dòng nào đeo nhãn thì nó không
+  // bảo vệ gì cả, chỉ trông như đang bảo vệ.
+  const html = readFileSync(join(ROOT, "DASHBOARD-Ark-Repo-Harness.html"), "utf8");
+  const soNhan = html.split(NL).filter((d) => d.trimStart().startsWith(NHAN_KHOA)).length;
+  assert.ok(soNhan >= 3, "trang thật chỉ có " + soNhan + " dòng mang nhãn — khối bảng quyền chưa được đánh dấu");
+  ok("dòng bảng quyền: bỏ qua ở phép SO, và trang thật có mang nhãn thật");
 }
 
 console.log(`overview-doc-smoke: ${passed} vế xanh`);
