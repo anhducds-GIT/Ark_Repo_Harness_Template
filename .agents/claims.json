@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-tabmigrate",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-06",
       "task": "ban do file + nhat ky",
-      "released_at": null,
+      "released_at": "2026-09-06",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,21 +23,21 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-tabmigrate",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-06",
       "task": "tab Migrate + tab con",
-      "released_at": null,
+      "released_at": "2026-09-06",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "claude-tabmigrate",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-06",
       "task": "sinh lai ban trich 1.3.16",
-      "released_at": null
+      "released_at": "2026-09-06"
     }
   }
 }
