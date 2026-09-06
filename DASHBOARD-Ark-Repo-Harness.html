@@ -156,7 +156,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   <div class="cu" data-sinh="2026-09-06"></div>
   <header>
     <div class="nhan-hang">
-      <span class="chip">v1.3.11</span>
+      <span class="chip">v1.3.13</span>
       <span>sinh ngày 2026-09-06</span>
     </div>
     <h1>Ark Repo Harness</h1>
@@ -878,20 +878,40 @@ npm run overview                  # sinh lại bảng HTML ở gốc repo, rồi
 
   <section class="tab" id="tab-da-xong" hidden>
     <div class="the">
-      <h2>Đã xong 100% — 13 việc</h2>
+      <h2>Đã xong 100% — 17 việc</h2>
       <p>Việc đã <strong>đóng hẳn</strong> trong sổ nợ, không phải việc đang làm dở. Nguồn là
       <span class="ref">BACKLOG.md</span>: mục nào có mã bị gạch thì nó nằm ở đây.</p>
       <p><strong>Sổ giữ lại mục đã đóng chứ không xoá</strong> — để tra được việc gì đã làm, làm
       lúc nào, và vì sao. Bảng này chỉ chiếu lại phần đó cho dễ nhìn; nó không phải nguồn sự thật
       thứ hai.</p>
       <div class="tw"><table><thead><tr><th>Mã</th><th>Việc</th><th>Ưu tiên lúc mở</th></tr></thead><tbody>
-      <tr><td><code>KHUNG-1</code></td><td>Mục đỏ &quot;Sự thật máy sinh còn tươi&quot; — MỘT bug, không phải hai</td><td>P1</td></tr><tr><td><code>KHUNG-5</code></td><td>Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi</td><td>P1</td></tr><tr><td><code>KHUNG-2</code></td><td>Hai quy trình migrate không đi theo bản trích</td><td>P2</td></tr><tr><td><code>KHUNG-12</code></td><td>Lớp &quot;nghề nào đếm file nghề ấy&quot; chưa từng chạy ở luồng thật</td><td>P3</td></tr><tr><td><code>KHUNG-16</code></td><td>ĐÓNG 06/09 · <code>DASHBOARD.md</code> nhúng mã commit HEAD nên KHÔNG THỂ hội tụ</td><td>P3</td></tr><tr><td><code>KHUNG-18</code></td><td>ĐÓNG 06/09 · Mã việc không nhận tiền tố có SỐ — repo tên chứa số vấp ngay</td><td>P3</td></tr><tr><td><code>KHUNG-19</code></td><td>Cổng đóng cứng vị trí &quot;Bản đồ file&quot; ở AGENTS.md</td><td>P3</td></tr><tr><td><code>KHUNG-20</code></td><td><code>units.behaviour_globs</code> bị validator TỪ CHỐI, dù chú thích trong code dạy đúng trường đó</td><td>P3</td></tr><tr><td><code>KHUNG-21</code></td><td><code>claim.mjs</code> crash khi một khoá có giá trị <code>null</code></td><td>P3</td></tr><tr><td><code>KHUNG-23</code></td><td>ĐÓNG 06/09 · <code>ALL_SKILL_MANAGEMENT</code> — audit tiền-migrate xong, CHƯA migrate</td><td>P3</td></tr><tr><td><code>KHUNG-25</code></td><td>ĐÓNG 06/09 · Sổ tay bảo trì bảo DỌN nhật ký, cổng đóng phiên CẤM — thử thật, cổng thắng</td><td>P3</td></tr><tr><td><code>KHUNG-26</code></td><td>ĐÓNG 06/09 · Bộ khung ĐÓNG CỨNG tên <code>DASHBOARD.md</code> — repo nào đã có bảng viết tay đều phải nhường</td><td>P3</td></tr><tr><td><code>KHUNG-27</code></td><td>ĐÓNG 06/09 · Bản trích KHÔNG mang <code>docs/LEGEND.md</code> và <code>docs/HUONG-DAN.md</code> — hai file repo mới cần nhất</td><td>P3</td></tr>
+      <tr><td><code>KHUNG-1</code></td><td>Mục đỏ &quot;Sự thật máy sinh còn tươi&quot; — MỘT bug, không phải hai</td><td>P1</td></tr><tr><td><code>KHUNG-5</code></td><td>Phép ghim của khối miễn trừ bỏ sót đúng hai file gây lỗi</td><td>P1</td></tr><tr><td><code>KHUNG-2</code></td><td>Hai quy trình migrate không đi theo bản trích</td><td>P2</td></tr><tr><td><code>KHUNG-13</code></td><td>ĐÓNG 06/09 · Bản trích phát đi luật bắt dùng HAI file mà nó không mang theo</td><td>P2</td></tr><tr><td><code>KHUNG-7</code></td><td>ĐÓNG 06/09 · Luật đóng phiên bắt ghi vào <code>decisions.md</code> — file không tồn tại</td><td>P3</td></tr><tr><td><code>KHUNG-12</code></td><td>Lớp &quot;nghề nào đếm file nghề ấy&quot; chưa từng chạy ở luồng thật</td><td>P3</td></tr><tr><td><code>KHUNG-16</code></td><td>ĐÓNG 06/09 · <code>DASHBOARD.md</code> nhúng mã commit HEAD nên KHÔNG THỂ hội tụ</td><td>P3</td></tr><tr><td><code>KHUNG-18</code></td><td>ĐÓNG 06/09 · Mã việc không nhận tiền tố có SỐ — repo tên chứa số vấp ngay</td><td>P3</td></tr><tr><td><code>KHUNG-19</code></td><td>Cổng đóng cứng vị trí &quot;Bản đồ file&quot; ở AGENTS.md</td><td>P3</td></tr><tr><td><code>KHUNG-20</code></td><td><code>units.behaviour_globs</code> bị validator TỪ CHỐI, dù chú thích trong code dạy đúng trường đó</td><td>P3</td></tr><tr><td><code>KHUNG-21</code></td><td><code>claim.mjs</code> crash khi một khoá có giá trị <code>null</code></td><td>P3</td></tr><tr><td><code>KHUNG-23</code></td><td>ĐÓNG 06/09 · <code>ALL_SKILL_MANAGEMENT</code> — audit tiền-migrate xong, CHƯA migrate</td><td>P3</td></tr><tr><td><code>KHUNG-25</code></td><td>ĐÓNG 06/09 · Sổ tay bảo trì bảo DỌN nhật ký, cổng đóng phiên CẤM — thử thật, cổng thắng</td><td>P3</td></tr><tr><td><code>KHUNG-26</code></td><td>ĐÓNG 06/09 · Bộ khung ĐÓNG CỨNG tên <code>DASHBOARD.md</code> — repo nào đã có bảng viết tay đều phải nhường</td><td>P3</td></tr><tr><td><code>KHUNG-27</code></td><td>ĐÓNG 06/09 · Bản trích KHÔNG mang <code>docs/LEGEND.md</code> và <code>docs/HUONG-DAN.md</code> — hai file repo mới cần nhất</td><td>P3</td></tr><tr><td><code>KHUNG-28</code></td><td>ĐÓNG 06/09 · <code>upgrade.mjs</code> CHỈ đẩy tầng máy — file tài liệu mới không bao giờ tới repo đã lắp</td><td>P3</td></tr><tr><td><code>KHUNG-29</code></td><td>ĐÓNG 06/09 · Bộ sinh đọc cấu hình từ HEAD — khai <code>generated_names</code> rồi chạy ngay là ĐÈ MẤT</td><td>P3</td></tr>
       </tbody></table></div>
     </div>
   </section>
 
   <section class="tab" id="tab-nhat-ky" hidden>
     <details open>
+      <summary><strong>v1.3.13</strong><span class="ngay">2026-09-06</span><span class="tt">Bộ nâng cấp mang cả tài liệu, và bộ sinh DỪNG trước khi ghi nhầm</span></summary>
+      <p>Hai lỗi do lượt nâng <code>ALL_SKILL_MANAGEMENT</code> lôi ra, vá cả hai. Cùng một hình dạng: <strong>một lớp bảo vệ chỉ chạy được nửa đường.</strong></p>
+<h4><code>upgrade.mjs</code> nay so cả tầng TÀI LIỆU</h4>
+<p>Trước bản này nó chỉ đẩy tầng máy, nên mọi repo đã lắp <strong>đóng băng ở tầng tài liệu</strong> tại thời điểm lắp — bộ khung thêm sổ tay bao nhiêu cũng chỉ tới repo dựng mới.</p>
+<p>Ba trạng thái, in <strong>riêng</strong> khỏi bảng tầng máy:</p>
+<div class="tw"><table><thead><tr><th></th><th>Làm gì</th></tr></thead><tbody><tr><td><code>THIẾU</code></td><td>mang sang — không có gì để mất</td></tr><tr><td><code>KHÁC</code></td><td><strong>chỉ kể tên, KHÔNG BAO GIỜ ghi đè</strong></td></tr><tr><td><code>ĐÃ MỚI</code></td><td>không làm gì</td></tr></tbody></table></div>
+<p>In riêng là cố ý: trộn vào bảng tầng máy là mời người đọc tưởng <code>KHÁC</code> ở tài liệu cũng sẽ bị ghi đè như <code>CŨ</code> ở máy. Tài liệu là chữ repo đích <strong>được phép sửa</strong> cho nghề của mình — ghi đè là xoá việc của người ta, và <code>upgrade.mjs</code> tồn tại chính vì nó từ chối làm thế.</p>
+<h4>Bộ sinh DỪNG TRƯỚC KHI GHI khi <code>generated_names</code> trên đĩa khác HEAD</h4>
+<p>Bộ sinh đọc cấu hình <strong>từ HEAD</strong> — cố ý, để trang luôn suy ra từ trạng thái đã commit. Nhưng <code>generated_names</code> quyết định <strong>nó ghi vào file nào</strong>. Nên khai tên mới rồi chạy ngay trước khi commit thì nó dùng tên CŨ, và <strong>ghi đè đúng cái file mà <code>generated_names</code> sinh ra để bảo vệ</strong>.</p>
+<p>Vấp thật, và vấp bởi chính người vừa vá KHUNG-26: bảng viết tay 123 dòng ở <code>ALL_SKILL_MANAGEMENT</code> bị đè, md5 đổi từ <code>0b41e4d3…</code> sang <code>673f36df…</code>.</p>
+<p>Bộ sinh <strong>có</strong> cảnh báo thứ tự — nhưng in ra <strong>SAU khi đã ghi</strong>. <strong>Cảnh báo sau khi mất là biên bản, không phải cảnh báo.</strong></p>
+<p>Nay: mã thoát <strong>2</strong>, <strong>không ghi một byte nào</strong>, và nói rõ HEAD định ghi vào đâu, đĩa định ghi vào đâu. Chỉ chặn đúng khối đó — sửa dở phần khác của cấu hình không làm mất file nào nên vẫn chỉ cảnh báo như cũ.</p>
+<p>Đọc đĩa là một <strong>ngoại lệ hẹp</strong> (<code>readDia</code>), dùng đúng MỘT chỗ. <code>F19</code> <strong>đếm số lần gọi</strong> để lời hứa <em>&quot;trang suy ra từ HEAD&quot;</em> không bị nới dần.</p>
+<h4>Đột biến kiểm bắt được HAI phép kiểm trang trí của chính lượt này</h4>
+<ol><li>Vế kiểm thứ tự dò chuỗi <code>tenMaySinhLech(deps)</code> — mà chính <strong>dòng khai báo hàm</strong> cũng</li></ol>
+<p>   chứa chuỗi đó và luôn nằm trước chỗ ghi. Nên nó <strong>luôn xanh</strong> dù có đổi chỗ hay không.</p>
+<ol><li>Vế kiểm KHUNG-28 chỉ gọi hàm so sánh, không chạm vòng ghi. Phá hẳn vòng ghi mà không</li></ol>
+<p>   gì đỏ. Phải thêm một vế chạy <code>--apply</code> <strong>thật</strong> trên một repo đích thật.</p>
+<p><em>Một phép kiểm không thể đỏ và một phép kiểm đúng trông giống hệt nhau trên bảng</em> — lần thứ hai trong một ngày.</p>
+    </details><details>
       <summary><strong>v1.3.11</strong><span class="ngay">2026-09-06</span><span class="tt">Bộ khung thôi bắt chủ nhà dọn phòng, và bản trích mang đủ hai file repo mới cần nhất</span></summary>
       <p>Hai lỗi do lượt migrate <code>ALL_SKILL_MANAGEMENT</code> lôi ra hôm qua, vá cả hai.</p>
 <h4>Ba artifact máy sinh nay KHAI TÊN ĐƯỢC</h4>
@@ -1017,7 +1037,7 @@ npm run don -- --apply     # ghi thật</code></pre>
   </section>
 
   <footer>
-    <span>Ark Repo Harness v1.3.11</span>
+    <span>Ark Repo Harness v1.3.13</span>
     <span>sinh ngày 2026-09-06 — không gõ tay</span>
     <span>mọi con số đọc từ repo</span>
   </footer>
