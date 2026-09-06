@@ -317,3 +317,25 @@ Xếp vào [IDEAS.md](IDEAS.md) mục `Y-10`, bậc **ý tưởng**. Chưa viế
 chưa đo: bảng của bộ khung mang dữ liệu khoá **sống**, nên tiến trình nền ghi đè nó mỗi lượt
 nhận/trả khoá có thể làm bẩn cây làm việc và **chặn push của mọi lane**. Việc kế là đo đúng chỗ
 đó, không phải viết mã.
+
+## 2026-09-07 — Bốn quyết định cho chuỗi chạy đêm
+
+Đức trả lời bốn câu trong một lượt, để phiên chạy được một mình qua đêm.
+
+**1 · Bảng sống — DUYỆT CẢ BA CỬA, kể cả tiến trình tự chạy lúc bật máy.** Luật mục 2 hàng 5
+bắt hỏi trước khi tạo automation tự chạy, nên ghi ra đây để phiên sau biết **đây là quyết định
+của Đức, không phải AI tự làm**. Cài và gỡ đều bằng nhấp đúp, dùng thư mục Startup của người
+dùng, **không cần quyền quản trị, không dịch vụ hệ thống**. Tắt bằng `Tat-tu-chay.cmd` — nó đặt
+một file cờ chứ **không giết theo tên tiến trình**, vì giết theo tên sẽ giết luôn tiến trình
+`node` của một phiên AI đang làm việc.
+
+**2 · KHUNG-36 — cho khai lại hai mốc vào CHÍNH ba hồ sơ migrate cũ.** Chỉ thêm dòng khai ở
+phần đầu hồ sơ, **không sửa một chữ nào của thân bài**. Ranh giới: khai lại điều thân bài đã
+nói ≠ viết lại lịch sử.
+
+**3 · KHUNG-30 — HOÃN.** Repo `Project 3 AI Agent Unify` còn ba file sửa dở của phiên khác;
+nâng bây giờ là giẫm chân. Không phải vấn đề kỹ thuật, và luật 8A của chính repo đó vẫn đúng.
+
+**4 · Chuỗi đêm — bỏ mọi mục cần nói chuyện với Đức giữa chừng.** Nguyên văn: *"bỏ mục nào mà
+sẽ block flow tự chạy & cần giao tiếp với Đức"*. Nên `KHUNG-30` (đã hoãn) và `KHUNG-37` (Đức
+phải bấm nút giết tiến trình) ra khỏi chuỗi.

@@ -23,7 +23,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ageHours, ageLabel, dangNhac, DAU_VET, GIO_NHAC, mocCoGio, noiDauVet, xetDauVet } from "../scripts/claim.mjs";
+import { ageHours, ageLabel, dangNhac, DAU_VET, decide, EXIT, GIO_NHAC, mocCoGio, noiDauVet, xetDauVet } from "../scripts/claim.mjs";
 import { khoiDangLamGi } from "../scripts/build-overview.mjs";
 
 let passed = 0;
@@ -248,6 +248,38 @@ const SAU = "2026-09-06T11:00:00Z";
   // Mốc chỉ-ngày qua hẳn một ngày thì được nhắc — độ phân giải ngày đủ để khẳng định điều đó.
   assert.equal(dangNhac(30, false), true, "qua han mot ngay thi moc chi-ngay cung du chac de nhac");
   ok("9 · mốc chỉ có ngày: không bịa ra giờ, và KHÔNG bật ⚠ — con số ma Đức bắt được 06/09");
+}
+
+/* ---- 10. TRẢ KHOÁ KHI CÒN COMMIT CHƯA ĐẨY -------------------------------
+ *
+ * HAI VẾ PHẢI ĐI CÙNG NHAU, và vế này ghim đúng điều đó. Chỉ có vế chặn thì một lane bị cổng
+ * xuất bản từ chối đẩy sẽ KẸT KHOÁ VĨNH VIỄN: không đẩy được → không trả được → vùng chết theo
+ * nó. Cửa thoát `--du-biet` không phải chỗ hở; nó là điều kiện để vế chặn được phép tồn tại.
+ *
+ * Và chiều ngược lại cũng ghim: KHÔNG ĐO ĐƯỢC thì KHÔNG CHẶN. Cố ý khác nhánh `--take` ở ngay
+ * trên (nơi không đo được thì từ chối) — giành vùng không lùi lại được, còn trả khoá là thao tác
+ * GỠ BÍ, và một lệnh gỡ bí mà tự chặn vì git hỏng thì nó biến sự cố nhỏ thành sự cố kẹt cả vùng.
+ *
+ * Đột biến đã chạy: bỏ `!duBiet` khỏi điều kiện → vế này ĐỎ · cho `chuaDay == null` cũng chặn
+ * → vế này ĐỎ. */
+{
+  const cur = { _x: { owner: "toi" } };
+  const goi = (them2) => decide(cur, { action: "release", key: "_x", as: "toi", today: "T", ...them2 });
+
+  const chan = goi({ chuaDay: ["a1b2 sua mot thu"] });
+  assert.equal(chan.code, EXIT.REFUSED, "con commit chua day thi PHAI tu choi tra khoa");
+  assert.match(chan.message, /safe-push/, "phai chi ra duong di tiep, khong chi noi KHONG");
+  assert.match(chan.message, /--du-biet/, "PHAI chi ra cua thoat — chan ma khong co loi ra la ket khoa vinh vien");
+
+  const thoat = goi({ chuaDay: ["a1b2 sua"], duBiet: "cổng đỏ, giao lane khác" });
+  assert.equal(thoat.code, EXIT.OK, "noi ro la minh biet thi phai tra duoc — khong thi lane bi chan day se ket khoa mai");
+  assert.match(String(thoat.next.tra_khi_chua_day), /cổng đỏ/,
+    "cua thoat phai GHI LAI ly do vao bang — mot cau khai, khong phai mot cai tac luoi");
+
+  assert.equal(goi({ chuaDay: null }).code, EXIT.OK,
+    "KHONG DO DUOC thi khong chan: tra khoa la thao tac go bi, khac han nhanh --take o tren");
+  assert.equal(goi({ chuaDay: [] }).code, EXIT.OK, "day het roi thi tra binh thuong");
+  ok("10 · trả khoá khi còn commit chưa đẩy: chặn, có cửa thoát ghi lý do, và không đo được thì không chặn");
 }
 
 console.log(`khoa-dau-vet: ${passed} vế xanh`);

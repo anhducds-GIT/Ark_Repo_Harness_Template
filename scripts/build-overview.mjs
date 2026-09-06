@@ -44,6 +44,10 @@ import {
 } from "./overview-doc.mjs";
 
 const NL = String.fromCharCode(10);
+
+/* Bật bằng `--khoa-song` hoặc biến môi trường `ARK_KHOA_SONG=1`. Biến môi trường có vì cửa
+ * nhấp đúp gọi lệnh qua nhiều lớp và một cờ dòng lệnh dễ rơi mất giữa đường. */
+const KHOA_SONG = process.argv.includes("--khoa-song") || process.env.ARK_KHOA_SONG === "1";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /* ĐỌC TỪ HEAD, KHÔNG ĐỌC TỪ ĐĨA — và đây là chỗ dễ làm tê cả repo nhất, nên nói to.
@@ -1496,8 +1500,18 @@ export async function gomDuLieu() {
   }
   canDuc.sort((a, b) => (b.ngay ?? -1) - (a.ngay ?? -1));
 
-  /* Bảng chủ sở hữu. NÉM nếu hỏng — xem ghi chú ở `readKhoa`. */
-  const rawKhoa = doc(".agents/claims.json") || "{}";
+  /* Bảng chủ sở hữu. NÉM nếu hỏng — xem ghi chú ở `readKhoa`.
+   *
+   * MẶC ĐỊNH ĐỌC TỪ HEAD, và mặc định đó cấm đổi: bản đang commit ở gốc repo phải tất định từ
+   * HEAD, không thì cổng "Sự thật máy sinh còn tươi" đỏ với mọi phiên mỗi lượt ai đó nhận khoá.
+   *
+   * `--khoa-song` đọc từ ĐĨA thay vì HEAD, và CHỈ dùng cho bản ra nằm ngoài git (`bang-song/`).
+   * Vì sao cần: đo 06/09 trên chính lịch sử repo này — bốn khoá một phiên giữ suốt lượt làm việc
+   * nằm trong **0/6 commit**, nên bảng suy từ HEAD nói "không có luồng nào chạy" trong khi có
+   * bốn. Với bảng sống thì câu duy nhất đáng hỏi là câu về BÂY GIỜ. */
+  const rawKhoa = (KHOA_SONG
+    ? (() => { try { return fs.readFileSync(path.join(ROOT, ".agents/claims.json"), "utf8"); } catch (_) { return doc(".agents/claims.json") || "{}"; } })()
+    : doc(".agents/claims.json")) || "{}";
   const khoa = readKhoa(rawKhoa);
 
   /* Dấu vết đo LÚC SINH BẢNG, không đọc từ HEAD như mọi con số khác trên trang.

@@ -44,6 +44,12 @@
       "ownership_mode": "root",
       "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá"
     },
+    "bang-song/": {
+      "steward": "_root",
+      "mutability": "rw",
+      "ownership_mode": "root",
+      "note": "ba cửa vào bảng SỐNG — bản ra (BANG.html, trang-thai.json) nằm NGOÀI git, xem .gitignore"
+    },
     "template/": {
       "steward": "_template",
       "mutability": "rw",

@@ -13,3 +13,12 @@
 # `eol=lf` chốt CẢ trong kho LẪN trong cây làm việc. Chốt một nửa — chỉ `text=auto` — thì kho
 # sạch mà cây làm việc vẫn CRLF, tức đúng cái bệnh này vẫn còn nguyên.
 * text=auto eol=lf
+
+
+# ĐÃ THỬ THÊM MỘT NGOẠI LỆ CHO `*.cmd`, RỒI GỠ ĐI — ghi lại để không ai thêm lại vì cùng một
+# linh cảm. Lý do định thêm: nghe nói `cmd.exe` đọc file batch thuần LF không ổn định. ĐO THẬT
+# 07/09 trên Windows 11: file `.cmd` thuần LF chạy đúng, kể cả khối `if errorlevel (...)` nhiều
+# dòng và `chcp 65001` với chữ có dấu — mã thoát 0.
+# Chưa thử: nhãn và `goto`. Không cửa nào trong `bang-song/` dùng chúng.
+# Luật mục 8: chưa có ca hỏng thật thì đừng thêm luật. Một dòng cấu hình không ai chứng minh
+# được là cần thì sớm muộn có người gỡ, và lúc đó không ai biết gỡ có sao không.

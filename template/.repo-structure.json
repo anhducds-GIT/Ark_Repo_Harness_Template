@@ -22,7 +22,8 @@
     "docs/": { "steward": "_docs", "mutability": "rw", "ownership_mode": "root", "note": "tài liệu bốn tầng: studies, briefs, archive, adr" },
     "scripts/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "bộ sinh + cổng kiểm + đẩy an toàn" },
     "tests/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "suite gốc repo" },
-    "evidence/": { "steward": "_root", "mutability": "append-only", "ownership_mode": "root", "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá" }
+    "evidence/": { "steward": "_root", "mutability": "append-only", "ownership_mode": "root", "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá" },
+    "bang-song/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "ba cửa vào bảng SỐNG — bản ra (BANG.html, trang-thai.json) nằm NGOÀI git, xem .gitignore" }
   },
   "generators": ["build-dashboard.mjs"],
   "_generators_doc": "Script nào sinh ra artifact đã commit. Cổng đóng phiên đối chiếu từng cái với HEAD. CHỈ khai script repo này THẬT SỰ có — khai thừa là cổng đỏ vì thiếu file.",

@@ -124,7 +124,25 @@ const VERBATIM = [
   /* Cơ chế đa phiên → `MULTIFLOW.md` mục 5 bắt đột biến kiểm, và phát một cơ chế mà không phát
    * phép ghim của nó là phát một lời hứa. Suite này tự dựng kho git riêng và đọc `areas` của
    * repo đích, nên nó chạy được cả ở repo khai khối `areas` rỗng. */
-  ["tests/khoa-dau-vet.mjs", "tests/khoa-dau-vet.mjs"]
+  ["tests/khoa-dau-vet.mjs", "tests/khoa-dau-vet.mjs"],
+  /* BẢNG SỐNG — ba cửa, một lõi. Đi theo bản trích vì chỗ hỏng nó vá là chỗ MỌI repo dựng từ bộ
+   * khung đều có: bảng suy từ HEAD trả lời câu về QUÁ KHỨ, mà câu người chốt hỏi là câu về BÂY
+   * GIỜ. Đo ở repo nhà 06/09 — bốn khoá một phiên giữ suốt lượt làm việc nằm trong 0/6 commit.
+   *
+   * Không đóng cứng tên khoá ở đây: `khoaChanSinhFrom` suy chủ của `scripts/` và `template/` từ
+   * `.repo-structure.json`, nên chốt ⑴ còn nổ ở repo đặt tên khoá khác. Một danh sách gõ tay ở
+   * đây là chốt im lặng không bao giờ nổ — đúng loại lỗi chính nó sinh ra để chặn. */
+  ["bang-song/loi.mjs", "bang-song/loi.mjs"],
+  ["bang-song/may-chu.mjs", "bang-song/may-chu.mjs"],
+  ["bang-song/mot-luot.mjs", "bang-song/mot-luot.mjs"],
+  ["bang-song/Xem-bang.cmd", "bang-song/Xem-bang.cmd"],
+  ["bang-song/Mo-may-chu.cmd", "bang-song/Mo-may-chu.cmd"],
+  ["bang-song/Bat-tu-chay.cmd", "bang-song/Bat-tu-chay.cmd"],
+  ["bang-song/Tat-tu-chay.cmd", "bang-song/Tat-tu-chay.cmd"],
+  ["tests/bang-song.mjs", "tests/bang-song.mjs"],
+  /* Bản ra PHẢI nằm ngoài git ở repo đích y như ở đây, không thì repo đó commit bảng sống và
+   * mọi phiên của nó thấy cây làm việc bẩn mỗi lượt có ai nhận khoá. */
+  [".gitignore", ".gitignore"]
 ];
 
 /* ADR-0000 CỐ Ý KHÔNG chép nguyên văn. Bản gốc kể lại lịch sử di trú của riêng repo gốc — ba
@@ -649,7 +667,8 @@ const STRUCTURE_SEED = `{
     "docs/": { "steward": "_docs", "mutability": "rw", "ownership_mode": "root", "note": "tài liệu bốn tầng: studies, briefs, archive, adr" },
     "scripts/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "bộ sinh + cổng kiểm + đẩy an toàn" },
     "tests/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "suite gốc repo" },
-    "evidence/": { "steward": "_root", "mutability": "append-only", "ownership_mode": "root", "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá" }
+    "evidence/": { "steward": "_root", "mutability": "append-only", "ownership_mode": "root", "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá" },
+    "bang-song/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "ba cửa vào bảng SỐNG — bản ra (BANG.html, trang-thai.json) nằm NGOÀI git, xem .gitignore" }
   },
   "generators": ["build-dashboard.mjs"],
   "_generators_doc": "Script nào sinh ra artifact đã commit. Cổng đóng phiên đối chiếu từng cái với HEAD. CHỈ khai script repo này THẬT SỰ có — khai thừa là cổng đỏ vì thiếu file.",
@@ -868,7 +887,7 @@ function packageJson(version) {
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
-      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs"
+      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs"
     }
   }, null, 2) + "\n";
 }

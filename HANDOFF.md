@@ -1021,3 +1021,52 @@ Y-10 là **đo đúng chỗ đó**, không phải viết mã. Chỗ chặn thứ
 
 **Còn mở:** `KHUNG-34` (tám cái bẫy, chưa phân loại) · `KHUNG-33` · `KHUNG-36` `@Đức:chốt` ·
 `KHUNG-37` `@Đức:bấm` · `KHUNG-30`.
+
+---
+
+## 2026-09-07 · claude-k4-bangsong · bản 1.3.26 — chuỗi đêm: bảng SỐNG · trả khoá an toàn · tám cái bẫy
+
+**Đức giao một chuỗi chạy một mình qua đêm**, và trả lời trước bốn câu chặn: duyệt cả ba cửa bảng
+sống (kể cả tiến trình tự chạy — luật mục 2 hàng 5) · cho khai lại ba hồ sơ migrate · hoãn
+`KHUNG-30` · và *"bỏ mục nào mà sẽ block flow tự chạy & cần giao tiếp với Đức"*.
+
+### Việc ① hoá ra đã xong từ trước
+
+Nút `giao-viec.mjs` mà `Y-09` ghi là chỗ chặn **đã được gỡ ở bản 1.3.18** — `VIEC` nay ở
+`overview-doc.mjs`, cả ba file bộ sinh đều đi theo bản trích. Chữ trong `Y-09` đang nói sai và
+đáng sửa: một chỗ chặn đã hết mà sổ vẫn ghi là còn thì phiên sau đi đuổi một cái bóng.
+
+### Việc ② — bảng sống, và chỗ chặn KHÁC HẲN dự đoán
+
+Dự đoán: tiến trình nền làm bẩn cây làm việc rồi chặn push của lane khác. **Sai.** Bảng đọc bảng
+quyền **từ HEAD**, nên bốn khoá một phiên giữ suốt lượt làm việc nằm trong **0/6 commit** — bảng
+nói "không có luồng nào chạy" trong khi có bốn.
+
+Cái giá đo được: cổng của lane khác **không chỗ nào ĐỎ**, và cột "bảng sống bẩn" **giống hệt** cột
+"chỉ `claims.json` bẩn" — thêm **0 đồng chi phí**, với điều kiện bản ra nằm ngoài git.
+
+### Ba lượt phép ghim của tôi tự nói dối, và cả ba đáng ghi hơn phần chạy được
+
+1. **Vế canh chốt ⑴ lặp qua chính danh sách nó phải canh** — bỏ một khoá đi thì nó chỉ kiểm phần
+   còn lại rồi báo xanh. Đột biến số 1 **sống sót**. Chữa bằng cách hỏi HÀNH VI, không so hai
+   danh sách.
+2. **Chỉ thử hình dạng repo HỎNG, chưa thử hình dạng ĐỌC ĐƯỢC MÀ THIẾU** — mà đó mới là ca thật ở
+   repo đích. Đột biến số 9 sống sót vì thế.
+3. **Đóng cứng `_root` là "vùng không chứa bộ sinh"** — đúng ở repo nhà, SAI ở bản trích (ở đó
+   `scripts/` thuộc `_root`). Phép ghim **tự đỏ ở chính repo nó vừa được phát tới**.
+
+Và hai chốt CŨ của repo bắt được hai lỗ tôi tạo ra: bản trích mang phép ghim nhưng chuỗi `test`
+không gọi nó · repo dựng từ bản trích đỏ B3 vì `bang-song/` chưa khai vùng.
+
+### Một luật tôi thêm rồi TỰ GỠ
+
+Thêm `*.cmd text eol=crlf` vào `.gitattributes` dựa trên linh cảm *"cmd.exe đọc batch thuần LF
+không ổn"*. Đo thật trên Windows 11: **chạy đúng, mã thoát 0**, kể cả khối `if errorlevel (...)`
+nhiều dòng và `chcp 65001` với chữ có dấu. Gỡ luật, và ghi lý do ngay trong `.gitattributes` để
+không ai thêm lại vì cùng linh cảm. Luật mục 8 áp cho chính mình trước.
+
+### Còn mở
+
+`KHUNG-38` (mới — `--du-biet` để lại vùng vô chủ, phải ĐO trước khi hạ mức cổng) · `KHUNG-30`
+(Đức hoãn) · `KHUNG-37` (`@Đức:bấm`) · `KHUNG-31` · `Y-10` nay đã có bản chạy được, còn phần
+"nghiệm thu trên máy Đức" chưa ai làm.

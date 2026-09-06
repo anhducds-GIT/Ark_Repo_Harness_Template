@@ -12,6 +12,10 @@ chi_phi_sau: thả 0 · viết 0 · soi 0
 cong_dong_phien: XANH TOÀN BỘ
 trang_thai: xong
 loi_tim_ra: 3
+viec_audit: xong
+viec_assistant: xong
+viec_ke: `bootstrap.blocking` đang RỖNG cố ý — chạy vài phiên cho sạch rồi bật dần từng mã, mỗi lần ghi lý do vào `decisions.md` của repo đó
+khai_boi: claude-k4-bangsong 2026-09-07, Đức chốt cho khai lại · audit: thân bài — mục 'Ba lỗi tìm ra', hai cái là bẫy im lặng · assistant: thân bài — `npm test` exit 0/53 xanh, cổng XANH TOÀN BỘ, đã đẩy 5 commit và trả ba khoá
 ---
 
 ## Trạng thái mới nhất

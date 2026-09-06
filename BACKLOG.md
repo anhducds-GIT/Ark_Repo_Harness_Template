@@ -643,7 +643,7 @@ TRƯỚC lượt ghi đầu*, *một lane một khoá gói*. Nền cần trướ
 thụ về. Đây là **cơ chế đa phiên → đột biến kiểm bắt buộc**. Vùng: `_code` + `_root`.
 Xem [bản đồ hoà giải](docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md) §2.
 
-### KHUNG-33 · Trả khoá khi còn commit chưa đẩy để lại commit vô chủ
+### ~~KHUNG-33~~ · ĐÓNG 07/09 · Trả khoá khi còn commit chưa đẩy để lại commit vô chủ
 
 Repo tiêu thụ có `canDayTruocKhiTra` (từ chối trả khoá khi còn commit chưa đẩy) **cộng** cửa thoát
 `--du-biet` (trả kèm lý do). Bộ khung không có vế nào.
@@ -652,7 +652,44 @@ Hai vế phải vào **cùng một lượt**: chỉ lấy vế chặn thì một
 khoá vĩnh viễn — đúng nguyên nhân ② mà bản giao việc dặn **đừng đụng**. Chỉ lấy cửa thoát thì
 không chặn được gì. Vùng: `_code`.
 
-### KHUNG-34 · Tám cái bẫy đo được 06/09 — chưa phân loại xem bộ khung nên chặn cái nào
+### ~~KHUNG-34~~ · ĐÓNG 07/09 · Tám cái bẫy đo được 06/09 — đã phân loại
+
+**Kết quả: nhận 2, bác 5, một cái đã có sẵn.** (Bẫy 2 suýt thành cái thứ ba được nhận — xem dòng của nó.) Mỗi dòng dưới đây trả lời câu hỏi của luật mục 8 —
+*đã xảy ra thật ở repo NÀY chưa* — bằng một phép đo, không bằng cảm giác.
+
+| # | Bẫy | Đo ở repo này | Quyết |
+|---|---|---|---|
+| 1 | mỏ neo khớp 0 chỗ mà báo như đã kiểm | **CÓ, ngay lượt này** — nhưng ở công cụ sửa file của phiên AI, không ở script của repo | **nhận, dạng nhẹ**: luật đã có sẵn ở mục 3 luật vàng 2 (*fixture phải dựng nổi ca hỏng*). Không thêm phép kiểm máy: không dựng nổi ca hỏng cho hành vi của một phiên AI |
+| 2 | mỏ neo `
+` gặp file CRLF | **chưa** — `git ls-files --eol`: **133/133 file LF**, không một file CRLF nào | **bác.** Lượt này CÓ thêm ngoại lệ `*.cmd eol=crlf` rồi **gỡ đi**: nó dựa trên linh cảm *"cmd.exe đọc LF không ổn"*, mà đo thật trên Windows 11 thì file `.cmd` thuần LF chạy đúng, mã thoát 0. Lý do ghi trong `.gitattributes` để không ai thêm lại vì cùng linh cảm đó |
+| 3 | `git commit -o` không chặn cuốn sửa đổi cùng file | **chưa** — 0 chỗ dùng trong cả repo | **bác** |
+| 4 | byte NUL làm diff biến mất | **chưa** — quét 133 file được track, **0 file** có byte NUL | **bác** |
+| 5 | trạng thái ADR khai hai chỗ | **chưa** — cả 6 ADR khai đúng MỘT chỗ (frontmatter), thân bài 0 chỗ | **bác** |
+| 6 | trả khoá kèm lý do để lại cổng đỏ | **vừa thành live lượt này** — `--du-biet` là của `KHUNG-33` | **nhận** → `KHUNG-38` |
+| 7 | bộ đếm gộp mù khi nội dung dời sang lưu trữ | **đã giải sẵn** — `can-nang.mjs` có `THU_MUC_LUU_TRU`, `session-check.mjs` có `LA_LUU_TRU` | **không cần làm gì** |
+| 8 | bộ sinh lấy tiêu đề từ tên thư mục nên sai trong worktree | **chưa** — 0 chỗ dùng `basename(ROOT)`; tên suy từ `.repo-structure.json` | **bác** |
+
+**Năm cái bị bác đều là bẫy THẬT ở repo tiêu thụ.** Bác không phải vì chúng vô lý, mà vì luật mục
+8 hỏi *"đã xảy ra thật chưa"* — và ở đây câu trả lời đo được là chưa. Chép chúng sang là nhập năm
+cơ chế mà không nhập lý do tồn tại của chúng, rồi phiên sau đọc không hiểu vì sao có và gỡ đi.
+
+### KHUNG-38 · `--du-biet` trả khoá xong để lại vùng KHÔNG AI ĐỨNG TÊN mà vẫn có commit chưa đẩy
+
+Rơi ra từ `KHUNG-34` bẫy số 6, và từ chính `KHUNG-33` vừa làm.
+
+Cửa thoát `--du-biet` cho trả khoá khi còn commit chưa đẩy — cần thiết, không thì lane bị chặn đẩy
+kẹt khoá vĩnh viễn. Nhưng sau đó vùng đó `owner: null` trong khi vẫn còn commit chưa công bố, nên
+cổng của phiên SAU đỏ với câu *"vùng bị sửa nhưng chưa ai đứng tên"* — và phiên sau **không hiểu vì
+sao**, vì nó không phải người để lại.
+
+Bảng quyền ĐÃ ghi `tra_khi_chua_day` (số commit + lý do). Việc là cho cổng đọc trường đó và hạ từ
+ĐỎ xuống VÀNG **kèm nói ra ai để lại và vì sao** — chứ không phải bỏ phép kiểm.
+
+**Chưa làm vì chưa đo.** Phải dựng ca thật trước: trả khoá bằng `--du-biet` rồi chạy cổng ở một
+phiên khác, xem nó đỏ ở đúng phép kiểm nào và câu chữ ra sao. Hạ mức trước khi biết nó đỏ ở đâu là
+làm yếu một lớp bảo vệ theo phỏng đoán — luật vàng 3 cấm. Vùng: `_code`.
+
+### KHUNG-34-cu · (giữ tiêu đề cũ để tra ngược) Tám cái bẫy đo được 06/09
 
 Tám thứ cắn repo tiêu thụ trong MỘT ngày: mỏ neo khớp 0 chỗ mà báo như đã kiểm · mỏ neo `\n` gặp
 file CRLF · `git commit -o` không chặn được cuốn sửa đổi cùng file · byte NUL làm diff biến mất (5
@@ -672,7 +709,7 @@ nào tôi sẽ continue"*. Tab hiện chiếu gần trọn thân hồ sơ — t�
 Việc: tab Migrate thành **bảng mốc + danh sách kiểm**, thân hồ sơ gập lại sau `<details>`. Kèm bỏ
 trang `SO-MIGRATE-*.html` đứng riêng (Đức chốt: chỉ nuôi tab). Vùng: `_code` + `_root`.
 
-### KHUNG-36 · Ba hồ sơ migrate cũ không khai hai mốc sau — bảng mốc trống hai cột @Đức:chốt
+### ~~KHUNG-36~~ · ĐÓNG 07/09 · Ba hồ sơ migrate cũ không khai hai mốc sau — Đức chốt cho khai lại
 
 Bảng mốc mới (1.3.21) chiếu ba mốc: *migrate · audit · AI onboard*. Chỉ mốc đầu suy được (từ
 `muc_sau`); hai mốc sau **không có trường nào tương đương** trong ba hồ sơ đã ghi, nên hai cột

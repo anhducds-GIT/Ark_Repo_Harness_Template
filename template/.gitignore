@@ -1,0 +1,12 @@
+# Bản ra của ba cửa vào BẢNG SỐNG (`bang-song/`).
+#
+# NGOÀI GIT LÀ CỐ Ý, và đây là chỗ dễ "sửa cho gọn" nhất nên nói to: bảng sống đọc bảng quyền
+# từ ĐĨA, nên nó đổi byte mỗi lượt có ai nhận hay trả khoá. Commit nó là mọi phiên khác mở repo
+# ra thấy cây làm việc bẩn, và một tiến trình nền ghi đè file đã commit là máy của người chủ
+# làm bẩn việc của lane đang chạy.
+#
+# Bản ĐÃ COMMIT là `DASHBOARD-Ark-Repo-Harness.html` ở gốc repo — nó suy hoàn toàn từ HEAD và
+# cổng đóng phiên đối chiếu nó mỗi lượt. Hai file, hai việc, đừng gộp.
+bang-song/BANG.html
+bang-song/trang-thai.json
+bang-song/DUNG.txt

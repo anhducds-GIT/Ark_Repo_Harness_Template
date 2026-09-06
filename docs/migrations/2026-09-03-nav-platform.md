@@ -12,6 +12,10 @@ chi_phi_sau: thả 0 · viết 0 · soi 0
 cong_dong_phien: xanh
 trang_thai: đã đóng
 loi_tim_ra: 9
+viec_audit: xong
+viec_assistant: xong
+viec_ke: hạn miễn trừ 5 test `R01 V2` hết 2026-12-02 — hoặc làm xong, hoặc gia hạn có lý do
+khai_boi: claude-k4-bangsong 2026-09-07, Đức chốt cho khai lại · audit: thân bài — báo cáo `drafts/MIGRATE-REPORT-NAV.md`, 9 lỗi mỗi lỗi kèm lệnh tái hiện · assistant: thân bài — `npm test` xanh 127/132 + 5 nợ đã khai, cổng XANH TOÀN BỘ
 ---
 
 ## Trạng thái mới nhất

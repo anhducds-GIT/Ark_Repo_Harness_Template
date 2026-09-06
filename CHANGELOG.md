@@ -3,6 +3,92 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.26 — 2026-09-07 — Chuỗi đêm: bảng SỐNG · trả khoá an toàn · tám cái bẫy đã phân loại
+
+Đức: *"tôi có thể F5 trên dashboard html là latest status sẽ được hiển thị lên các luồng làm
+việc cùng lúc."*
+
+### Đo trước, và chỗ chặn hoá ra KHÁC hẳn dự đoán
+
+Dự đoán ban đầu: tiến trình nền làm bẩn cây làm việc rồi chặn push của lane khác. **Sai.**
+
+Đo ra: bảng đọc bảng quyền **từ HEAD** (`git show HEAD:.agents/claims.json`). Trên chính lịch sử
+repo này, bốn khoá một phiên giữ suốt lượt làm việc nằm trong **0/6 commit** — nên bảng nói
+*"không có luồng nào chạy"* trong khi có bốn. F5 cả buổi cũng chỉ thấy số 0.
+
+Cái giá của bản đọc-từ-đĩa, đo bằng cổng của một lane khác:
+
+| | bảng sống bẩn | chỉ `claims.json` bẩn (nền hôm nay) |
+|---|---|---|
+| Phạm vi trách nhiệm | XANH | XANH |
+| Sự thật máy sinh còn tươi | XANH | XANH |
+| Test xanh | BỎ (2 file) | BỎ (1 file) |
+
+**Hai cột giống hệt nhau** — bảng sống thêm **0 đồng chi phí**, với điều kiện nó không được
+commit. Đó là lý do bản ra nằm ngoài git, không phải sở thích.
+
+### Ba cửa, một lõi
+
+`bang-song/` — nhấp đúp · máy chủ tại chỗ (`127.0.0.1`, **ba đường, chỉ GET/HEAD**) · tiến trình
+nền tự chạy lúc bật máy. **Đức duyệt tường minh cửa ③** (luật mục 2 hàng 5). Tắt bằng **file cờ**,
+không giết theo tên tiến trình — giết theo tên sẽ giết luôn `node` của một phiên AI đang chạy.
+
+Hai bản, hai việc, **đừng gộp**: `DASHBOARD-*.html` đã commit vẫn suy hoàn toàn từ HEAD; chỉ bản
+sống mới đọc bảng quyền từ đĩa, sau hàng rào `--khoa-song`.
+
+### Chín đột biến, và HAI cái sống sót lượt đầu
+
+Hai cái sống sót đáng ghi hơn bảy cái kia:
+
+- Vế canh chốt ⑴ **lặp qua chính danh sách nó phải canh**, nên bỏ một khoá đi thì nó chỉ kiểm
+  phần còn lại rồi báo xanh. Một phép kiểm tự soi mình luôn đúng, tức nó ghim số 0. Chữa bằng
+  cách hỏi **hành vi**, không so hai danh sách.
+- Phép ghim chỉ thử hình dạng repo **hỏng**, chưa thử hình dạng **đọc được mà thiếu** — mà đó
+  mới là ca thật ở repo đích.
+
+Và trước khi phát đi: `KHOA_CHAN_SINH` từng **đóng cứng** `_code`/`_template`. Repo đích đặt tên
+khoá khác thì chốt ⑴ im lặng không bao giờ nổ — đúng loại lỗi nó sinh ra để chặn, ở đúng chỗ
+không ai nhìn. Nay suy chủ của `scripts/` và `template/` từ `.repo-structure.json`.
+
+### KHUNG-33 — trả khoá khi còn commit chưa đẩy
+
+Trả khoá xong mà commit còn nằm trên máy thì vùng đó **không ai đứng tên** trong khi vẫn có thay
+đổi chưa công bố, và cổng của phiên sau đỏ với câu *"vùng bị sửa nhưng chưa ai đứng tên"*.
+
+**Hai vế đi cùng một lượt, và đây là chỗ dễ làm hỏng nhất.** Chỉ lấy vế chặn thì một lane bị cổng
+xuất bản từ chối đẩy sẽ **kẹt khoá vĩnh viễn**: không đẩy được → không trả được → vùng chết theo
+nó. Cửa thoát `--du-biet` không phải chỗ hở — nó là **điều kiện để vế chặn được phép tồn tại**, và
+nó ghi lý do vào bảng nên là một câu khai chứ không phải một cái tặc lưỡi.
+
+Chiều thứ ba, cố ý khác `--take`: **không đo được thì KHÔNG chặn**. Giành vùng không lùi lại được
+nên ở đó fail-closed là đúng; trả khoá là thao tác **gỡ bí**, và một lệnh gỡ bí tự chặn vì git hỏng
+thì nó biến sự cố nhỏ thành sự cố kẹt cả vùng.
+
+### KHUNG-34 — tám cái bẫy: nhận 2, bác 5, một cái đã có sẵn
+
+Từng cái trả lời câu của luật mục 8 — *đã xảy ra thật ở repo NÀY chưa* — bằng một phép đo:
+`git commit -o` **0 chỗ dùng** · byte NUL **0/133 file** · ADR khai trạng thái **1 chỗ, không phải
+2** · tên repo **không suy từ tên thư mục** · bộ đếm lưu trữ **đã giải sẵn**.
+
+**Năm cái bị bác đều là bẫy THẬT ở repo tiêu thụ.** Bác không phải vì chúng vô lý, mà vì chép sang
+là nhập năm cơ chế mà không nhập lý do tồn tại của chúng — rồi phiên sau đọc không hiểu vì sao có
+và gỡ đi.
+
+**Và bẫy số 2 suýt thành cái thứ ba được nhận.** Lượt này có thêm `*.cmd text eol=crlf` vào
+`.gitattributes` dựa trên linh cảm *"cmd.exe đọc file batch thuần LF không ổn"*. Đo thật trên
+Windows 11: file `.cmd` thuần LF chạy đúng, kể cả khối `if errorlevel (...)` nhiều dòng và
+`chcp 65001` với chữ có dấu, mã thoát 0. **Gỡ luật đi**, và ghi lý do ngay trong `.gitattributes`
+để không ai thêm lại vì cùng một linh cảm. Rơi ra `KHUNG-38`.
+
+### KHUNG-36 — ba hồ sơ migrate cũ nay khai đủ ba mốc
+
+Đức chốt cho khai lại. **Git xác nhận: 12 dòng thêm, 0 dòng xoá** — không viết lại một chữ nào của
+thân bài, và mỗi dòng khai dẫn nguồn từ chính thân bài hồ sơ đó.
+
+Bảng mốc nay đầy, và **một ô là dấu ✗ thật**: `Project 3 AI Agent Unify` chưa có mốc "AI onboard",
+vì thân bài ghi cổng **9 XANH 1 BỎ** — mà BỎ không phải xanh, nên chưa lane nào đi trọn vòng.
+Khai đúng cái đang thiếu có ích hơn một bảng toàn dấu ✓.
+
 ## 1.3.23 — 2026-09-06 — Hai luật từ repo tiêu thụ: một nguồn cho câu chữ, và vai điều phối không đứng chờ
 
 Repo `Chrome_Extension_AI_Agentic` rút ra hai luật ngày 06/09. Cả hai thuộc về bộ khung — nó là

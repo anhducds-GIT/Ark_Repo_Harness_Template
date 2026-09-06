@@ -17,7 +17,7 @@
  * Dùng:
  *   node scripts/claim.mjs --list
  *   node scripts/claim.mjs --take <khoá> --as <phiên> --task "một câu" [--ai Codex]
- *   node scripts/claim.mjs --release <khoá> --as <phiên> [--task "một câu"]
+ *   node scripts/claim.mjs --release <khoá> --as <phiên> [--task "một câu"] [--du-biet "vì sao"]
  *   node scripts/claim.mjs --take <khoá> --as <phiên> --task "…" --duc-duyet "<câu chốt của Đức>"
  *       ↑ giành vùng người khác đang giữ. Đòi câu chốt, và TỪ CHỐI nếu vùng đó còn file sửa dở.
  *
@@ -68,7 +68,7 @@ export function readClaims(file = CLAIMS_FILE) {
 }
 
 /* Quyết định THUẦN — tách khỏi việc đọc/ghi để kiểm được mọi nhánh mà không cần đĩa. */
-export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty }) {
+export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty, chuaDay, duBiet }) {
   if (!Object.prototype.hasOwnProperty.call(claims, key)) {
     return {
       code: EXIT.MISUSE,
@@ -141,7 +141,42 @@ export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty }) 
           + "\nTrả hộ là xoá dấu vết một phiên đang làm dở, và phiên đó sẽ không biết mình vừa mất quyền."
       };
     }
-    return { code: EXIT.OK, next: { ...cur, owner: null, ai: null, released_at: today } };
+    /* COMMIT CHƯA ĐẨY THÌ CHƯA TRẢ ĐƯỢC — trừ khi nói rõ là mình biết.
+     *
+     * Trả khoá xong mà commit còn nằm trên máy thì vùng đó **không ai đứng tên** trong khi vẫn
+     * có thay đổi chưa công bố. Cổng đóng phiên của phiên SAU sẽ đỏ với câu *"vùng bị sửa nhưng
+     * chưa ai đứng tên"* — và cổng đúng: một commit chưa công bố mà không quy được chủ là một
+     * commit không ai chịu trách nhiệm.
+     *
+     * HAI VẾ PHẢI ĐI CÙNG NHAU, và đây là chỗ dễ làm hỏng nhất. Chỉ lấy vế chặn thì một lane bị
+     * cổng xuất bản từ chối đẩy sẽ **kẹt khoá vĩnh viễn**: nó không đẩy được, nên không trả được,
+     * nên vùng đó chết theo nó. Cửa thoát `--du-biet` không phải chỗ hở — nó là điều kiện để vế
+     * chặn kia được phép tồn tại. Cửa thoát GHI LẠI lý do vào bảng, nên nó là một câu khai chứ
+     * không phải một cái tặc lưỡi.
+     *
+     * Không đo được (`chuaDay == null`) thì KHÔNG chặn: trả khoá là thao tác gỡ bí, và một lệnh
+     * gỡ bí mà tự chặn vì git hỏng thì nó biến sự cố nhỏ thành sự cố kẹt cả vùng. Khác hẳn nhánh
+     * `--take` ở trên, nơi fail-closed là đúng vì giành vùng không lùi lại được. */
+    if (Array.isArray(chuaDay) && chuaDay.length && !duBiet) {
+      const NL2 = String.fromCharCode(10);
+      return {
+        code: EXIT.REFUSED,
+        message: [
+          `TU_CHOI: "${key}" còn ${chuaDay.length} commit CHƯA ĐẨY chạm vùng này:`,
+          ...chuaDay.slice(0, 8).map((c) => `  ${c}`),
+          ...(chuaDay.length > 8 ? [`  … và ${chuaDay.length - 8} commit nữa`] : []),
+          "Trả khoá bây giờ là để lại commit chưa công bố mà không ai đứng tên — cổng của phiên sau sẽ đỏ,",
+          "và người đọc GitHub thì không thấy việc đó tồn tại.",
+          `Cách xử lý: đẩy trước, rồi trả — node scripts/safe-push.mjs --as ${as}`,
+          "Thật sự muốn trả kèm commit chưa đẩy thì nói rõ là mình biết:",
+          `  node scripts/claim.mjs --release ${key} --as ${as} --du-biet "vì sao"`
+        ].join(NL2)
+      };
+    }
+    const khai = duBiet && Array.isArray(chuaDay) && chuaDay.length
+      ? { tra_khi_chua_day: `${chuaDay.length} commit · ${typeof duBiet === "string" ? duBiet : "không nêu lý do"}` }
+      : {};
+    return { code: EXIT.OK, next: { ...cur, owner: null, ai: null, released_at: today, ...khai } };
   }
 
   return { code: EXIT.MISUSE, message: `HANH_DONG_LA: "${action}"` };
@@ -431,7 +466,28 @@ async function main() {
     }
   }
 
-  const verdict = decide(parsed.claims, { action, key, as, today, ai: flag("ai"), ducDuyet: flag("duc-duyet"), dirty });
+  /* Commit CHƯA ĐẨY chạm vùng sắp trả. `null` = không đo được, và không đo được thì KHÔNG chặn
+     (xem lý lẽ ở `decide`). Chỉ đo lúc `--release`: `git log` trên repo lớn không rẻ. */
+  let chuaDay = null;
+  if (action === "release" && parsed.claims[key]?.owner === as) {
+    try {
+      const { stewardOf, claimPrefixesFrom, readStructureFromDisk } = await import("./repo-structure.mjs");
+      const cauTruc = readStructureFromDisk(ROOT);
+      const tienTo = claimPrefixesFrom(cauTruc);
+      const xa = execFileSync("git", ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"], { cwd: ROOT, encoding: "utf8" }).trim();
+      const ds = execFileSync("git", ["log", `${xa}..HEAD`, "--format=%x01%h %s", "--name-only"], { cwd: ROOT, encoding: "utf8" })
+        .split(String.fromCharCode(1)).filter(Boolean);
+      chuaDay = ds.filter((khoi) => {
+        const [, ...file] = khoi.split(String.fromCharCode(10));
+        return file.filter(Boolean).some((f) => f !== ".agents/claims.json" && stewardOf(f, cauTruc, tienTo) === key);
+      }).map((khoi) => khoi.split(String.fromCharCode(10))[0].trim());
+    } catch (_) {
+      // Không có nhánh xa, git hỏng, repo mới clone — trả `null`, tức không chặn.
+      chuaDay = null;
+    }
+  }
+
+  const verdict = decide(parsed.claims, { action, key, as, today, ai: flag("ai"), ducDuyet: flag("duc-duyet"), dirty, chuaDay, duBiet: flag("du-biet") });
   if (verdict.code !== EXIT.OK) { console.error(verdict.message); process.exit(verdict.code); }
 
   parsed.claims[key] = typeof task === "string" ? { ...verdict.next, task } : verdict.next;

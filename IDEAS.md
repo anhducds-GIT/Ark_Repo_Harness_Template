@@ -136,7 +136,7 @@
 ## Y-09 · Bảng của mọi repo phải là MỘT bảng, không phải N bản fork
 
 - **bậc:** đang xây
-- **việc kế:** đưa `build-overview.mjs` vào bản trích rồi phát sang ba repo đã lắp
+- **việc kế:** phát bảng sang ba repo đã lắp rồi đối chiếu (bộ sinh đã vào bản trích từ 1.3.18 — nút import đã gỡ, xem dưới)
 - **chủ:** claude-bang9tab
 - **phạm vi:** `_code` + `_template`
 
@@ -144,7 +144,11 @@
 
 **vì sao** — Repo Chrome Extension tự đi trước và dựng chín tab mà bộ khung chưa có. Để nguyên là hai repo có hai bảng khác nhau, và lúc chúng lệch thì không ai biết tin bản nào — đúng cái bệnh cả chương trình này sinh ra để chữa. Mang logic về một nguồn rồi phát đi thì nhìn repo nào cũng biết mục nào ở đâu.
 
-**vì sao chưa làm ngay** — Chín tab đã dựng và đã chạy thật ở repo nhà (bản 1.3.14). Còn **một chỗ chặn đo được**: `build-overview.mjs` đang `import { VIEC } from "./giao-viec.mjs"`, mà `giao-viec.mjs` **ở lại repo nhà** — phát bộ sinh đi mà không gỡ chỗ nối này thì repo đích nạp trang là **chết ngay dòng import**. Ba lối: phát kèm `giao-viec.mjs`, hay cho chỗ nối đó hỏng êm, hay tách khối "giao việc" ra khỏi bộ sinh. Thêm nữa: `TRANG_FILE` đang đóng cứng tên file của repo nhà.
+**chỗ chặn đã HẾT, sửa 2026-09-07** — Đoạn dưới đây từng ghi một chỗ chặn: `build-overview.mjs` `import { VIEC } from "./giao-viec.mjs"`, mà file kia ở lại repo nhà nên repo đích nạp trang là chết ngay dòng import. **Đo lại 07/09: nút đó đã gỡ từ bản 1.3.18** — `VIEC` nay nằm ở `overview-doc.mjs`, và cả ba file bộ sinh (`build-overview.mjs` · `overview-doc.mjs` · `md-mini.mjs`) đều đã đi theo bản trích. `TRANG_FILE` cũng đã suy từ `.repo-structure.json` chứ không còn đóng cứng.
+
+Ghi lại chỗ này thay vì xoá, vì bài học không nằm ở cái nút: **một chỗ chặn đã hết mà sổ vẫn ghi là còn thì phiên sau đi đuổi một cái bóng** — và nó tốn đúng bằng một chỗ chặn thật.
+
+**Việc còn lại của `Y-09`** là phát bảng sang ba repo đã lắp và đối chiếu, không phải gỡ nút nữa.
 
 Repo Chrome Extension sẽ là **bản fork cần hợp nhất sau**, không phải nguồn.
 
