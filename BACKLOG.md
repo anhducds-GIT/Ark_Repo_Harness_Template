@@ -86,6 +86,8 @@ trình migrate, chỗ người migrate thật sự đọc. Vùng: `_code` (bộ 
 
 ### KHUNG-14 · Chưa lượt migrate nào đi qua phép thử "assistant onboard"
 
+> `@Đức:bấm` — mở một phiên AI mới ở một repo đã migrate, KHÔNG nhắc gì, và xem nó có tự làm trọn một việc nhỏ tới lúc cổng xanh không. Chừng 15 phút. Không tự động hoá được: cả giá trị của phép thử nằm ở chỗ không ai mớm.
+
 Đức chốt 05/09: lượt migrate **không xong khi cổng xanh**, mà xong khi một phiên AI ở repo đích
 nhận được khoá và làm trọn một việc nhỏ tới lúc cổng xanh, không cần ai ở bộ khung giải thích.
 
@@ -111,6 +113,8 @@ cả ba **chưa có phép kiểm nào canh**. Ở repo sinh ra sổ này, một 
 sớm muộn cũng bị bỏ qua* — nên ba mục đó hiện là quy ước, không phải chốt. Vùng: `_code`.
 
 ### KHUNG-6 · Danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin lời khai
+
+> `@Đức:chốt` — chọn một: (a) chỉ GHI RÕ giới hạn vào sổ tay, hay (b) siết thật bằng chữ ký. Hai lối khác hẳn nhau về quy mô.
 
 Audit độc lập Codex 05/09. Cả ba chốt quy trách nhiệm chỉ so chuỗi, không có gì chứng minh
 người chạy đúng là người họ khai:
@@ -167,6 +171,8 @@ là đỏ-thật-được, vừa đang đỏ thật — và không ai bắt đư
 vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng chứng. Vùng: `_docs`.
 
 ### KHUNG-11 · Repo vượt ngân sách — nay có CƠ CHẾ dọn, không còn là việc làm tay
+
+> `@Đức:chốt` — chọn một: (a) gọt thật và chấp nhận mất nội dung, hay (b) đặt lại ngân sách theo SỐ ĐO hôm nay cộng biên. Nới ngân sách là nới một luật an toàn, mục 2 hàng 6 bắt hỏi.
 
 > **Đức chốt 06/09:** cắt gọn + dời sang lưu trữ, KHÔNG xoá. Đã làm một vòng, mỗi bước có md5
 > chứng minh không mất byte: `HANDOFF.md` 1.273→415 · `CHANGELOG.md` 806→241 · `ROADMAP-V1`
@@ -278,7 +284,17 @@ commit**, và mọi phiên đều phải chạy thêm một vòng sinh-lại-com
 do thật khiến mục đó đỏ suốt nhiều phiên trước — bản 1.3.1 vá **một** trong **hai** đường; đây là
 đường còn lại. Vùng: `_code`.
 
-### KHUNG-17 · Mục "đang chờ người chốt" của bản đồ việc CHỈ đọc sổ ý tưởng, không đọc sổ nợ
+### ~~KHUNG-17~~ · ĐÓNG 06/09 · Mục "đang chờ người chốt" của bản đồ việc CHỈ đọc sổ ý tưởng, không đọc sổ nợ
+
+> **ĐÓNG 06/09 — đã vá từ trước, sổ chỉ chưa gạch mã.** Đo lại `scripts/what-next.mjs` hôm nay:
+> `CHO_CHOT` (dòng 77) bắt chuỗi `**CHỜ NGƯỜI CHỐT:**` trong thân mục sổ nợ · `hienTai.choChot`
+> (dòng 105) ghim nó vào mục · `tuSoNo` (dòng 333) lọc ra · và dòng 338 in riêng trạng thái
+> **KHÔNG LỌC ĐƯỢC TRỌN VẸN** kèm con số từng nguồn, thay vì gộp im lặng.
+>
+> **Bài học đáng ghi hơn cả bản vá:** mục này nằm mở trong sổ suốt sau khi việc đã xong, nên nó
+> vẫn chiếm một chỗ trong "12 mục còn mở" và mọi phiên đọc bảng đều tưởng còn nợ. **Vá xong mà
+> không gạch mã thì sổ nợ nói dối theo chiều ngược lại** — báo thừa. Cùng ngày cũng tìm thấy
+> `STATUS.md` đang trỏ `next_step` vào `KHUNG-13` đã đóng: cùng một hình dạng lỗi, hai chỗ.
 
 **Đo 05/09.** `npm run what-next` in ra:
 
@@ -554,7 +570,7 @@ không. Đã đổi sang dò **chỗ gọi**.
 
 ### KHUNG-30 · `Project 3 AI Agent Unify` chưa nâng được — luật của CHÍNH REPO ĐÓ chặn
 
-> **CHỜ NGƯỜI CHỐT:** nhánh đang lệch `origin/main` **5 sau / 48 trước**. Nâng bộ khung trên một
+> **CHỜ NGƯỜI CHỐT:** `@Đức:chốt` — nhánh đang lệch `origin/main` **5 sau / 48 trước**. Nâng bộ khung trên một
 > nhánh lệch xa như thế là quyết định của Đức, không phải của AI.
 
 **Đo 06/09, và đây là lượt giao việc cho Codex CLI đầu tiên có kết quả dùng được.**

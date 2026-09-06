@@ -717,3 +717,55 @@ nhận một dòng luật trỏ tới một lệnh không tồn tại ở đó �
 
 **Ngân sách tài liệu xấu đi:** 3640 → ~4000 dòng / 2200. Ba đề bài mới là phần lớn. Chỗ bù được
 ngay là `npm run don` cho `HANDOFF.md` (652/600) — chưa chạy lượt này.
+
+## 2026-09-06 · `claude-bang9tab` — BẢNG CHÍN TAB, VÀ SỔ Ý TƯỞNG
+
+**Đức mở bảng của `Chrome_Extension_AI_Agentic` và thấy bảng bộ khung thiếu hẳn năm tab.** Repo
+kia đã tự đi trước. Đức chốt hai câu: **(1) đi theo bản trích** — bảng phải là MỘT bảng cho mọi
+repo, không để mỗi nơi một kiểu; **(2) dựng nguồn thật**, không tạo file rỗng cho có tab.
+
+### Làm gì
+
+Chín tab thay cho mười. Bốn tab cũ **gộp vào chỗ đúng** thay vì đứng riêng — thêm thẳng là mười
+lăm tab, và một bảng mười lăm tab thì không ai tìm nổi mục mình cần.
+
+`scripts/overview-doc.mjs` (mới) tách phần **kiểm được bằng phép kiểm thuần**. `IDEAS.md` (mới)
+là sổ ý tưởng — chín ý tưởng rút từ `decisions.md` · `BACKLOG.md` · `HANDOFF.md`, mỗi cái kèm
+*nguồn · vì sao · vì sao chưa làm ngay · đo trước khi sửa*.
+
+Dấu `@Đức:bấm` / `@Đức:chốt` đặt ngay trên dòng của mục: **bảng không giữ danh sách việc chờ**,
+mục đóng thì dấu mất theo. Bốn mục đang mang dấu.
+
+### Bốn lỗi thật, cả bốn chỉ lộ khi chạy trên dữ liệu thật
+
+1. Lọc khoá chú thích bằng **tiền tố** `_doc` → nuốt luôn khoá vùng thật **`_docs`**.
+2. Regex bất biến neo `$` cuối dòng → đọc ra **0/5** và vẫn trả mảng rỗng **lễ phép**.
+3. Vùng đã khai mà chưa có file → biến mất khỏi bảng (git không theo dõi thư mục rỗng).
+4. Backtick trong chú thích CSS → **lần thứ tư** dính bẫy template literal.
+
+Lỗi 2 đáng nhớ nhất: **rỗng-vì-đúng và rỗng-vì-đọc-hỏng trông giống hệt nhau trên bảng.** Phép
+kiểm nay ghim bằng SỐ (`bb.length === 5`), không ghim bằng "không nổ".
+
+### Hai chỗ sổ nói sai, tìm ra khi rà nguồn — và tôi tự kiểm chứng lại cả hai
+
+- `KHUNG-17` **đã vá từ trước mà sổ chưa gạch mã**. Đo lại `what-next.mjs`: `CHO_CHOT` dòng 77 ·
+  `hienTai.choChot` dòng 105 · `tuSoNo` dòng 333 — vá thật. Đã đóng, kèm bằng chứng.
+- `STATUS.md` trỏ `next_step` vào `KHUNG-13`, **mục đã đóng 06/09**. Đã vá, cùng `human_action`
+  đang dẫn một con số cũ hai vòng.
+
+Cùng một hình dạng lỗi, hai chỗ: **sổ nói về một thực tế đã đổi.** Vá xong mà không gạch mã thì
+sổ nợ nói dối theo chiều ngược lại — báo THỪA.
+
+### Số
+
+`npm test` **15 suite** (thêm `overview-doc-smoke` 8 vế) · `npm run bootstrap` **0 chỗ ĐỎ** ·
+bản khung **1.3.14 → 1.3.15**.
+
+### Còn mở — và đây là chỗ chặn ĐO ĐƯỢC, không phải cảm tính
+
+Đức chốt bảng phải **đi theo bản trích**. Chưa làm được ngay vì `build-overview.mjs` đang
+`import { VIEC } from "./giao-viec.mjs"`, mà `giao-viec.mjs` **ở lại repo nhà** — phát bộ sinh đi
+mà không gỡ chỗ nối này thì repo đích nạp trang là **chết ngay dòng import**. Thêm nữa
+`TRANG_FILE` đang đóng cứng tên file của repo nhà.
+
+Ghi thành **Y-09** trong sổ ý tưởng, kèm ba lối đi. Đây là việc kế tiếp của repo.

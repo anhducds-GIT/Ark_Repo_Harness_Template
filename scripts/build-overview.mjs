@@ -32,6 +32,9 @@ import { fileURLToPath } from "node:url";
 import { esc, md, tachFrontmatter } from "./md-mini.mjs";
 
 import { VIEC } from "./giao-viec.mjs";
+import {
+  BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readIdeas, readKhoa, readNo
+} from "./overview-doc.mjs";
 
 const NL = String.fromCharCode(10);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -74,6 +77,20 @@ export function mocHEAD() {
     throw new Error(`MOC_HEAD_HONG: ngày của HEAD đọc ra "${ra}", không phải dạng YYYY-MM-DD. Trang này phải suy mốc từ HEAD — đọc không ra thì KHÔNG sinh.`);
   }
   return ra;
+}
+
+/* NGÀY SINH CỦA MỘT DÒNG — dùng để nói một việc chờ người chốt đã treo bao lâu.
+ *
+ * `git log -L n,n:file` chứ không phải đồng hồ. Cùng lý do với `mocHEAD`: bảng nằm trong khối
+ * `generators`, nên một con số nhìn đồng hồ là sang ngày mọi phiên bị chặn đẩy.
+ *
+ * `null` = KHÔNG ĐO ĐƯỢC, và null khác 0. Dòng vừa thêm mà chưa commit thì git không biết nó,
+ * và bảng phải nói "chưa đo được tuổi" chứ không phải "treo 0 ngày" — hai câu đó khác nhau. */
+function ngaySinhDong(rel, soDong) {
+  try {
+    const ra = gitRa("log", "-1", "--format=%cs", `-L${soDong},${soDong}:${rel}`).split(NL)[0].trim();
+    return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(ra) ? ra : null;
+  } catch (_) { return null; }
 }
 
 /* ---- gom dữ liệu ----------------------------------------------------------- */
@@ -201,6 +218,84 @@ const CSS = `
   .mh-mui{flex-direction:row;padding:7px 0;min-width:0}
   .mh-mui .ky{transform:rotate(90deg)}
 }
+
+/* ---- NĂM TAB MỚI (06/09) — mượn hình từ bảng repo Chrome Extension -------------------
+   Không dựng bảng token thứ hai: chúng dùng lại đúng biến màu khai ở khối :root phía trên. Một bảng
+   màu thứ hai là hai bảng sẽ lệch nhau, và lúc đó không ai biết màu nào là đúng. */
+
+/* Ô đếm KÈM MẪU SỐ. Một số 0 đứng một mình trông giống hệt nhau ở hai ca ngược nhau:
+   "đã dò hết, sạch" và "chưa dò gì cả". Mẫu số là thứ tách được hai ca đó. */
+.sk{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;
+  background:var(--vien);border:1px solid var(--vien);border-radius:11px;overflow:hidden}
+.sk .o{background:var(--mat);padding:13px 15px;display:flex;flex-direction:column;gap:3px}
+.sk .n{font-family:var(--disp);font-size:27px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.sk .o.sach .n{color:var(--xanh)}
+.sk .o.ban .n{color:var(--vang)}
+.sk .l{font-size:13.4px;font-weight:600;color:var(--chu)}
+.sk .m{font-size:11.8px;color:var(--mo);line-height:1.4}
+
+/* Hàng "số rồi tới chữ" — nợ theo nhóm, khoá, mốc. */
+.hs{display:grid;grid-template-columns:46px 1fr;gap:8px;align-items:baseline;
+  padding:7px 0;border-top:1px solid var(--vien)}
+.hs:first-child{border-top:0}
+.hs .n{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--vang);text-align:right}
+.hs .t{font-size:14px;color:var(--chu)}
+
+/* Dòng CẦN NGƯỜI CHỐT: nhãn loại việc + câu + tuổi. */
+.cd{display:grid;grid-template-columns:56px 1fr;gap:9px;padding:8px 0;border-top:1px solid var(--vien)}
+.cd:first-of-type{border-top:0}
+.cd .lo{font-family:var(--mono);font-size:10px;letter-spacing:.08em;font-weight:600;
+  padding:3px 0;text-align:center;border-radius:5px;height:fit-content}
+.cd .lo.bam{background:var(--nhan-nen);color:var(--nhan)}
+.cd .lo.chot{background:var(--vang-nen);color:var(--vang)}
+.cd .c{font-size:14px;line-height:1.45;color:var(--chu)}
+.cd .tu{font-family:var(--mono);font-size:11.4px;color:var(--mo);display:block;margin-top:2px}
+
+/* Một khoá vùng: tên + MỞ/BẬN + ai giữ. */
+.kh{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  padding:8px 0;border-top:1px solid var(--vien)}
+.kh:first-of-type{border-top:0}
+.kh .t{font-family:var(--mono);font-size:13.4px;color:var(--chu)}
+.kh .t small{font-family:var(--sans);color:var(--mo);font-size:12px;display:block;margin-top:1px}
+.hieu{font-family:var(--mono);font-size:10px;letter-spacing:.09em;font-weight:600;
+  padding:3px 8px;border-radius:20px;white-space:nowrap}
+.hieu.mo{background:var(--xanh-nen);color:var(--xanh)}
+.hieu.ban{background:var(--vang-nen);color:var(--vang)}
+.hieu.tt{background:var(--mat2);color:var(--chu2)}
+
+/* Thanh ba bậc của một ý tưởng. Bậc "nghỉ" KHÔNG phải bậc thứ tư: nó vẽ thành chấm rỗng có
+   gạch ngang, để không ai đọc nhầm một ý tưởng đã bỏ là "gần xong". */
+.yt{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:12px;align-items:center;
+  padding:9px 0;border-top:1px solid var(--vien)}
+.yt:first-of-type{border-top:0}
+.yt .ten{font-size:14px;font-weight:600;color:var(--chu)}
+.yt .ke{font-size:12.6px;color:var(--chu2);margin-top:2px;line-height:1.4}
+.bac{display:flex;align-items:center;gap:0;position:relative}
+.bac .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.bac .d{width:11px;height:11px;border-radius:50%;background:var(--vien2);border:2px solid var(--mat)}
+.bac .b.qua .d{background:var(--xanh)}
+.bac .b.nay .d{background:var(--mat);border-color:var(--nhan);box-shadow:0 0 0 3px var(--nhan-nen)}
+.bac .nh{font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--mo);white-space:nowrap}
+.bac .b.nay .nh{color:var(--nhan);font-weight:600}
+.bac .l{height:2px;background:var(--vien);flex:1;margin-bottom:15px;min-width:8px}
+.bac .l.qua{background:var(--xanh)}
+.bac.nghi .d{background:transparent;border-color:var(--vien2)}
+.bac.nghi::after{content:"";position:absolute;left:6%;right:6%;top:5px;height:2px;
+  background:var(--vien2)}
+
+/* Cấu trúc: thư mục / file gốc / bản đồ file. Tab DUY NHẤT được in đường dẫn. */
+.cay{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:center;
+  padding:7px 0;border-top:1px solid var(--vien)}
+.cay:first-of-type{border-top:0}
+.cay .p{font-family:var(--mono);font-size:13px;color:var(--chu)}
+.cay .st{font-family:var(--mono);font-size:11.4px;color:var(--nhan)}
+.cay .sl{font-family:var(--mono);font-size:11.4px;color:var(--mo);white-space:nowrap}
+.tep{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tep span{font-family:var(--mono);font-size:11.6px;padding:3px 7px;border-radius:5px;
+  background:var(--mat2);color:var(--chu2)}
+.tep span.may{background:var(--xanh-nen);color:var(--xanh)}
+@media (max-width:600px){ .yt{grid-template-columns:1fr} .cay{grid-template-columns:1fr auto} }
 
 .batdau pre.code{margin:6px 0 4px}
 .lienquan{margin:6px 0 0;padding-left:20px}
@@ -568,6 +663,212 @@ export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [
 </div>`;
 }
 
+/* ---- KHỐI CỦA NĂM TAB MỚI ------------------------------------------------------------
+ *
+ * Mỗi khối dưới đây trả lời ĐÚNG MỘT câu, và câu đó viết ngay trên đầu hàm. Khối nào không nói
+ * được nó trả lời câu gì thì nó là trang trí — và trang trí trên một bảng trạng thái là thứ làm
+ * người ta thôi đọc cả bảng.
+ */
+
+/* "Còn việc nào đang chờ chính tôi?" — quét dấu đặt ngay trên dòng của mục, ở bốn sổ. */
+export function khoiCanDuc(canDuc, tenNguoi) {
+  if (!canDuc.length) {
+    return '<div class="the"><h2>Cần ' + esc(tenNguoi) + '</h2>'
+      + '<p>Không mục nào đang mang dấu chờ. <strong>Đọc đúng chữ:</strong> nghĩa là chưa ai '
+      + '<em>đánh dấu</em> việc nào cần ' + esc(tenNguoi) + ' — không phải là không có việc nào. '
+      + 'Muốn một mục hiện ở đây thì đặt <code>@Đức:bấm</code> hoặc <code>@Đức:chốt</code> ngay '
+      + 'trên dòng của mục đó trong sổ nợ, sổ ý tưởng hay hồ sơ trạng thái.</p></div>';
+  }
+  const bam = canDuc.filter((c) => c.loai === "bam").length;
+  const chot = canDuc.length - bam;
+  const dong = canDuc.map((c) => '<div class="cd">'
+    + '<span class="lo ' + c.loai + '">' + (c.loai === "bam" ? "BẤM" : "CHỐT") + '</span>'
+    + '<span class="c">' + esc(c.cau)
+    + '<span class="tu">' + esc(c.tuoi) + ' · nêu trong ' + esc(c.file) + '</span></span></div>').join("");
+  return '<div class="the"><h2>Cần ' + esc(tenNguoi) + ' — ' + canDuc.length + ' việc · '
+    + bam + ' bấm · ' + chot + ' chốt</h2>' + dong
+    + '<p class="ghi"><strong>BẤM</strong> là việc tay vài phút, gom được thành một buổi. '
+    + '<strong>CHỐT</strong> là việc cần nghĩ, mỗi cái một lượt. Số ngày treo <strong>đo bằng '
+    + 'lịch sử kho mã</strong>, không đọc đồng hồ. Bảng <strong>không giữ danh sách này</strong>: '
+    + 'nó quét dấu ngay trên dòng của mục, nên mục đóng thì dấu mất theo — không ai phải nhớ đi '
+    + 'xoá ở một chỗ thứ hai.</p></div>';
+}
+
+/* "Ngay lúc này có mấy luồng đang chạy, và chúng đang làm gì?" */
+export function khoiDangLamGi(khoa, ngay) {
+  const giu = khoa.filter((k) => k.owner);
+  const than = giu.length
+    ? giu.map((k) => '<div class="kh"><span class="t">' + esc(k.owner)
+        + '<small>' + esc(k.task || "chưa khai đang làm gì") + ' · giữ khoá <code>' + esc(k.khoa)
+        + '</code>' + (k.tu ? ' từ ' + esc(k.tu) : "") + '</small></span>'
+        + '<span class="hieu ban">ĐANG GIỮ</span></div>').join("")
+    : '<p>Không luồng nào đang giữ vùng trong repo này.</p>';
+  return '<div class="the"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · ' + giu.length + ' luồng</h2>'
+    + than
+    + '<p class="ghi"><strong>Khối này không thấy hai thứ.</strong> Một: <em>luồng đang chạy ở '
+    + 'repo khác</em> — bảng của repo này chỉ thấy repo của nó. Hai: <em>luồng vừa được giao mà '
+    + 'chưa kịp nhận vùng</em> — lúc đó nó chưa để lại dấu vết nào trong repo. Nên dòng "không '
+    + 'luồng nào đang chạy" đọc đúng là <strong>"không luồng nào đang giữ vùng trong repo '
+    + 'này"</strong>. Đây là ảnh chụp theo lần ghi gần nhất vào repo (' + esc(ngay)
+    + '), không phải số liệu thời gian thực.</p></div>';
+}
+
+/* "Còn mấy chỗ trống để giao việc song song?" — cố ý KHÔNG kể ai giữ, khối trên đã kể rồi. */
+export function khoiKhoa(khoa) {
+  const mo = khoa.filter((k) => !k.owner).length;
+  const dong = khoa.map((k) => '<div class="kh"><span class="t">' + esc(k.khoa) + '</span>'
+    + '<span class="hieu ' + (k.owner ? "ban" : "mo") + '">' + (k.owner ? "BẬN" : "MỞ")
+    + '</span></div>').join("");
+  return '<details class="the"><summary>Khoá làm việc — ' + khoa.length + ' khoá, ' + mo
+    + ' đang mở<span class="tt">mở ra khi cần giao việc song song</span></summary>'
+    + '<div class="in">' + dong
+    + '<p class="ghi">Bảng này trả lời đúng một câu: <strong>còn mấy chỗ trống để giao việc song '
+    + 'song</strong>. Hai việc chạy song song được <strong>khi và chỉ khi</strong> chúng thuộc hai '
+    + 'khoá khác nhau và cả hai đang MỞ. Khoá BẬN thì chỉ đọc, đừng giao thêm.</p></div></details>';
+}
+
+/* Thanh ba bậc của một ý tưởng.
+ *
+ * Bậc "nghỉ" KHÔNG phải bậc thứ tư trên đường đi — nó là nhánh rẽ ra. Vẽ nó thành chấm rỗng có
+ * gạch ngang, chứ vẽ nó ở cuối thanh là báo cáo sai chiều: một ý tưởng đã bỏ trông y hệt một ý
+ * tưởng gần xong. */
+const BAC_HIEN = [["ý tưởng", "Ý TƯỞNG"], ["đang xây", "ĐANG XÂY"], ["đã chứng minh", "ĐÃ CHỨNG MINH"]];
+function thanhBac(bac) {
+  const nghi = bac === "nghỉ";
+  const i = nghi ? -1 : BAC_HIEN.findIndex((x) => x[0] === bac);
+  const o = [];
+  BAC_HIEN.forEach((x, n) => {
+    if (n) o.push('<span class="l' + (!nghi && n <= i ? " qua" : "") + '"></span>');
+    const lop = nghi ? "" : (n < i ? " qua" : (n === i ? " nay" : ""));
+    o.push('<span class="b' + lop + '"><span class="d"></span><span class="nh">' + esc(x[1]) + '</span></span>');
+  });
+  return '<span class="bac' + (nghi ? " nghi" : "") + '">' + o.join("") + '</span>';
+}
+
+/* "Những hướng đang mở của repo đang ở bước nào?" — bản rút gọn, cho tab Tổng quan. */
+export function khoiYTuongGon(ideas) {
+  if (!ideas.length) return "";
+  const dong = ideas.map((y) => '<div class="yt"><span>'
+    + '<a href="#y-' + esc(slug(y.ma)) + '" data-goto="y-tuong">' + esc(y.ma) + ' · ' + esc(y.ten) + '</a>'
+    + (y.viecKe ? '<span class="ke">' + esc(y.viecKe) + '</span>' : "")
+    + '</span>' + thanhBac(y.bac) + '</div>').join("");
+  return '<div class="the"><h2>Ý tưởng đang ở bước nào — ' + ideas.length + ' hướng</h2>' + dong
+    + '<p class="ghi">Ba bước là đường đi thật của một ý tưởng. <strong>Nghỉ</strong> không phải '
+    + 'bước thứ tư — ý tưởng đã nghỉ hiện thanh rỗng có gạch ngang, để không ai đọc nhầm là gần '
+    + 'xong. Bấm tên để xem chi tiết ở tab <strong>Ý tưởng</strong>.</p></div>';
+}
+
+/* Tab Ý tưởng — mỗi ý tưởng một thẻ gập.
+ *
+ * GIỮ NGUYÊN mọi trường lạ (`extra`). Ai viết thêm `- **rủi ro:** …` vào sổ thì dòng đó vẫn hiện
+ * lên bảng. Bảng không được im lặng nuốt chữ của người viết. */
+export function khoiYTuongDay(ideas) {
+  if (!ideas.length) {
+    return '<div class="the"><h2>Sổ ý tưởng</h2><p>Repo này chưa có <code>IDEAS.md</code>. '
+      + 'Sổ ý tưởng là <em>phòng chờ</em>: chỗ để một hướng nằm lại trước khi có người bắt tay '
+      + 'làm — để nó không phải rơi vào sổ nợ (nơi mọi thứ trông như lỗi) mà cũng không bốc hơi.</p></div>';
+  }
+  return ideas.map((y) => {
+    const kv = [["Việc kế", y.viecKe], ["Ai đang làm", y.chu || "chưa ai nhận"],
+      ["Phạm vi", y.phamVi || "chưa khai"]].concat(y.extra).filter((x) => x[1]);
+    const than = y.khoi.map((k) => '<h4>' + esc(k.ten) + '</h4><p>' + esc(k.than.join(" ")) + '</p>').join("");
+    return '<details class="the" id="y-' + esc(slug(y.ma)) + '">'
+      + '<summary>' + esc(y.ma) + ' · ' + esc(y.ten)
+      + '<span class="tt">' + esc(y.viecKe || "chưa khai việc kế") + '</span></summary>'
+      + '<div class="in">' + thanhBac(y.bac)
+      + '<dl class="kv">' + kv.map((x) => '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>').join("") + '</dl>'
+      + than + '</div></details>';
+  }).join("");
+}
+
+/* "Repo chia vùng thế nào, ai được ghi vào đâu?" — tab DUY NHẤT được in đường dẫn. */
+export function khoiCauTruc(vung, fileGoc, banDo) {
+  const hangVung = vung.map((v) => '<div class="cay"><span class="p">' + esc(v.duong) + '</span>'
+    + '<span class="st">' + esc(v.chu || "từng gói tự giữ") + '</span>'
+    + '<span class="sl">' + v.soFile + ' file</span></div>').join("");
+  const oFile = fileGoc.map((f) => '<span' + (f.may ? ' class="may"' : "") + '>' + esc(f.ten) + '</span>').join("");
+  const sach = (t) => String(t).replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\*\*/g, "");
+  /* CẮT Ở RANH GIỚI CÂU, không cắt giữa chữ. Cắt giữa chữ rồi thêm ba chấm là câu đọc lên có
+   * thể mang nghĩa khác hẳn nghĩa gốc — trên một bảng trạng thái thì đó là nói sai, không phải
+   * là gọn. Không tìm được ranh giới nào thì thà để dài. */
+  const gon = (t, max) => {
+    const x = String(t).trim();
+    if (x.length <= max) return x;
+    const cat = x.slice(0, max);
+    const i = Math.max(cat.lastIndexOf(" — "), cat.lastIndexOf(". "), cat.lastIndexOf(", "), cat.lastIndexOf(" · "));
+    return (i > max * 0.4 ? cat.slice(0, i) : cat.slice(0, cat.lastIndexOf(" "))) + "…";
+  };
+  const hangBanDo = banDo.map((c) => '<div class="cay">'
+    + '<span class="p">' + esc(sach(String(c[0]))) + '</span>'
+    + '<span class="st">' + esc(gon(sach(String(c[1])), 78)) + '</span>'
+    + '<span class="sl"></span></div>').join("");
+  return '<div class="the"><h2>Thư mục ở tầng ngoài cùng — ' + vung.length + ' vùng</h2>' + hangVung
+    + '<p class="ghi">Cột giữa là <strong>ai được ghi vào đó</strong>. Một vùng chỉ một AI được ghi '
+    + 'tại một thời điểm; vùng của người khác thì chỉ được đọc.</p></div>'
+    + '<div class="the"><h2>File ở gốc repo — ' + fileGoc.length + ' file</h2>'
+    + '<div class="tep">' + oFile + '</div>'
+    + '<p class="ghi">Ô tô xanh là file <strong>máy sinh</strong> — đừng sửa tay, sửa là mất ở lần '
+    + 'sinh sau. Số còn lại là chữ của người.</p></div>'
+    + '<div class="the"><h2>Khi cần gì thì mở file nào — ' + banDo.length + ' lối</h2>' + hangBanDo
+    + '<p class="ghi">Bảng này <strong>đọc lại từ luật gốc</strong>, không phải bản chép — nên nó '
+    + 'không thể nói khác luật.</p></div>';
+}
+
+/* "Repo đang nợ gì, và những con số 0 kia là sạch hay là chưa dò?" */
+export function khoiSucKhoeNo(so, noMo, noMuc) {
+  const o = so.map((x) => {
+    const lop = x.so === null ? "" : (x.so === 0 ? " sach" : " ban");
+    return '<div class="o' + lop + '"><span class="n">' + (x.so === null ? "?" : x.so) + '</span>'
+      + '<span class="l">' + esc(x.nhan) + '</span>'
+      + '<span class="m">' + esc(x.mau || "chưa khai đã dò bao nhiêu") + '</span></div>';
+  }).join("");
+  const daDong = noMuc.length - noMo.length;
+  return '<div class="the"><h2>Sức khoẻ — mỗi phép dò kèm nó đã dò bao nhiêu</h2>'
+    + '<div class="sk">' + o + '</div>'
+    + '<p class="ghi">Một số <strong>0</strong> đứng một mình trông giống hệt nhau ở hai ca ngược '
+    + 'nhau: <em>đã dò hết, sạch</em> và <em>chưa dò gì cả</em>. Dòng nhỏ dưới mỗi ô là thứ tách '
+    + 'được hai ca đó. Dấu <strong>?</strong> nghĩa là KHÔNG ĐO ĐƯỢC — và nó khác 0.</p></div>'
+    + '<div class="the"><h2>Việc còn nợ — ' + noMo.length + ' mục đang mở</h2>'
+    + '<div class="hs"><span class="n">' + noMo.length + '</span><span class="t">đang mở trong sổ nợ</span></div>'
+    + '<div class="hs"><span class="n">' + daDong + '</span><span class="t">đã đóng, giữ lại để tra</span></div>'
+    + '<details><summary>Con số này đếm thế nào, và vì sao nó thà đếm thừa hơn đếm thiếu</summary>'
+    + '<p>Đếm mục trong sổ nợ, và một mục tính là đã đóng <strong>chỉ khi mã của nó bị gạch</strong>. '
+    + 'Không dò từ khoá "xong" trong văn xuôi — có mục viết <em>"gỡ khoá sau khi việc kia xong"</em>, '
+    + 'và chữ "xong" ở đó là một điều kiện chứ không phải trạng thái. Dò giữa câu là <strong>đóng '
+    + 'oan</strong> một việc đang mở, tức bảng báo <em>thiếu</em> nợ. Cố ý lệch về phía báo thừa: '
+    + 'một việc bị đếm thừa thì có người mở ra xem rồi bỏ qua; một việc bị đếm thiếu thì biến mất '
+    + 'và không ai đi tìm.</p></details></div>';
+}
+
+/* "Bảng này chạy thế nào, và nhiều AI cùng làm thì cái gì giữ cho không giẫm chân?" */
+export function khoiVanHanh(coChe, batBien, soKhoa) {
+  const cc = coChe.map((c) => '<li><strong>' + esc(c.ten) + '</strong> — '
+    + esc(String(c.cau).replace(/\*/g, "")) + '</li>').join("");
+  const bb = batBien.map((b) => '<li><strong>' + esc(b.so) + '</strong> ' + esc(b.cau) + '</li>').join("");
+  return '<div class="the"><h2>Làm mới bảng này</h2>'
+    + '<p>Bảng là <strong>ảnh chụp, không tự cập nhật</strong>. Dải đỏ ở đầu trang tự bật khi bạn '
+    + 'mở nó vào một ngày khác ngày sinh — nó tính lúc <em>xem</em>, không lúc sinh, nên không cần '
+    + 'sinh lại mới biết là cũ.</p>'
+    + '<pre class="code">npm run overview</pre>'
+    + '<p class="ghi">Bảng <strong>được commit vào repo</strong>, có chủ đích: nhờ vậy bất kỳ AI nào '
+    + 'cũng sinh lại rồi commit được, không phải nhờ riêng một AI đăng hộ. Cổng đóng phiên so bảng '
+    + 'đã commit với trạng thái repo mỗi phiên, nên bảng <strong>không thể âm thầm cũ</strong>. Nội '
+    + 'dung suy hoàn toàn từ lần commit gần nhất, không nhìn đồng hồ — nhìn đồng hồ thì sang ngày là '
+    + 'mọi phiên bị chặn đẩy dù không dữ liệu nào đổi.</p></div>'
+    + (coChe.length
+      ? '<div class="the"><h2>' + coChe.length + ' cơ chế giữ cho không giẫm chân</h2>'
+        + '<p>Hiện có <strong>' + soKhoa + ' vùng</strong>, nên tối đa <strong>' + soKhoa
+        + ' việc</strong> chạy song song được — việc thứ ' + (soKhoa + 1)
+        + ' phải chờ một vùng được trả.</p><ul>' + cc + '</ul></div>'
+      : "")
+    + (batBien.length
+      ? '<div class="the"><h2>' + batBien.length + ' điều không được phá</h2>'
+        + '<p>Mỗi cái sinh ra từ một lần hỏng thật.</p><ul>' + bb + '</ul>'
+        + '<p class="ghi">Các mục trên <strong>đọc lại từ luật</strong>, không phải bản chép — nên '
+        + 'bảng không thể nói khác luật.</p></div>'
+      : "");
+}
+
 export function khoiLienQuan(banDo, trangCo) {
   const co = trangCo instanceof Set ? trangCo : new Set(trangCo || []);
   const item = [];
@@ -585,29 +886,39 @@ export function khoiLienQuan(banDo, trangCo) {
 }
 
 export function trang(dl) {
-  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st, briefs = [], dichDen = [], soPhepKiem = null } = dl;
+  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st,
+    briefs = [], dichDen = [], soPhepKiem = null,
+    ideas = [], canDuc = [], khoa = [], noMo = [], noMuc = [], coChe = [], batBien = [], vung = [], fileGoc = [] } = dl;
+  const tenNguoi = dl.tenNguoiChot || "người chốt";
 
   const tabs = [
     // Thứ tự = tần suất dùng, không phải thứ tự viết ra. "Cách vận hành" và "Sổ tay" là hai
     // tab mở hằng ngày; "Làm được gì" chỉ đọc một lần lúc mới vào.
+    // CHÍN TAB, và con số chín là có chủ đích.
+    //
+    // Bản trước có mười tab và vẫn thiếu năm thứ Đức hỏi tới (AI điều phối · Ý tưởng · Vận hành
+    // · Sức khoẻ & nợ · Cấu trúc). Thêm thẳng vào là mười lăm tab — và một bảng mười lăm tab thì
+    // không ai tìm nổi mục mình cần, tức bảng chết theo kiểu khác. Nên bốn tab cũ được GỘP vào
+    // chỗ đúng của chúng thay vì đứng riêng: "Sổ tay" + "Bảo trì" + "Cách vận hành" → **Vận
+    // hành**; "Làm được gì" → **Mô hình** (nó vốn là danh sách tính năng của khối dữ liệu lõi);
+    // "Đã xong" → **Nhật ký**; "Bên trong" → **Cấu trúc**.
+    //
+    // Thứ tự = tần suất dùng, không phải thứ tự viết ra.
     ["tong-quan", "Tổng quan"],
+    ["ai-dieu-phoi", "AI điều phối"],
+    ["y-tuong", "Ý tưởng"],
     ["mo-hinh", "Mô hình"],
-    ["cach-van-hanh", "Cách vận hành"],
-    ["so-tay", "Sổ tay"],
-    ["lam-duoc-gi", "Làm được gì"],
-    ["bao-tri", "Bảo trì"],
-    ["kien-truc", "Bên trong"],
-    ["tra-cuu", "Tra cứu"],
-    ["da-xong", "Đã xong"],
-    ["nhat-ky", "Nhật ký"]
+    ["van-hanh", "Vận hành"],
+    ["suc-khoe", "Sức khoẻ & nợ"],
+    ["cau-truc", "Cấu trúc"],
+    ["nhat-ky", "Nhật ký"],
+    ["tra-cuu", "Tra cứu"]
   ].filter(([id]) => {
-    if (id === "lam-duoc-gi") return Boolean(dl.tinhNang);
-    if (id === "cach-van-hanh") return workflows.length > 0 || Boolean(huongDan);
-    if (id === "so-tay") return Boolean(dl.soTay) || protocols.length > 0;
-    if (id === "bao-tri") return Boolean(dl.baoTri);
+    // Tab nào không có nguồn thì BIẾN MẤT ÊM, không hiện ra rỗng. Một tab rỗng dạy người mở nó
+    // rằng bảng này có chỗ không dùng được, và lần sau họ thôi mở cả những tab có dữ liệu.
+    if (id === "y-tuong") return ideas.length > 0;
     if (id === "tra-cuu") return Boolean(legend);
-    if (id === "da-xong") return daXong.length > 0;
-    if (id === "nhat-ky") return nhatKy.length > 0;
+    if (id === "nhat-ky") return nhatKy.length > 0 || daXong.length > 0 || adrs.length > 0;
     return true;
   });
 
@@ -662,6 +973,8 @@ export function trang(dl) {
 
   <section class="tab" id="tab-tong-quan" hidden>
     ${khoiNowNext(st)}
+    ${khoiCanDuc(canDuc, tenNguoi)}
+    ${khoiYTuongGon(ideas)}
     ${khoiBatDau(dl)}
     ${khoiLienQuan(dl.banDo, dl.trangCo)}
     ${khoiVongDoi(st)}
@@ -688,6 +1001,31 @@ export function trang(dl) {
     </details>
   </section>
 
+  <section class="tab" id="tab-ai-dieu-phoi" hidden>
+    ${khoiDangLamGi(khoa, ngay)}
+    ${khoiCanDuc(canDuc, tenNguoi)}
+    ${khoiKhoa(khoa)}
+    <div class="the">
+      <h2>Giao một việc cho AI khác — ba lệnh</h2>
+      <p>Đề bài <strong>không viết tay</strong>. Lệnh dưới đo repo đích trước — nhánh · cây làm
+      việc · bảng quyền · bản khung đang ghim — rồi mới ghép đề bài quanh những con số đó. Đo
+      không được thì nó <strong>không in gì cả</strong>.</p>
+      <pre class="code">cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; git fetch
+npm run giao-viec -- --viec nang --repo "&lt;REPO ĐÍCH&gt;" --as codex-nang &gt; de-bai.txt
+cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.txt</pre>
+      <p class="ghi">Ba loại việc giao được: <code>nang</code> · <code>migrate</code> ·
+      <code>audit</code>. Phiên nhận việc trả về <strong>năm dòng</strong> — và năm dòng đó vẫn
+      là <strong>lời tự khai</strong>, chưa lệnh nào đo lại. Kiểm chứng độc lập trước khi tin.</p>
+    </div>
+  </section>
+
+  ${ideas.length ? `<section class="tab" id="tab-y-tuong" hidden>
+    <div class="the"><h2>Sổ ý tưởng — phòng chờ của cả repo</h2>
+      <p>Đây <strong>không phải</strong> sổ nợ. Sổ nợ ghi thứ đang <em>hỏng</em>; sổ này ghi
+      <em>hướng đi</em>. Trộn hai thứ là mọi hướng đi trông như một lỗi cần vá gấp.</p></div>
+    ${khoiYTuongDay(ideas)}
+  </section>` : ""}
+
   <section class="tab" id="tab-mo-hinh" hidden>
     ${khoiMoHinh({ lenh, protocols, briefs, dichDen, soPhepKiem })}
     <div class="the">
@@ -703,13 +1041,11 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
       sửa dở của phiên khác — tức dạy phiên nhận việc cuốn việc của người khác vào commit của
       mình rồi đẩy đi. Lỗi đó không phải của phiên nhận việc.</p>
     </div>
+    ${dl.tinhNang ? `<div class="the">${md(dl.tinhNang)}</div>` : ""}
   </section>
 
-  ${dl.tinhNang ? `<section class="tab" id="tab-lam-duoc-gi" hidden>
-    <div class="the">${md(dl.tinhNang)}</div>
-  </section>` : ""}
-
-  ${(workflows.length || huongDan) ? `<section class="tab" id="tab-cach-van-hanh" hidden>
+  <section class="tab" id="tab-van-hanh" hidden>
+    ${khoiVanHanh(coChe, batBien, khoa.length)}
     ${huongDan ? `<div class="the" id="huong-dan">${md(huongDan)}</div>` : ""}
     ${mucLuc(workflows.map((w) => ({ id: `wf-${slug(w.file)}`, ten: w.fm.ten || w.tieuDe })))}
     ${workflows.map((w) => {
@@ -728,20 +1064,19 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
         <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
       </div>`;
     }).join("")}
-  </section>` : ""}
-
-  ${(dl.soTay || protocols.length) ? `<section class="tab" id="tab-so-tay" hidden>
     ${dl.soTay ? `<div class="the">${md(dl.soTay)}</div>` : ""}
     ${protocols.length ? `<div class="the"><h2>Quy trình đầy đủ</h2>
       ${protocols.map((p2) => `<details><summary>${esc(p2.tieuDe)}</summary>${md(p2.than.split(NL).filter((l) => !l.startsWith("# ")).join(NL))}</details>`).join("")}
     </div>` : ""}
-  </section>` : ""}
+    ${dl.baoTri ? `<div class="the">${md(dl.baoTri)}</div>` : ""}
+  </section>
 
-  ${dl.baoTri ? `<section class="tab" id="tab-bao-tri" hidden>
-    <div class="the">${md(dl.baoTri)}</div>
-  </section>` : ""}
+  <section class="tab" id="tab-suc-khoe" hidden>
+    ${khoiSucKhoeNo(so, noMo, noMuc)}
+  </section>
 
-  <section class="tab" id="tab-kien-truc" hidden>
+  <section class="tab" id="tab-cau-truc" hidden>
+    ${khoiCauTruc(vung, fileGoc, banDo)}
     <div class="the">
       <h2>Bốn tầng, và chúng được đối xử khác nhau</h2>
       ${md(["```mermaid", "flowchart LR", '  L["LUẬT<br/>người viết<br/>đổi vài tháng một lần"] --> S["TRẠNG THÁI<br/>người viết<br/>đổi mỗi phiên"]',
@@ -752,18 +1087,12 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
     </div>
     <div class="the">
       <h2>Lệnh chạy được</h2>
-      <p>Dành cho ai gõ lệnh. Người không gõ lệnh thì xem tab <strong>Làm được gì</strong> —
-      cùng một thứ, kể bằng tiếng người.</p>
+      <p>Dành cho ai gõ lệnh. Người không gõ lệnh thì xem tab <strong>Mô hình</strong> — cùng
+      một thứ, kể bằng tiếng người.</p>
       <div class="tw"><table><thead><tr><th>Lệnh</th><th>Chạy gì</th></tr></thead><tbody>
       ${lenh.map(([k, v]) => `<tr><td><code>npm run ${esc(k)}</code></td><td><code>${esc(v)}</code></td></tr>`).join("")}
       </tbody></table></div>
     </div>
-    ${adrs.length ? `<div class="the"><h2>Quyết định đã chốt</h2>
-      <p>Mỗi quyết định một file, <strong>không sửa lại</strong>. Đổi ý thì viết quyết định mới
-      thay thế cái cũ, để sau này còn đọc được vì sao lúc đó chọn thế.</p>
-      <div class="tw"><table><thead><tr><th>Quyết định</th><th>Trạng thái</th><th>Ngày</th></tr></thead><tbody>
-      ${adrs.map((a) => `<tr><td>${esc(a.tieuDe)}</td><td>${esc(a.fm.status || "—")}</td><td>${esc(a.fm.date || "—")}</td></tr>`).join("")}
-      </tbody></table></div></div>` : ""}
     <div class="the"><h2>Khi bạn sắp… thì mở file nào</h2>
       <div class="tw"><table><thead><tr><th>Khi bạn sắp…</th><th>Mở cái gì</th></tr></thead><tbody>
       ${banDo.map((r) => `<tr><td>${md(r[0]).replace(/^<p>|<\/p>$/g, "")}</td><td>${md(r.slice(1).join(" · ")).replace(/^<p>|<\/p>$/g, "")}</td></tr>`).join("")}
@@ -773,8 +1102,18 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
 
   ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><details class="the" open><summary>Bảng tra cứu thuật ngữ</summary><div>${md(legend)}</div></section>` : ""}
 
-  ${daXong.length ? `<section class="tab" id="tab-da-xong" hidden>
-    <div class="the">
+  <section class="tab" id="tab-nhat-ky" hidden>
+    ${adrs.length ? `<div class="the"><h2>Quyết định đã chốt — ${adrs.length} bản ghi</h2>
+      <p>Mỗi quyết định là một file <strong>bất biến</strong>: đã chốt thì không sửa được, chỉ
+      thay bằng bản mới. Bản bị thay vẫn giữ nguyên để tra lại được.</p>
+      <div class="tw"><table><thead><tr><th>Quyết định</th><th>Trạng thái</th><th>Ngày</th></tr></thead><tbody>
+      ${adrs.map((a) => `<tr><td>${esc(a.tieuDe)}</td><td>${esc(a.fm.status || "—")}</td><td>${esc(a.fm.date || "—")}</td></tr>`).join("")}
+      </tbody></table></div></div>` : ""}
+    ${nhatKy.map((k, idx) => `<details${idx === 0 ? " open" : ""}>
+      <summary><strong>v${esc(k.ban)}</strong><span class="ngay">${esc(k.ngay)}</span><span class="tt">${esc(k.tomTat)}</span></summary>
+      ${md(k.than)}
+    </details>`).join("")}
+    ${daXong.length ? `<div class="the">
       <h2>Đã xong 100% — ${daXong.length} việc</h2>
       <p>Việc đã <strong>đóng hẳn</strong> trong sổ nợ, không phải việc đang làm dở. Nguồn là
       <span class="ref">BACKLOG.md</span>: mục nào có mã bị gạch thì nó nằm ở đây.</p>
@@ -784,15 +1123,8 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
       <div class="tw"><table><thead><tr><th>Mã</th><th>Việc</th><th>Ưu tiên lúc mở</th></tr></thead><tbody>
       ${daXong.map((v) => `<tr><td><code>${esc(v.ma)}</code></td><td>${md(v.tieuDe).replace(/^<p>|<\/p>$/g, "")}</td><td>${esc(v.uuTien || "—")}</td></tr>`).join("")}
       </tbody></table></div>
-    </div>
-  </section>` : ""}
-
-  ${nhatKy.length ? `<section class="tab" id="tab-nhat-ky" hidden>
-    ${nhatKy.map((k, idx) => `<details${idx === 0 ? " open" : ""}>
-      <summary><strong>v${esc(k.ban)}</strong><span class="ngay">${esc(k.ngay)}</span><span class="tt">${esc(k.tomTat)}</span></summary>
-      ${md(k.than)}
-    </details>`).join("")}
-  </section>` : ""}
+    </div>` : ""}
+  </section>
 
   <footer>
     <span>${esc(ten)} v${esc(ban)}</span>
@@ -807,6 +1139,9 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
 /* ---- chạy ------------------------------------------------------------------ */
 
 export function gomDuLieu() {
+  /* MỘT mốc cho cả hàm. Gọi `mocHEAD()` ở ba chỗ thì ba chỗ đó về lý thuyết đọc được ba giá
+   * trị khác nhau (HEAD đổi giữa chừng), và bảng sẽ tự mâu thuẫn với chính nó. */
+  const headDate = mocHEAD();
   const pkg = JSON.parse(doc("package.json") || "{}");
   // Tên NGƯỜI ĐỌC lấy từ `.repo-structure.json`, không lấy `package.json.name`. Cái sau là tên
   // gói npm — chữ thường, gạch nối — và in nó lên đầu một trang cho người xem thì vừa xấu vừa
@@ -815,6 +1150,7 @@ export function gomDuLieu() {
   // hỏng cú pháp vẫn sinh ra một trang trông hoàn toàn bình thường — trong khi cổng kiểm của
   // chính repo đó đang chết. Trang là thứ Đức nhìn; nó không được đẹp hơn sự thật.
   let tenNguoi = null;
+  let tenNguoiChot = null;
   const cauHinhRaw = doc(".repo-structure.json");
   if (cauHinhRaw !== null) {
     let j;
@@ -824,8 +1160,89 @@ export function gomDuLieu() {
       throw new Error(`.repo-structure.json hỏng cú pháp (${String(e.message).split(NL)[0]}) — KHÔNG sinh trang. Một trang dựng từ cấu hình hỏng sẽ trông bình thường trong khi repo đang hỏng.`);
     }
     tenNguoi = j?.repo?.name || null;
+    /* TÊN NGƯỜI CHỐT lấy từ cấu hình, không đóng cứng "Đức" vào bộ sinh: bộ khung này chạy ở
+     * repo của người khác, và một bảng gọi sai tên chủ dự án là bảng nói về một repo khác. */
+    tenNguoiChot = j?.repo?.owner || null;
   }
   const nhatKy = tachNhatKy(doc("CHANGELOG.md"));
+
+  /* ---- NĂM NGUỒN MỚI (06/09) — xem `overview-doc.mjs` để biết vì sao có chúng ----------- */
+
+  /* Sổ ý tưởng. Repo chưa có sổ thì tab biến mất ÊM — đó là trạng thái hợp lệ của một repo
+   * mới dựng, khác hẳn với "sổ có mà đọc không ra" (readIdeas sẽ NÉM ở ca đó). */
+  const rawY = doc("IDEAS.md");
+  const ideas = rawY ? readIdeas(rawY) : [];
+
+  /* Việc chờ người chốt. Quét dấu `@Đức:bấm` / `@Đức:chốt` ngay trên dòng của mục, ở BA sổ.
+   * Bảng KHÔNG giữ danh sách này: đóng mục thì dấu mất theo, không ai phải nhớ đi xoá. */
+  const canDuc = [];
+  for (const f of ["BACKLOG.md", "IDEAS.md", "STATUS.md", "HANDOFF.md"]) {
+    const t = doc(f);
+    if (t === null) continue;
+    for (const d of quetDauDuc(t, f)) {
+      const sinh = ngaySinhDong(f, d.soDong);
+      canDuc.push({ ...d, ngay: sinh === null ? null : khoangNgay(headDate, sinh), tuoi: noiTuoi(sinh === null ? null : khoangNgay(headDate, sinh)) });
+    }
+  }
+  canDuc.sort((a, b) => (b.ngay ?? -1) - (a.ngay ?? -1));
+
+  /* Bảng chủ sở hữu. NÉM nếu hỏng — xem ghi chú ở `readKhoa`. */
+  const khoa = readKhoa(doc(".agents/claims.json") || "{}");
+
+  /* Sổ nợ: mục còn mở. `tachDaXong` phía trên đã lo phần đã đóng, hai bên đọc CÙNG một dấu
+   * (gạch mã) nên chúng không thể nói khác nhau về cùng một mục. */
+  const noMuc = readNo(doc("BACKLOG.md") || "");
+  const noMo = noMuc.filter((n) => !n.dong);
+
+  /* Cây thư mục tầng ngoài cùng, và ai được ghi vào đâu. Số file đếm từ HEAD, không đếm đĩa —
+   * cùng lý do với mọi con số khác trên trang này. */
+  const vung = [];
+  const fileGoc = [];
+  {
+    let cauHinh = {};
+    try { cauHinh = JSON.parse(doc(".repo-structure.json") || "{}"); } catch (_) { cauHinh = {}; }
+    const areas = cauHinh.areas && typeof cauHinh.areas === "object" ? cauHinh.areas : {};
+    const maySinh = new Set([].concat(cauHinh.generated || [], Object.values(cauHinh.generated_names || {})));
+    let tatCa = [];
+    try {
+      tatCa = gitRa("ls-tree", "-r", "-z", "--name-only", "HEAD").split("\0").filter(Boolean);
+    } catch (_) { tatCa = []; }
+    const dem = new Map();
+    for (const f of tatCa) {
+      const i = f.indexOf("/");
+      if (i < 0) { fileGoc.push({ ten: f, may: maySinh.has(f) }); continue; }
+      const d = f.slice(0, i + 1);
+      dem.set(d, (dem.get(d) || 0) + 1);
+    }
+    for (const [duong, soFile] of [...dem.entries()].sort((a, b) => b[1] - a[1])) {
+      const khai = areas[duong];
+      vung.push({
+        duong,
+        chu: khai && typeof khai === "object" ? (khai.steward || null) : (typeof khai === "string" ? khai : null),
+        soFile
+      });
+    }
+    /* VÙNG ĐÃ KHAI MÀ CHƯA CÓ FILE NÀO vẫn phải hiện, với số 0.
+     *
+     * git không theo dõi thư mục rỗng, nên một vùng đã khai trong bảng phân vùng mà chưa có
+     * file sẽ biến mất khỏi danh sách nếu chỉ đếm từ cây HEAD — trong khi nó VẪN là một khoá
+     * nhận được, vẫn chặn được phiên khác. Bảng giấu nó đi là giấu một chỗ giao việc. */
+    for (const duong of Object.keys(areas)) {
+      if (!duong.endsWith("/") || dem.has(duong)) continue;
+      const khai = areas[duong];
+      vung.push({
+        duong,
+        chu: khai && typeof khai === "object" ? (khai.steward || null) : (typeof khai === "string" ? khai : null),
+        soFile: 0
+      });
+    }
+    fileGoc.sort((a, b) => a.ten.localeCompare(b.ten));
+  }
+
+  /* Bốn cơ chế + năm bất biến: đọc lại từ luật, không chép. */
+  const rawMF = doc("docs/protocols/MULTIFLOW.md") || "";
+  const coChe = readCoChe(rawMF);
+  const batBien = readBatBien(rawMF);
   const daXong = tachDaXong(doc("BACKLOG.md"));
   const workflows = docTaiLieu("docs/workflows");
   const protocols = docTaiLieu("docs/protocols");
@@ -845,12 +1262,14 @@ export function gomDuLieu() {
   // Tài liệu quá hạn: mỗi file khai `ttl_days`, so với lần commit gần nhất của chính nó. Không
   // đo được (chưa commit, không có git) thì KHÔNG tính là nợ — thà bỏ sót còn hơn báo động sai.
   const taiLieuQuaHan = [];
+  let soTaiLieu = 0;
   // "Hôm nay" ở đây cũng là mốc HEAD, cùng lý do ghi ở `ngay:` bên dưới: lấy `Date.now()` thì
   // con số này tự tăng theo lịch, và sang ngày là bản sinh lại lệch bản đã commit.
-  const homNay = Date.parse(`${mocHEAD()}T00:00:00Z`);
+  const homNay = Date.parse(`${headDate}T00:00:00Z`);
   for (const thuMuc of ["docs", "docs/workflows", "docs/protocols", "docs/briefs"]) {
     for (const f of liet(thuMuc)) {
       const fm = tachFrontmatter(doc(`${thuMuc}/${f}`) || "").fm;
+      soTaiLieu += 1;
       const ttl = Number(fm.ttl_days);
       if (!Number.isFinite(ttl) || ttl <= 0) continue;
       let sua = null;
@@ -875,6 +1294,7 @@ export function gomDuLieu() {
   // KHÔNG có dòng TỔNG mới là không đo được: script chết trước khi in, hoặc node/git không chạy.
   let canhBaoVang = null;
   let choDo = null;
+  let soPhepCauTruc = null;
   {
     let ra = "";
     try {
@@ -889,6 +1309,8 @@ export function gomDuLieu() {
     const mdo = dong.match(/([0-9]+)\s*chỗ\s*ĐỎ/);
     canhBaoVang = mv ? Number(mv[1]) : null;
     choDo = mdo ? Number(mdo[1]) : null;
+    const mb = /B1.*?B([0-9]+)/.exec(ra);
+    soPhepCauTruc = mb ? Number(mb[1]) : null;
   }
 
   /* "Việc lớn chưa chứng minh" — ĐỌC TỪ STATUS, ĐỪNG GÕ TAY.
@@ -904,6 +1326,7 @@ export function gomDuLieu() {
   const noCauTruc = (choDo === null || canhBaoVang === null) ? null : choDo + canhBaoVang;
   return {
     ten: tenNguoi || pkg.name || "Repo",
+    tenNguoiChot,
     ban: pkg.version || "0.0.0",
     // NGÀY CỦA HEAD, KHÔNG PHẢI NGÀY TRÊN ĐỒNG HỒ. Trước khi trang được commit, đây là
     // `new Date()` — và cái đó vô hại đúng tới lúc trang vào repo. Từ lúc vào, đồng hồ sang
@@ -911,11 +1334,12 @@ export function gomDuLieu() {
     // MỌI phiên bị chặn đẩy vì một ngày đã trôi qua. Việc BÁO CŨ không mất đi: đoạn JS cuối
     // trang tự tính lúc người ta MỞ trang, từ `data-sinh` — đúng chỗ hơn, vì một trang tĩnh
     // không biết trước bao giờ có người mở nó.
-    ngay: mocHEAD(),
+    ngay: headDate,
     lenh: Object.entries(pkg.scripts || {}),
     banDo: docBanDo(doc("AGENTS.md")),
     trangCo: new Set(lietHTML()),
     workflows, protocols, adrs, nhatKy, daXong, briefs, dichDen,
+    ideas, canDuc, khoa, noMo, noMuc, coChe, batBien, vung, fileGoc,
     // Số suite phép kiểm = số lần `node tests/...` trong lệnh `test`. Đếm từ đó chứ không đếm
     // file trong `tests/`: một file không được lệnh `test` gọi thì nó không canh gì cả.
     soPhepKiem: (String((pkg.scripts || {}).test || "").match(/node tests\//g) || []).length || null,
@@ -932,11 +1356,20 @@ export function gomDuLieu() {
     // 10 chỗ ĐỎ và 0 chỗ VÀNG hiện ra "0" và đèn có thể XANH — bảng giấu đúng thứ nặng nhất
     // và giữ lại thứ nhẹ. Không đọc được một trong hai thì để `null`, và `null` không phải 0:
     // đèn sẽ không xanh. Audit độc lập bắt được 03/09.
+    // MẪU SỐ ĐI KÈM TỪNG SỐ, không tách ra chỗ khác.
+    //
+    // Một số 0 đứng một mình trông giống hệt nhau ở hai ca ngược nhau: "đã dò hết, sạch" và
+    // "chưa dò gì cả". Trước 06/09 bảng chỉ in con số, nên nó không phân biệt được hai ca đó —
+    // và ca thứ hai là ca nguy hiểm, vì nó hiện ra màu xanh.
     so: [
-      { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn" },
-      { so: noCauTruc, nhan: "nợ cấu trúc (đỏ + vàng)" },
-      { so: viecChuaChungMinh, nhan: "việc lớn chưa chứng minh" }
+      { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn", mau: `đã tính tuổi ${soTaiLieu} tài liệu theo hạn rà mỗi file tự khai` },
+      { so: noCauTruc, nhan: "nợ cấu trúc (đỏ + vàng)", mau: noCauTruc === null ? "KHÔNG đọc được cổng cấu trúc — chưa dò được" : `đã chạy trọn ${soPhepCauTruc} phép kiểm cấu trúc` },
+      { so: viecChuaChungMinh, nhan: "việc lớn chưa chứng minh", mau: "đọc từ vòng đời khai trong STATUS.md" }
     ]
+    /* ĐÚNG BA con số, và một phép kiểm cũ ghim con số ba đó. Tôi đã thử thêm ô thứ tư "vùng
+     * đang bận" và phép kiểm ĐỎ — đúng. Ba ô này đếm NỢ, và đèn chỉ xanh khi cả ba bằng 0;
+     * một vùng đang bận thì hoàn toàn bình thường, nhét nó vào đây là đèn không bao giờ xanh
+     * được nữa và con số mất nghĩa. Số khoá bận đã có chỗ của nó ở tab AI điều phối. */
   };
 }
 

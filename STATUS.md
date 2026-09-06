@@ -3,16 +3,16 @@ schema: extension-status/v2
 id: ark-repo-harness
 name: Ark Repo Harness
 lifecycle: active
-last_verified: 2026-09-05
+last_verified: 2026-09-06
 last_verified_commit: baebd07fafa3a5e1435977894372a2ba76a76599
 last_verified_how: "npm test 145/145 xanh · cổng đóng phiên XANH TOÀN BỘ 11/11 · bản 1.3.1 đã phát, dấu vân tay 5b2b74c0eee8e3b6 trong sổ phát hành · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái"
 evidence_ref: HANDOFF.md
-owner: harness-vong2
+owner: claude-bang9tab
 priority_rank: 1
-next_step: "KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới."
+next_step: "Y-09 trong IDEAS.md — đưa `build-overview.mjs` vào bản trích rồi phát bảng chín tab sang ba repo đã lắp. Chín tab đã dựng xong ở repo nhà 06/09; phần còn lại là bỏ chữ riêng của repo nhà, thêm phép kiểm, rồi mới phát."
 version_source: package.json
-current_focus: "Bản 1.3.1 · migrate nay là BA việc trong một (migrate + audit + bring AI assistant onboard), Đức chốt 05/09 — xong không còn nghĩa là cổng xanh"
-human_action: "CÓ — KHUNG-11: bớt cái gì trong 998 dòng tài liệu vượt ngân sách. Mọi việc còn lại đều THÊM chữ, nên chốt càng muộn càng vượt xa. Xem BACKLOG.md."
+current_focus: "Bản 1.3.14 · bảng nay có chín tab và đọc thêm năm nguồn (sổ ý tưởng · dấu chờ người chốt · bảng chủ sở hữu · sổ nợ · luật đa phiên). Đức chốt 06/09: bảng phải đi theo bản trích, không để mỗi repo một kiểu."
+human_action: "CÓ — bốn mục đang mang dấu chờ, xem tab \"AI điều phối\" của bảng: KHUNG-11 và KHUNG-6 và KHUNG-30 cần Đức CHỐT, KHUNG-14 cần Đức BẤM. Bảng quét dấu `@Đức:` ngay trên dòng của mục, nên danh sách này không cần ai nhớ cập nhật."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---

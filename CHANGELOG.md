@@ -3,6 +3,66 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.15 — 2026-09-06 — Bảng chín tab: năm nguồn trước nay chưa chiếu ra bao giờ
+
+Đức mở bảng của repo `Chrome_Extension_AI_Agentic` và thấy bảng bộ khung **thiếu hẳn năm tab**.
+Repo kia đã tự đi trước và chứng minh chúng dùng được. Bản này mang logic về một nguồn.
+
+### Chín tab, và con số chín là có chủ đích
+
+Bản trước có **mười** tab mà vẫn thiếu năm thứ Đức hỏi tới. Thêm thẳng vào là mười lăm tab —
+một bảng mười lăm tab thì không ai tìm nổi mục mình cần, tức bảng chết theo kiểu khác. Nên bốn
+tab cũ được **gộp vào chỗ đúng của chúng**, không đứng riêng:
+
+| Mới | Trả lời câu gì | Gộp thêm |
+|---|---|---|
+| **AI điều phối** | ai đang làm gì · còn việc nào chờ Đức · còn mấy chỗ giao việc song song | — |
+| **Ý tưởng** | những hướng đang mở đang ở bước nào | — |
+| **Vận hành** | bảng này chạy thế nào · cái gì giữ cho không giẫm chân | Cách vận hành + Sổ tay + Bảo trì |
+| **Sức khoẻ & nợ** | repo đang nợ gì, và số 0 kia là sạch hay chưa dò | — |
+| **Cấu trúc** | repo chia vùng thế nào, ai được ghi vào đâu | Bên trong |
+
+"Làm được gì" vào **Mô hình** (nó vốn là danh sách tính năng của khối dữ liệu lõi); "Đã xong"
+vào **Nhật ký**.
+
+### Năm nguồn mới, và `IDEAS.md` — sổ ý tưởng
+
+`scripts/overview-doc.mjs` tách riêng phần **kiểm được bằng phép kiểm thuần**: đưa vào một
+chuỗi, đòi ra một cấu trúc. Nó đọc sổ ý tưởng · dấu chờ người chốt · bảng chủ sở hữu · sổ nợ ·
+bốn cơ chế và năm bất biến của luật đa phiên.
+
+`IDEAS.md` là file mới ở gốc repo — **sổ nợ ghi thứ đang hỏng, sổ ý tưởng ghi hướng đi**. Trộn
+hai thứ là mọi hướng đi trông như một lỗi cần vá gấp. Chín ý tưởng rút từ `decisions.md` ·
+`BACKLOG.md` · `HANDOFF.md`, mỗi ý tưởng kèm *nguồn · vì sao · vì sao chưa làm ngay · đo trước
+khi sửa*.
+
+### Dấu `@Đức:bấm` / `@Đức:chốt` — bảng KHÔNG giữ danh sách việc chờ
+
+Đặt dấu ngay trên dòng của mục trong sổ nợ / sổ ý tưởng / hồ sơ trạng thái. Mục đóng thì dấu
+mất theo — **không ai phải nhớ đi xoá ở một chỗ thứ hai**, và một danh sách thứ hai thì luôn cũ
+hơn thực tế. Số ngày treo đo bằng `git log -L`, không đọc đồng hồ.
+
+### Mỗi số 0 nay kèm MẪU SỐ
+
+Một số `0` đứng một mình trông giống hệt nhau ở hai ca ngược nhau: *đã dò hết, sạch* và *chưa dò
+gì cả*. Ca thứ hai là ca nguy hiểm, vì nó hiện ra màu xanh. Nay mỗi ô kèm dòng "đã dò bao nhiêu",
+và `?` nghĩa là KHÔNG ĐO ĐƯỢC — khác 0.
+
+### Bốn lỗi thật bắt được ngay lúc chạy trên dữ liệu thật
+
+| Lỗi | Hậu quả nếu không bắt |
+|---|---|
+| Lọc khoá chú thích bằng **tiền tố** `_doc` | nuốt luôn khoá vùng thật **`_docs`** — một vùng biến mất khỏi bảng, im lặng |
+| Regex bất biến neo `$` cuối dòng | đọc ra **0/5** bất biến và vẫn trả mảng rỗng lễ phép — rỗng-vì-đúng và rỗng-vì-hỏng trông giống hệt nhau |
+| Vùng đã khai mà chưa có file | git không theo dõi thư mục rỗng, nên một chỗ giao việc thật biến mất khỏi bảng |
+| Backtick trong chú thích CSS | **lần thứ tư** repo dính bẫy template literal — module không nạp được |
+
+### Hai chỗ sổ nói sai, tìm ra khi rà nguồn
+
+`KHUNG-17` **đã được vá từ trước mà sổ chưa gạch mã**, nên nó vẫn chiếm chỗ trong "12 mục còn
+mở". Và `STATUS.md` đang trỏ `next_step` vào `KHUNG-13` — **mục đã đóng**. Cùng một hình dạng
+lỗi, hai chỗ: *sổ nói về một thực tế đã đổi*. Đã vá cả hai.
+
 ## 1.3.14 — 2026-09-06 — Đề bài KHÔNG viết tay nữa, và trang có mô hình ba khối
 
 Lượt giao việc đầu tiên cho Codex CLI (06/09) không hỏng vì Codex. Nó hỏng vì **đề bài
