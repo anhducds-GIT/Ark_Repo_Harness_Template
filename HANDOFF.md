@@ -870,3 +870,30 @@ mới bắt được — và việc đó mất đúng năm phút.
 *Vì sao nhảy qua 1.3.17:* sổ phát hành đã ghi 1.3.17, rồi tôi phải sửa suite cho nó chạy được ở
 repo lạ — mà sửa file đi theo bản trích là đổi dấu vân tay. Sổ **chỉ thêm**, không sửa dòng cũ,
 nên cắt bản mới. Cổng chặn đúng.
+
+## 2026-09-06 · `claude-y09` (tiếp) — ĐÃ PHÁT BẢNG SANG HAI REPO
+
+| Repo | Bản | Tab | Cổng |
+|---|---|---|---|
+| `n8n-orchestrator` | 1.3.13 → **1.3.19** | 7 | XANH TOÀN BỘ, đã đẩy |
+| `ALL_SKILL_MANAGEMENT` | 1.3.13 → **1.3.19** | 7 | XANH TOÀN BỘ, đã đẩy |
+| `Project 3 AI Agent Unify` | **vẫn 1.2.20** | — | **CHƯA NÂNG** — xem dưới |
+
+**Vì sao 1.3.19 chứ không phải 1.3.18:** vế "liên kết nhảy tab" đòi cứng phải CÓ liên kết. Đúng ở
+repo nhà, sai ở repo chưa có sổ ý tưởng — nơi trang không có liên kết nào, và đó là trạng thái
+hợp lệ. **Lần thứ hai trong cùng một ngày** một suite vừa phát đi lại đòi thứ chỉ repo nhà có.
+
+**Bài học lặp lại hai lần, nên ghi thành luật:** trước khi thêm một vế vào suite ĐI THEO BẢN
+TRÍCH, hỏi *"vế này còn đúng ở một repo KHÔNG có sổ ý tưởng, KHÔNG có hồ sơ migrate, chưa sinh
+trang lần nào không?"* Không chắc thì dựng một repo giả rồi chạy — mất năm phút.
+
+**Chỗ vấp chung của cả hai repo đích:** bảng markdown của chúng nhúng **số commit chưa đẩy**, nên
+mỗi commit mới làm bảng lệch — nó tự đuổi theo đuôi mình. Lối ra: sinh lại rồi `--amend`.
+
+### `Project 3 AI Agent Unify` — vẫn là KHUNG-30, chưa ai gỡ
+
+Đo lại lượt này: nhánh `codex/antigravity-operating-protocol-hooks` khớp upstream của chính nó
+nhưng lệch `origin/main` **5 sau · 48 trước**, và cây làm việc có **3 file sửa dở NGOÀI vùng bộ
+khung** — việc của phiên khác. Luật 8A của chính repo đó cấm ghi khi bản trên máy còn sau cloud.
+
+Không tự quyết. Ba lối đã ghi ở `KHUNG-30`.

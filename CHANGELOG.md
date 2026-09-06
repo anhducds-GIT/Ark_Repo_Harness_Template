@@ -3,6 +3,33 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.19 — 2026-09-06 — Vá một vế kiểm quá chặt, và phát bảng sang hai repo đã lắp
+
+### Vế kiểm đòi thứ không phải repo nào cũng có
+
+Vế "liên kết nhảy tab" đòi cứng `goto.length > 0`. Đúng ở repo nhà — có sổ ý tưởng nên có chín
+liên kết. **Sai ở repo vừa nhận bản phát**: chưa có `IDEAS.md`, chưa có hồ sơ migrate, nên trang
+không có liên kết nào — và đó là trạng thái **hợp lệ**.
+
+Nay điều kiện là **có điều kiện**: tab nào có mặt thì liên kết của tab đó phải có. Bắt được lúc
+nâng `n8n-orchestrator`; đọc lại code không thấy, chỉ chạy ở repo thật mới thấy. **Lần thứ hai
+trong cùng một ngày** một suite vừa phát đi lại đòi thứ chỉ repo nhà có.
+
+### Đã phát sang hai repo
+
+| Repo | Bản | Tab | Ghi chú |
+|---|---|---|---|
+| `n8n-orchestrator` | 1.3.13 → 1.3.19 | 7 | cổng XANH TOÀN BỘ |
+| `ALL_SKILL_MANAGEMENT` | 1.3.13 → 1.3.19 | 7 | trang là **file thứ TƯ** do máy sinh, KHÔNG đụng `DASHBOARD.md` viết tay |
+
+Ba tab còn lại (**Mô hình · Ý tưởng · Migrate**) tự ẩn ở cả hai — chúng không có nguồn cho những
+tab đó. Cả hai repo đều phải khai thêm `build-overview.mjs` vào khối `generators`: không khai thì
+cổng không kiểm trang, và trang cũ dần mà không ai biết.
+
+**Một chỗ vấp chung của cả hai:** bảng markdown của chúng nhúng **số commit chưa đẩy**, nên mỗi
+commit mới lại làm bảng lệch — nó tự đuổi theo đuôi mình. Lối ra là sinh lại rồi `--amend` thay
+vì tạo thêm commit.
+
 ## 1.3.18 — 2026-09-06 — Bảng ĐI THEO BẢN TRÍCH: gỡ bốn chỗ nối, phát sang repo đã lắp
 
 Đức chốt 06/09: bảng phải là **MỘT bảng cho mọi repo**, không để mỗi nơi một kiểu. `Y-09` xong.

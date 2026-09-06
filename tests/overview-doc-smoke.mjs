@@ -215,7 +215,18 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const tab2Co = new Set([...html.matchAll(/data-tab2="([^"]+)"/g)].map((m) => m[1]));
 
   const goto = [...html.matchAll(/href="#([^"]+)"\s+data-goto="([^"]+)"/g)];
-  assert.ok(goto.length > 0, "trang không còn liên kết nhảy tab nào — khối ý tưởng đã mất?");
+  /* CHỈ ĐÒI CÓ LIÊN KẾT KHI CÓ THỨ ĐỂ LIÊN KẾT TỚI.
+   *
+   * Bản đầu đòi cứng `goto.length > 0`. Đúng ở repo nhà (có sổ ý tưởng nên có chín liên kết),
+   * SAI ở repo vừa nhận bản phát: chưa có `IDEAS.md`, chưa có hồ sơ migrate, nên trang không có
+   * liên kết nào — và đó là trạng thái HỢP LỆ. Bắt được lúc nâng repo `n8n-orchestrator` lên
+   * 1.3.19; đọc lại code không thấy, chỉ chạy ở repo thật mới thấy.
+   *
+   * Điều kiện đúng là điều kiện CÓ ĐIỀU KIỆN: tab nào có mặt thì liên kết của tab đó phải có. */
+  const coTabY = /data-tab="y-tuong"/.test(html);
+  if (coTabY) {
+    assert.ok(goto.length > 0, "trang CÓ tab Ý tưởng mà không có liên kết nhảy nào — khối ý tưởng đã mất?");
+  }
   for (const [, dich, tab] of goto) {
     assert.ok(tabCo.has(tab), `liên kết nhảy tới tab "${tab}" mà tab đó không có trên trang`);
     assert.ok(idCo.has(dich), `liên kết nhảy tới id "${dich}" mà id đó không có trên trang`);

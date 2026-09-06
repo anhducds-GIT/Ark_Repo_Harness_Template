@@ -293,7 +293,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   <div class="cu" data-sinh="2026-09-06"></div>
   <header>
     <div class="nhan-hang">
-      <span class="chip">v1.3.18</span>
+      <span class="chip">v1.3.19</span>
       <span>sinh ngày 2026-09-06</span>
     </div>
     <h1>Ark Repo Harness</h1>
@@ -1176,6 +1176,15 @@ git mv handoff-tam.md HANDOFF.md</code></pre>
       <tr><td>ADR-0000 — Ghi nhận quyết định kiến trúc bằng ADR bất biến</td><td>Proposed</td><td>YYYY-MM-DD</td></tr><tr><td>ADR-0001 — Template ở một repo độc lập; Project 3AI kết thúc vai trò</td><td>Accepted</td><td>2026-09-02</td></tr><tr><td>ADR-0002 — Công cụ đo/khởi tạo và hai quy trình ở REPO NHÀ, không đi theo bản trích</td><td>Accepted</td><td>2026-09-03</td></tr><tr><td>ADR-0003 — Đóng băng một mốc Stable Baseline, và chuyển sang chế độ bảo trì</td><td>Accepted</td><td>2026-09-04</td></tr><tr><td>ADR-0004 — Repo bộ khung công khai; các repo còn lại vẫn kín</td><td>Accepted</td><td>2026-09-04</td></tr><tr><td>ADR-0005 — Gói Assistant phát hành từ bộ khung; repo nào dùng thì là người tiêu thụ</td><td>Accepted</td><td>2026-09-05</td></tr>
       </tbody></table></div></div>
     <details open>
+      <summary><strong>v1.3.19</strong><span class="ngay">2026-09-06</span><span class="tt">Vá một vế kiểm quá chặt, và phát bảng sang hai repo đã lắp</span></summary>
+      <h4>Vế kiểm đòi thứ không phải repo nào cũng có</h4>
+<p>Vế &quot;liên kết nhảy tab&quot; đòi cứng <code>goto.length &gt; 0</code>. Đúng ở repo nhà — có sổ ý tưởng nên có chín liên kết. <strong>Sai ở repo vừa nhận bản phát</strong>: chưa có <code>IDEAS.md</code>, chưa có hồ sơ migrate, nên trang không có liên kết nào — và đó là trạng thái <strong>hợp lệ</strong>.</p>
+<p>Nay điều kiện là <strong>có điều kiện</strong>: tab nào có mặt thì liên kết của tab đó phải có. Bắt được lúc nâng <code>n8n-orchestrator</code>; đọc lại code không thấy, chỉ chạy ở repo thật mới thấy. <strong>Lần thứ hai trong cùng một ngày</strong> một suite vừa phát đi lại đòi thứ chỉ repo nhà có.</p>
+<h4>Đã phát sang hai repo</h4>
+<div class="tw"><table><thead><tr><th>Repo</th><th>Bản</th><th>Tab</th><th>Ghi chú</th></tr></thead><tbody><tr><td><code>n8n-orchestrator</code></td><td>1.3.13 → 1.3.19</td><td>7</td><td>cổng XANH TOÀN BỘ</td></tr><tr><td><code>ALL_SKILL_MANAGEMENT</code></td><td>1.3.13 → 1.3.19</td><td>7</td><td>trang là <strong>file thứ TƯ</strong> do máy sinh, KHÔNG đụng <code>DASHBOARD.md</code> viết tay</td></tr></tbody></table></div>
+<p>Ba tab còn lại (<strong>Mô hình · Ý tưởng · Migrate</strong>) tự ẩn ở cả hai — chúng không có nguồn cho những tab đó. Cả hai repo đều phải khai thêm <code>build-overview.mjs</code> vào khối <code>generators</code>: không khai thì cổng không kiểm trang, và trang cũ dần mà không ai biết.</p>
+<p><strong>Một chỗ vấp chung của cả hai:</strong> bảng markdown của chúng nhúng <strong>số commit chưa đẩy</strong>, nên mỗi commit mới lại làm bảng lệch — nó tự đuổi theo đuôi mình. Lối ra là sinh lại rồi <code>--amend</code> thay vì tạo thêm commit.</p>
+    </details><details>
       <summary><strong>v1.3.18</strong><span class="ngay">2026-09-06</span><span class="tt">Bảng ĐI THEO BẢN TRÍCH: gỡ bốn chỗ nối, phát sang repo đã lắp</span></summary>
       <p>Đức chốt 06/09: bảng phải là <strong>MỘT bảng cho mọi repo</strong>, không để mỗi nơi một kiểu. <code>Y-09</code> xong.</p>
 <h4>Bốn chỗ nối, không phải một</h4>
@@ -1393,7 +1402,7 @@ npm run don -- --apply     # ghi thật</code></pre>
   </section>
 
   <footer>
-    <span>Ark Repo Harness v1.3.18</span>
+    <span>Ark Repo Harness v1.3.19</span>
     <span>sinh ngày 2026-09-06 — không gõ tay</span>
     <span>mọi con số đọc từ repo</span>
   </footer>
