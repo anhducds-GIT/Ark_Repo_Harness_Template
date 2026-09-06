@@ -166,13 +166,37 @@ export function ageHours(stamp, now = new Date()) {
   return Math.max(0, (now.getTime() - t) / 3600000);
 }
 
-export function ageLabel(hours) {
+/* MỐC CHỈ CÓ NGÀY THÌ KHÔNG BIẾT GIỜ — và không được giả vờ là biết.
+ *
+ * ĐO ĐƯỢC 06/09, và Đức là người nhìn thấy trước: bảng quyền báo ba khoá "giữ 16h ⚠ quá 6h",
+ * trong khi cả ba vừa được nhận **hai tiếng trước**. Nguyên nhân: mốc cũ là `"2026-09-06"` —
+ * chỉ ngày — nên `Date.parse` đọc thành nửa đêm UTC, và tới chiều thì phép trừ ra 16 tiếng.
+ *
+ * Con số ma đó nguy hiểm hơn không có con số: nó **bật ⚠**, và một cái ⚠ sai vài lần thì lần
+ * thứ ba không ai nhìn nữa — lúc đó một khoá kẹt thật cũng trôi qua. Từ bản 1.3.21 mốc mới luôn
+ * có giờ; mốc cũ thì nói ĐÚNG ĐỘ CHÍNH XÁC nó có: "nhận trong hôm nay", không phải "16h". */
+export function mocCoGio(stamp) {
+  return /\d{1,2}:\d{2}/.test(String(stamp || ""));
+}
+
+export function ageLabel(hours, coGio = true) {
   if (hours == null) return "không rõ từ khi nào";
+  if (!coGio) {
+    // Độ phân giải của mốc là NGÀY, nên câu trả lời cũng phải ở mức ngày.
+    return hours < 24 ? "nhận trong hôm nay" : `${Math.round(hours / 24)} ngày`;
+  }
   // Phút, không phải "dưới 1h": cả lỗ mà tín hiệu bên dưới chữa đều xảy ra trong vòng 20 phút
   // đầu của một lượt giữ. Gộp hết vào "dưới 1h" là làm mù đúng khoảng thời gian đáng nhìn.
   if (hours < 1) return `${Math.round(hours * 60)} phút`;
   if (hours < 48) return `${Math.round(hours)}h`;
   return `${Math.round(hours / 24)} ngày`;
+}
+
+/** ⚠ chỉ khi con số ĐỦ CHÍNH XÁC để đáng tin: mốc có giờ thì theo `GIO_NHAC`, mốc chỉ-ngày thì
+ *  phải qua hẳn một ngày. Không có luật này thì mọi mốc cũ đều kêu ⚠ ngay từ trưa. */
+export function dangNhac(hours, coGio) {
+  if (hours == null) return false;
+  return coGio ? hours >= GIO_NHAC : hours >= 24;
 }
 
 /* ---- REPO CHƯA THẤY DẤU VẾT ----------------------------------------------
@@ -297,12 +321,13 @@ async function main() {
       const owner = value.owner || "";
       let duoi = "";
       if (owner) {
+        const coGio = mocCoGio(value.claimed_at);
         const gio = ageHours(value.claimed_at);
-        const cot = [`giữ ${ageLabel(gio)}`];
+        const cot = [coGio ? `giữ ${ageLabel(gio, true)}` : ageLabel(gio, false)];
         const noi = noiDauVet(dauVet.get(key));
         if (noi) cot.push(noi);
         if (dauVet.get(key) === DAU_VET.CHUA) coChua = true;
-        if (gio != null && gio >= GIO_NHAC) cot.push("⚠ quá " + GIO_NHAC + "h");
+        if (dangNhac(gio, coGio)) cot.push(coGio ? "⚠ quá " + GIO_NHAC + "h" : "⚠ quá một ngày");
         duoi = `  (${cot.join(" · ")})`;
       }
       console.log(`${owner ? "GIU  " : "TRỐNG"} ${key.padEnd(34)}${owner}${duoi}`);

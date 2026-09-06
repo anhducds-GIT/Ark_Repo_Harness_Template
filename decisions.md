@@ -279,3 +279,13 @@ khai"*, không làm tròn thành *"chưa xong"*.
 Thêm luật vào mục 1 làm `template/AGENTS.md` vượt trần 200 dòng (phép kiểm B9), đúng thứ mục 8
 cấm. Đã BỚT: định nghĩa năm "luật an toàn" dời sang [docs/LEGEND.md](docs/LEGEND.md), phần còn
 lại gói lại chặt hơn. Không nới trần — nới trần là làm yếu lớp bảo vệ để cho phép kiểm xanh.
+
+## 2026-09-06 · Tiến trình nền: AI ĐO, người GIẾT
+
+Đức thấy một tiến trình nền 14 tiếng và hỏi protocol. Đo ra năm thế hệ MCP server mồ côi
+(32.9h · 15.9h · 2.2h · 1.9h · 0.9h), cộng một cầu nối của repo khác sống 32.9h.
+
+Luật: **AI không tự giết tiến trình nào.** Nó đo, in bảng tuổi, chỉ ra cái nào chắc chắn thuộc
+phiên đã chết. Người bấm. Lý do: tuổi KHÔNG phân biệt được "phiên đã chết" với "phiên đang chạy
+lâu" — đúng hình dạng sai lầm của tín hiệu khoá vùng, chỉ đổi đối tượng.
+Chi tiết: [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md) · `KHUNG-37`.

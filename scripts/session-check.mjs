@@ -1087,7 +1087,7 @@ try {
   const vet = await kh.doDauVet(cuaToi, ROOT);
   const chua = [...vet.entries()].filter(([, t]) => t === kh.DAU_VET.CHUA).map(([k]) => k);
   if (chua.length) {
-    const tuoi = chua.map((k) => `${k} (${kh.ageLabel(kh.ageHours(CLAIMS[k]?.claimed_at))})`).join(", ");
+    const tuoi = chua.map((k) => { const st = CLAIMS[k]?.claimed_at; const cg = kh.mocCoGio(st); return `${k} (${cg ? "giữ " : ""}${kh.ageLabel(kh.ageHours(st), cg)})`; }).join(", ");
     console.log(`⚠ VÀNG — repo chưa thấy dấu vết ở: ${tuoi}`);
     console.log("  Không commit nào chạm vùng đó kể từ lúc bạn nhận khoá, và không file nào đang sửa dở.");
     console.log("  KHÔNG chặn bạn: đọc kỹ trước khi sửa là việc tốt, và repo không thấy được việc bạn");

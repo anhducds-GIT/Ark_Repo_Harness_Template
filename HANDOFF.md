@@ -967,3 +967,21 @@ kiểm B9 — phần còn lại gói chặt hơn. Về đúng **200/200**.
 | Bản | 1.3.19 → **1.3.21** (1.3.20 cắt giữa chừng, sổ phát hành chặn — đúng thiết kế) |
 | `template/AGENTS.md` | 200/200 dòng, B9 sạch |
 | Còn mở | `KHUNG-33` (trả khoá khi chưa đẩy) · `KHUNG-34` (tám cái bẫy) · `KHUNG-36` (backfill hồ sơ cũ) · `KHUNG-30` (repo thứ ba) |
+
+### Bổ sung cuối phiên · Đức bắt được một con số ma → 1.3.22
+
+Giữa lúc chạy cổng, Đức nhìn bảng và hỏi *"có task chạy ngầm đã 14 tiếng"*. Đo ra **hai chuyện
+khác nhau**, cùng một hình dạng lỗi:
+
+**Một — con số ma trên bảng quyền.** Ba khoá báo *"giữ 16h ⚠ quá 6h"*, thật ra nhận **hai tiếng
+trước**. Mốc cũ chỉ có ngày → `Date.parse` đọc thành nửa đêm UTC. Bản 1.3.21 đã cho mốc mới có
+giờ nhưng vẫn đọc mốc cũ như thể nó biết giờ. Nay `mocCoGio()`/`dangNhac()` bắt ba chỗ hiển thị
+nói **đúng độ chính xác của mốc**, và ⚠ không bật trên một con số không đo được. Vế 9 + 2 đột biến.
+
+**Hai — tiến trình nền thật.** `node.exe` theo tuổi: **32.9h · 15.9h · 2.2h · 1.9h · 0.9h**. Năm
+thế hệ MCP server chồng lên nhau; "14 tiếng" Đức thấy là thế hệ 15.9h. Thêm nhịp GIẾT vào
+`docs/BAO-TRI-DINH-KY.md` — lệnh đo + ba câu luật. **Chưa giết cái nào**: giết tiến trình của
+phiên khác không lùi lại được và chạm việc người khác. `KHUNG-37`, `@Đức:bấm`.
+
+**Bài học chung của cả hai:** *một tín hiệu luôn kêu là một tín hiệu không ai nhìn.* Bản 1.3.21
+dựng tín hiệu khoá vùng để chữa đúng bệnh này, rồi tự dính nó ở chỗ khác trong cùng một ngày.

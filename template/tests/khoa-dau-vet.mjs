@@ -7,6 +7,8 @@
  *   2. đổi ghi chú thành một `check(...)` thật            → vế 7 ĐỎ (số phép kiểm đổi)
  *   3. đảo nhánh "file sửa dở" trong `xetDauVet`         → vế 1 ĐỎ
  *   4. cho nhánh git-hỏng trả `CHUA` thay vì `KHONG_DO`  → vế 4 ĐỎ
+ *   5. `mocCoGio` luôn trả `true` (dựng lại đúng con số ma) → vế 9 ĐỎ
+ *   6. `dangNhac` bỏ qua độ chính xác của mốc            → vế 9 ĐỎ
  *
  * MỨC NGHIÊM TRỌNG LÀ PHẦN CỦA HỢP ĐỒNG. Vế 7 ghim rằng tín hiệu này **không đổi mã thoát của
  * cổng**. Nếu ai đó thấy nó "quan trọng quá nên phải chặn", họ đang dạy mọi lane ghi bừa một
@@ -20,7 +22,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { DAU_VET, noiDauVet, xetDauVet } from "../scripts/claim.mjs";
+import { ageHours, ageLabel, dangNhac, DAU_VET, GIO_NHAC, mocCoGio, noiDauVet, xetDauVet } from "../scripts/claim.mjs";
 import { khoiDangLamGi } from "../scripts/build-overview.mjs";
 
 let passed = 0;
@@ -194,6 +196,39 @@ const SAU = "2026-09-06T11:00:00Z";
     assert.ok(d.trimStart().startsWith("<!--khoa-->"), `dong mang du lieu khoa ma khong co nhan de doi: ${d.slice(0, 70)}`);
   }
   ok("8 · bảng: đúng vùng được gắn nhãn, cùng một câu, và mọi dòng đều dễ đổi");
+}
+
+/* ---- 9. CON SỐ MA: mốc chỉ có NGÀY không được báo giờ ------------------
+ *
+ * ĐO ĐƯỢC 06/09, Đức nhìn thấy trước: bảng quyền báo ba khoá *"giữ 16h ⚠ quá 6h"* trong khi cả
+ * ba vừa nhận **hai tiếng trước**. Mốc là `"2026-09-06"` — chỉ ngày — nên `Date.parse` đọc thành
+ * nửa đêm UTC và tới chiều thì phép trừ ra 16 tiếng.
+ *
+ * Vế này ghim cả hai vế của lỗi, vì sửa một nửa là chưa sửa: (a) chữ không được nói giờ, và
+ * (b) **⚠ không được bật**. Một cái ⚠ sai vài lần thì lần thứ ba không ai nhìn nữa — lúc đó một
+ * khoá kẹt thật cũng trôi qua, và tín hiệu thành thứ ngược lại chính nó. */
+{
+  const gioTruoc = new Date("2026-09-06T16:00:00Z");
+  const chiNgay = "2026-09-06";
+  const coGio = "2026-09-06T14:00:00Z";
+
+  assert.equal(mocCoGio(chiNgay), false, "moc chi co ngay thi mocCoGio phai la false");
+  assert.equal(mocCoGio(coGio), true, "moc co gio thi mocCoGio phai la true");
+
+  const hNgay = ageHours(chiNgay, gioTruoc);
+  assert.ok(hNgay > 6, "doi chung: phep tru VAN ra 16h — day chinh la con so ma");
+  assert.doesNotMatch(ageLabel(hNgay, false), /\d+\s*h|phút/,
+    `moc chi-ngay KHONG duoc noi gio, dang noi: "${ageLabel(hNgay, false)}"`);
+  assert.match(ageLabel(hNgay, false), /hôm nay/, "moc chi-ngay trong ngay thi noi 'nhan trong hom nay'");
+  assert.equal(dangNhac(hNgay, false), false,
+    "⚠ KHONG duoc bat tren mot con so khong do duoc — mot canh bao sai vai lan la khong ai nhin nua");
+
+  // Đối chứng ngược: mốc CÓ giờ thì mọi thứ vẫn chạy như cũ, không bị vế trên làm câm.
+  assert.match(ageLabel(ageHours(coGio, gioTruoc), true), /^2h$/, "moc co gio van phai noi dung so gio");
+  assert.equal(dangNhac(GIO_NHAC + 1, true), true, "moc co gio va qua han thi ⚠ VAN phai bat");
+  // Mốc chỉ-ngày qua hẳn một ngày thì được nhắc — độ phân giải ngày đủ để khẳng định điều đó.
+  assert.equal(dangNhac(30, false), true, "qua han mot ngay thi moc chi-ngay cung du chac de nhac");
+  ok("9 · mốc chỉ có ngày: không bịa ra giờ, và KHÔNG bật ⚠ — con số ma Đức bắt được 06/09");
 }
 
 console.log(`khoa-dau-vet: ${passed} vế xanh`);

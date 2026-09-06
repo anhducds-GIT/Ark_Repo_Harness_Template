@@ -182,7 +182,7 @@ export function tieuDiemTuStatus(text) {
    Ba thứ này ĐÃ DỜI sang `claim.mjs` ở bản 1.3.20 — file GHI `claimed_at` là file duy nhất
    biết con số ấy nghĩa là gì, và `claim.mjs --list` nay cũng in tuổi. Xuất lại ở đây để mọi
    chỗ gọi cũ không phải đổi; hai bản sao của cùng một hàm là hai bản sẽ trôi khỏi nhau. */
-export const { GIO_NHAC, ageHours, ageLabel } = claimMod;
+export const { GIO_NHAC, ageHours, ageLabel, dangNhac, mocCoGio } = claimMod;
 
 /* --- Ghép việc vào khoá, rồi cắt theo trạng thái khoá ------------------------- */
 
@@ -206,6 +206,9 @@ export function banDoVung({ viecTheoFile, tieuDiemTheoFile = [], claims, structu
         // luc ma khong gi chan. Ca nay lo ra o repo khai ten vung khac han bo khung.
         khongCoTrongBang: !co,
         gio: chu && o.claimed_at ? ageHours(o.claimed_at, now) : null,
+        // Giữ luôn mốc thô: chỉ nhìn số giờ thì không biết nó đo được tới đâu — mốc chỉ có ngày
+        // và mốc có giờ cho ra cùng một con số, nhưng chỉ một trong hai đáng tin. `mocCoGio`.
+        tu: chu ? (o.claimed_at || null) : null,
         viecChu: chu ? lamSach(o.task) : "",
         viec: [],
         tieuDiem: [],
@@ -301,7 +304,8 @@ export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], khongHie
   d.push("B · ĐANG CÓ CHỦ — " + chan.length + " vùng, chỉ được ĐỌC");
   if (!chan.length) d.push("  (không có: mọi vùng đang trống chủ)");
   for (const v of chan) {
-    const tuoi = v.gio == null ? "" : "  (" + ageLabel(v.gio) + (v.gio >= GIO_NHAC ? " ⚠" : "") + ")";
+    const cg = mocCoGio(v.tu);
+    const tuoi = v.gio == null ? "" : "  (" + ageLabel(v.gio, cg) + (dangNhac(v.gio, cg) ? " ⚠" : "") + ")";
     d.push("  ▸ " + v.khoa + "  ← " + v.chu + tuoi + nhanHang(v));
     if (v.viecChu) d.push("      đang làm: " + catNgan(v.viecChu, 84));
     for (const t of v.tieuDiem) d.push("      tiêu điểm (STATUS): " + catNgan(t.nextStep, 80));

@@ -166,8 +166,15 @@ const html = trang(dl);
      trang vẫn sinh ra trông hoàn toàn bình thường. Với người chỉ mở một link, trang vệ tinh
      không có đường dẫn tới thì coi như không tồn tại. */
   assert.match(html, /Trang liên quan/, "trang me phai co khoi Trang lien quan");
-  assert.match(html, /href="SO-MIGRATE-Ark-Repo-Harness\.html"/,
-    "phai co duong dan tu trang me sang so migrate");
+
+  /* SỔ MIGRATE PHẢI ĐẾN ĐƯỢC — điều được ghim vẫn y nguyên, chỉ đổi đường tới.
+   *
+   * Tới bản 1.3.20 vế này đòi `href="SO-MIGRATE-<repo>.html"`, vì sổ migrate là một trang riêng.
+   * Đức chốt 06/09: *"chỉ maintain tab Migrate"* — trang riêng thôi được nuôi, sổ nay là một TAB.
+   * Nên vế đổi chỗ nhìn, KHÔNG đổi điều nó bảo vệ: sổ migrate vẫn phải có đường tới từ trang mẹ.
+   * Bỏ hẳn vế này mới là làm yếu lớp bảo vệ. */
+  assert.match(html, /data-tab="migrate"/, "so migrate phai den duoc tu trang me — nay la mot tab");
+  assert.match(html, /Sổ migrate — \d+ lượt/, "tab migrate phai co than bai that, khong phai mot cai tab rong");
 
   // Link chết còn tệ hơn không link: chỉ nhận trang CÓ THẬT trong HEAD.
   assert.equal(khoiLienQuan([["Sổ giả", "[so-gia.html](so-gia.html)"]], new Set()), "",

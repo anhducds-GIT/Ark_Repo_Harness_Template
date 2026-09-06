@@ -37,7 +37,7 @@ import { esc, md, tachFrontmatter } from "./md-mini.mjs";
  * `build-so-migrate.mjs` — hai lệnh **ở lại repo nhà** — nên phát đi là repo đích nạp trang
  * chết ngay dòng import, với một câu lỗi không nói gì về nguyên nhân thật. Hằng số và bộ đọc
  * đã dời sang `overview-doc.mjs`; chiều phụ thuộc nay chảy từ thứ ở lại sang thứ đi theo. */
-import { ageHours, ageLabel, DAU_VET, doDauVet, noiDauVet } from "./claim.mjs";
+import { ageHours, ageLabel, DAU_VET, dangNhac, doDauVet, GIO_NHAC as GIO_NHAC_BANG, mocCoGio, noiDauVet } from "./claim.mjs";
 import {
   BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readHoSo, readIdeas, readKhoa,
   readNo, THU_MUC_MIGRATE, VIEC
@@ -791,7 +791,10 @@ export function khoiDangLamGi(khoa, ngay, vet = new Map()) {
     // Tuổi thay cho mốc thô: "giữ 40 phút" đọc được ngay, "2026-09-06T09:40:00Z" thì phải tự trừ.
     // Không tính được tuổi thì mới in mốc — thà xấu còn hơn giấu.
     const gio = ageHours(k.tu);
-    const phan = [gio != null ? "giữ " + ageLabel(gio) : k.tu ? "từ " + k.tu : null];
+    const coGio = mocCoGio(k.tu);
+    // Mốc chỉ có ngày thì KHÔNG nói giờ — xem `mocCoGio` ở `claim.mjs`, con số ma đã bật ⚠ thật.
+    const phan = [gio != null ? (coGio ? "giữ " + ageLabel(gio, true) : ageLabel(gio, false)) : k.tu ? "từ " + k.tu : null];
+    if (dangNhac(gio, coGio)) phan.push(coGio ? "⚠ quá " + GIO_NHAC_BANG + "h" : "⚠ quá một ngày");
     phan.push(noiDauVet(vet.get(k.khoa)));
     const co = phan.filter(Boolean);
     return co.length ? " · " + esc(co.join(" · ")) : "";

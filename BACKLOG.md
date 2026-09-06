@@ -682,3 +682,26 @@ Bảng nói đúng — nhưng nó chỉ hữu ích khi có dữ liệu. Lối ra
 (`viec_audit` · `viec_assistant` · `viec_ke`) vào frontmatter ba hồ sơ cũ, lấy từ chính thân bài
 của chúng. Chưa tự làm: luật cấm sửa hồ sơ cũ, và dù đây chỉ là *khai lại điều hồ sơ đã viết*
 thì ranh giới đó do Đức vạch, không do AI. Vùng: `_docs`.
+
+### KHUNG-37 · Tiến trình nền của phiên đã kết thúc KHÔNG ai dọn — đo được 5 thế hệ còn sống @Đức:bấm
+
+Đức thấy trước, 06/09: *"tôi thấy có task chạy ngầm đã 14 tiếng, phải có protocol tắt những fake
+task ko còn tác dụng chứ nhỉ?"* Đo lại ngay lúc đó, đếm tiến trình `node.exe` theo tuổi:
+
+| Tuổi | Là gì |
+|---|---|
+| **32.9h** | MCP server + npm bọc ngoài — phiên sinh ra chúng đã chết từ hôm kia |
+| **15.9h** | thế hệ thứ hai — chính là "14 tiếng" Đức nhìn thấy |
+| 2.2h · 1.9h · 0.9h | ba thế hệ nữa |
+
+Mỗi lần mở phiên đẻ ra một bộ MCP server; phiên đóng thì **không ai giết chúng**. Chúng không
+làm gì, nhưng chúng ăn RAM và — nặng hơn — chúng làm mọi bảng tiến trình **trông như đang bận**,
+nên lần sau có một tiến trình treo THẬT thì không ai phân biệt nổi.
+
+Đây **không phải nợ của repo này**: tiến trình nằm ở tầng máy, một trong số đó là cầu nối của
+repo khác (`Chrome Extension Bridge`, 32.9h). Nên việc cần là một **protocol**, không phải một
+bản vá: (a) một lệnh đo *"tiến trình nào thuộc phiên đã chết"*; (b) luật ai được giết, khi nào.
+
+**Chưa tự giết cái nào** — giết tiến trình của phiên khác là việc không lùi lại được và chạm tới
+việc người khác, đúng hai nhánh bắt phải hỏi. Lệnh đo đã ghi ở [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md).
+Vùng: `_docs`.

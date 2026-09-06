@@ -3,6 +3,32 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.22 — 2026-09-06 — Con số ma trên bảng quyền: mốc chỉ có ngày thôi bịa ra giờ
+
+**Đức bắt được, không phải phép kiểm nào.** Bảng quyền báo ba khoá *"giữ 16h ⚠ quá 6h"* trong khi
+cả ba vừa nhận **hai tiếng trước**.
+
+Nguyên nhân: mốc cũ là `"2026-09-06"` — chỉ có ngày — nên `Date.parse` đọc thành nửa đêm UTC, và
+tới chiều thì phép trừ ra 16 tiếng. Bản 1.3.21 đã cho mốc MỚI có giờ, nhưng mốc CŨ vẫn nằm đó và
+vẫn được đọc như thể nó biết giờ.
+
+**Vì sao đáng một bản riêng:** con số ma đó **bật ⚠**. Một cảnh báo sai vài lần thì lần thứ ba
+không ai nhìn nữa — lúc đó một khoá kẹt thật cũng trôi qua, và tín hiệu thành thứ ngược lại chính
+nó. Đúng cái bệnh mà chính bản 1.3.21 dựng ra để chữa, ở một chỗ khác.
+
+Nay mốc nói **đúng độ chính xác nó có**: mốc chỉ-ngày → *"nhận trong hôm nay"*, và ⚠ chỉ bật khi
+qua hẳn một ngày. Mốc có giờ chạy như cũ. Ba chỗ hiển thị (`--list` · bảng · `what-next`) dùng
+chung một luật — `mocCoGio()` và `dangNhac()`.
+
+Ghim: `tests/khoa-dau-vet.mjs` vế 9, **hai đột biến đã chạy** (dựng lại đúng con số ma → đỏ).
+
+### Nhịp GIẾT — tiến trình nền của phiên đã chết
+
+Đức, cùng lúc: *"phải có protocol tắt những fake task ko còn tác dụng chứ nhỉ?"* Đo `node.exe`
+theo tuổi: **32.9h · 15.9h · 2.2h · 1.9h · 0.9h** — năm thế hệ MCP server chồng lên nhau, ba
+thuộc phiên đã chết. `docs/BAO-TRI-DINH-KY.md` thêm nhịp thứ tư: lệnh đo, ba câu luật giết, và
+**AI không tự giết cái nào**. `KHUNG-37`.
+
 ## 1.3.21 — 2026-09-06 — Khoá giữ mà repo chưa thấy dấu vết, và sổ migrate gom về một tab
 
 > Bản 1.3.20 được cắt giữa chừng rồi tầng máy còn đổi tiếp, nên sổ phát hành chặn và số nhảy sang

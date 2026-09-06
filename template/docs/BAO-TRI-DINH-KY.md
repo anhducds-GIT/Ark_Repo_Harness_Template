@@ -151,6 +151,35 @@ Ba điều kiện, thiếu một là thành xoá lịch sử:
 đẹp lên là **đúng cái bệnh công cụ này sinh ra để bắt**. Nới thì phải ghi lý do vào
 `decisions.md`, và lý do phải là *"repo lớn hơn thật"*, không phải *"đang đỏ"*.
 
+## Nhịp GIẾT — tiến trình nền của phiên đã chết
+
+> Cái này **không đo bằng repo**, nên nó không nằm trong cổng đóng phiên. Nhịp: mỗi tuần, hoặc
+> bất cứ lúc nào máy ì.
+
+Mỗi phiên AI mở ra đẻ một bộ MCP server. Phiên đóng thì **không ai giết chúng** — chúng sống tiếp
+tới khi tắt máy. Đo thật 2026-09-06, đếm `node.exe` theo tuổi: **32.9h · 15.9h · 2.2h · 1.9h ·
+0.9h** — năm thế hệ chồng lên nhau, ba trong số đó thuộc phiên đã chết từ hôm trước.
+
+Cái hại không phải RAM. Cái hại là **bảng tiến trình trông như đang bận**, nên lần sau có một
+tiến trình treo THẬT thì không ai phân biệt nổi — cùng hình dạng với con số ma trên bảng quyền
+(xem `mocCoGio` trong `scripts/claim.mjs`): *một tín hiệu luôn kêu là một tín hiệu không ai nhìn.*
+
+**Đo trước, đừng giết trước:**
+
+```bash
+powershell -NoProfile -Command "$now=Get-Date; Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | ForEach-Object { '{0,6} | {1,5}h | {2}' -f $_.ProcessId, [Math]::Round(($now-$_.CreationDate).TotalHours,1), $_.CommandLine.Substring(0,[Math]::Min(70,$_.CommandLine.Length)) } | Sort-Object"
+```
+
+**Luật giết — ba câu, và câu thứ ba là câu quan trọng:**
+
+1. Tiến trình **quá 24h** và thuộc một phiên bạn biết chắc đã đóng → giết được.
+2. Tiến trình của **phiên đang chạy** (kể cả phiên của bạn) → **không đụng**. Tuổi không nói được
+   điều này; phải nhìn cửa sổ nào đang mở.
+3. Tiến trình mang tên **repo khác** (ví dụ một cầu nối) → **hỏi Đức**. Nó là việc của người khác,
+   và đó là một trong hai nhánh luật bắt phải hỏi.
+
+AI **không tự giết** tiến trình nào. Nó đo, in bảng, và nói rõ cái nào rơi vào ô 1. Người bấm.
+
 ## Ba dấu hiệu repo đang xuống cấp
 
 Cả ba đều **im lặng**, và đó là lý do phải chủ động đi tìm.
