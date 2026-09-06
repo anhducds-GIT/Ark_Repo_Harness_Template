@@ -628,3 +628,24 @@ Cộng ba lần trước trong ngày, **năm lần** cùng một hình dạng: v
 
 **Còn mở — 12 mục, không mục nào chặn ai, không mục nào chờ Đức.** Xếp theo nhóm ở
 [docs/ROADMAP-V2.md](docs/ROADMAP-V2.md), mục cập nhật 06/09.
+
+## 2026-09-06 · `claude-codex` — NÂNG HAI REPO, và BỘ KHUNG NAY GIAO VIỆC ĐƯỢC CHO AI KHÁC
+
+**Đức chốt:** *"Claude Code không thể làm hết một mình tất cả, sẽ hết usage."* Nên lượt này
+không chỉ nâng hai repo — nó dựng **đường giao việc**.
+
+**`n8n-orchestrator` 1.3.3 → 1.3.13, tôi làm.** `npm test` **53 xanh** · cổng cấu trúc **0 đỏ**
+· cổng đóng phiên **XANH TOÀN BỘ** · đã đẩy, trả ba khoá. Nhận 6 file máy (4 `CŨ` được vá + 2
+`THIẾU`: `can-nang.mjs`, `don.mjs`) và **4 file tài liệu** — thứ bản 1.3.13 mới mang được.
+
+**`docs/briefs/NANG-BO-KHUNG.md` — đề bài dán trọn cho AI nào cũng được.** Chín mục, mỗi mục
+một checklist chạy được. Nó cố ý KHÔNG giả định người đọc đã đọc repo bộ khung.
+
+**MỘT LỖI CỦA CHÍNH ĐỀ BÀI, bắt được TRƯỚC khi giao — nhờ đo repo đích trước.**
+Bản đầu viết `git add -A` vô điều kiện. Nhưng `Project 3 AI Agent Unify` đang có **3 file sửa
+dở của phiên khác**, cả ba **ngoài** vùng bộ khung. `git add -A` lúc đó là **cuốn việc của
+người khác vào commit của mình rồi đẩy đi** — đúng thứ `safe-push` sinh ra để chặn, nhưng nó
+chặn ở tầng *commit*, không cứu được nếu đã trộn chung **một** commit.
+
+Đã vá: đề bài nay hỏi *"file sửa dở nằm TRONG hay NGOÀI vùng bộ khung"* và cho hai lối đi khác
+nhau. **Đây là lý do phải đo repo đích trước khi viết đề bài, không phải viết xong rồi mới đo.**
