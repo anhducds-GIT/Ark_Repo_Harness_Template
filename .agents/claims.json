@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T16:34:46.342Z",
-      "task": "xep viec may chu tai cho vao so y tuong",
-      "released_at": "2026-09-06T16:56:16.067Z",
+      "claimed_at": "2026-09-06T18:06:39.621Z",
+      "task": "dung bang song ba cua + chuoi dem",
+      "released_at": "2026-09-06T18:59:55.226Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -15,9 +15,9 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T16:34:46.239Z",
-      "task": "luat 2 vao ORCHESTRATOR muc 5b",
-      "released_at": "2026-09-06T16:56:15.918Z",
+      "claimed_at": "2026-09-06T18:06:39.867Z",
+      "task": "dung bang song ba cua + chuoi dem",
+      "released_at": "2026-09-06T18:59:55.102Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T16:34:46.160Z",
-      "task": "ghim chu 'ranh' chi duoc xuat hien duoi phu dinh",
-      "released_at": "2026-09-06T16:56:15.843Z",
+      "claimed_at": "2026-09-06T18:47:08.183Z",
+      "task": "bang song + KHUNG-33",
+      "released_at": "2026-09-06T18:59:54.983Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T16:34:46.432Z",
-      "task": "phat lai ban trich sau khi sua test da phat",
-      "released_at": "2026-09-06T16:56:16.242Z"
+      "claimed_at": "2026-09-06T18:47:08.249Z",
+      "task": "phat bang song di theo ban trich",
+      "released_at": "2026-09-06T18:59:55.363Z"
     }
   }
 }
