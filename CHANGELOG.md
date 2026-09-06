@@ -3,6 +3,38 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.16 — 2026-09-06 — Migrate thành một TAB, và mỗi lượt một tab con
+
+Đức mở bảng mẹ và **không thấy đường nào dẫn sang sổ migrate**. Đường đó có thật — nó nằm trong
+khối "Trang liên quan" ở tab đầu — nhưng nằm dưới bốn khối khác. **Một liên kết người dùng không
+tìm ra thì bằng không có**, và câu trả lời đúng không phải là bôi đậm nó lên.
+
+### Tab **Migrate**, quy về một mối
+
+Mở đầu bằng **bảng đối chiếu mọi lượt** (repo · ngày · bản khung · mức · lỗi tìm ra · kết quả) —
+vì câu hỏi đầu tiên của người mở sổ hầu như luôn là *"đã làm mấy repo, cái nào còn treo"*, không
+phải *"lượt thứ hai viết gì"*. Bấm tên repo là nhảy thẳng vào tab con của lượt đó.
+
+### Mỗi lượt migrate một TAB CON
+
+Đức nêu: *"tách riêng các job thành các tab riêng, sẽ dễ theo dõi hơn so với để tràn lan"*. Ba hồ
+sơ nối đuôi nhau thì phải cuộn qua hai lượt cũ mới tới lượt mình cần, và hồ sơ nào cũng dài.
+
+Tab con dùng `data-tab2` / `.tab2` — **tên khác hẳn tab lớn, cố ý**: dùng chung tên thì một cú
+bấm tab con sẽ quét luôn cả tab lớn và người xem bị đá về trang đầu mà không hiểu vì sao.
+
+**Trang riêng VẪN GIỮ.** Cả hai đọc chung `docs/migrations/` nên không thể nói khác nhau — một
+nguồn, hai cách chiếu. Bản riêng dùng khi cần gửi riêng sổ migrate cho ai đó.
+
+### Một lỗi HỎNG IM LẶNG của bản trước, vá luôn
+
+Bản 1.3.15 thêm liên kết `data-goto` vào khối ý tưởng nhưng **không thêm đoạn JS xử lý nó**.
+Trình duyệt nhảy tới một id đang nằm trong tab **bị ẩn**, nên không có gì xảy ra cả — người bấm
+chỉ thấy trang không nhúc nhích, và không ai báo lỗi.
+
+Phép kiểm mới bắt cả ba đường hỏng: liên kết trỏ tới **tab** không tồn tại · trỏ tới **id** không
+tồn tại · và trang **thiếu đoạn JS** để xử lý. Đột biến kiểm hai lượt, cả hai đỏ đúng chỗ.
+
 ## 1.3.15 — 2026-09-06 — Bảng chín tab: năm nguồn trước nay chưa chiếu ra bao giờ
 
 Đức mở bảng của repo `Chrome_Extension_AI_Agentic` và thấy bảng bộ khung **thiếu hẳn năm tab**.

@@ -784,3 +784,49 @@ mấy dòng đó. Lọc cả hai vế thì trang đứng yên ở một quá kh�
 
 **Đã thử thật:** nhận một khoá → commit → `--check-head` **vẫn xanh**. Phép kiểm ghim CẢ HAI
 chiều, vì ghim một chiều thì một bộ lọc bỏ qua TẤT CẢ cũng xanh.
+
+## 2026-09-06 · `claude-tabmigrate` — MIGRATE THÀNH MỘT TAB, MỖI LƯỢT MỘT TAB CON
+
+**Đức nêu hai ý.** Một: mở bảng mẹ mà **không thấy đường nào dẫn sang sổ migrate**. Hai: trong sổ
+migrate, tách từng lượt thành tab riêng thay vì để tràn lan.
+
+Ý thứ nhất đáng ghi lại vì nó là một bài học chung: **đường dẫn ấy CÓ THẬT**, nằm trong khối
+"Trang liên quan" ở tab đầu, và có cả một phép kiểm ghim nó. Nhưng nó nằm dưới bốn khối khác nên
+trên thực tế không ai tìm ra. **Một liên kết người dùng không tìm ra thì bằng không có** — và
+câu trả lời đúng không phải là bôi đậm nó lên, mà là đưa nội dung về đúng chỗ người ta đi tìm.
+
+### Làm gì
+
+Tab **Migrate** mở đầu bằng bảng đối chiếu mọi lượt, rồi mỗi lượt một **tab con** (`data-tab2` /
+`.tab2` — tên khác hẳn tab lớn, vì dùng chung tên thì một cú bấm tab con quét luôn cả tab lớn).
+Bấm tên repo trong bảng là nhảy thẳng vào tab con của lượt đó.
+
+Trang riêng `SO-MIGRATE-*.html` **vẫn giữ**: cả hai đọc chung `docs/migrations/` nên không thể
+nói khác nhau — một nguồn, hai cách chiếu.
+
+### Một lỗi HỎNG IM LẶNG của chính lượt trước, tôi để lọt
+
+Bản 1.3.15 thêm liên kết `data-goto` vào khối ý tưởng **mà không thêm đoạn JS xử lý**. Trình
+duyệt nhảy tới một id đang nằm trong tab **bị ẩn** → không có gì xảy ra. Người bấm chỉ thấy trang
+không nhúc nhích, và **không ai báo lỗi** — không có cổng nào bắt được loại hỏng này.
+
+Nay có: phép kiểm bắt cả ba đường hỏng (tab không tồn tại · id không tồn tại · thiếu đoạn JS).
+**Đột biến kiểm hai lượt, cả hai đỏ đúng chỗ.**
+
+### Số
+
+`npm test` — thêm 1 vế (`overview-doc-smoke` nay **10 vế**) · bản khung **1.3.15 → 1.3.16**.
+
+### Còn mở — CHƯA ĐẨY ĐƯỢC, chờ Đức chốt một câu
+
+Lượt trước tôi tạo một commit mang nhãn phiên `claude-thu-khoa` (nhãn bịa ra để thử bộ lọc dòng
+biến động). `safe-push` nay **từ chối đẩy** vì thấy đang cuốn theo commit của phiên khác — nó
+chặn ĐÚNG, nó không phân biệt được đó cũng là tôi. Commit `f187e7f` chỉ chạm `.agents/claims.json`
+và tác dụng đã bị lượt trả khoá sau đó xoá sạch.
+
+Hai lối, cả hai nằm trong danh sách phải hỏi Đức: **(1)** cho đẩy kèm `--carry`; **(2)** viết lại
+nhãn của đúng commit đó. Nghiêng về lối 1.
+
+**Bài học cho phiên sau: đừng bịa một nhãn phiên thứ hai để thử một cơ chế.** Thử bằng nhãn của
+chính mình, hoặc thử trong kho tạm. Một commit mang nhãn lạ là một commit không đẩy đi được nữa
+nếu không có người chốt.

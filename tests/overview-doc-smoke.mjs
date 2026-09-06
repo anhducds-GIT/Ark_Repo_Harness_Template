@@ -174,4 +174,35 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   ok("dòng bảng quyền: bỏ qua ở phép SO, và trang thật có mang nhãn thật");
 }
 
+/* ---- 10. Liên kết nhảy tab phải trỏ tới thứ CÓ THẬT ---------------------- */
+{
+  /* HỎNG IM LẶNG, và đã lọt thật một lần. Bản trước thêm liên kết `data-goto` vào khối ý tưởng
+   * nhưng KHÔNG thêm đoạn JS xử lý nó — trình duyệt nhảy tới một id đang nằm trong tab BỊ ẨN,
+   * nên không có gì xảy ra cả. Người bấm chỉ thấy trang không nhúc nhích, và không ai báo lỗi.
+   *
+   * Vế này bắt cả ba đường hỏng: liên kết trỏ tới tab không tồn tại · trỏ tới id không tồn tại ·
+   * và trang không có đoạn JS để xử lý liên kết đó. */
+  const html = readFileSync(join(ROOT, "DASHBOARD-Ark-Repo-Harness.html"), "utf8");
+  const idCo = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+  const tabCo = new Set([...html.matchAll(/data-tab="([^"]+)"/g)].map((m) => m[1]));
+  const tab2Co = new Set([...html.matchAll(/data-tab2="([^"]+)"/g)].map((m) => m[1]));
+
+  const goto = [...html.matchAll(/href="#([^"]+)"\s+data-goto="([^"]+)"/g)];
+  assert.ok(goto.length > 0, "trang không còn liên kết nhảy tab nào — khối ý tưởng đã mất?");
+  for (const [, dich, tab] of goto) {
+    assert.ok(tabCo.has(tab), `liên kết nhảy tới tab "${tab}" mà tab đó không có trên trang`);
+    assert.ok(idCo.has(dich), `liên kết nhảy tới id "${dich}" mà id đó không có trên trang`);
+  }
+  for (const t2 of tab2Co) {
+    assert.ok(idCo.has(t2), `nút tab con "${t2}" không có khung nội dung nào mang id đó`);
+  }
+  const goto2 = [...html.matchAll(/data-goto2="([^"]+)"/g)].map((m) => m[1]);
+  for (const g of goto2) assert.ok(tab2Co.has(g), `bảng trỏ tới tab con "${g}" mà không có nút nào`);
+
+  // Và JS phải THẬT SỰ có đoạn xử lý. Không có nó thì mọi liên kết trên là chữ chết.
+  assert.match(html, /data-goto\]/, "trang thiếu đoạn JS bắt liên kết nhảy tab");
+  assert.match(html, /data-goto2\]/, "trang thiếu đoạn JS bắt liên kết nhảy tab con");
+  ok(`liên kết nhảy tab: ${goto.length} liên kết + ${tab2Co.size} tab con đều trỏ tới thứ có thật`);
+}
+
 console.log(`overview-doc-smoke: ${passed} vế xanh`);

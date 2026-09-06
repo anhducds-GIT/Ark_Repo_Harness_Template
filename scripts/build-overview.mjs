@@ -32,6 +32,11 @@ import { fileURLToPath } from "node:url";
 import { esc, md, tachFrontmatter } from "./md-mini.mjs";
 
 import { VIEC } from "./giao-viec.mjs";
+/* ĐỌC LẠI hồ sơ migrate từ đúng bộ đọc của sổ migrate, không viết bộ đọc thứ hai.
+ *
+ * Hai bộ đọc cùng một thư mục là hai bộ sẽ trôi khỏi nhau, và lúc chúng nói khác nhau thì
+ * không ai biết tin bản nào — đúng cái bệnh cả bộ khung này sinh ra để chữa. */
+import { docHoSo, nguonHEAD } from "./build-so-migrate.mjs";
 import {
   BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readIdeas, readKhoa, readNo
 } from "./overview-doc.mjs";
@@ -297,6 +302,33 @@ const CSS = `
 .tep span.may{background:var(--xanh-nen);color:var(--xanh)}
 @media (max-width:600px){ .yt{grid-template-columns:1fr} .cay{grid-template-columns:1fr auto} }
 
+/* TAB CON — dùng cho tab Migrate, và dùng lại được cho bất kỳ tab nào có nhiều hồ sơ.
+   Đức nêu 06/09: "tách riêng các job thành các tab riêng, sẽ dễ theo dõi hơn so với để tràn
+   lan". Đúng: sổ migrate xếp ba hồ sơ nối đuôi nhau, và hồ sơ nào cũng dài — người mở ra phải
+   cuộn qua hai lượt cũ mới tới lượt mình cần. */
+.tabs2{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 12px;padding:4px;
+  background:var(--mat2);border:1px solid var(--vien);border-radius:10px}
+.tabs2 button{font:inherit;font-size:13.2px;font-weight:600;cursor:pointer;
+  padding:7px 13px;border:1px solid transparent;border-radius:7px;background:transparent;
+  color:var(--chu2);display:flex;align-items:center;gap:7px}
+.tabs2 button:hover{color:var(--chu)}
+.tabs2 button[aria-selected="true"]{background:var(--mat);border-color:var(--vien);
+  color:var(--chu);box-shadow:var(--bong)}
+.tabs2 button .cham{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.tabs2 button .cham.xanh{background:var(--xanh)}
+.tabs2 button .cham.vang{background:var(--vang)}
+.tabs2 button .cham.do{background:var(--do)}
+.tabs2 button small{font-weight:400;color:var(--mo);font-size:11.4px}
+.tab2[hidden]{display:none}
+
+/* Bảng đối chiếu mọi lượt migrate — cái nhìn đầu tiên, trước khi mở từng hồ sơ. */
+.mgt{width:100%;border-collapse:collapse;font-size:13.6px}
+.mgt th,.mgt td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--vien)}
+.mgt th{font-family:var(--mono);font-size:10.6px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--mo);font-weight:600}
+.mgt td.so{font-family:var(--mono);white-space:nowrap}
+.mgt tr:last-child td{border-bottom:0}
+
 .batdau pre.code{margin:6px 0 4px}
 .lienquan{margin:6px 0 0;padding-left:20px}
 .lienquan li{margin:5px 0;font-size:14.4px}
@@ -445,8 +477,45 @@ const JS = `
   nut.forEach(function(b){ b.addEventListener('click', function(){ chon(b.dataset.tab, true); }); });
   var dau = (location.hash || '').replace('#','');
   chon(nut.some(function(b){ return b.dataset.tab === dau; }) ? dau : nut[0].dataset.tab, false);
-  // Mục lục nhảy trong cùng tab
+  // TAB CON — dùng ở tab Migrate. Chọn theo \`data-tab2\`, khung là \`.tab2\`.
+  // Tên thuộc tính KHÁC hẳn tab lớn, cố ý: dùng chung tên thì một cú bấm tab con sẽ quét luôn
+  // cả tab lớn, và người xem bị đá về trang đầu mà không hiểu vì sao.
+  function chon2(id){
+    [].slice.call(document.querySelectorAll('.tabs2 button')).forEach(function(b){
+      b.setAttribute('aria-selected', String(b.dataset.tab2 === id));
+    });
+    [].slice.call(document.querySelectorAll('.tab2')).forEach(function(d){ d.hidden = (d.id !== id); });
+  }
   document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.tabs2 button');
+    if (b) { chon2(b.dataset.tab2); return; }
+
+    // Bảng đối chiếu nhảy thẳng vào tab con của một lượt.
+    var g2 = e.target.closest && e.target.closest('[data-goto2]');
+    if (g2) {
+      e.preventDefault();
+      chon2(g2.dataset.goto2);
+      var el2 = document.getElementById(g2.dataset.goto2);
+      if (el2) el2.scrollIntoView({ behavior:'smooth', block:'start' });
+      return;
+    }
+
+    // NHẢY CHÉO TAB. Không có đoạn này thì mọi liên kết \`data-goto\` là chữ chết: trình duyệt
+    // nhảy tới một id đang nằm trong tab BỊ ẨN, nên không có gì xảy ra cả — và hỏng IM LẶNG,
+    // người bấm chỉ thấy trang không nhúc nhích. Đã để lọt đúng lỗi này ở bản trước.
+    var g = e.target.closest && e.target.closest('[data-goto]');
+    if (g) {
+      e.preventDefault();
+      chon(g.dataset.goto, true);
+      var el = document.getElementById((g.getAttribute('href') || '').slice(1));
+      if (el) {
+        if (el.tagName === 'DETAILS') el.open = true;
+        el.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+      return;
+    }
+
+    // Mục lục nhảy trong cùng tab
     var a = e.target.closest && e.target.closest('.muc-luc a');
     if (!a) return;
     var d = document.getElementById(a.getAttribute('href').slice(1));
@@ -888,6 +957,72 @@ export function khoiVanHanh(coChe, batBien, soKhoa) {
       : "");
 }
 
+/* "Đã đưa repo nào lên chuẩn, ngày nào, bản nào, còn treo gì?"
+ *
+ * VÌ SAO NÓ THÀNH MỘT TAB, chứ vẫn để là một trang riêng. Đức nêu 06/09: mở bảng mẹ mà **không
+ * thấy đường nào dẫn sang sổ migrate**. Đường đó có thật — nó nằm trong khối "Trang liên quan"
+ * ở tab đầu — nhưng nằm dưới bốn khối khác, nên trên thực tế nó không tồn tại. Một liên kết
+ * người dùng không tìm ra thì bằng không có, và câu trả lời đúng không phải là bôi đậm nó lên.
+ *
+ * Trang riêng VẪN GIỮ: cả hai đọc chung một thư mục hồ sơ, nên chúng không thể nói khác nhau —
+ * một nguồn, hai cách chiếu. Trang riêng có ích khi cần gửi riêng sổ migrate cho ai đó.
+ *
+ * TÁCH TỪNG LƯỢT THÀNH TAB CON, cũng theo Đức: ba hồ sơ nối đuôi nhau thì người mở ra phải
+ * cuộn qua hai lượt cũ mới tới lượt mình cần, và mỗi hồ sơ đều dài. */
+export function khoiMigrate(hoSo) {
+  if (!hoSo.length) {
+    return '<div class="the"><h2>Sổ migrate</h2><p>Chưa lượt migrate nào được ghi hồ sơ. '
+      + 'Mỗi lần đưa một repo lên chuẩn thì thêm <strong>một</strong> hồ sơ, chỉ thêm — migrate '
+      + 'xảy ra thưa, vài tuần có khi vài tháng một lần, nên không ghi là lần sau dò lại từ đầu '
+      + 'và vấp đúng chỗ cũ.</p></div>';
+  }
+  const den = { "xanh": "xanh", "đỏ": "do", "chưa chạy": "vang" };
+  const v = (h, k) => (h.fm[k] === undefined || h.fm[k] === "" ? null : String(h.fm[k]));
+  const id = (h) => "mg-" + slug(v(h, "repo") || h.file);
+
+  const nut = hoSo.map((h, i) => '<button role="tab" data-tab2="' + esc(id(h)) + '"'
+    + ' aria-selected="' + (i === 0 ? "true" : "false") + '">'
+    + '<span class="cham ' + (den[String(v(h, "cong_dong_phien") || "").trim()] || "vang") + '"></span>'
+    + esc(v(h, "repo") || h.file)
+    + '<small>' + esc(v(h, "ngay") || "chưa khai ngày") + '</small></button>').join("");
+
+  /* BẢNG ĐỐI CHIẾU đứng TRƯỚC các tab con, cố ý: câu hỏi đầu tiên của người mở sổ hầu như luôn
+   * là "đã làm mấy repo, cái nào còn treo" — không phải "lượt thứ hai viết gì". */
+  const hang = hoSo.map((h) => '<tr>'
+    + '<td><a href="#' + esc(id(h)) + '" data-goto2="' + esc(id(h)) + '">' + esc(v(h, "repo") || h.file) + '</a></td>'
+    + '<td class="so">' + esc(v(h, "ngay") || "—") + '</td>'
+    + '<td class="so">' + esc(v(h, "ban_khung") || "—") + '</td>'
+    + '<td class="so">' + esc((v(h, "muc_truoc") || "?") + " → " + (v(h, "muc_sau") || "?")) + '</td>'
+    + '<td class="so">' + esc(v(h, "loi_tim_ra") || "—") + '</td>'
+    + '<td>' + esc(v(h, "trang_thai") || "chưa khai") + '</td></tr>').join("");
+
+  const oSo = (h) => [["mức đạt chuẩn", (v(h, "muc_truoc") || "?") + " → " + (v(h, "muc_sau") || "?")],
+    ["lỗi bộ khung tìm ra", v(h, "loi_tim_ra") || "chưa khai"],
+    ["cổng đóng phiên", v(h, "cong_dong_phien") || "chưa khai"],
+    ["kết quả", v(h, "trang_thai") || "chưa khai"]]
+    .map((x) => '<div class="o"><span class="n">' + esc(x[1]) + '</span><span class="l">' + esc(x[0]) + '</span></div>')
+    .join("");
+
+  const khung = hoSo.map((h, i) => '<div class="tab2" id="' + esc(id(h)) + '"' + (i === 0 ? "" : " hidden") + '>'
+    + '<div class="the"><h2>' + esc(v(h, "repo") || h.file) + '</h2>'
+    + '<p class="ghi">' + esc(v(h, "ngay") || "chưa khai ngày") + ' · bản khung <code>'
+    + esc(v(h, "ban_khung") || "?") + '</code> · ' + esc(v(h, "nghe") || "chưa khai nghề") + '</p>'
+    + '<div class="sk">' + oSo(h) + '</div>'
+    + '<div class="hs-do">chi phí trước: ' + esc(v(h, "chi_phi_truoc") || "chưa khai")
+    + ' &nbsp;·&nbsp; sau: ' + esc(v(h, "chi_phi_sau") || "chưa khai") + '</div>'
+    + '</div>'
+    + '<div class="the">' + md(h.body) + '</div></div>').join("");
+
+  return '<div class="the"><h2>Sổ migrate — ' + hoSo.length + ' lượt đã ghi hồ sơ</h2>'
+    + '<div class="tw"><table class="mgt"><thead><tr><th>Repo</th><th>Ngày</th><th>Bản khung</th>'
+    + '<th>Mức</th><th>Lỗi tìm ra</th><th>Kết quả</th></tr></thead><tbody>' + hang + '</tbody></table></div>'
+    + '<p class="ghi">Hồ sơ <strong>chỉ thêm, không sửa cái cũ</strong> — sửa hồ sơ cũ là viết lại '
+    + 'lịch sử của lần migrate đó. Cột <em>lỗi tìm ra</em> đếm lỗi <strong>của chính bộ khung</strong> '
+    + 'mà lượt ấy lôi ra, không phải lỗi của repo đích: đó là chỗ bộ khung lớn lên.</p></div>'
+    + '<nav class="tabs2" role="tablist">' + nut + '</nav>'
+    + khung;
+}
+
 export function khoiLienQuan(banDo, trangCo) {
   const co = trangCo instanceof Set ? trangCo : new Set(trangCo || []);
   const item = [];
@@ -907,7 +1042,7 @@ export function khoiLienQuan(banDo, trangCo) {
 export function trang(dl) {
   const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st,
     briefs = [], dichDen = [], soPhepKiem = null,
-    ideas = [], canDuc = [], khoa = [], noMo = [], noMuc = [], coChe = [], batBien = [], vung = [], fileGoc = [] } = dl;
+    ideas = [], canDuc = [], khoa = [], noMo = [], noMuc = [], coChe = [], batBien = [], vung = [], fileGoc = [], hoSo = [] } = dl;
   const tenNguoi = dl.tenNguoiChot || "người chốt";
 
   const tabs = [
@@ -930,6 +1065,7 @@ export function trang(dl) {
     ["van-hanh", "Vận hành"],
     ["suc-khoe", "Sức khoẻ & nợ"],
     ["cau-truc", "Cấu trúc"],
+    ["migrate", "Migrate"],
     ["nhat-ky", "Nhật ký"],
     ["tra-cuu", "Tra cứu"]
   ].filter(([id]) => {
@@ -937,6 +1073,7 @@ export function trang(dl) {
     // rằng bảng này có chỗ không dùng được, và lần sau họ thôi mở cả những tab có dữ liệu.
     if (id === "y-tuong") return ideas.length > 0;
     if (id === "tra-cuu") return Boolean(legend);
+    if (id === "migrate") return hoSo.length > 0;
     if (id === "nhat-ky") return nhatKy.length > 0 || daXong.length > 0 || adrs.length > 0;
     return true;
   });
@@ -1121,6 +1258,10 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
 
   ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><details class="the" open><summary>Bảng tra cứu thuật ngữ</summary><div>${md(legend)}</div></section>` : ""}
 
+  ${hoSo.length ? `<section class="tab" id="tab-migrate" hidden>
+    ${khoiMigrate(hoSo)}
+  </section>` : ""}
+
   <section class="tab" id="tab-nhat-ky" hidden>
     ${adrs.length ? `<div class="the"><h2>Quyết định đã chốt — ${adrs.length} bản ghi</h2>
       <p>Mỗi quyết định là một file <strong>bất biến</strong>: đã chốt thì không sửa được, chỉ
@@ -1258,6 +1399,10 @@ export function gomDuLieu() {
     fileGoc.sort((a, b) => a.ten.localeCompare(b.ten));
   }
 
+  /* Hồ sơ migrate — đọc bằng đúng bộ đọc của sổ migrate, và đọc TỪ HEAD như mọi thứ khác. */
+  let hoSo = [];
+  try { hoSo = docHoSo(ROOT, nguonHEAD(ROOT)); } catch (_) { hoSo = []; }
+
   /* Bốn cơ chế + năm bất biến: đọc lại từ luật, không chép. */
   const rawMF = doc("docs/protocols/MULTIFLOW.md") || "";
   const coChe = readCoChe(rawMF);
@@ -1358,7 +1503,7 @@ export function gomDuLieu() {
     banDo: docBanDo(doc("AGENTS.md")),
     trangCo: new Set(lietHTML()),
     workflows, protocols, adrs, nhatKy, daXong, briefs, dichDen,
-    ideas, canDuc, khoa, noMo, noMuc, coChe, batBien, vung, fileGoc,
+    ideas, canDuc, khoa, noMo, noMuc, coChe, batBien, vung, fileGoc, hoSo,
     // Số suite phép kiểm = số lần `node tests/...` trong lệnh `test`. Đếm từ đó chứ không đếm
     // file trong `tests/`: một file không được lệnh `test` gọi thì nó không canh gì cả.
     soPhepKiem: (String((pkg.scripts || {}).test || "").match(/node tests\//g) || []).length || null,
