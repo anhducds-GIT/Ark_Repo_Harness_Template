@@ -3,6 +3,40 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.9 — 2026-09-06 — Nhịp dọn chạy thật lần đầu, và nó lôi ra hai lỗ của chính nó
+
+Bản 1.3.8 dựng `npm run don` với bốn vế test. Chạy nó trên **dữ liệu thật** cùng ngày
+thì lộ hai lỗ mà **không vế nào trong bốn vế bắt được** — vì cả hai chỉ xuất hiện khi
+gặp dữ liệu thật.
+
+### Tên file lưu trữ vô nghĩa
+
+Cách đặt tên lọc mọi ký tự không phải số rồi cắt 6 chữ số đầu của tiêu đề. Trên
+`## Lượt · Đẩy hộ 12 commit của bốn lane` nó ra **`HANDOFF-12.md`**.
+
+Một file lưu trữ tên vô nghĩa là một file **không ai mở** — chữ vẫn còn trong repo mà
+coi như đã mất. Luật vàng 5 áp cả cho tên file.
+
+Nay quét **mọi** khối bị dời tìm `YYYY-MM`; không khối nào có ngày thì lấy tháng CẤT.
+
+### Ghi đè im lặng — lỗ nguy hiểm nhất của cả lệnh
+
+Hai lượt dọn trong cùng một tháng cho ra cùng một nhãn, nên bản trước **đè mất file
+lưu trữ của lượt trước**. Tức chính lệnh dọn làm mất đúng thứ nó sinh ra để giữ, và
+**không báo gì**.
+
+Nay trùng tên thì thêm hậu tố `-2`, `-3`… — tuyệt đối không đè.
+
+### Chạy thật: hai bản vá của hôm nay lần đầu chạy cùng nhau
+
+`HANDOFF.md` **654 → 509** · `CHANGELOG.md` **326 → 263**, không mất byte nào. Lệnh dọn
+xoá dòng khỏi nhật ký, cổng KHUNG-25 đối chiếu byte với kho lưu trữ và cho qua — đây là
+lần đầu vòng đó khép kín trên repo thật.
+
+Nhật ký phình lại từ 415 lên 654 **trong đúng một ngày**. Đó là lý do Đức đòi một *nhịp*
+chứ không phải một *lượt*.
+
+
 ## 1.3.8 — 2026-09-06 — Repo có NHỊP DỌN, và cổng thôi cấm chính việc nó bảo phải làm
 
 Hai luật của repo cắn nhau — sổ tay bảo trì bắt **dời** nhật ký cũ đi, cổng đóng phiên

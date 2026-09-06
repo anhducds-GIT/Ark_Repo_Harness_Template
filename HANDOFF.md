@@ -507,3 +507,34 @@ nếu thấy sai.
 
 **Còn mở:** KHUNG-26 · KHUNG-27 · KHUNG-11 phần đuôi (`ORCHESTRATOR.md` 426 dòng) · thời gian
 chạy phép kiểm vượt trần. Không mục nào chặn ai, và **không mục nào chờ Đức chốt**.
+
+## 2026-09-06 · `claude-don` — NHỊP DỌN chạy thật lần đầu, và nó lôi ra hai lỗ của chính nó
+
+**Làm gì:** chạy `npm run don --apply` lần đầu trên repo thật. Nhật ký đã phình lại 654/600
+ngay trong ngày — đúng điều Đức nói khi chốt: *"nội dung sẽ luôn bị phình sau 1 quá trình"*.
+
+**Kết quả:** `HANDOFF.md` 654 → **509** · `CHANGELOG.md` 326 → **263**. Không mất byte nào.
+Và đây là lần đầu **cả hai bản vá hôm nay chạy cùng nhau**: lệnh dọn xoá dòng khỏi nhật ký, cổng
+KHUNG-25 đối chiếu byte với kho lưu trữ và cho qua.
+
+**HAI LỖ CỦA CHÍNH LỆNH, chỉ lộ khi chạy trên dữ liệu thật:**
+
+1. **Tên file vô nghĩa.** Cách đặt tên lọc mọi ký tự không phải số rồi cắt 6 chữ số đầu. Trên
+   tiêu đề `## Lượt · Đẩy hộ 12 commit của bốn lane` nó ra **`HANDOFF-12.md`**. Một file lưu
+   trữ tên vô nghĩa là một file không ai mở — chữ vẫn còn mà coi như đã mất.
+   Đã sửa: quét **mọi** khối bị dời tìm `YYYY-MM`; không khối nào có ngày thì lấy tháng CẤT.
+
+2. **GHI ĐÈ IM LẶNG — lỗ nguy hiểm nhất.** Hai lượt dọn cùng một tháng cho ra cùng một nhãn,
+   nên bản đầu **đè mất file lưu trữ của lượt trước**. Tức chính lệnh dọn làm mất đúng thứ nó
+   sinh ra để giữ, và **không báo gì**. Đã sửa: trùng tên thì thêm hậu tố `-2`, `-3`…, tuyệt
+   đối không đè.
+
+Cả hai nay là vế 5 của `tests/don-smoke.mjs`, qua đột biến kiểm.
+
+**BÀI HỌC:** bốn vế test viết lúc dựng lệnh **không vế nào bắt được hai lỗ này** — vì chúng chỉ
+lộ trên dữ liệu thật (một tiêu đề không có ngày, và một kho lưu trữ đã có sẵn file). Cùng bài
+học với lượt migrate cùng ngày: *bảy phiên ở repo nhà không tìm ra lỗi mà một lượt chạm repo
+thật lôi ra hết*.
+
+**Còn mở:** KHUNG-26 · KHUNG-27 · KHUNG-11 phần đuôi · thời gian chạy phép kiểm vượt trần.
+Không mục nào chặn ai, không mục nào chờ Đức chốt.
