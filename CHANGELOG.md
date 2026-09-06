@@ -3,6 +3,55 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.23 — 2026-09-06 — Hai luật từ repo tiêu thụ: một nguồn cho câu chữ, và vai điều phối không đứng chờ
+
+Repo `Chrome_Extension_AI_Agentic` rút ra hai luật ngày 06/09. Cả hai thuộc về bộ khung — nó là
+nơi phát hành, repo kia tiêu thụ. **Hoà giải theo hình dạng bộ khung, không chép nguyên văn.**
+
+### Luật 1 — tên của tín hiệu khoá là phần của hợp đồng
+
+Phần chữ bộ khung **đã có** từ bản 1.3.20 (cấm nhả khoá hộ · ba đường hợp lệ · VÀNG không ĐỎ).
+Đo lại thì lòi ra chỗ chưa khớp: **`session-check.mjs` gõ lại câu bằng tay** thay vì lấy từ
+`noiDauVet`. Tức có HAI bản của một câu — và cái bẫy của luật này chính là câu chữ: bản đầu gọi
+nó *"vùng chưa bị chạm"*, và cả người viết ra nó cũng đọc thành *"lane đang rảnh"*.
+
+Nay ba mặt in tín hiệu (`--list` · bảng · cổng đóng phiên) lấy câu từ **một nguồn**. Ghim ở
+`tests/khoa-dau-vet.mjs` vế 6, **đột biến thứ 7 đã chạy**: gõ tay lại câu chữ → ĐỎ, kể cả khi vẫn
+còn nhắc tên `noiDauVet` ở chỗ khác trong file.
+
+Phép ghim **gỡ chú thích trước khi soi** — nhắc tên tín hiệu trong lời giải thích không phải là
+dựng một bản thứ hai, và một phép ghim bắt nhầm chú thích là phép ghim người ta sẽ gỡ đi.
+
+### Luật 2 — vai điều phối không bao giờ dừng vì chuyện commit
+
+Mới với bộ khung. Vào `docs/protocols/ORCHESTRATOR.md` mục **5b**.
+
+*"Dừng lại"* rộng hơn *"hỏi xin phép"*: ca thật là vai điều phối **không** hỏi phép, nó đứng chờ
+cổng chạy xong rồi mới commit, và nhắn về một câu *"chờ cổng xong rồi tôi đẩy"*. Với người không
+đọc được trạng thái trên máy thì **"AI đang chờ" và "AI đang làm" trông giống hệt nhau**.
+
+**Hai chỗ cố ý khác bản gốc:**
+
+- **Thêm một ranh giới bản gốc để ngầm:** "cho cổng chạy nền rồi làm tiếp" **không** có nghĩa là
+  đẩy khi chưa đọc kết quả cổng. `AGENTS.md` mục 2 vẫn đòi XANH TOÀN BỘ. Mục này gỡ cái *chờ vô
+  ích*, không gỡ cái *chốt*.
+- **KHÔNG kéo về khoản `--carry` khỏi phải hỏi.** Bên kia có quyết định thường trực của người chốt
+  bên đó; bộ khung không có. Quyết định thường trực là của một người ở một repo — chép sang là bộ
+  khung tự cho mình một cái phép mà người chốt của repo này chưa hề cho.
+
+Mục 5b được khai thẳng vào bảng *"chưa có phép kiểm máy"* ở đầu sổ, với lý do: máy nhìn thấy
+commit và nhánh, nó **không** nhìn thấy một tin nhắn nói "đang chờ". `AGENTS.md` mục 8 hỏi *"dựng
+nổi ca hỏng không?"* — ở đây là **không**, nên nó là quy ước, và nói thẳng là quy ước.
+
+### Xếp hàng đợi — bảng tự tươi, F5 là thấy
+
+`IDEAS.md` mục `Y-10`. Đức nêu: *"tôi có thể F5 trên dashboard html là latest status sẽ được hiển
+thị"*. Repo kia đã dựng: ba cửa, một lõi, máy chủ **chỉ đọc** ở `127.0.0.1`, nhịp 30 giây so dấu
+vân tay. Chưa làm vì **ba chỗ chặn**, chỗ thứ ba là của riêng bộ khung: bảng ở đây mang dữ liệu
+khoá SỐNG, mà cổng đóng phiên soi artifact và `safe-push` từ chối vùng bị sửa không ai đứng tên —
+một tiến trình nền ghi đè bảng mỗi lượt nhận/trả khoá có thể **chặn push của mọi lane**. Đo trước,
+thiết kế sau.
+
 ## 1.3.22 — 2026-09-06 — Con số ma trên bảng quyền: mốc chỉ có ngày thôi bịa ra giờ
 
 **Đức bắt được, không phải phép kiểm nào.** Bảng quyền báo ba khoá *"giữ 16h ⚠ quá 6h"* trong khi

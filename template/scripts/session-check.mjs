@@ -1080,7 +1080,12 @@ console.log(`Bạn chịu trách nhiệm: ${[...myPackages, ...myRootAreas].join
  * biến thành thứ ngược lại chính nó.
  *
  * Và câu này nói với ĐÚNG MỘT người: chính lane đang giữ khoá, người duy nhất biết mình có
- * đang làm hay không. Nó không nói với phiên điều phối, và nó không cho phép ai nhả khoá hộ. */
+ * đang làm hay không. Nó không nói với phiên điều phối, và nó không cho phép ai nhả khoá hộ.
+ *
+ * CÂU IN RA LẤY TỪ `noiDauVet`, không gõ lại ở đây. Trước bản 1.3.23 chỗ này gõ tay, tức có
+ * HAI bản của cùng một câu — và tên của tín hiệu này là phần của hợp đồng: bản đầu gọi nó là
+ * "vùng chưa bị chạm", và cả người viết ra nó cũng đọc thành "lane đang rảnh". Hai bản thì
+ * sớm muộn một bản trôi, và bản trôi là bản dạy sai. */
 try {
   const kh = await import("./claim.mjs");
   const cuaToi = Object.fromEntries(Object.entries(CLAIMS || {}).filter(([, v]) => v?.owner === asLabel));
@@ -1088,7 +1093,7 @@ try {
   const chua = [...vet.entries()].filter(([, t]) => t === kh.DAU_VET.CHUA).map(([k]) => k);
   if (chua.length) {
     const tuoi = chua.map((k) => { const st = CLAIMS[k]?.claimed_at; const cg = kh.mocCoGio(st); return `${k} (${cg ? "giữ " : ""}${kh.ageLabel(kh.ageHours(st), cg)})`; }).join(", ");
-    console.log(`⚠ VÀNG — repo chưa thấy dấu vết ở: ${tuoi}`);
+    console.log(`⚠ VÀNG — ${kh.noiDauVet(kh.DAU_VET.CHUA)} ở: ${tuoi}`);
     console.log("  Không commit nào chạm vùng đó kể từ lúc bạn nhận khoá, và không file nào đang sửa dở.");
     console.log("  KHÔNG chặn bạn: đọc kỹ trước khi sửa là việc tốt, và repo không thấy được việc bạn");
     console.log("  làm ở ngoài nó. Chỉ là: nếu vùng đó bạn CHƯA cần nữa thì tự trả, phiên khác đang chờ.");

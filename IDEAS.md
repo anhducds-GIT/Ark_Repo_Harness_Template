@@ -149,3 +149,24 @@
 Repo Chrome Extension sẽ là **bản fork cần hợp nhất sau**, không phải nguồn.
 
 **đo trước khi sửa** — Chạy bộ sinh trên một repo cố tình khác hình dạng repo nhà (không đơn vị con, thiếu sổ ý tưởng, tên vùng khác) và đòi nó ra trang không vỡ.
+
+## Y-10 · Bảng phải tự tươi — F5 là thấy, không phải nhờ AI sinh lại
+
+- **bậc:** ý tưởng
+- **việc kế:** đo xem tiến trình nền sinh lại bảng có làm cây làm việc bẩn không, vì bảng mang dữ liệu khoá SỐNG — ra "có" thì phải giải xong chỗ đó trước khi viết dòng mã nào
+- **chủ:** chưa ai nhận
+- **phạm vi:** `_root` + `_code` + `_template`
+
+**nguồn** — Đức nêu 2026-09-06: *"tôi có thể F5 trên dashboard html là latest status sẽ được hiển thị lên các luồng làm việc cùng lúc"*, và chỉ sang repo `Chrome_Extension_AI_Agentic` đã làm rồi. Cùng ngày, bên đó ghi lại nguyên văn lý do: *"Mỗi lần tôi muốn xem thông tin mới nhất thì lại phải bảo AI làm, rất bất tiện và bị interrupt vào các luồng công việc khác một cách vô ích."*
+
+**vì sao** — Hôm nay bảng của bộ khung chỉ tươi khi **một phiên AI chạy `npm run overview` rồi commit**. Nên câu hỏi rẻ nhất của Đức — *"đang có mấy luồng chạy?"* — lại là câu đắt nhất: nó cắt ngang một phiên đang làm việc khác. Đó là **kênh giao tiếp chính**, không phải một khối trang trí.
+
+**đã có gì để học** (đo 06/09 tại `Chrome_Extension_AI_Agentic`, thư mục `bang-trang-thai/`) — ba cửa dùng chung **một lõi**: nhấp đúp một file `.cmd` · máy chủ tại chỗ ở `127.0.0.1:4747` · tiến trình nền tự sinh lại khi repo đổi. Máy chủ **265 + 137 dòng**, ba đường, **chỉ `GET`/`HEAD`** — không một đường ghi nào, và đó là luật chứ không phải "chưa làm": Đức đã bác việc tự nhập liệu. Nhịp **30 giây**, mỗi nhịp chỉ **so dấu vân tay** rồi mới quyết có sinh hay không, vì một lượt lane làm việc đổi hàng chục file trong vài giây.
+
+**vì sao chưa làm ngay — ba chỗ chặn, chỗ thứ ba là chỗ riêng của bộ khung**
+
+1. **Chốt an toàn phải có trước, không phải sau.** Cửa thứ ba chạy lúc không ai nhìn, nên mọi lỗi ở đó là lỗi im lặng: lane đang giữ `_code` có thể đang sửa dở chính bộ sinh → phải **NGỪNG sinh và nói rõ trên trang vì sao đang ngừng**. Bảng cũ mà trông như bảng mới thì tệ hơn không có bảng.
+2. **Chỗ nối còn treo của `Y-09`** — `build-overview.mjs` đang `import` từ `giao-viec.mjs`, mà file kia **ở lại repo nhà**. Cùng một chỗ chặn, nên hai ý tưởng này phải gỡ nút đó **một lần**, đừng gỡ hai kiểu.
+3. **Bảng của bộ khung mang dữ liệu khoá SỐNG** (khối `NHAN_KHOA`). Bên repo kia bảng cũng thế, nhưng bộ khung có thêm một thứ họ không có: cổng đóng phiên **so artifact với HEAD** và `safe-push` **từ chối vùng bị sửa mà không ai đứng tên**. Nên nếu tiến trình nền ghi đè bảng mỗi lượt nhận/trả khoá, nó **làm bẩn cây làm việc của mọi lane** — máy của Đức chặn push của người khác. Chưa đo được điều này có xảy ra thật không; **đo xong mới thiết kế.**
+
+**đo trước khi sửa** — Bật một tiến trình sinh lại bảng, rồi cho một lane nhận và trả một khoá. Sau mỗi lượt chạy `git status --porcelain` và `node scripts/session-check.mjs`. Bảng đổi byte mà cổng vẫn xanh → đường này đi được. Cổng đỏ → phải tách khối khoá ra khỏi file có commit trước, chứ không phải nới cổng.

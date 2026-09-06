@@ -985,3 +985,39 @@ phiên khác không lùi lại được và chạm việc người khác. `KHUNG
 
 **Bài học chung của cả hai:** *một tín hiệu luôn kêu là một tín hiệu không ai nhìn.* Bản 1.3.21
 dựng tín hiệu khoá vùng để chữa đúng bệnh này, rồi tự dính nó ở chỗ khác trong cùng một ngày.
+
+---
+
+## 2026-09-06 · claude-k3-donglenh · bản 1.3.23 — hai luật từ repo tiêu thụ, và xếp việc bảng tự tươi
+
+**Vào việc bằng cách ĐO, không bằng cách tin.** Đức chuyển hai luật `Chrome_Extension_AI_Agentic`
+rút ra 06/09. Luật 1 (tên tín hiệu khoá là phần của hợp đồng) đọc qua thì tưởng bộ khung đã có đủ
+từ bản 1.3.20 — chữ có, ba đường hợp lệ có, VÀNG-không-ĐỎ có, phép ghim có. Đo thì lòi ra chỗ hở
+thật: **`session-check.mjs` gõ lại câu bằng tay** thay vì gọi `noiDauVet`. Hai bản của một câu, ở
+đúng cái luật mà cả bài học của nó là *câu chữ trôi thì luật trôi theo*.
+
+Nay ba mặt in tín hiệu lấy từ một nguồn. Ghim ở `tests/khoa-dau-vet.mjs` vế 6. **Đột biến thứ 7
+chạy hai biến thể**: gỡ hẳn lời gọi → ĐỎ; giữ lời gọi ở chỗ khác nhưng gõ tay lại câu → **vẫn
+ĐỎ**. Biến thể hai là biến thể đáng chạy — biến thể một đỏ vì lý do quá dễ.
+
+Một lượt suýt sai: phép ghim bản đầu soi **cả chú thích**, nên nó đỏ ngay với chính lời giải
+thích đang nói đúng. Nhắc tên tín hiệu trong chú thích **không** phải dựng bản thứ hai. Nay nó gỡ
+chú thích trước khi soi — một phép ghim bắt nhầm là một phép ghim người ta sẽ gỡ đi.
+
+**Luật 2 → `ORCHESTRATOR.md` mục 5b**, và khai thẳng vào bảng *"chưa có phép kiểm máy"* ở đầu sổ.
+Không giả vờ có răng: máy nhìn thấy commit, nó không nhìn thấy một tin nhắn nói "đang chờ".
+
+**Chỗ CỐ Ý KHÔNG chép** — bản gốc còn cho `--carry` khỏi phải hỏi. Bộ khung giữ `AGENTS.md` mục 2
+hàng 2. Một quyết định thường trực là của một người ở một repo; kéo về là bộ khung tự cấp cho mình
+cái phép mà Đức chưa cho. Ghi vào `decisions.md` để phiên sau không "sửa lại cho khớp bản gốc".
+
+**Xếp hàng đợi: `IDEAS.md` Y-10** — bảng tự tươi, F5 là thấy. Đọc thật `bang-trang-thai/` bên repo
+kia: ba cửa một lõi, máy chủ 265+137 dòng, ba đường, **chỉ `GET`/`HEAD`**, nhịp 30 giây so dấu vân
+tay. **Chưa viết dòng mã nào** vì chỗ chặn thứ ba là của riêng bộ khung: bảng ở đây mang dữ liệu
+khoá SỐNG, mà cổng đóng phiên soi artifact và `safe-push` từ chối vùng bị sửa không ai đứng tên —
+tiến trình nền ghi đè bảng mỗi lượt nhận/trả khoá có thể **chặn push của mọi lane**. Việc kế của
+Y-10 là **đo đúng chỗ đó**, không phải viết mã. Chỗ chặn thứ hai dùng chung với `Y-09`
+(`build-overview.mjs` còn `import` từ `giao-viec.mjs`, file ở lại repo nhà) — gỡ một lần cho cả hai.
+
+**Còn mở:** `KHUNG-34` (tám cái bẫy, chưa phân loại) · `KHUNG-33` · `KHUNG-36` `@Đức:chốt` ·
+`KHUNG-37` `@Đức:bấm` · `KHUNG-30`.

@@ -29,6 +29,7 @@ thẳng cái gì đang có răng và cái gì chưa:
 | Mục 4 — firewall chống trượt vai | **chưa có** |
 | Mục 0b — query-driven | **chưa có** |
 | Mục 4 — luật nạp báo cáo năm mục | **chưa có** |
+| Mục 5b — không dừng vì chuyện commit | **không kiểm được** — xem ghi chú dưới mục đó |
 
 Ở repo nơi sổ này sinh ra, một phép kiểm cho firewall **đã được viết** nhưng **chưa đi theo bộ
 khung**. Nên ở đây ba mục trên là **quy ước có lý do**, không phải chốt tự chặn. Đừng đọc chúng
@@ -329,6 +330,43 @@ Danh sách việc phải hỏi nằm ở `AGENTS.md` mục 2 — bản duy nhấ
   nhận cả gốc repo.
 - **Bảng quyền báo bất thường** (bị ghi đè, hoặc có dấu hiệu sửa tay) → dừng, đọc `AGENTS.md`
   mục 1. Đừng đóng dấu lại cho xong việc — làm thế là xoá tang chứng.
+
+### 5b. Và KHÔNG BAO GIỜ dừng vì chuyện commit
+
+Bốn ca trên là **hết** danh sách. Commit, push, và cổng đóng phiên **không** nằm trong đó —
+`AGENTS.md` mục 2 đã cho phép commit và push tự làm khi đủ ba điều kiện; mục này chỉ nói thêm
+rằng **chờ** cũng là một kiểu dừng.
+
+**"Dừng lại" rộng hơn "hỏi xin phép".** Ca thật 06/09 ở repo đã sinh ra sổ này: vai điều phối
+không hỏi phép, nó **đứng chờ cổng chạy xong** rồi mới commit, và nhắn về đúng một câu *"chờ
+cổng xong rồi tôi đẩy"*. Với người không đọc được trạng thái trên máy thì **"AI đang chờ" và
+"AI đang làm" trông giống hệt nhau** — một tin nhắn không có gì để đọc, đổi lấy một lượt tưởng
+việc đang chạy.
+
+- Xong một mẩu thì **commit ngay**. Commit là chuyện của mình; cổng là chuyện của **lượt đẩy**.
+- Cổng chạy lâu → **cho chạy nền rồi làm việc tiếp**. Đừng gửi tin chỉ để nói "đang chờ".
+- Cổng đỏ ở đúng một phép kiểm mình vừa sửa và **tự chạy lại được** → chạy riêng phép đó lấy
+  bằng chứng rồi đi tiếp, đừng chờ cả bộ chạy lại để xác nhận thứ đã biết.
+
+**Ranh giới, và nó thắng cả ba gạch đầu dòng trên:** "chạy nền rồi làm tiếp" **không** có nghĩa
+là đẩy khi chưa đọc kết quả cổng. `AGENTS.md` mục 2 vẫn đòi **XANH TOÀN BỘ** trước lượt đẩy, và
+việc **dở dang** thì vẫn không đẩy. Mục này gỡ cái **chờ vô ích**, không gỡ cái **chốt**.
+
+**Một điều KHÔNG kéo về, dù bản gốc có.** Repo đã sinh ra luật này còn cho `--carry` khỏi phải
+hỏi, dựa trên một quyết định thường trực của người chốt bên đó. Bộ khung **giữ nguyên** `AGENTS.md`
+mục 2 hàng 2: đẩy kèm commit của phiên khác thì **phải hỏi**. Quyết định thường trực là của một
+người ở một repo, không đi theo bộ khung — chép nó sang là bộ khung tự cho mình một cái phép mà
+người chốt của repo này chưa hề cho.
+
+**Vì sao vai này nghiêm hơn mọi vai khác:** mọi việc đi qua một cửa. Executor dừng thì một lane
+dừng; **điều phối dừng thì cả hàng dừng**.
+
+> **Không có phép kiểm máy, và không dựng nổi một cái.** Máy trong repo nhìn thấy commit và
+> nhánh; nó **không** nhìn thấy một tin nhắn nói "đang chờ", cũng không biết khoảng lặng giữa
+> hai commit là suy nghĩ hay là đứng đợi. `AGENTS.md` mục 8 hỏi *"dựng nổi ca hỏng không?"* —
+> ở đây là **không**, nên mục này được ghi thẳng là **quy ước**, không giả vờ là chốt tự chặn.
+> Thứ gần nhất với răng: mục 6 bắt chạy `state-check` **trước khi báo cáo**, nên một lượt báo
+> cáo rỗng ít nhất cũng phải kèm được ba cặp đối chiếu.
 
 ## 6. Kết một lượt trả lời
 

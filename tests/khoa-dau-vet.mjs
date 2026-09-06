@@ -9,6 +9,7 @@
  *   4. cho nhánh git-hỏng trả `CHUA` thay vì `KHONG_DO`  → vế 4 ĐỎ
  *   5. `mocCoGio` luôn trả `true` (dựng lại đúng con số ma) → vế 9 ĐỎ
  *   6. `dangNhac` bỏ qua độ chính xác của mốc            → vế 9 ĐỎ
+ *   7. gõ lại câu chữ vào `session-check.mjs` thay vì gọi `noiDauVet` → vế 6 ĐỎ
  *
  * MỨC NGHIÊM TRỌNG LÀ PHẦN CỦA HỢP ĐỒNG. Vế 7 ghim rằng tín hiệu này **không đổi mã thoát của
  * cổng**. Nếu ai đó thấy nó "quan trọng quá nên phải chặn", họ đang dạy mọi lane ghi bừa một
@@ -94,7 +95,25 @@ const SAU = "2026-09-06T11:00:00Z";
     assert.doesNotMatch(noiDauVet(t), /rảnh|nhàn|không làm gì|đang chờ/,
       `"${noiDauVet(t)}" — tin hieu nay noi REPO CHUA THAY GI, no khong noi lane dang ranh`);
   }
-  ok("6 · câu in ra đúng chữ đã chốt, và không chỗ nào nói 'rảnh'");
+  /* MỘT NGUỒN CHO CÂU CHỮ. Ba chỗ in tín hiệu này ra cho người đọc: `claim.mjs --list`, khối
+   * "Đang làm gì" của bảng, và ghi chú của cổng đóng phiên. Cả ba PHẢI lấy câu từ `noiDauVet`.
+   *
+   * Vì sao vế trên chưa đủ: nó chỉ hỏi hàm nói gì. Tới bản 1.3.22 cổng đóng phiên **gõ lại câu
+   * bằng tay**, nên đổi chữ trong `noiDauVet` thì hai chỗ đổi và một chỗ ở lại — và chỗ ở lại
+   * mới là chỗ lane đọc lúc đóng phiên. Hai bản của một câu thì một bản sẽ trôi.
+   *
+   * Ghi chú thì được nhắc tên tín hiệu — nhắc tên trong lời giải thích không phải là gõ lại một
+   * bản thứ hai. Nên phép ghim GỠ CHÚ THÍCH trước khi soi, và chỉ soi phần mã thật sự chạy. */
+  const CAU = noiDauVet(DAU_VET.CHUA);
+  const goChuThich = (ma) => ma.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+  for (const f of ["session-check.mjs", "build-overview.mjs"]) {
+    const ma = goChuThich(readFileSync(join(ROOT, "scripts", f), "utf8"));
+    assert.match(ma, /noiDauVet/, `${f} phai LAY cau tu noiDauVet, dung tu dat ten cho trang thai nay`);
+    assert.ok(!ma.includes(CAU), `${f} go lai "${CAU}" bang tay — hai ban thi mot ban se troi`);
+  }
+  assert.ok(readFileSync(join(ROOT, "scripts", "claim.mjs"), "utf8").includes(CAU),
+    "claim.mjs la NOI DUY NHAT giu cau chu nay");
+  ok("6 · câu in ra đúng chữ đã chốt, không chỗ nào nói 'rảnh', và ba mặt lấy từ MỘT nguồn");
 }
 
 /* ---- 7. CỔNG: hiện ra, VÀNG, và KHÔNG đổi mã thoát --------------------- */

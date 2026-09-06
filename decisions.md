@@ -289,3 +289,31 @@ Luật: **AI không tự giết tiến trình nào.** Nó đo, in bảng tuổi,
 phiên đã chết. Người bấm. Lý do: tuổi KHÔNG phân biệt được "phiên đã chết" với "phiên đang chạy
 lâu" — đúng hình dạng sai lầm của tín hiệu khoá vùng, chỉ đổi đối tượng.
 Chi tiết: [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md) · `KHUNG-37`.
+
+## 2026-09-06 — Hai luật của repo tiêu thụ về bộ khung, và một chỗ CỐ Ý KHÔNG chép
+
+Đức chuyển sang hai luật `Chrome_Extension_AI_Agentic` rút ra 06/09, kèm câu chốt vai:
+*"Cả hai thuộc về bộ khung… đọc, phản biện, rồi hoà giải vào bộ khung theo hình dạng của bộ
+khung — đừng chép nguyên văn."*
+
+**Nhận cả hai.** Luật 1 (tên tín hiệu khoá là phần của hợp đồng) phần chữ đã có từ 1.3.20; việc
+thật là bịt chỗ `session-check.mjs` gõ lại câu bằng tay. Luật 2 (vai điều phối không dừng vì
+chuyện commit) là mới → `docs/protocols/ORCHESTRATOR.md` mục 5b.
+
+**Chỗ không chép, và đây là phần cần Đức biết:** bản gốc còn cho `--carry` khỏi phải hỏi, dựa
+trên một quyết định thường trực của người chốt **bên repo đó**. Bộ khung giữ nguyên `AGENTS.md`
+mục 2 hàng 2 — đẩy kèm commit của phiên khác thì **vẫn phải hỏi Đức**. Lý do: một quyết định
+thường trực là của một người ở một repo, nó không đi theo bộ khung; chép sang là bộ khung tự cấp
+cho mình cái phép mà Đức chưa hề cho.
+
+Chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.23.
+
+## 2026-09-06 — Bảng phải tự tươi, Đức F5 là thấy — xếp hàng đợi, chưa làm
+
+Đức nêu: *"tôi có thể F5 trên dashboard html là latest status sẽ được hiển thị lên các luồng làm
+việc cùng lúc. Hãy xếp việc này vào hàng đợi."*
+
+Xếp vào [IDEAS.md](IDEAS.md) mục `Y-10`, bậc **ý tưởng**. Chưa viết dòng mã nào vì một chỗ chặn
+chưa đo: bảng của bộ khung mang dữ liệu khoá **sống**, nên tiến trình nền ghi đè nó mỗi lượt
+nhận/trả khoá có thể làm bẩn cây làm việc và **chặn push của mọi lane**. Việc kế là đo đúng chỗ
+đó, không phải viết mã.

@@ -1,6 +1,6 @@
 {
   "name": "ark-repo-harness",
-  "version": "1.3.22",
+  "version": "1.3.23",
   "private": true,
   "type": "module",
   "description": "Bộ khung repo dùng lại được: luật, cổng kiểm, bộ sinh trang, và công cụ đưa repo khác lên chuẩn.",
