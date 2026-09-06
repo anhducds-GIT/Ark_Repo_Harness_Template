@@ -3,6 +3,62 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.21 — 2026-09-06 — Khoá giữ mà repo chưa thấy dấu vết, và sổ migrate gom về một tab
+
+> Bản 1.3.20 được cắt giữa chừng rồi tầng máy còn đổi tiếp, nên sổ phát hành chặn và số nhảy sang
+> 1.3.21 — đúng như thiết kế: một số chỉ được trỏ tới **một** nội dung.
+
+### Tín hiệu mới: "repo chưa thấy dấu vết"
+
+Không commit nào chạm vùng đó kể từ lúc nhận khoá, **và** không file nào trong vùng đang sửa dở.
+Hiện ở **ba chỗ**: `claim.mjs --list` · khối "Đang làm gì" trên bảng · cổng đóng phiên.
+
+**VÀNG, không ĐỎ — và mức đó là phần của hợp đồng.** Một lane đọc kỹ 30 phút trước khi sửa một
+dòng là lane tốt; chặn nó là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ.
+
+**Tên của tín hiệu cũng là phần của hợp đồng.** Nó nói *repo chưa thấy gì*, **không** nói *lane
+đang rảnh*. Ngày 06/09 một phiên điều phối đọc thành "rảnh", nhả khoá hộ, và lane kia — đang dựng
+bản nháp ở thư mục **ngoài repo** — phải hoàn nguyên phần đã xong. Con số này **về nguyên tắc**
+không thấy được việc làm ngoài repo, nên đo kỹ hơn cũng không đóng được lỗ đó.
+
+`tests/khoa-dau-vet.mjs` — 8 vế, **4 đột biến đã chạy thật**, kể tên ngay đầu file.
+
+### Luật khoá đổi ba chỗ
+
+- **Nhận khoá ngay TRƯỚC lượt ghi đầu tiên**, không phải lúc mở phiên — đọc và đo không cần khoá.
+- **Một lane, một khoá gói.**
+- **Không nhả khoá hộ lane khác** vì con số này. Ba đường hợp lệ, và chỉ ba.
+
+`AGENTS.md` mục 1 và `MULTIFLOW.md` mục 3. Thêm luật thì phải bớt luật (mục 8): định nghĩa năm
+"luật an toàn" dời sang `docs/LEGEND.md`, phần còn lại gói chặt hơn — `template/AGENTS.md` về
+đúng 200 dòng, **không nới trần**.
+
+### Tab Migrate viết lại — Đức chốt
+
+*"Tôi chỉ muốn hiểu kết quả đang ở đâu, roadmap thế nào… nếu dừng lại bước nào tôi sẽ continue."*
+
+| Trước | Sau |
+|---|---|
+| bảng đối chiếu → tab con → gần trọn thân hồ sơ trải ra | **bảng ba mốc** → **"dừng ở đâu"** → chữ gập trong `<details>` |
+
+Ba mốc lấy từ `CHUYEN-REPO-LEN-CHUAN.md` (*migrate · audit · AI onboard*), không tự đặt mốc mới.
+Ô không có nguồn nói **"chưa khai"**, không làm tròn thành "chưa xong" — ba hồ sơ đang có được
+ghi trước khi bảng này tồn tại. Hồ sơ từ nay khai thêm `viec_audit` · `viec_assistant` ·
+`viec_ke` thì ô tự đầy.
+
+**Trang riêng thôi được nuôi.** `SO-MIGRATE-*.html` rời `generators`/`generated`, bản cuối **dời**
+sang `docs/archive/` (dời chỗ, không xoá). `build-so-migrate.mjs` nay **bắt đưa đường dẫn**: giữ
+mặc định cũ là gài bẫy một file không ai khai ở gốc repo.
+
+### Bản đồ hoà giải với repo tiêu thụ
+
+`docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md` — mỗi khối lệch rơi vào đúng một ô: `KÉO XUỐNG` (7) ·
+`ĐẨY LÊN` (2) · `CỐ Ý KHÁC` (9). Bản gốc và bản trích **khớp từng dòng ở cả năm file** đo được.
+
+Một ca của luật vàng 4: bản giao việc gửi sang nói bộ khung *thiếu* `ageHours`/`ageLabel`. Số đo
+đúng, **kết luận sai** — bộ khung đã có, ở `what-next.mjs` chứ không ở `claim.mjs`. So tên hàm
+theo file thì một hành vi viết ở chỗ khác hiện ra như "thiếu". Chỉ chạy `grep` mới thấy.
+
 ## 1.3.19 — 2026-09-06 — Vá một vế kiểm quá chặt, và phát bảng sang hai repo đã lắp
 
 ### Vế kiểm đòi thứ không phải repo nào cũng có

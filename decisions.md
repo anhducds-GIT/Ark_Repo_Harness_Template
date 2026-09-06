@@ -249,3 +249,33 @@ Repo đích có luật riêng chọi với đề bài thì phiên nhận việc 
 Lưu ý cách đọc: quyết định 06/09 *"bộ khung là chuẩn, cơ chế cũ thôi hiệu lực"* nói về **cơ chế
 hiệp đồng SAU KHI đã migrate**. Nó không cho phép một phiên nhận việc tự ý bước qua luật của
 repo đích ngay trong lượt đang làm.
+
+## 2026-09-06 · Khoá vùng: nhận muộn, một lane một khoá, và cấm nhả hộ
+
+Đức: *"tôi muốn adjust rule về việc giữ khóa để tối ưu flow làm việc hơn"*. Ba luật vào
+`AGENTS.md` mục 1: **nhận khoá ngay trước lượt ghi đầu tiên** (đọc và đo không cần khoá) ·
+**một lane một khoá gói** · **không nhả khoá hộ lane khác** vì đo thấy vùng chưa bị chạm.
+
+Tín hiệu mới `"repo chưa thấy dấu vết"` hiện ở ba chỗ và là **VÀNG, không ĐỎ** — chặn một lane
+đang đọc kỹ là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ. Bằng chứng gốc: 06/09 một
+phiên điều phối đo thấy "0 commit 0 sửa đổi" rồi nhả khoá hộ, trong khi lane đó đang làm thật ở
+thư mục ngoài repo — lane phải hoàn nguyên phần đã xong. Ghim: `tests/khoa-dau-vet.mjs`.
+
+## 2026-09-06 · Sổ migrate: chỉ nuôi TAB, thôi nuôi trang riêng
+
+Đức: *"chúng ta sẽ maintain tab Migrate ở trong dashboard chung của template, không cần phải
+maintain Migrate.html độc lập riêng… tôi chỉ muốn hiểu kết quả đang ở đâu, roadmap thế nào"*.
+
+`SO-MIGRATE-<repo>.html` rời `generators`/`generated`, bản cuối dời sang `docs/archive/` (dời
+chỗ, **không xoá**). Lệnh `build-so-migrate.mjs` vẫn chạy nhưng **bắt đưa đường dẫn** — mặc định
+cũ sẽ đẻ ra một file không ai khai ở gốc repo.
+
+Tab Migrate đổi bố cục: **bảng ba mốc lớn** (migrate · audit · AI onboard, lấy từ quy trình chứ
+không tự đặt) → **"dừng ở đâu"** → chữ **gập trong `<details>`**. Ô không có nguồn nói *"chưa
+khai"*, không làm tròn thành *"chưa xong"*.
+
+## 2026-09-06 · Đổi luật chung của `AGENTS.md` — và bớt để bù
+
+Thêm luật vào mục 1 làm `template/AGENTS.md` vượt trần 200 dòng (phép kiểm B9), đúng thứ mục 8
+cấm. Đã BỚT: định nghĩa năm "luật an toàn" dời sang [docs/LEGEND.md](docs/LEGEND.md), phần còn
+lại gói lại chặt hơn. Không nới trần — nới trần là làm yếu lớp bảo vệ để cho phép kiểm xanh.

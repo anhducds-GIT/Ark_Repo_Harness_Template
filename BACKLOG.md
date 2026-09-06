@@ -626,3 +626,59 @@ lượt giao qua đề bài mới này. Đợi thêm hai ba lượt nữa rồi 
 Tab mới (05/09) chiếu mục nợ đã gạch mã — 7 việc. Nhưng nó chỉ đọc `BACKLOG.md` ở gốc; repo có
 đơn vị con, mỗi đơn vị một sổ nợ, thì các mục đã đóng ở đơn vị con **không hiện**. Chưa đau ở
 repo nhà (không có đơn vị con), sẽ đau ở repo dùng `units.root_dir`. Vùng: `_code`.
+
+### ~~KHUNG-32~~ · ĐÓNG 06/09 · Bảng quyền không thấy được "khoá đang giữ mà repo chưa thấy dấu vết"
+
+Đo 06/09 ở repo tiêu thụ: một lane giữ **ba** khoá **14 phút** với **0 commit, 0 file sửa** trong
+cả ba vùng, và một phiên khác phải đứng chờ. Không cơ chế nào hiện chuyện đó ra — người điều phối
+phải tự chạy `git` để đo rồi mới biết.
+
+**Ca đó về sau hoá ra là DƯƠNG GIẢ:** lane ấy đang làm thật, ở một thư mục **ngoài repo**, và chỉ
+định ghi vào repo ở bước cuối. Phiên điều phối tin con số, nhả khoá hộ, lane mất phần đã xong. Nên
+tín hiệu phải mang đúng tên **"repo chưa thấy dấu vết"** — không được rút gọn thành "rảnh".
+
+Việc: hiện tín hiệu ở ba chỗ (`claim.mjs --list` · khối "Đang làm gì" trên bảng · cổng đóng phiên),
+**VÀNG không ĐỎ**, và **cấm máy tự nhả khoá của lane khác**. Kèm sửa luật nhận khoá: *nhận ngay
+TRƯỚC lượt ghi đầu*, *một lane một khoá gói*. Nền cần trước: kéo `ageHours`/`ageLabel` từ repo tiêu
+thụ về. Đây là **cơ chế đa phiên → đột biến kiểm bắt buộc**. Vùng: `_code` + `_root`.
+Xem [bản đồ hoà giải](docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md) §2.
+
+### KHUNG-33 · Trả khoá khi còn commit chưa đẩy để lại commit vô chủ
+
+Repo tiêu thụ có `canDayTruocKhiTra` (từ chối trả khoá khi còn commit chưa đẩy) **cộng** cửa thoát
+`--du-biet` (trả kèm lý do). Bộ khung không có vế nào.
+
+Hai vế phải vào **cùng một lượt**: chỉ lấy vế chặn thì một lane bị cổng xuất bản chặn đẩy sẽ kẹt
+khoá vĩnh viễn — đúng nguyên nhân ② mà bản giao việc dặn **đừng đụng**. Chỉ lấy cửa thoát thì
+không chặn được gì. Vùng: `_code`.
+
+### KHUNG-34 · Tám cái bẫy đo được 06/09 — chưa phân loại xem bộ khung nên chặn cái nào
+
+Tám thứ cắn repo tiêu thụ trong MỘT ngày: mỏ neo khớp 0 chỗ mà báo như đã kiểm · mỏ neo `\n` gặp
+file CRLF · `git commit -o` không chặn được cuốn sửa đổi cùng file · byte NUL làm diff biến mất (5
+lần) · trạng thái ADR khai hai chỗ · trả khoá kèm lý do để lại cổng đỏ · bộ đếm gộp mù khi nội dung
+dời sang lưu trữ · bộ sinh lấy tiêu đề từ tên thư mục nên sai trong worktree.
+
+Chưa nhận cái nào. Luật mục 8 đòi từng cái phải trả lời: đã xảy ra thật ở **repo này** chưa, thay
+chỗ cái nào, dựng nổi ca hỏng không. Vùng: `_docs` trước, `_code` sau.
+
+### ~~KHUNG-35~~ · ĐÓNG 06/09 · Tab Migrate viết dài, không đọc ra được "đang ở bước nào"
+
+Đức 06/09: *"mỗi khi tôi check status migrate, tôi sẽ thấy milestone lớn đang ở bước nào, các
+feature đã migrate thế nào, đã go live thế nào, trải qua các bước audit ra sao. Nếu dừng lại bước
+nào tôi sẽ continue"*. Tab hiện chiếu gần trọn thân hồ sơ — tốn usage của AI và tốn thời gian của
+Đức mà vẫn không trả lời được câu trên.
+
+Việc: tab Migrate thành **bảng mốc + danh sách kiểm**, thân hồ sơ gập lại sau `<details>`. Kèm bỏ
+trang `SO-MIGRATE-*.html` đứng riêng (Đức chốt: chỉ nuôi tab). Vùng: `_code` + `_root`.
+
+### KHUNG-36 · Ba hồ sơ migrate cũ không khai hai mốc sau — bảng mốc trống hai cột @Đức:chốt
+
+Bảng mốc mới (1.3.21) chiếu ba mốc: *migrate · audit · AI onboard*. Chỉ mốc đầu suy được (từ
+`muc_sau`); hai mốc sau **không có trường nào tương đương** trong ba hồ sơ đã ghi, nên hai cột
+hiện `·` (chưa khai) cho cả ba lượt.
+
+Bảng nói đúng — nhưng nó chỉ hữu ích khi có dữ liệu. Lối ra là **thêm** ba trường
+(`viec_audit` · `viec_assistant` · `viec_ke`) vào frontmatter ba hồ sơ cũ, lấy từ chính thân bài
+của chúng. Chưa tự làm: luật cấm sửa hồ sơ cũ, và dù đây chỉ là *khai lại điều hồ sơ đã viết*
+thì ranh giới đó do Đức vạch, không do AI. Vùng: `_docs`.

@@ -1,6 +1,6 @@
 {
   "name": "ark-repo-harness",
-  "version": "1.3.19",
+  "version": "1.3.21",
   "private": true,
   "type": "module",
   "description": "Bộ khung repo dùng lại được: luật, cổng kiểm, bộ sinh trang, và công cụ đưa repo khác lên chuẩn.",
@@ -14,11 +14,10 @@
     "template": "node scripts/build-template.mjs",
     "assess": "node scripts/assess.mjs",
     "init": "node scripts/init-repo.mjs",
-    "test": "node scripts/build-template.mjs --check && node tests/harness-smoke.mjs && node tests/template-null-repo.mjs && node tests/assess-smoke.mjs && node tests/init-repo-smoke.mjs && node tests/overview-smoke.mjs && node tests/so-migrate-smoke.mjs && node tests/assistant-smoke.mjs && node tests/core-contract.mjs && node tests/upgrade-smoke.mjs && node tests/cong-do-that.mjs && node tests/don-smoke.mjs && node tests/giao-viec-smoke.mjs && node tests/overview-doc-smoke.mjs",
+    "test": "node scripts/build-template.mjs --check && node tests/harness-smoke.mjs && node tests/template-null-repo.mjs && node tests/assess-smoke.mjs && node tests/init-repo-smoke.mjs && node tests/overview-smoke.mjs && node tests/so-migrate-smoke.mjs && node tests/assistant-smoke.mjs && node tests/core-contract.mjs && node tests/upgrade-smoke.mjs && node tests/cong-do-that.mjs && node tests/don-smoke.mjs && node tests/giao-viec-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs",
     "overview": "node scripts/build-overview.mjs",
     "can-nang": "node scripts/can-nang.mjs",
     "don": "node scripts/don.mjs",
-    "so-migrate": "node scripts/build-so-migrate.mjs",
     "upgrade": "node scripts/upgrade.mjs",
     "giao-viec": "node scripts/giao-viec.mjs"
   }

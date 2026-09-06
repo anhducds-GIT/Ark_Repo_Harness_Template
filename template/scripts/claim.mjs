@@ -147,6 +147,138 @@ export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty }) 
   return { code: EXIT.MISUSE, message: `HANH_DONG_LA: "${action}"` };
 }
 
+/* ---- TUỔI MỘT LƯỢT GIỮ KHOÁ ---------------------------------------------
+ *
+ * Ba thứ này trước ở `what-next.mjs`, với lý do ghi rõ: *"đặt vào `claim.mjs` là buộc phải sửa
+ * một script đang đi theo bản trích, tức buộc cắt một phiên bản bộ khung mới — trả giá lớn cho
+ * hai hàm bốn dòng."* Lý do đó đúng lúc viết. Nay `claim.mjs` phải sửa vì việc khác (tín hiệu
+ * dấu vết bên dưới) nên cái giá ấy đã trả rồi, và chỗ đúng của chúng là ĐÂY — file này là file
+ * GHI `claimed_at`, nên nó là file duy nhất biết con số ấy nghĩa là gì.
+ *
+ * CỐ Ý KHÔNG tự đòi lại khoá quá hạn. Một phiên chạy dài là chuyện bình thường, và `claimed_at`
+ * không được chạm lại trong lúc làm — nên "cũ" KHÔNG đồng nghĩa "chết". Đây là số liệu để HỎI,
+ * không phải một phán quyết. */
+export const GIO_NHAC = 6;
+
+export function ageHours(stamp, now = new Date()) {
+  const t = Date.parse(String(stamp || ""));
+  if (!Number.isFinite(t)) return null;
+  return Math.max(0, (now.getTime() - t) / 3600000);
+}
+
+export function ageLabel(hours) {
+  if (hours == null) return "không rõ từ khi nào";
+  // Phút, không phải "dưới 1h": cả lỗ mà tín hiệu bên dưới chữa đều xảy ra trong vòng 20 phút
+  // đầu của một lượt giữ. Gộp hết vào "dưới 1h" là làm mù đúng khoảng thời gian đáng nhìn.
+  if (hours < 1) return `${Math.round(hours * 60)} phút`;
+  if (hours < 48) return `${Math.round(hours)}h`;
+  return `${Math.round(hours / 24)} ngày`;
+}
+
+/* ---- REPO CHƯA THẤY DẤU VẾT ----------------------------------------------
+ *
+ * TÊN CỦA TÍN HIỆU LÀ PHẦN CỦA HỢP ĐỒNG, không phải chuyện chữ nghĩa.
+ *
+ * Bản đầu của đề bài gọi nó là "vùng chưa bị chạm", và mọi người đọc — kể cả chính phiên viết ra
+ * nó — đọc thành "lane đang rảnh". Hai câu đó KHÁC NHAU, và khoảng cách giữa chúng đã trả giá
+ * thật ngày 06/09: một lane bị đo thấy "0 commit 0 sửa đổi" suốt 14 phút, phiên điều phối tin
+ * con số và nhả khoá hộ — trong khi lane ấy **đang làm thật**, dựng bản nháp ở một thư mục
+ * NGOÀI repo và chỉ định ghi vào ở bước cuối. Lane đó phải hoàn nguyên phần đã xong.
+ *
+ * Nên câu đúng, và là câu duy nhất được in ra:
+ *
+ *     Tín hiệu này nói REPO CHƯA THẤY GÌ. Nó KHÔNG nói lane đang rảnh, và nó KHÔNG BAO GIỜ đủ
+ *     để nhả khoá của lane khác.
+ *
+ * Con số này về NGUYÊN TẮC không thấy được việc làm ngoài repo — nên đo kỹ hơn cũng không đóng
+ * được lỗ đó. Ba đường hợp lệ để một khoá được trả, và chỉ ba: chính lane đó trả · lane đó đã
+ * kết thúc · Đức chốt chuyển khoá. Xem `AGENTS.md` mục 1. */
+export const DAU_VET = Object.freeze({ THAY: "thay", CHUA: "chua", KHONG_DO: "khong-do-duoc" });
+
+/**
+ * Quyết định THUẦN — không chạm git, không chạm đĩa, nên đột biến kiểm được từng nhánh.
+ *
+ * @param {string}  claimedAt  mốc nhận khoá, dạng ISO. Đọc không ra thì trả `KHONG_DO`.
+ * @param {Array<{key:string,khi:string}>|null} chamCommit  file đã commit, đã quy về khoá, kèm
+ *        mốc commit. `null` = không đo được (git hỏng) — KHÔNG được coi là "chưa thấy".
+ * @param {Array<{key:string}>|null} chamDia  file sửa dở trên đĩa, đã quy về khoá.
+ */
+export function xetDauVet(key, claimedAt, chamCommit, chamDia) {
+  /* KHÔNG ĐO ĐƯỢC ≠ CHƯA THẤY. Đây là chiều fail-closed của tín hiệu này, và nó quan trọng
+   * hơn bình thường: nhánh "chưa thấy" là nhánh khiến người ta nghĩ tới việc nhả khoá. Một lần
+   * git hỏng mà im lặng ngã về "chưa thấy" là dựng đúng tai nạn 06/09 thành hành vi mặc định. */
+  if (chamCommit === null || chamDia === null) return DAU_VET.KHONG_DO;
+  const moc = Date.parse(String(claimedAt || ""));
+  if (!Number.isFinite(moc)) return DAU_VET.KHONG_DO;
+  if (chamDia.some((f) => f.key === key)) return DAU_VET.THAY;
+  const coCommit = chamCommit.some((f) => {
+    if (f.key !== key) return false;
+    const t = Date.parse(String(f.khi || ""));
+    // Commit không đọc được mốc thì TÍNH LÀ CÓ — nhầm về phía "lane đang làm" là nhầm an toàn.
+    return !Number.isFinite(t) || t >= moc;
+  });
+  return coCommit ? DAU_VET.THAY : DAU_VET.CHUA;
+}
+
+/** Câu in ra. Một chỗ duy nhất, để ba nơi hiển thị không thể nói ba kiểu. */
+export function noiDauVet(trangThai) {
+  if (trangThai === DAU_VET.CHUA) return "repo chưa thấy dấu vết";
+  if (trangThai === DAU_VET.KHONG_DO) return "không đo được dấu vết";
+  return "";
+}
+
+/**
+ * Đo dấu vết cho MỌI khoá đang có chủ, bằng ĐÚNG HAI lệnh git cho cả bảng.
+ *
+ * Không đo khi bảng trống: `git status` trên repo lớn không rẻ, và `--list` là lệnh chạy nhiều
+ * nhất trong cả bộ. Không có khoá nào bị giữ thì không có gì để nói.
+ */
+export async function doDauVet(claims, root = ROOT) {
+  const dangGiu = Object.entries(claims).filter(([, v]) => v?.owner);
+  if (!dangGiu.length) return new Map();
+
+  const som = dangGiu
+    .map(([, v]) => Date.parse(String(v.claimed_at || "")))
+    .filter((t) => Number.isFinite(t));
+  const tuKhi = som.length ? new Date(Math.min(...som)).toISOString() : null;
+
+  let chamCommit = null;
+  let chamDia = null;
+  try {
+    const { stewardOf, claimPrefixesFrom, readStructureFromDisk } = await import("./repo-structure.mjs");
+    const cauTruc = readStructureFromDisk(root);
+    const tienTo = claimPrefixesFrom(cauTruc);
+    const chay = (args) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+
+    chamDia = chay(["status", "--porcelain", "--untracked-files=all"])
+      .split(String.fromCharCode(10)).filter(Boolean)
+      .map((d) => d.slice(3).replace(/^"|"$/g, ""))
+      // File bảng quyền được MIỄN khoá (luật mục 1) nên nó không phải dấu vết của ai cả.
+      .filter((f) => f !== ".agents/claims.json")
+      .map((f) => ({ key: stewardOf(f, cauTruc, tienTo) }));
+
+    chamCommit = [];
+    if (tuKhi) {
+      // `%x00` giữa mốc và danh sách file: tên file có thể chứa mọi thứ trừ NUL.
+      const ra = chay(["log", `--since=${tuKhi}`, "--name-only", "--pretty=format:%x01%cI"]);
+      for (const khoi of ra.split(String.fromCharCode(1)).filter((x) => x.trim())) {
+        const dong = khoi.split(String.fromCharCode(10));
+        const khi = dong[0].trim();
+        for (const f of dong.slice(1).filter(Boolean)) {
+          chamCommit.push({ key: stewardOf(f, cauTruc, tienTo), khi });
+        }
+      }
+    }
+  } catch (_) {
+    chamCommit = null;
+    chamDia = null;
+  }
+
+  const ra = new Map();
+  for (const [k, v] of dangGiu) ra.set(k, xetDauVet(k, v.claimed_at, chamCommit, chamDia));
+  return ra;
+}
+
 async function main() {
   const argv = process.argv.slice(2);
   const flag = (name) => {
@@ -159,9 +291,28 @@ async function main() {
   catch (error) { console.error(error.message); process.exit(EXIT.MISUSE); }
 
   if (flag("list") || argv.length === 0) {
+    const dauVet = await doDauVet(parsed.claims);
+    let coChua = false;
     for (const [key, value] of Object.entries(parsed.claims)) {
       const owner = value.owner || "";
-      console.log(`${owner ? "GIU  " : "TRỐNG"} ${key.padEnd(34)}${owner}`);
+      let duoi = "";
+      if (owner) {
+        const gio = ageHours(value.claimed_at);
+        const cot = [`giữ ${ageLabel(gio)}`];
+        const noi = noiDauVet(dauVet.get(key));
+        if (noi) cot.push(noi);
+        if (dauVet.get(key) === DAU_VET.CHUA) coChua = true;
+        if (gio != null && gio >= GIO_NHAC) cot.push("⚠ quá " + GIO_NHAC + "h");
+        duoi = `  (${cot.join(" · ")})`;
+      }
+      console.log(`${owner ? "GIU  " : "TRỐNG"} ${key.padEnd(34)}${owner}${duoi}`);
+    }
+    if (coChua) {
+      console.log("");
+      console.log('"repo chưa thấy dấu vết" = không commit nào chạm vùng đó kể từ lúc nhận khoá,');
+      console.log("và không file nào trong vùng đang sửa dở. Nó KHÔNG nói lane đó rảnh — một lane");
+      console.log("cẩn thận dựng nháp ở ngoài repo rồi mới ghi vào, và repo không thấy được việc đó.");
+      console.log("KHÔNG nhả khoá hộ lane khác vì con số này. Hỏi lane đó, hoặc hỏi Đức — AGENTS.md mục 1.");
     }
     process.exit(EXIT.OK);
   }
@@ -222,7 +373,13 @@ async function main() {
   const nhaKhoa = () => { try { fs.rmSync(KHOA, { recursive: true, force: true }); } catch { /* đã nhả rồi */ } };
   process.on("exit", nhaKhoa);
 
-  const today = new Date().toISOString().slice(0, 10);
+  /* MỐC CÓ GIỜ, không chỉ có ngày.
+   *
+   * Trước bản 1.3.20 đây là `.slice(0, 10)` — chỉ ngày. Với thứ duy nhất đọc nó lúc đó (bản đồ
+   * việc, in "giữ N ngày") thì đủ. Với tín hiệu dấu vết thì KHÔNG: cả hai ca thật xảy ra trong
+   * vòng 20 phút đầu của một lượt giữ, mà mốc chỉ-ngày làm mọi lượt trong ngày trông như nhận
+   * lúc nửa đêm. `ageHours` vẫn đọc được mốc chỉ-ngày cũ, nên bảng đang có không phải sửa. */
+  const today = new Date().toISOString();
 
   /* File sửa dở NẰM TRONG vùng sắp giành. Chỉ tính khi thật sự đi giành vùng người khác —
      `git status` trên repo lớn không rẻ, và nhận một vùng trống thì không có gì để canh. */

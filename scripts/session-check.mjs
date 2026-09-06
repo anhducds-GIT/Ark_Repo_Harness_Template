@@ -1068,6 +1068,36 @@ if (!originMainResolves) {
   console.log(`  Kiểm: \`git remote -v\` và \`git branch -r\`. Repo mới thì chạy \`git fetch origin\` một lần.`);
 }
 console.log(`Bạn chịu trách nhiệm: ${[...myPackages, ...myRootAreas].join(", ") || "(không vùng nào)"}`);
+
+/* ---- VÀNG, KHÔNG ĐỎ: khoá bạn đang giữ mà repo chưa thấy dấu vết ----------
+ *
+ * MỨC NGHIÊM TRỌNG LÀ PHẦN CỦA HỢP ĐỒNG, không phải chi tiết trình bày. Đây là một GHI CHÚ,
+ * cố ý nằm ngoài danh sách phép kiểm: nó không đụng `EXPECTED_CHECKS`, không đụng `results`,
+ * và không đổi mã thoát. `tests/khoa-dau-vet.mjs` ghim đúng điều đó.
+ *
+ * Vì sao không được để nó thành ĐỎ: một lane đọc kỹ 30 phút trước khi sửa một dòng là lane
+ * TỐT. Chặn nó là dạy mọi lane **ghi bừa một byte để giữ khoá cho hợp lệ** — lúc đó phép kiểm
+ * biến thành thứ ngược lại chính nó.
+ *
+ * Và câu này nói với ĐÚNG MỘT người: chính lane đang giữ khoá, người duy nhất biết mình có
+ * đang làm hay không. Nó không nói với phiên điều phối, và nó không cho phép ai nhả khoá hộ. */
+try {
+  const kh = await import("./claim.mjs");
+  const cuaToi = Object.fromEntries(Object.entries(CLAIMS || {}).filter(([, v]) => v?.owner === asLabel));
+  const vet = await kh.doDauVet(cuaToi, ROOT);
+  const chua = [...vet.entries()].filter(([, t]) => t === kh.DAU_VET.CHUA).map(([k]) => k);
+  if (chua.length) {
+    const tuoi = chua.map((k) => `${k} (${kh.ageLabel(kh.ageHours(CLAIMS[k]?.claimed_at))})`).join(", ");
+    console.log(`⚠ VÀNG — repo chưa thấy dấu vết ở: ${tuoi}`);
+    console.log("  Không commit nào chạm vùng đó kể từ lúc bạn nhận khoá, và không file nào đang sửa dở.");
+    console.log("  KHÔNG chặn bạn: đọc kỹ trước khi sửa là việc tốt, và repo không thấy được việc bạn");
+    console.log("  làm ở ngoài nó. Chỉ là: nếu vùng đó bạn CHƯA cần nữa thì tự trả, phiên khác đang chờ.");
+    console.log(`  Trả: node scripts/claim.mjs --release ${chua[0]} --as ${asLabel}`);
+  }
+} catch (_) {
+  /* Không đo được thì im — đây là ghi chú, không phải phép kiểm. Một ghi chú tự nổ sẽ làm
+   * người ta gỡ nó ra, và lúc đó mất luôn thứ nó định nói. */
+}
 const others = [...foreignPackages, ...foreignRootAreas].map((k) => `${k} [${ownedBy(k)}]`);
 if (others.length) console.log(`Phiên khác đang làm dở, KHÔNG tính cho bạn: ${others.join(", ")}`);
 console.log("");

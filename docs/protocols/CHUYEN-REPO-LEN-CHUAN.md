@@ -262,7 +262,7 @@ khuôn của các hồ sơ đã có: khai `repo` · `ngay` · `ban_khung` · `mu
 thân bài: **trạng thái mới nhất · vì sao chưa đóng được (nếu có) · báo cáo · câu hỏi mở**.
 
 ```bash
-npm run so-migrate    # ghi đè SO-MIGRATE-Ark-Repo-Harness.html ở gốc repo — RỒI COMMIT
+npm run overview      # tab "Migrate" của bảng đọc thẳng docs/migrations/ — RỒI COMMIT
 ```
 
 Vì sao bắt buộc: migrate xảy ra **thưa** — vài tuần, có khi vài tháng một lần. Đúng loại việc

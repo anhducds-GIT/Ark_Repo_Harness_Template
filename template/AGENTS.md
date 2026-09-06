@@ -29,9 +29,8 @@ nếu bạn đang cuốn theo việc người khác.
 
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
-Bảng chủ sở hữu là `.agents/claims.json`. **Một vùng chỉ có MỘT phiên AI được ghi tại một thời điểm.**
-
-**Nhận và trả quyền bằng lệnh, đừng sửa file bằng tay:**
+Bảng chủ sở hữu là `.agents/claims.json`. **Một vùng chỉ có MỘT phiên AI được ghi tại một thời
+điểm.** Nhận và trả quyền **bằng lệnh**, đừng sửa file bằng tay:
 
 ```bash
 node scripts/claim.mjs --list
@@ -39,25 +38,29 @@ node scripts/claim.mjs --take <khoá> --as <tên-phiên> --task "một câu"
 node scripts/claim.mjs --release <khoá> --as <tên-phiên>
 ```
 
-Sửa tay là đọc-sửa-ghi, và ngày 02/09 đã có một quyền **bị ghi đè im lặng** vì thế: hai phiên
-cùng đọc thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
+Sửa tay là đọc-sửa-ghi, và ngày 02/09 một quyền đã **bị ghi đè im lặng** vì thế: hai phiên cùng đọc
+thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
 
-- Vùng đang có chủ, mà chủ không phải bạn → **chỉ được đọc, tuyệt đối không sửa**.
-- Vùng trống chủ → nhận rồi làm.
+- Vùng trống chủ → nhận rồi làm. Vùng có chủ khác → **chỉ đọc, tuyệt đối không sửa**.
 - Muốn giành vùng người khác đang giữ → **hỏi Đức**, không tự lấy.
 
-**Gốc repo chia làm NHIỀU khoá.** Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng
-phiên sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của
-`.repo-structure.json`.
+**Nhận khoá NGAY TRƯỚC LƯỢT GHI ĐẦU TIÊN** — đọc và đo không cần khoá — và **một lane một khoá gói**,
+cần thêm thì nhận thêm lúc cần. Đo 06/09: mọi bản giao việc mở đầu bằng *"nhận khoá trước"*, trong khi
+lane dành 5–20 phút đầu chỉ để đọc.
 
+**KHÔNG nhả khoá hộ lane khác vì thấy "repo chưa thấy dấu vết"** (tín hiệu ở `--list` và trên bảng).
+Nó nói repo chưa thấy gì, **không** nói lane đó rảnh — lane cẩn thận dựng nháp ngoài repo rồi mới ghi
+vào; 06/09 nhả hộ một lần, lane kia mất phần đã xong. Thấy thì **HỎI**. Ba đường hợp lệ để khoá được
+trả: chính lane đó trả · lane đó đã kết thúc · Đức chốt chuyển khoá.
 
-**Hai file được MIỄN, và lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác
-hành chính — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt
-MỌI phiên ghi Log — nhưng **chỉ miễn khi chỉ thêm dòng**; sửa HAY XOÁ dòng cũ là viết lại lịch sử của
-phiên khác).
+**Gốc repo chia làm NHIỀU khoá.** Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng phiên
+sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của `.repo-structure.json`.
 
-Đây không phải hình thức: ngày 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một
-khoá duy nhất là điểm nghẽn thật, không phải lý thuyết.
+**Hai file được MIỄN, lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác hành chính
+— không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt MỌI phiên ghi Log
+— nhưng **chỉ miễn khi chỉ THÊM dòng**; sửa hay xoá dòng cũ là viết lại lịch sử của phiên khác).
+Không phải hình thức: 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một khoá duy nhất
+là điểm nghẽn thật, không phải lý thuyết.
 
 ## 2. Sáu việc PHẢI hỏi Đức trước
 
@@ -87,9 +90,7 @@ flowchart TD
     D -- không --> E["TỰ LÀM"]
 ```
 
-**"Luật an toàn" ở hàng 6 là năm thứ này:** *thử lại* (hỏng thì thử mấy lần rồi bỏ) · *dừng khẩn*
-(gặp chuyện thì dừng hẳn) · *quy trách nhiệm* (việc nào cũng ghi rõ ai làm) · *lưu trạng thái*
-(làm dở thì nhớ tới đâu) · *làm đúng một lần* (chạy hai lần không được ra hai kết quả).
+**"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md).
 
 Repo có phụ lục nghề (`docs/ANNEX-*.md`) thì việc phụ lục liệt kê cũng phải hỏi — phụ lục chỉ
 được **thêm** vào sáu việc trên, không được bớt.
@@ -131,10 +132,9 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và m�
 
 Ba AI có thể cùng lúc trong repo, nhưng **khác package** (mục 1).
 
-**Cửa vào của từng AI:** Claude tự đọc `CLAUDE.md` gốc → trỏ sang file này. Codex tự đọc
-`AGENTS.md` gốc. Antigravity thì Đức phải dán **một câu mở màn** mỗi phiên: *"Đọc AGENTS.md ở
-gốc repo trước khi làm gì."* — thử live 26/08 cho thấy nó đọc và tuân luật, nhưng chưa chứng
-minh được nó **tự** nạp lúc mở phiên.
+**Cửa vào của từng AI:** Claude tự đọc `CLAUDE.md` gốc → trỏ sang file này. Codex tự đọc `AGENTS.md`
+gốc. Antigravity thì Đức phải dán **một câu mở màn** mỗi phiên: *"Đọc AGENTS.md ở gốc repo trước khi
+làm gì."* — thử live 26/08: nó đọc và tuân luật, nhưng chưa chứng minh được nó **tự** nạp lúc mở phiên.
 
 ## 6. Sổ tay mở khi cần — Tầng 2
 

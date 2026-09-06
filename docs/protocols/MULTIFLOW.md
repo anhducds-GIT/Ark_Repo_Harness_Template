@@ -55,18 +55,27 @@ Vùng nào có những khoá gì thì khai ở `.repo-structure.json`, khối `a
 
 ```bash
 node scripts/claim.mjs --list                                    # 1. xem vùng nào còn trống
-node scripts/claim.mjs --take <khoá> --as <phiên> --task "..."    # 2. nhận vùng mình sắp đụng
-#    ... làm việc, commit với dòng cuối `Lane: <phiên>` ...       # 3.
-node scripts/session-check.mjs --as <phiên>                      # 4. cổng đóng phiên, phải XANH
-node scripts/safe-push.mjs --as <phiên>                          # 5. đẩy, rồi --release vùng
+#    ... ĐỌC, đo, hiểu việc — bước này KHÔNG cần khoá ...        # 2.
+node scripts/claim.mjs --take <khoá> --as <phiên> --task "..."    # 3. nhận NGAY TRƯỚC lượt ghi đầu
+#    ... làm việc, commit với dòng cuối `Lane: <phiên>` ...       # 4.
+node scripts/session-check.mjs --as <phiên>                      # 5. cổng đóng phiên, phải XANH
+node scripts/safe-push.mjs --as <phiên>                          # 6. đẩy, rồi --release vùng
 ```
 
-Ba điều **không** được làm, mỗi điều là một tai nạn thật:
+**Bước 2 tách khỏi bước 3 là cố ý.** Trước 06/09 hai bước này gộp làm một, và đo được: mọi bản
+giao việc hôm đó mở đầu bằng *"nhận khoá trước"*, trong khi lane dành 5–20 phút đầu chỉ để đọc.
+Khoá nằm rảnh **do cấu trúc bản giao việc**, không do lane lười. **Một lane, một khoá gói** —
+cần khoá thứ hai giữa chừng thì nhận thêm lúc cần, đừng gom sẵn từ đầu.
+
+Bốn điều **không** được làm, mỗi điều là một tai nạn thật:
 
 - **Đừng sửa `.agents/claims.json` bằng tay.** Sửa tay là đọc–sửa–ghi, và hai phiên cùng đọc
   thấy "trống" sẽ cùng ghi tên mình. Dùng lệnh.
 - **Đừng `git push` trần.** Nó cuốn theo commit của mọi phiên khác.
 - **Đừng bỏ dòng `Lane:`.** Không có nhãn thì không quy thuộc được commit về ai.
+- **Đừng nhả khoá hộ lane khác vì thấy "repo chưa thấy dấu vết".** Tín hiệu đó nói repo chưa
+  thấy gì, **không** nói lane đó rảnh — nó không thấy được việc làm ngoài repo. 06/09: nhả hộ
+  một lần, lane kia mất phần đã xong. Thấy tín hiệu thì **hỏi**, đừng quyết. `AGENTS.md` mục 1.
 
 ## 4. Năm bất biến — luật phải giữ, kèm lý do
 

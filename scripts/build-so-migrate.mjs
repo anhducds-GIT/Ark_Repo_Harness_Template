@@ -267,9 +267,21 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     process.exit(0);
   }
 
-  // Không đưa đường dẫn thì ghi vào bản chuẩn của repo. Có đưa thì ghi ra đó — để xem thử mà
-  // không chạm file trong repo.
-  const ra = args.find((a) => !a.startsWith("--")) || path.join(ROOT, TRANG_FILE);
+  /* PHẢI ĐƯA ĐƯỜNG DẪN, từ bản 1.3.20. Trước đây không đưa thì nó ghi vào gốc repo — nhưng
+   * Đức chốt 06/09 *"chỉ maintain tab Migrate"*, nên trang này **không còn là artifact repo phải
+   * giữ tươi**: nó đã rời khỏi `generators` và `generated` của `.repo-structure.json`.
+   *
+   * Giữ mặc định cũ là gài bẫy: một phiên chạy quen tay sẽ đẻ ra một file KHÔNG AI KHAI ở gốc
+   * repo, và cổng đóng phiên đỏ với câu "file mới chưa khai vào Bản đồ file" — đúng, nhưng không
+   * nói gì về nguyên nhân thật. Bắt đưa đường dẫn thì lỗi xảy ra ở chỗ người ta hiểu được. */
+  const ra = args.find((a) => !a.startsWith("--"));
+  if (!ra) {
+    console.error("THIEU_DUONG_DAN: trang này không còn là artifact của repo (Đức chốt 06/09 — sổ migrate nay là TAB của bảng).");
+    console.error("Cần một bản in riêng để gửi cho ai đó thì nói rõ ghi vào đâu:");
+    console.error("  node scripts/build-so-migrate.mjs <đường-dẫn-file.html>");
+    console.error(`Bản cuối từng có commit nằm ở docs/archive/${TRANG_FILE}.`);
+    process.exit(2);
+  }
   const { hoSo, html } = sinh();
   fs.writeFileSync(path.resolve(ra), html, "utf8");
   console.log(`Đã sinh ${ra} — ${hoSo.length} hồ sơ migrate · mốc HEAD ${mocHEAD()}.`);

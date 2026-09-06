@@ -3,31 +3,31 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-k2-khoa",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "cau hinh + nhat ky",
-      "released_at": "2026-09-06",
+      "task": "xep hang doi + khai file moi vao ban do",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": null,
+      "owner": "claude-k2-khoa",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "gop So tay/Bao tri vao tab Van hanh",
-      "released_at": "2026-09-06",
+      "task": "ban do hoa giai bo khung vs repo tieu thu",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-k2-khoa",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "go cho noi + phat bang di",
-      "released_at": "2026-09-06",
+      "task": "tin hieu repo chua thay dau vet + tuoi khoa",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06",
-      "task": "them bang vao ban trich",
-      "released_at": "2026-09-06"
+      "claimed_at": "2026-09-06T15:12:38.115Z",
+      "task": "thu vang o cong",
+      "released_at": "2026-09-06T15:13:14.475Z"
     }
   }
 }

@@ -45,3 +45,18 @@ ttl_days: 365
 | **ADR** | Architecture Decision Record — mỗi quyết định một file, không sửa lại | Tên chuẩn ngành, có tài liệu ở ngoài |
 | **HANDOFF** | Bàn giao giữa các phiên. Chỉ thêm dòng, không sửa dòng cũ | |
 | **P1…P5** | Hồ sơ repo, khai ở trường `profile` trong `.repo-structure.json`: P1 nhiều gói · P2 ứng dụng đơn · P3 tài liệu · P4 hạ tầng · P5 điều phối | |
+
+## Năm "luật an toàn" của repo — hàng 6 của `AGENTS.md` mục 2
+
+Đổi một trong năm thứ này là **đổi thứ đang canh mọi thứ khác**, nên phải hỏi Đức trước.
+Cắt khỏi `AGENTS.md` sang đây ở bản 1.3.20 vì mục 1 phải nhận thêm luật giữ khoá, và Tầng 1 có
+trần 200 dòng — chính lời khuyên của phép kiểm B9: *"cắt chi tiết ra sổ tay riêng, để lại một
+dòng trỏ tới nó"*.
+
+| Luật | Nghĩa |
+|---|---|
+| **thử lại** (retry) | hỏng thì thử mấy lần rồi bỏ, không thử mãi |
+| **dừng khẩn** (kill switch) | gặp chuyện thì dừng hẳn, không cố chạy tiếp |
+| **quy trách nhiệm** (attribution) | việc nào cũng ghi rõ ai làm |
+| **lưu trạng thái** (checkpoint) | làm dở thì nhớ tới đâu |
+| **làm đúng một lần** (idempotent) | chạy hai lần không được ra hai kết quả |

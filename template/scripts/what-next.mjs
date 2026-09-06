@@ -179,24 +179,10 @@ export function tieuDiemTuStatus(text) {
 }
 
 /* --- Tuổi một lượt giữ khoá -------------------------------------------------
-   Hai hàm này ở ĐÂY, không ở `claim.mjs`: chúng là chuyện TRÌNH BÀY của bản đồ này, và
-   `claim.mjs --list` của bộ khung không in tuổi. Đặt vào `claim.mjs` là buộc phải sửa một
-   script đang đi theo bản trích, tức buộc cắt một phiên bản bộ khung mới — trả giá lớn cho
-   hai hàm bốn dòng. */
-export const GIO_NHAC = 6;
-
-export function ageHours(stamp, now = new Date()) {
-  const t = Date.parse(String(stamp || ""));
-  if (!Number.isFinite(t)) return null;
-  return Math.max(0, (now.getTime() - t) / 3600000);
-}
-
-export function ageLabel(hours) {
-  if (hours == null) return "không rõ từ khi nào";
-  if (hours < 1) return "dưới 1h";
-  if (hours < 48) return Math.round(hours) + "h";
-  return Math.round(hours / 24) + " ngày";
-}
+   Ba thứ này ĐÃ DỜI sang `claim.mjs` ở bản 1.3.20 — file GHI `claimed_at` là file duy nhất
+   biết con số ấy nghĩa là gì, và `claim.mjs --list` nay cũng in tuổi. Xuất lại ở đây để mọi
+   chỗ gọi cũ không phải đổi; hai bản sao của cùng một hàm là hai bản sẽ trôi khỏi nhau. */
+export const { GIO_NHAC, ageHours, ageLabel } = claimMod;
 
 /* --- Ghép việc vào khoá, rồi cắt theo trạng thái khoá ------------------------- */
 

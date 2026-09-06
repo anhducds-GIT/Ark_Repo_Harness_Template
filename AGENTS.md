@@ -29,9 +29,8 @@ nếu bạn đang cuốn theo việc người khác.
 
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
-Bảng chủ sở hữu là `.agents/claims.json`. **Một vùng chỉ có MỘT phiên AI được ghi tại một thời điểm.**
-
-**Nhận và trả quyền bằng lệnh, đừng sửa file bằng tay:**
+Bảng chủ sở hữu là `.agents/claims.json`. **Một vùng chỉ có MỘT phiên AI được ghi tại một thời
+điểm.** Nhận và trả quyền **bằng lệnh**, đừng sửa file bằng tay:
 
 ```bash
 node scripts/claim.mjs --list
@@ -39,25 +38,29 @@ node scripts/claim.mjs --take <khoá> --as <tên-phiên> --task "một câu"
 node scripts/claim.mjs --release <khoá> --as <tên-phiên>
 ```
 
-Sửa tay là đọc-sửa-ghi, và ngày 02/09 đã có một quyền **bị ghi đè im lặng** vì thế: hai phiên
-cùng đọc thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
+Sửa tay là đọc-sửa-ghi, và ngày 02/09 một quyền đã **bị ghi đè im lặng** vì thế: hai phiên cùng đọc
+thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
 
-- Vùng đang có chủ, mà chủ không phải bạn → **chỉ được đọc, tuyệt đối không sửa**.
-- Vùng trống chủ → nhận rồi làm.
+- Vùng trống chủ → nhận rồi làm. Vùng có chủ khác → **chỉ đọc, tuyệt đối không sửa**.
 - Muốn giành vùng người khác đang giữ → **hỏi Đức**, không tự lấy.
 
-**Gốc repo chia làm NHIỀU khoá.** Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng
-phiên sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của
-`.repo-structure.json`.
+**Nhận khoá NGAY TRƯỚC LƯỢT GHI ĐẦU TIÊN** — đọc và đo không cần khoá — và **một lane một khoá gói**,
+cần thêm thì nhận thêm lúc cần. Đo 06/09: mọi bản giao việc mở đầu bằng *"nhận khoá trước"*, trong khi
+lane dành 5–20 phút đầu chỉ để đọc.
 
+**KHÔNG nhả khoá hộ lane khác vì thấy "repo chưa thấy dấu vết"** (tín hiệu ở `--list` và trên bảng).
+Nó nói repo chưa thấy gì, **không** nói lane đó rảnh — lane cẩn thận dựng nháp ngoài repo rồi mới ghi
+vào; 06/09 nhả hộ một lần, lane kia mất phần đã xong. Thấy thì **HỎI**. Ba đường hợp lệ để khoá được
+trả: chính lane đó trả · lane đó đã kết thúc · Đức chốt chuyển khoá.
 
-**Hai file được MIỄN, và lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác
-hành chính — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt
-MỌI phiên ghi Log — nhưng **chỉ miễn khi chỉ thêm dòng**; sửa HAY XOÁ dòng cũ là viết lại lịch sử của
-phiên khác).
+**Gốc repo chia làm NHIỀU khoá.** Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng phiên
+sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của `.repo-structure.json`.
 
-Đây không phải hình thức: ngày 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một
-khoá duy nhất là điểm nghẽn thật, không phải lý thuyết.
+**Hai file được MIỄN, lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác hành chính
+— không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt MỌI phiên ghi Log
+— nhưng **chỉ miễn khi chỉ THÊM dòng**; sửa hay xoá dòng cũ là viết lại lịch sử của phiên khác).
+Không phải hình thức: 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một khoá duy nhất
+là điểm nghẽn thật, không phải lý thuyết.
 
 ## 2. Sáu việc PHẢI hỏi Đức trước
 
@@ -87,9 +90,7 @@ flowchart TD
     D -- không --> E["TỰ LÀM"]
 ```
 
-**"Luật an toàn" ở hàng 6 là năm thứ này:** *thử lại* (hỏng thì thử mấy lần rồi bỏ) · *dừng khẩn*
-(gặp chuyện thì dừng hẳn) · *quy trách nhiệm* (việc nào cũng ghi rõ ai làm) · *lưu trạng thái*
-(làm dở thì nhớ tới đâu) · *làm đúng một lần* (chạy hai lần không được ra hai kết quả).
+**"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md).
 
 Repo có phụ lục nghề (`docs/ANNEX-*.md`) thì việc phụ lục liệt kê cũng phải hỏi — phụ lục chỉ
 được **thêm** vào sáu việc trên, không được bớt.
@@ -131,10 +132,9 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và m�
 
 Ba AI có thể cùng lúc trong repo, nhưng **khác package** (mục 1).
 
-**Cửa vào của từng AI:** Claude tự đọc `CLAUDE.md` gốc → trỏ sang file này. Codex tự đọc
-`AGENTS.md` gốc. Antigravity thì Đức phải dán **một câu mở màn** mỗi phiên: *"Đọc AGENTS.md ở
-gốc repo trước khi làm gì."* — thử live 26/08 cho thấy nó đọc và tuân luật, nhưng chưa chứng
-minh được nó **tự** nạp lúc mở phiên.
+**Cửa vào của từng AI:** Claude tự đọc `CLAUDE.md` gốc → trỏ sang file này. Codex tự đọc `AGENTS.md`
+gốc. Antigravity thì Đức phải dán **một câu mở màn** mỗi phiên: *"Đọc AGENTS.md ở gốc repo trước khi
+làm gì."* — thử live 26/08: nó đọc và tuân luật, nhưng chưa chứng minh được nó **tự** nạp lúc mở phiên.
 
 ## 6. Sổ tay mở khi cần — Tầng 2
 
@@ -152,6 +152,7 @@ minh được nó **tự** nạp lúc mở phiên.
 | Viết một tài liệu nghiên cứu | [docs/_TEMPLATE-study.md](docs/_TEMPLATE-study.md) |
 | Viết đề bài cho một phiên AI | [docs/_TEMPLATE-brief.md](docs/_TEMPLATE-brief.md) |
 | **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) — bốn cơ chế (bảng chủ sở hữu · nhãn `Lane:` · cổng đóng phiên · cổng xuất bản), một ngày làm việc 5 bước, **năm bất biến kèm lý do từng cái**, và quy trình đổi cơ chế có **đột biến kiểm bắt buộc**. Mục 1–3 viết cho người không code. **Cố ý không chứa số đo, không kiểm kê chốt, không bảng mã lỗi** — ba thứ đó khác nhau ở từng repo và mục nhanh hơn ai kịp sửa, nên nó chỉ đưa câu lệnh để tự đo |
+| **Muốn biết bộ khung và một repo đã lắp nó đang LỆCH nhau ở đâu** | [docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md](docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md) — đo 06/09, mỗi khối lệch rơi vào **đúng một** trong ba ô: `KÉO XUỐNG` · `ĐẨY LÊN` · `CỐ Ý KHÁC`. Ô thứ ba là ô hay bị bỏ sót nhất: repo tiêu thụ lớn hơn vì nó **phản ứng với sự cố thật của riêng nó**, không vì nó tốt hơn — chép mù bản của nó là nhập cả những luật chỉ đúng ở đó |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) — đọc phần **cuối** file |
 | Biết repo đang nợ gì về cấu trúc | chạy `npm run bootstrap` |
 | **Phát sinh việc ngoài phạm vi phiên mình — chỗ ghi nợ, luật mục 0 bắt** | [BACKLOG.md](BACKLOG.md) — nhóm `## P<n>`, mỗi mục `### KHUNG-<số> · <tiêu đề>`, đóng thì **gạch mã** chứ đừng xoá. `npm run what-next` đọc thẳng file này; sai quy ước một ký tự là mục biến mất khỏi bản đồ việc |
@@ -181,12 +182,13 @@ minh được nó **tự** nạp lúc mở phiên.
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
 | **Biết vì sao hai lệnh của vai điều phối lại phát đi từ đây, dù bộ khung đang ở chế độ bảo trì** | [docs/adr/0005](docs/adr/0005-goi-assistant-phat-hanh-tu-bo-khung.md) — từ bản 1.3.0 bộ khung là **nơi phát hành** gói này; repo đã sinh ra nó thành người tiêu thụ. Hai bất biến cấm đổi ghi ngay trong ADR |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | `tests/` — [tests/harness-smoke.mjs](tests/harness-smoke.mjs) là các khối hạt giống; [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) ghim hai lệnh của vai điều phối, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó; chạy tất cả bằng `npm test`; [tests/giao-viec-smoke.mjs](tests/giao-viec-smoke.mjs) dựng kho git thật rồi đòi lệnh giao việc DỪNG đúng chỗ |
-| **Nhìn lại đã migrate repo nào, ngày nào, bản nào, còn treo gì** | **Tab "Migrate"** của [DASHBOARD-Ark-Repo-Harness.html](DASHBOARD-Ark-Repo-Harness.html) — bảng đối chiếu mọi lượt, rồi **mỗi lượt một tab con**. Đức chốt 06/09: quy về một mối, vì đường dẫn sang trang riêng nằm lẫn trong khối "Trang liên quan" nên trên thực tế không ai tìm ra. Bản in riêng vẫn giữ ở [SO-MIGRATE-Ark-Repo-Harness.html](SO-MIGRATE-Ark-Repo-Harness.html) (`npm run so-migrate`) — **hai trang đọc CHUNG một thư mục hồ sơ nên không thể nói khác nhau**; bản riêng dùng khi cần gửi riêng sổ migrate cho ai đó. Nguồn là `docs/migrations/`: mỗi lần migrate MỘT hồ sơ, **chỉ thêm**. Việc này xảy ra thưa nên không ghi là quên sạch |
+| **Nhìn lại đã migrate repo nào, ngày nào, bản nào, còn treo gì** | **Tab "Migrate"** của [DASHBOARD-Ark-Repo-Harness.html](DASHBOARD-Ark-Repo-Harness.html) — bảng đối chiếu mọi lượt, rồi **mỗi lượt một tab con**. Đức chốt 06/09: quy về một mối, vì đường dẫn sang trang riêng nằm lẫn trong khối "Trang liên quan" nên trên thực tế không ai tìm ra. Trang riêng **thôi được nuôi từ bản 1.3.20** (Đức chốt 06/09: *"chỉ maintain tab Migrate"*) — bản cuối nằm ở [docs/archive/](docs/archive/SO-MIGRATE-Ark-Repo-Harness.html), lệnh `npm run so-migrate` vẫn chạy nếu cần gửi riêng sổ cho ai đó, nhưng nó **không còn là artifact repo phải giữ tươi**. Nguồn là `docs/migrations/`: mỗi lần migrate MỘT hồ sơ, **chỉ thêm**. Việc này xảy ra thưa nên không ghi là quên sạch |
 | **Vá bộ khung rồi đẩy bản vá sang các repo đã lắp** | `scripts/upgrade.mjs` — `npm run upgrade -- --plan <repo>` xem trước, `--apply` ghi. Sổ ghim `.ark/harness.lock.json` ở repo đích. **TỪ CHỐI ghi đè file đã bị sửa tay** — đó là lý do nó tồn tại, không phải để chép file |
 | **Nạp hiểu cả repo trong một lần đọc (cho AI mới vào)** | `llms.txt` ở gốc — cổng vào chuẩn llmstxt.org, **MÁY SINH**. Bản đồ máy đọc đi kèm: `repo-map.json`. Bảng cho người: `DASHBOARD.md`. Cả ba sinh lại bằng `node scripts/build-dashboard.mjs`, đừng sửa tay |
 | **Xem bảng trạng thái trực quan (trang mẹ)** | [DASHBOARD-Ark-Repo-Harness.html](DASHBOARD-Ark-Repo-Harness.html) ở gốc repo — **MÁY SINH, đừng sửa tay**. Mở thẳng bằng trình duyệt, không cần AI đăng hộ. Sinh lại: `npm run overview`. **Từ bản 1.3.18 trang này ĐI THEO BẢN TRÍCH** — mọi repo đã lắp đều sinh được cùng một bảng mười tab, tên file suy từ `repo.name` (`DASHBOARD-<tên>.html`), muốn tên khác thì khai `generated_names.overview`. Ba file đi cùng nhau, thiếu một là hai file kia nạp không nổi: `build-overview.mjs` dựng trang · `overview-doc.mjs` bộ đọc · `md-mini.mjs` đổi markdown. Hai khối chỉ đúng ở repo nhà (**Mô hình** và **Giao việc cho AI khác**) tự ẩn ở repo đích. Nội dung suy **hoàn toàn từ HEAD**, cố ý: nó nằm trong khối `generators` nên cổng kiểm nó mỗi phiên, và một bộ sinh nhìn đồng hồ thì sang ngày mới là **mọi phiên bị chặn đẩy** dù không dữ liệu nào đổi. Việc báo cũ do đoạn JS trong trang tự tính lúc MỞ trang. Bộ đọc của năm tab mới (**AI điều phối · Ý tưởng · Vận hành · Sức khoẻ & nợ · Cấu trúc**) tách ở [scripts/overview-doc.mjs](scripts/overview-doc.mjs) — nó là phần **kiểm được bằng phép kiểm thuần**, khác phần dựng HTML. Muốn một mục việc hiện ở tab AI điều phối thì đặt dấu `@Đức:bấm` hoặc `@Đức:chốt` **ngay trên dòng của mục** trong sổ nợ / sổ ý tưởng / hồ sơ trạng thái — mục đóng thì dấu mất theo, không ai phải nhớ đi xoá |
 | **Bảy chỗ hợp đồng lõi đã từng vỡ, và phép kiểm phá cho từng chỗ** | `tests/core-contract.mjs` — bộ đo nói dối · đo được nghề khác · vòng đời một bảng · git hỏng không hoá số 0 · quy chủ theo tiền tố dài nhất · ADR xoá cũng bị bắt · khoá quyền nguyên tử |
 | **Biết cổng đóng phiên có ĐỎ THẬT được không** | [tests/cong-do-that.mjs](tests/cong-do-that.mjs) — sáu phép kiểm từng **chưa từng đỏ lần nào** qua 46 lượt chạy. Mỗi khối dựng một kho thật, phá đúng MỘT thứ, rồi đòi ĐÚNG phép kiểm ấy đỏ. Một phép kiểm chưa từng đỏ và một phép kiểm **không thể** đỏ trông giống hệt nhau trên bảng — và bảng thì luôn xanh |
+| **Sắp sửa cơ chế KHOÁ VÙNG — nhận, giữ, hay trả** | [tests/khoa-dau-vet.mjs](tests/khoa-dau-vet.mjs) — tám vế ghim tín hiệu *"repo chưa thấy dấu vết"*. Vế 7 ghim **mức nghiêm trọng**: tín hiệu này là VÀNG, nó **không** được đổi mã thoát của cổng — chặn một lane đang đọc kỹ là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ. Bốn đột biến đã chạy thật, ghi trong đầu file |
 | **Biết một số phiên bản bộ khung ứng với nội dung nào** | [RELEASE-LEDGER.json](RELEASE-LEDGER.json) — mỗi bản ↔ dấu vân tay tầng máy, **CHỈ THÊM**. Sửa một dòng đã có là nói dối về một bản đã phát. Đổi nội dung `scripts/` hay `tests/` mà không tăng `version` thì sổ lệch, và ba chỗ cùng chặn: `npm test` · bộ sinh từ chối tự sửa · `upgrade.mjs` không phát đi được với **mọi** repo đích |
 | **Một phép kiểm tự nhiên đỏ với người vừa clone mà xanh trên máy bạn** | [.gitattributes](.gitattributes) — chốt kiểu xuống dòng cho CẢ repo, cả trong kho lẫn trong cây làm việc. Không có nó thì máy Windows tự đổi lúc lấy file ra, một commit có hai dạng byte, và `git status` nói SẠCH ở cả hai. Đo trước khi thêm: cùng một cây làm việc, 75 file LF và 21 file CRLF |
 | **Biết cổng nào còn chạy sau khi mã rời máy** | [.github/workflows/](.github/workflows/) — `cong-kiem.yml` chạy trên GitHub: bộ phép kiểm · cấu trúc B1–B15 · artifact máy sinh còn tươi. Nó KHÔNG thay cổng đóng phiên (cổng đó hỏi những câu chỉ có nghĩa trong một phiên: bạn tên gì, giữ vùng nào, đã ghi Log chưa), mà bịt chỗ hở duy nhất còn lại: mọi lớp bảo vệ khác chạy trên máy người dùng nên `git push` trần đi qua hết |

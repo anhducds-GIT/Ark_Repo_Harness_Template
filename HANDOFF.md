@@ -897,3 +897,73 @@ nhưng lệch `origin/main` **5 sau · 48 trước**, và cây làm việc có *
 khung** — việc của phiên khác. Luật 8A của chính repo đó cấm ghi khi bản trên máy còn sau cloud.
 
 Không tự quyết. Ba lối đã ghi ở `KHUNG-30`.
+
+---
+
+## 2026-09-06 · `claude-k2-khoa` — luật giữ khoá + tab Migrate + bản đồ hoà giải → 1.3.21
+
+**Ba việc, theo yêu cầu của Đức và một bản giao việc từ repo tiêu thụ `Chrome_Extension_AI_Agentic`.**
+
+### 1. Bản đồ hoà giải — làm trước, không sửa dòng mã nào
+
+`docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md`. Đo lại tất cả bằng lệnh, không tin bảng gửi sang.
+Bản gốc và bản trích **khớp từng dòng ở cả năm file** — bộ sinh bản trích khoẻ. Lệch nằm hoàn
+toàn ở repo tiêu thụ, và lệch **cả hai chiều**.
+
+Phân loại: **KÉO XUỐNG 7** · **ĐẨY LÊN 2** · **CỐ Ý KHÁC 9**.
+
+**Một ca của luật vàng 4.** Bản giao việc nói bộ khung thiếu `ageHours`/`ageLabel`/`GIO_NHAC`
+(đếm 0 ở `scripts/*.mjs` của bộ khung). Số đo đúng, **kết luận sai** — ba thứ đó có sẵn, ở
+`what-next.mjs`. Cách đo (so tên hàm theo từng file) làm một hành vi *viết ở file khác* hiện ra
+như "thiếu". Ô ĐẨY LÊN vì thế còn **một** mục thật, không phải hai.
+
+### 2. Tín hiệu "repo chưa thấy dấu vết" — VÀNG, không ĐỎ
+
+Ba chỗ hiện: `claim.mjs --list` · khối "Đang làm gì" trên bảng · cổng đóng phiên. Một câu duy
+nhất, lấy từ `noiDauVet()` — ba chỗ tự viết lại là ba chỗ sẽ rút gọn thành "rảnh".
+
+**Chữ "rảnh" là chỗ nguy hiểm, không phải chuyện chữ nghĩa.** Ca 14 phút mà bản giao việc dẫn ra
+hoá ra là **dương giả**: lane ấy đang làm thật ở thư mục ngoài repo. Phiên điều phối tin con số,
+nhả khoá hộ, lane mất phần đã xong. Con số này **về nguyên tắc** không thấy được việc ngoài repo.
+
+Đo được ngay tại repo này khi viết: giữ `_template` 0 phút không chạm gì → cả `--list` lẫn cổng
+đều nói đúng câu; giữ `_code` đang sửa dở → im. Hai nhánh đều chạy thật, không chỉ trong test.
+
+`claimed_at` từ nay có **giờ**, không chỉ ngày — cả hai ca thật xảy ra trong 20 phút đầu, mà mốc
+chỉ-ngày làm mọi lượt trong ngày trông như nhận lúc nửa đêm. Mốc cũ vẫn đọc được.
+
+**Ghim: `tests/khoa-dau-vet.mjs`, 8 vế, 4 đột biến đã chạy thật.**
+
+Một đột biến **suýt lọt và đã sửa**: vế "mã thoát không đổi" vô nghĩa ở kho nền vốn đã đỏ vì lý
+do khác (mã thoát là 1 ở cả hai lượt). Thêm hai phép ghim độc lập với nền — **số phép kiểm** và
+**câu kết luận của cổng** — thì đột biến mới thật sự đỏ. Ghi lại vì đây đúng là hình dạng "một
+phép kiểm không thể đỏ trông giống hệt một phép kiểm chưa từng đỏ".
+
+Luật vào `AGENTS.md` mục 1 + `MULTIFLOW.md` mục 3: **nhận khoá ngay trước lượt ghi đầu** ·
+**một lane một khoá gói** · **không nhả khoá hộ**.
+
+### 3. Tab Migrate viết lại, trang riêng thôi được nuôi
+
+Bố cục mới: **bảng ba mốc** → **"dừng ở đâu"** → chữ gập trong `<details>`. Ba mốc lấy từ
+`CHUYEN-REPO-LEN-CHUAN.md`, không tự đặt. Ô không có nguồn nói **"chưa khai"** — không làm tròn
+thành "chưa xong", và chỗ trống đó tự nó là thông tin (`KHUNG-36`).
+
+`SO-MIGRATE-*.html` rời `generators`/`generated`, bản cuối **dời** sang `docs/archive/`.
+`build-so-migrate.mjs` nay **bắt đưa đường dẫn** — giữ mặc định cũ là gài bẫy một file không ai
+khai ở gốc repo, và cổng sẽ đỏ với một câu không nói gì về nguyên nhân thật.
+
+### Trả giá cho việc thêm luật — mục 8, đo được
+
+Thêm luật vào mục 1 làm `template/AGENTS.md` **vượt trần 200 dòng** và `tests/template-null-repo`
+đỏ: một repo vừa dựng đã mang nợ. **Không nới trần** (đó là làm yếu lớp bảo vệ để lấy màu xanh).
+Đã bớt: năm định nghĩa "luật an toàn" dời sang `docs/LEGEND.md` — đúng lời khuyên của chính phép
+kiểm B9 — phần còn lại gói chặt hơn. Về đúng **200/200**.
+
+### Số cuối phiên
+
+| Việc | Kết quả |
+|---|---|
+| `npm test` | **19+21+9+5+9+10+8 vế xanh**, 0 đỏ |
+| Bản | 1.3.19 → **1.3.21** (1.3.20 cắt giữa chừng, sổ phát hành chặn — đúng thiết kế) |
+| `template/AGENTS.md` | 200/200 dòng, B9 sạch |
+| Còn mở | `KHUNG-33` (trả khoá khi chưa đẩy) · `KHUNG-34` (tám cái bẫy) · `KHUNG-36` (backfill hồ sơ cũ) · `KHUNG-30` (repo thứ ba) |

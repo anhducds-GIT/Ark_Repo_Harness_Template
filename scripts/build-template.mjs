@@ -120,7 +120,11 @@ const VERBATIM = [
   [".gitattributes", ".gitattributes"],
   // Phép ghim của bộ đọc bảng. Phát ba file máy mà không phát suite ghim của chúng là phát một
   // lời hứa: repo đích sẽ có bảng, và sẽ không có gì bắt được lúc bảng đọc sai.
-  ["tests/overview-doc-smoke.mjs", "tests/overview-doc-smoke.mjs"]
+  ["tests/overview-doc-smoke.mjs", "tests/overview-doc-smoke.mjs"],
+  /* Cơ chế đa phiên → `MULTIFLOW.md` mục 5 bắt đột biến kiểm, và phát một cơ chế mà không phát
+   * phép ghim của nó là phát một lời hứa. Suite này tự dựng kho git riêng và đọc `areas` của
+   * repo đích, nên nó chạy được cả ở repo khai khối `areas` rỗng. */
+  ["tests/khoa-dau-vet.mjs", "tests/khoa-dau-vet.mjs"]
 ];
 
 /* ADR-0000 CỐ Ý KHÔNG chép nguyên văn. Bản gốc kể lại lịch sử di trú của riêng repo gốc — ba
@@ -435,7 +439,7 @@ function phanLuatChung(text) {
    là bản đồ địa phương của từng repo. Khác regex từ vựng hữu hạn, phép so này bắt MỌI thay đổi:
    thêm một luật nghề dùng từ chưa từng biết, đổi lời một luật cũ, hoặc làm mất một luật chung.
    Khi Đức duyệt đổi luật chung thật, người sửa phải cập nhật dấu vân tay cùng fixture tương ứng. */
-const COMMON_LAW_SHA256 = "2229dd09be0db8be74409f58d8bde79c71b1a330ba02543760cfe073ef1022f9";
+const COMMON_LAW_SHA256 = "a69e334f455b2056d7d3338f6924c70bde1088ed914dbd4d986a9db04decfe55";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -864,7 +868,7 @@ function packageJson(version) {
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
-      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs"
+      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs"
     }
   }, null, 2) + "\n";
 }

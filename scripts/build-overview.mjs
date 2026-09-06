@@ -31,12 +31,13 @@ import { fileURLToPath } from "node:url";
 
 import { esc, md, tachFrontmatter } from "./md-mini.mjs";
 
-/* CHỈ NHẬP TỪ HAI FILE, và cả hai ĐỀU ĐI THEO BẢN TRÍCH.
+/* CHỈ NHẬP TỪ BA FILE, và cả ba ĐỀU ĐI THEO BẢN TRÍCH.
  *
  * Đây là điều kiện để trang này phát đi được. Bản 1.3.16 nhập từ `giao-viec.mjs` và
  * `build-so-migrate.mjs` — hai lệnh **ở lại repo nhà** — nên phát đi là repo đích nạp trang
  * chết ngay dòng import, với một câu lỗi không nói gì về nguyên nhân thật. Hằng số và bộ đọc
  * đã dời sang `overview-doc.mjs`; chiều phụ thuộc nay chảy từ thứ ở lại sang thứ đi theo. */
+import { ageHours, ageLabel, DAU_VET, doDauVet, noiDauVet } from "./claim.mjs";
 import {
   BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readHoSo, readIdeas, readKhoa,
   readNo, THU_MUC_MIGRATE, VIEC
@@ -268,6 +269,16 @@ const CSS = `
 .hieu.mo{background:var(--xanh-nen);color:var(--xanh)}
 .hieu.ban{background:var(--vang-nen);color:var(--vang)}
 .hieu.tt{background:var(--mat2);color:var(--chu2)}
+/* CHƯA THẤY DẤU VẾT — vàng viền, không vàng đặc: nó là câu hỏi, không phải phán quyết. */
+.hieu.cho{background:transparent;color:var(--vang);box-shadow:inset 0 0 0 1px var(--vang)}
+/* Ô mốc của sổ migrate. Chữ to, màu theo trạng thái — bảng này để LIẾC, không để đọc. */
+.mc{font-size:15px;font-weight:700;text-align:center}
+.mc sup{font-size:9px;font-weight:400;opacity:.7}
+.mc-xong{color:var(--xanh)}.mc-chua{color:var(--do)}.mc-dang{color:var(--vang)}.mc-trong{color:var(--chu2);opacity:.45}
+details.gap>summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--chu2);list-style:none}
+details.gap>summary::before{content:'▸ ';color:var(--vang)}
+details.gap[open]>summary::before{content:'▾ '}
+details.gap[open]>summary{margin-bottom:12px;color:var(--chu)}
 
 /* Thanh ba bậc của một ý tưởng. Bậc "nghỉ" KHÔNG phải bậc thứ tư: nó vẽ thành chấm rỗng có
    gạch ngang, để không ai đọc nhầm một ý tưởng đã bỏ là "gần xong". */
@@ -769,13 +780,28 @@ export function khoiCanDuc(canDuc, tenNguoi) {
 }
 
 /* "Ngay lúc này có mấy luồng đang chạy, và chúng đang làm gì?" */
-export function khoiDangLamGi(khoa, ngay) {
+export function khoiDangLamGi(khoa, ngay, vet = new Map()) {
   const giu = khoa.filter((k) => k.owner);
+  /* CÂU IN RA LẤY TỪ `noiDauVet`, không viết lại ở đây.
+   *
+   * Ba chỗ hiển thị tín hiệu này (`claim.mjs --list` · khối này · cổng đóng phiên) phải nói ĐÚNG
+   * MỘT câu. Chỗ nào tự viết lại là chỗ đó sẽ rút gọn thành "rảnh" — và "rảnh" chính là cách đọc
+   * đã làm một lane mất việc ngày 06/09. Tên của tín hiệu là phần của hợp đồng. */
+  const noi = (k) => {
+    // Tuổi thay cho mốc thô: "giữ 40 phút" đọc được ngay, "2026-09-06T09:40:00Z" thì phải tự trừ.
+    // Không tính được tuổi thì mới in mốc — thà xấu còn hơn giấu.
+    const gio = ageHours(k.tu);
+    const phan = [gio != null ? "giữ " + ageLabel(gio) : k.tu ? "từ " + k.tu : null];
+    phan.push(noiDauVet(vet.get(k.khoa)));
+    const co = phan.filter(Boolean);
+    return co.length ? " · " + esc(co.join(" · ")) : "";
+  };
   const than = giu.length
     ? giu.map((k) => NHAN_KHOA + '<div class="kh"><span class="t">' + esc(k.owner)
         + '<small>' + esc(k.task || "chưa khai đang làm gì") + ' · giữ khoá <code>' + esc(k.khoa)
-        + '</code>' + (k.tu ? ' từ ' + esc(k.tu) : "") + '</small></span>'
-        + '<span class="hieu ban">ĐANG GIỮ</span></div>').join(NL)
+        + '</code>' + noi(k) + '</small></span>'
+        + '<span class="hieu ' + (vet.get(k.khoa) === DAU_VET.CHUA ? "cho" : "ban") + '">'
+        + (vet.get(k.khoa) === DAU_VET.CHUA ? "CHƯA THẤY DẤU VẾT" : "ĐANG GIỮ") + '</span></div>').join(NL)
     : NHAN_KHOA + '<p>Không luồng nào đang giữ vùng trong repo này.</p>';
   /* MỖI DÒNG MỘT KHOÁ, và mỗi dòng mang nhãn. Nối chúng bằng xuống dòng chứ không nối liền:
    * bộ lọc làm việc theo DÒNG, nên hai khoá nằm chung một dòng thì hoặc lọt cả hai hoặc lọc
@@ -787,7 +813,11 @@ export function khoiDangLamGi(khoa, ngay) {
     + 'chưa kịp nhận vùng</em> — lúc đó nó chưa để lại dấu vết nào trong repo. Nên dòng "không '
     + 'luồng nào đang chạy" đọc đúng là <strong>"không luồng nào đang giữ vùng trong repo '
     + 'này"</strong>. Đây là ảnh chụp theo lần ghi gần nhất vào repo (' + esc(ngay)
-    + '), không phải số liệu thời gian thực.</p></div>';
+    + '), không phải số liệu thời gian thực.</p>' + NL
+    + NHAN_KHOA + '<p class="ghi"><strong>"Repo chưa thấy dấu vết" KHÔNG có nghĩa là luồng đó rảnh.</strong> '
+    + 'Repo chỉ thấy được thứ đã chạm repo, mà một luồng cẩn thận thì dựng nháp ở ngoài rồi mới ghi vào. '
+    + 'Ngày 06/09 một luồng bị đọc nhầm đúng như vậy và bị nhả khoá hộ, phải hoàn nguyên phần đã xong. '
+    + '<strong>Đừng nhả khoá của luồng khác vì con số này</strong> — hỏi luồng đó, hoặc hỏi Đức.</p></div>';
 }
 
 /* "Còn mấy chỗ trống để giao việc song song?" — cố ý KHÔNG kể ai giữ, khối trên đã kể rồi. */
@@ -970,6 +1000,69 @@ export function khoiVanHanh(coChe, batBien, soKhoa) {
  *
  * TÁCH TỪNG LƯỢT THÀNH TAB CON, cũng theo Đức: ba hồ sơ nối đuôi nhau thì người mở ra phải
  * cuộn qua hai lượt cũ mới tới lượt mình cần, và mỗi hồ sơ đều dài. */
+/* ---- Tab Migrate: BẢNG MỐC trước, chữ sau ---------------------------------
+ *
+ * Đức chốt 06/09, nguyên văn: *"mỗi khi tôi check status migrate, tôi sẽ thấy milestone lớn đang
+ * ở bước nào, các feature đã được migrate thế nào, đã go live thế nào, trải qua các bước audit ra
+ * sao. Nếu mà dừng lại bước nào tôi sẽ continue và chạy bước đó chứ tôi sẽ không đi sâu vào đọc
+ * từng chữ."*
+ *
+ * Bản trước chiếu gần trọn thân hồ sơ ra màn hình. Chữ thì hay, nhưng nó trả lời sai câu hỏi:
+ * người mở sổ hỏi *"đang ở đâu, làm gì tiếp"*, không hỏi *"lượt thứ hai viết gì"*. Nên bố cục đảo
+ * lại: bảng mốc → việc kế → rồi mới tới chữ, và chữ **gập lại**.
+ *
+ * BA MỐC LỚN lấy từ `docs/protocols/CHUYEN-REPO-LEN-CHUAN.md` — *"migrate là BA việc trong một"*
+ * (Đức chốt 05/09): **migrate** · **audit** · **assistant onboard**. Không tự đặt mốc mới ở đây;
+ * bảng chỉ chiếu lại mốc mà quy trình đã khai, nếu không thì hai chỗ sẽ nói hai kiểu.
+ *
+ * "CHƯA KHAI" KHÔNG ĐƯỢC LÀM TRÒN THÀNH "CHƯA XONG". Ba hồ sơ đang có được ghi TRƯỚC khi bảng này
+ * tồn tại, nên chúng không khai hai mốc sau. Suy bừa ra "chưa xong" là bịa một con số nợ; suy bừa
+ * ra "xong" thì tệ hơn. Ô nào không có nguồn thì nói thẳng là chưa khai — và chính chỗ trống đó
+ * là thông tin: nó chỉ ra hồ sơ đang thiếu gì. */
+
+/** Ba mốc lớn của một lượt migrate. Thứ tự là thứ tự thật: không audit nổi thứ chưa nằm trong repo. */
+export const MOC_MIGRATE = Object.freeze([
+  { khoa: "viec_migrate", nhan: "Migrate", y: "bộ khung nằm trong repo đích, hình dạng đã khai, cổng chạy được" },
+  { khoa: "viec_audit", nhan: "Audit", y: "đã quét repo đích, nợ tìm được đã nằm trong sổ nợ của nó" },
+  { khoa: "viec_assistant", nhan: "AI onboard", y: "một phiên AI ở repo đích chạy được trọn vòng làm việc" }
+]);
+
+/**
+ * Trạng thái một mốc, và **nguồn** của nó. Thuần, nên đột biến kiểm được.
+ *
+ * `nguon` là phần quan trọng: `"khai"` = hồ sơ tự nói · `"suy"` = bảng suy ra từ trường khác, và
+ * phải nói rõ suy từ đâu · `null` = không có nguồn nào, ô để trống.
+ */
+export function xetMoc(fm, moc) {
+  const raw = fm?.[moc.khoa];
+  if (raw !== undefined && String(raw).trim() !== "") {
+    const t = String(raw).trim().toLowerCase();
+    const den = /^(xong|đã xong|có|xanh|đạt)$/.test(t) ? "xong" : /^(đang|dở|một phần)$/.test(t) ? "dang" : "chua";
+    return { den, chu: String(raw).trim(), nguon: "khai" };
+  }
+  /* SUY, và chỉ suy ĐÚNG MỘT ô. Mức 3 là định nghĩa "đã lên chuẩn" của quy trình, nên `muc_sau`
+   * trả lời được mốc 1 — và chỉ mốc 1. Hai mốc sau không có trường nào tương đương, nên chúng
+   * để trống chứ không được mượn tạm con số của mốc 1. */
+  if (moc.khoa === "viec_migrate") {
+    const m = Number(fm?.muc_sau);
+    if (Number.isFinite(m)) return { den: m >= 3 ? "xong" : "chua", chu: `mức ${m}`, nguon: "suy" };
+  }
+  return { den: "trong", chu: "chưa khai", nguon: null };
+}
+
+/** Một câu: lượt này dừng ở đâu, chạy gì để đi tiếp. Không có thì im, đừng bịa. */
+export function viecKe(fm) {
+  const khai = fm?.viec_ke;
+  if (typeof khai === "string" && khai.trim()) return khai.trim();
+  const cong = String(fm?.cong_dong_phien || "").trim().toLowerCase();
+  if (cong && !/xanh/.test(cong)) return "cổng đóng phiên chưa xanh — chạy lại `node scripts/session-check.mjs --as <phiên>` ở repo đó";
+  for (const moc of MOC_MIGRATE) {
+    const x = xetMoc(fm, moc);
+    if (x.den === "chua" || x.den === "dang") return `mốc "${moc.nhan}" chưa xong — ${moc.y}`;
+  }
+  return null;
+}
+
 export function khoiMigrate(hoSo) {
   if (!hoSo.length) {
     return '<div class="the"><h2>Sổ migrate</h2><p>Chưa lượt migrate nào được ghi hồ sơ. '
@@ -980,22 +1073,41 @@ export function khoiMigrate(hoSo) {
   const den = { "xanh": "xanh", "đỏ": "do", "chưa chạy": "vang" };
   const v = (h, k) => (h.fm[k] === undefined || h.fm[k] === "" ? null : String(h.fm[k]));
   const id = (h) => "mg-" + slug(v(h, "repo") || h.file);
+  const O = { xong: "✓", chua: "✗", dang: "◐", trong: "·" };
 
+  /* ---- 1. BẢNG MỐC. Ô đầu tiên người mở sổ nhìn vào. ---------------------- */
+  const hangMoc = hoSo.map((h) => {
+    const o = MOC_MIGRATE.map((m) => {
+      const x = xetMoc(h.fm, m);
+      return '<td class="so mc mc-' + x.den + '" title="' + esc(m.nhan + ": " + x.chu + (x.nguon === "suy" ? " (suy ra)" : "")) + '">'
+        + O[x.den] + (x.nguon === "suy" ? '<sup>?</sup>' : "") + '</td>';
+    }).join("");
+    const cong = v(h, "cong_dong_phien") || "chưa khai";
+    return '<tr><td><a href="#' + esc(id(h)) + '" data-goto2="' + esc(id(h)) + '">'
+      + esc(v(h, "repo") || h.file) + '</a><small>' + esc(v(h, "ngay") || "—") + '</small></td>'
+      + o
+      + '<td class="so"><span class="cham ' + (den[cong.trim()] || (/xanh/i.test(cong) ? "xanh" : "vang")) + '"></span>' + esc(cong) + '</td>'
+      + '<td class="so">' + esc(v(h, "ban_khung") || "—") + '</td>'
+      + '<td>' + esc(v(h, "trang_thai") || "chưa khai") + '</td></tr>';
+  }).join("");
+
+  /* ---- 2. VIỆC KẾ. Chỉ hiện repo còn dở — repo xong rồi thì không có gì để nói. */
+  const ke = hoSo.map((h) => [h, viecKe(h.fm)]).filter(([, k]) => k);
+  const khoiKe = ke.length
+    ? '<div class="the"><h2>Dừng ở đâu — ' + ke.length + ' lượt còn việc</h2>'
+      + ke.map(([h, k]) => '<div class="kh"><span class="t">' + esc(v(h, "repo") || h.file)
+        + '<small>' + esc(k) + '</small></span>'
+        + '<a class="hieu ban" href="#' + esc(id(h)) + '" data-goto2="' + esc(id(h)) + '">MỞ HỒ SƠ</a></div>').join("")
+      + '</div>'
+    : '<div class="the"><h2>Dừng ở đâu</h2><p>Không lượt nào đang dở — cả ' + hoSo.length
+      + ' hồ sơ đều khai xong và cổng đóng phiên xanh.</p></div>';
+
+  /* ---- 3. Tab con từng repo: SỐ trước, chữ GẬP LẠI ---------------------- */
   const nut = hoSo.map((h, i) => '<button role="tab" data-tab2="' + esc(id(h)) + '"'
     + ' aria-selected="' + (i === 0 ? "true" : "false") + '">'
     + '<span class="cham ' + (den[String(v(h, "cong_dong_phien") || "").trim()] || "vang") + '"></span>'
     + esc(v(h, "repo") || h.file)
     + '<small>' + esc(v(h, "ngay") || "chưa khai ngày") + '</small></button>').join("");
-
-  /* BẢNG ĐỐI CHIẾU đứng TRƯỚC các tab con, cố ý: câu hỏi đầu tiên của người mở sổ hầu như luôn
-   * là "đã làm mấy repo, cái nào còn treo" — không phải "lượt thứ hai viết gì". */
-  const hang = hoSo.map((h) => '<tr>'
-    + '<td><a href="#' + esc(id(h)) + '" data-goto2="' + esc(id(h)) + '">' + esc(v(h, "repo") || h.file) + '</a></td>'
-    + '<td class="so">' + esc(v(h, "ngay") || "—") + '</td>'
-    + '<td class="so">' + esc(v(h, "ban_khung") || "—") + '</td>'
-    + '<td class="so">' + esc((v(h, "muc_truoc") || "?") + " → " + (v(h, "muc_sau") || "?")) + '</td>'
-    + '<td class="so">' + esc(v(h, "loi_tim_ra") || "—") + '</td>'
-    + '<td>' + esc(v(h, "trang_thai") || "chưa khai") + '</td></tr>').join("");
 
   const oSo = (h) => [["mức đạt chuẩn", (v(h, "muc_truoc") || "?") + " → " + (v(h, "muc_sau") || "?")],
     ["lỗi bộ khung tìm ra", v(h, "loi_tim_ra") || "chưa khai"],
@@ -1004,22 +1116,42 @@ export function khoiMigrate(hoSo) {
     .map((x) => '<div class="o"><span class="n">' + esc(x[1]) + '</span><span class="l">' + esc(x[0]) + '</span></div>')
     .join("");
 
+  const mocCon = (h) => MOC_MIGRATE.map((m) => {
+    const x = xetMoc(h.fm, m);
+    return '<div class="kh"><span class="t">' + O[x.den] + " " + esc(m.nhan)
+      + '<small>' + esc(m.y) + '</small></span>'
+      + '<span class="hieu ' + (x.den === "xong" ? "mo" : x.den === "trong" ? "tt" : "ban") + '">'
+      + esc(x.chu) + (x.nguon === "suy" ? " (suy ra)" : "") + '</span></div>';
+  }).join("");
+
   const khung = hoSo.map((h, i) => '<div class="tab2" id="' + esc(id(h)) + '"' + (i === 0 ? "" : " hidden") + '>'
     + '<div class="the"><h2>' + esc(v(h, "repo") || h.file) + '</h2>'
     + '<p class="ghi">' + esc(v(h, "ngay") || "chưa khai ngày") + ' · bản khung <code>'
     + esc(v(h, "ban_khung") || "?") + '</code> · ' + esc(v(h, "nghe") || "chưa khai nghề") + '</p>'
     + '<div class="sk">' + oSo(h) + '</div>'
+    + mocCon(h)
     + '<div class="hs-do">chi phí trước: ' + esc(v(h, "chi_phi_truoc") || "chưa khai")
     + ' &nbsp;·&nbsp; sau: ' + esc(v(h, "chi_phi_sau") || "chưa khai") + '</div>'
     + '</div>'
-    + '<div class="the">' + md(h.body) + '</div></div>').join("");
+    /* CHỮ GẬP LẠI, và mặc định ĐÓNG. Toàn văn hồ sơ là thứ đáng giữ — chỗ vấp thật nằm trong đó —
+     * nhưng nó là thứ đọc KHI CẦN, không phải thứ đập vào mắt mỗi lần mở sổ. */
+    + '<details class="the gap"><summary>Toàn văn hồ sơ — chỗ vấp, cách chữa, số đo từng bước</summary>'
+    + md(h.body) + '</details></div>').join("");
 
-  return '<div class="the"><h2>Sổ migrate — ' + hoSo.length + ' lượt đã ghi hồ sơ</h2>'
-    + '<div class="tw"><table class="mgt"><thead><tr><th>Repo</th><th>Ngày</th><th>Bản khung</th>'
-    + '<th>Mức</th><th>Lỗi tìm ra</th><th>Kết quả</th></tr></thead><tbody>' + hang + '</tbody></table></div>'
-    + '<p class="ghi">Hồ sơ <strong>chỉ thêm, không sửa cái cũ</strong> — sửa hồ sơ cũ là viết lại '
-    + 'lịch sử của lần migrate đó. Cột <em>lỗi tìm ra</em> đếm lỗi <strong>của chính bộ khung</strong> '
-    + 'mà lượt ấy lôi ra, không phải lỗi của repo đích: đó là chỗ bộ khung lớn lên.</p></div>'
+  return '<div class="the"><h2>Sổ migrate — ' + hoSo.length + ' lượt · ba mốc mỗi lượt</h2>'
+    + '<div class="tw"><table class="mgt"><thead><tr><th>Repo</th>'
+    + MOC_MIGRATE.map((m) => '<th class="so" title="' + esc(m.y) + '">' + esc(m.nhan) + '</th>').join("")
+    + '<th class="so">Cổng</th><th class="so">Bản khung</th><th>Kết quả</th></tr></thead><tbody>'
+    + hangMoc + '</tbody></table></div>'
+    + '<p class="ghi"><strong>✓ xong · ◐ đang · ✗ chưa · · chưa khai.</strong> Dấu <sup>?</sup> nghĩa là '
+    + 'bảng <em>suy ra</em> từ trường khác, không phải hồ sơ tự khai — chỉ mốc <em>Migrate</em> suy được '
+    + '(từ <code>muc_sau</code>). Ô trống <strong>không</strong> có nghĩa là chưa làm: ba hồ sơ đang có '
+    + 'được ghi trước khi bảng này tồn tại nên chúng không khai hai mốc sau. Hồ sơ từ nay khai thêm '
+    + '<code>viec_audit</code> · <code>viec_assistant</code> · <code>viec_ke</code> thì ô tự đầy.</p>'
+    + '<p class="ghi">Hồ sơ <strong>chỉ thêm, không sửa cái cũ</strong>. Cột <em>lỗi tìm ra</em> ở tab con '
+    + 'đếm lỗi <strong>của chính bộ khung</strong> mà lượt ấy lôi ra, không phải lỗi của repo đích: '
+    + 'đó là chỗ bộ khung lớn lên.</p></div>'
+    + khoiKe
     + '<nav class="tabs2" role="tablist">' + nut + '</nav>'
     + khung;
 }
@@ -1043,7 +1175,7 @@ export function khoiLienQuan(banDo, trangCo) {
 export function trang(dl) {
   const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st,
     briefs = [], dichDen = [], soPhepKiem = null,
-    ideas = [], canDuc = [], khoa = [], noMo = [], noMuc = [], coChe = [], batBien = [], vung = [], fileGoc = [], hoSo = [], laRepoNha = false } = dl;
+    ideas = [], canDuc = [], khoa = [], vetKhoa = new Map(), noMo = [], noMuc = [], coChe = [], batBien = [], vung = [], fileGoc = [], hoSo = [], laRepoNha = false } = dl;
   const tenNguoi = dl.tenNguoiChot || "người chốt";
 
   const tabs = [
@@ -1160,7 +1292,7 @@ export function trang(dl) {
   </section>
 
   <section class="tab" id="tab-ai-dieu-phoi" hidden>
-    ${khoiDangLamGi(khoa, ngay)}
+    ${khoiDangLamGi(khoa, ngay, vetKhoa)}
     ${khoiCanDuc(canDuc, tenNguoi)}
     ${khoiKhoa(khoa)}
     ${laRepoNha ? `<div class="the">
@@ -1300,7 +1432,10 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
 
 /* ---- chạy ------------------------------------------------------------------ */
 
-export function gomDuLieu() {
+/* ASYNC từ bản 1.3.20: nó đo dấu vết khoá, và phép đo đó nạp `repo-structure.mjs` theo kiểu
+ * động (`claim.mjs` cố ý không nạp tĩnh file đó — mọi lượt `--take` sẽ phải trả tiền nạp).
+ * Ba chỗ gọi đều ở tầng ngoài cùng của module nên `await` ở đó không tốn gì. */
+export async function gomDuLieu() {
   /* MỘT mốc cho cả hàm. Gọi `mocHEAD()` ở ba chỗ thì ba chỗ đó về lý thuyết đọc được ba giá
    * trị khác nhau (HEAD đổi giữa chừng), và bảng sẽ tự mâu thuẫn với chính nó. */
   const headDate = mocHEAD();
@@ -1359,7 +1494,19 @@ export function gomDuLieu() {
   canDuc.sort((a, b) => (b.ngay ?? -1) - (a.ngay ?? -1));
 
   /* Bảng chủ sở hữu. NÉM nếu hỏng — xem ghi chú ở `readKhoa`. */
-  const khoa = readKhoa(doc(".agents/claims.json") || "{}");
+  const rawKhoa = doc(".agents/claims.json") || "{}";
+  const khoa = readKhoa(rawKhoa);
+
+  /* Dấu vết đo LÚC SINH BẢNG, không đọc từ HEAD như mọi con số khác trên trang.
+   *
+   * Cố ý phá lệ, và lệ đó có lý do thật (một bộ sinh nhìn đồng hồ thì sang ngày mới là mọi phiên
+   * bị chặn đẩy). Ở đây không sao: cả khối này đã mang `NHAN_KHOA`, nên phép so trang-với-HEAD
+   * bỏ qua từng dòng của nó. Không có ngoại lệ này thì tín hiệu vô nghĩa — "chưa thấy dấu vết"
+   * đọc từ HEAD là câu về quá khứ, mà câu duy nhất đáng hỏi là câu về BÂY GIỜ.
+   *
+   * Hỏng thì trả bản đồ rỗng: mọi khoá về "ĐANG GIỮ", tức về đúng hành vi trước bản 1.3.20. */
+  let vetKhoa = new Map();
+  try { vetKhoa = await doDauVet(JSON.parse(rawKhoa)?.claims || {}, ROOT); } catch (_) { vetKhoa = new Map(); }
 
   /* Sổ nợ: mục còn mở. `tachDaXong` phía trên đã lo phần đã đóng, hai bên đọc CÙNG một dấu
    * (gạch mã) nên chúng không thể nói khác nhau về cùng một mục. */
@@ -1547,6 +1694,7 @@ export function gomDuLieu() {
     // Một số 0 đứng một mình trông giống hệt nhau ở hai ca ngược nhau: "đã dò hết, sạch" và
     // "chưa dò gì cả". Trước 06/09 bảng chỉ in con số, nên nó không phân biệt được hai ca đó —
     // và ca thứ hai là ca nguy hiểm, vì nó hiện ra màu xanh.
+    vetKhoa,
     so: [
       { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn", mau: `đã tính tuổi ${soTaiLieu} tài liệu theo hạn rà mỗi file tự khai` },
       { so: noCauTruc, nhan: "nợ cấu trúc (đỏ + vàng)", mau: noCauTruc === null ? "KHÔNG đọc được cổng cấu trúc — chưa dò được" : `đã chạy trọn ${soPhepCauTruc} phép kiểm cấu trúc` },
@@ -1631,7 +1779,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
       console.error(`THIEU_TRANG: ${TRANG_FILE} chưa có trong HEAD. Sinh rồi commit: node scripts/build-overview.mjs`);
       process.exit(1);
     }
-    if (!soSanhTrang(trang(gomDuLieu()), dangCo)) {
+    if (!soSanhTrang(trang(await gomDuLieu()), dangCo)) {
       console.error(`TRANG_CU: ${TRANG_FILE} đã commit không khớp với HEAD. Sinh lại rồi commit: node scripts/build-overview.mjs`);
       process.exit(1);
     }
@@ -1642,7 +1790,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   // Không đưa đường dẫn thì ghi vào bản chuẩn của repo. Có đưa thì ghi ra đó — để xem thử mà
   // không chạm file trong repo.
   const ra = args.find((a) => !a.startsWith("--")) || path.join(ROOT, TRANG_FILE);
-  const dl = gomDuLieu();
+  const dl = await gomDuLieu();
   fs.mkdirSync(path.dirname(path.resolve(ra)), { recursive: true });
   fs.writeFileSync(path.resolve(ra), trang(dl), "utf8");
   console.log(`Đã sinh ${ra} — v${dl.ban} · ${dl.workflows.length} workflow · ${dl.protocols.length} protocol · ${dl.adrs.length} quyết định · ${dl.lenh.length} lệnh.`);

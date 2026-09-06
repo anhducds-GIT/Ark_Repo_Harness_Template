@@ -18,7 +18,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
-const dl = gomDuLieu();
+const dl = await gomDuLieu();
 const html = trang(dl);
 
 /* ---- 1. Đủ tab, và mỗi tab có phần thân của nó -------------------------- */
