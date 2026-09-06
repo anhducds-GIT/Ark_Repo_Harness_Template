@@ -622,3 +622,32 @@ DỰNG NỔI ca hỏng, và cách duy nhất biết là **thử phá**.
 - **KHUNG-23 / CP-1** — Đức đã duyệt thi hành migrate `ALL_SKILL_MANAGEMENT`. Chưa làm trong
   lượt này; là việc kế tiếp.
 - **Thời gian chạy phép kiểm** vẫn vượt trần và nay còn thêm một suite.
+
+## 2026-09-06 · `claude-1.3.9` — KHUNG-23 ĐÃ THI HÀNH: repo thứ ba lên chuẩn
+
+**Làm gì:** migrate `ALL_SKILL_MANAGEMENT` — ca khó nhất trong ba repo đã chạm, vì nó **đã có
+sẵn cơ chế hiệp đồng nhiều AI trước khi bộ khung tới**, và điều phối AI chính là nghề của nó.
+
+**Kết quả số ở repo đích:** `npm test` **exit 0, 53 xanh** · cổng cấu trúc **0 đỏ** · cổng đóng
+phiên **XANH TOÀN BỘ** · đã đẩy 5 commit, trả ba khoá.
+
+**Bốn file trùng tên giữ 1824 dòng — không file nào bị đè.** `AGENTS.md` 86 thêm / **0 xoá**;
+`HANDOFF.md` 48 thêm / **0 xoá**; `DASHBOARD` và `decisions.md` md5 y nguyên. Kiểm bằng
+`--numstat` chứ không bằng mắt.
+
+**BÀI HỌC — BƯỚC 0 là thứ cứu lượt này, và ca vấp là thứ không ai đoán được.**
+`handoff.md` và `HANDOFF.md` là **CÙNG MỘT FILE trên Windows**. Thả hạt giống `HANDOFF.md` vào
+là mất sạch 1225 dòng và **git không báo gì**. `npm run assess` có nói — nhưng nói ở mục cảnh
+báo, không phải mục chặn, nên rất dễ lướt qua.
+
+**Ba lỗi mới của BỘ KHUNG, cả ba chỉ lộ khi chạm repo thật:** KHUNG-26 (đóng cứng tên
+`DASHBOARD.md`) · KHUNG-27 (bản trích thiếu `LEGEND.md` + `HUONG-DAN.md`) · ca hoa/thường ở trên.
+Bảy phiên ở repo nhà không tìm ra cái nào, vì repo nhà đặt tên đúng chuẩn từ đầu và chưa bao
+giờ có bảng viết tay.
+
+**Một chỗ tôi cố ý KHÔNG áp quyết định quá tay:** `discussion_protocol.md` mục 1–4 là quy trình
+ghi biên bản, không phải cơ chế khoá — giữ nguyên hiệu lực. Ghi rõ ở `decisions.md` để Đức bác
+nếu thấy sai.
+
+**Còn mở:** KHUNG-26 · KHUNG-27 · KHUNG-11 phần đuôi (`ORCHESTRATOR.md` 426 dòng) · thời gian
+chạy phép kiểm vượt trần. Không mục nào chặn ai, và **không mục nào chờ Đức chốt**.

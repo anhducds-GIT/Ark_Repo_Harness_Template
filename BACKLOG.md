@@ -364,7 +364,7 @@ XANH**. Tức vế "bộ sinh có thật sự dùng lớp đó không" chưa có
 Ghim được vế này cần một bộ `deps` giả đầy đủ cho `collectModel` — chưa có helper nào trong
 `tests/`, nên là một lượt riêng. Ghi ra thay vì để người sau tưởng F13 đã phủ. Vùng: `_code`.
 
-### KHUNG-23 · `ALL_SKILL_MANAGEMENT` — audit tiền-migrate xong, CHƯA migrate
+### ~~KHUNG-23~~ · ĐÓNG 06/09 · `ALL_SKILL_MANAGEMENT` — audit tiền-migrate xong, CHƯA migrate
 
 Trial ngày 05/09: đo bằng `npm run assess` (**mức 1/3**, 0/32 file khớp, không có
 `package.json`) rồi giao Codex audit độc lập trên bản clone.
@@ -382,6 +382,12 @@ chế phân quyền và hiệp đồng nhiều AI trước khi bộ khung đến
 `authority_matrix` làm chuẩn và bộ khung chỉ thêm khoá vùng, hay ngược lại. Cùng câu hỏi với
 CP-1 ở repo n8n, nhưng nặng hơn vì repo này lấy chính việc điều phối AI làm nghề.
 
+> **XONG 06/09 — đã migrate thật, cổng XANH TOÀN BỘ, đã đẩy.** Hồ sơ:
+> [docs/migrations/2026-09-06-all-skill-management.md](docs/migrations/2026-09-06-all-skill-management.md).
+> Bốn file trùng tên giữ **1824 dòng — không file nào bị đè**, kiểm bằng `--numstat` chứ không
+> bằng mắt. Ba lỗi mới tìm ra: KHUNG-26, KHUNG-27, và ca `handoff.md`/`HANDOFF.md` cùng-một-file
+> trên Windows (đã thành mục của quy trình migrate).
+>
 > **ĐÃ CHỐT 06/09 — Đức chọn: BỘ KHUNG THẮNG, bỏ luật cũ.** Luật đã viết thành một mục của
 > [quy trình migrate](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md), áp cho cả repo này lẫn `n8n`.
 >
@@ -428,6 +434,45 @@ Ca hỏng phải dựng nổi trước khi vá — ba vế, thiếu vế nào th
 **Không chốt thì hậu quả cụ thể:** nhật ký phình mãi. Nó là thứ **mọi phiên AI phải nạp**, ở
 **mọi repo** dùng bộ khung — nên phí nhân theo (số repo × số phiên), khác hẳn tài liệu tra cứu
 chỉ đọc khi cần. Hiện 1.310 dòng và chỉ có một chiều: tăng. Vùng: `_code` + luật.
+
+
+### KHUNG-26 · Bộ khung ĐÓNG CỨNG tên `DASHBOARD.md` — repo nào đã có bảng viết tay đều phải nhường
+
+**Vấp thật 06/09, lượt migrate `ALL_SKILL_MANAGEMENT`.** Repo đó có một bảng theo dõi **viết
+tay 123 dòng**, có mirror sang Google Sheet, được `HANDOFF.md` · `decisions.md` ·
+`03_templates/` trỏ tới. Chạy `npm run overview` một lần là **đè mất sạch**.
+
+`DASHBOARD_FILE = "DASHBOARD.md"` là hằng số trong `build-dashboard.mjs`. Repo đích không khai
+được tên khác, nên **repo phải đổi tên file của mình để nhường bộ sinh** — ngược chiều: bộ khung
+là khách, nó đang bắt chủ nhà dọn phòng.
+
+Đã lách bằng cách đổi tên bản viết tay sang `DASHBOARD-THU-CONG.md` (md5 không đổi), nhưng mọi
+repo sau có `DASHBOARD.md` viết tay đều dính lại.
+
+Ba tên còn lại cùng bệnh: `llms.txt` · `repo-map.json` · `HANDOFF.md`.
+
+**Cách sửa:** cho khai trong `.repo-structure.json`, cùng chỗ với `generated` — ví dụ
+`"generated_names": { "dashboard": "BANG-MAY-SINH.md" }`. Ca hỏng phải dựng nổi: repo khai tên
+khác thì bộ sinh ghi đúng tên đó **và** cổng "sự thật máy sinh còn tươi" đối chiếu đúng file đó;
+repo không khai thì hành vi cũ giữ nguyên. Vùng: `_code`.
+
+### KHUNG-27 · Bản trích KHÔNG mang `docs/LEGEND.md` và `docs/HUONG-DAN.md` — hai file repo mới cần nhất
+
+**Vấp thật 06/09.** Viết bản đồ file cho repo đích, trỏ tới hai file đó vì repo nhà có. Kiểm lại
+trước khi commit thì **cả hai không tồn tại** ở repo đích.
+
+Đây là hình dạng lỗi đã đếm **lần thứ năm**: *luật trỏ tới một thứ không tồn tại*. `F12` ở
+`tests/core-contract.mjs` canh đúng hình dạng này cho `AGENTS.md` của bản trích — nhưng nó
+không canh được bản đồ file do người viết tay ở repo đích.
+
+Trớ trêu ở chỗ hai file này là **thứ repo mới cần nhất**: `LEGEND.md` (47 dòng) là từ điển
+thuật ngữ — gate · claim · lane · fail-closed; `HUONG-DAN.md` (148 dòng) là bản hướng dẫn cho
+người mới và cho phiên AI mới. Repo vừa lắp bộ khung là lúc **cần nhất** hai thứ đó, và là lúc
+duy nhất không có.
+
+**Cách sửa:** thêm cả hai vào `VERBATIM` của `build-template.mjs`. Cần soi trước: `LEGEND.md`
+nhắc tên repo nhà 2 chỗ, `HUONG-DAN.md` 1 chỗ — phải qua `genericize()` hoặc lọc như đã làm với
+`docs/BAO-TRI-DINH-KY.md`. Cổng chặn tên dự án gốc sẽ bắt nếu quên. Vùng: `_template`.
 
 
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
