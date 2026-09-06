@@ -374,8 +374,41 @@ function docMuc(kho, ten, as = "thu") {
     assert.equal(m.trangThai, "ĐỎ", `khong them dong nao phai DO, dang: ${m.chiTiet}`);
     assert.match(m.chiTiet, /KHÔNG thêm dòng nào/,
       "phai noi dung ly do: chua ghi Log — khac han ly do 'xoa mat chu'");
+
+    // --- VE 6: DONG DICH CHO TRONG CUNG FILE KHONG PHAI DONG BI XOA ---
+    // `git diff` in ra mot cap `-`/`+` cho mot dong chi doi vi tri, va ban dau cua ban va
+    // KHUNG-25 doc cai `-` do roi ket luan "mat chu". Do that 06/09, luot don dau tien:
+    // dong tro sang kho luu tru bi day tu giua file len dau file -> cong DO OAN dung dong do.
+    // Mot cong bat oan cung nguy hiem nhu mot cong bo sot: nguoi ta hoc cach bo qua no.
+    const DICH = "> dong nay se bi day len dau file";
+    writeFileSync(join(kho, "HANDOFF.md"),
+      nhatKy(["# HANDOFF", "", DICH, "", ...CU.slice(10), "", "## luot moi", "", "## luot moi hon"]), "utf8");
+    chamViec();
+    at("add", "-A");
+    at("commit", "-q", "-m", "nen co dong se dich cho" + NL + NL + "Lane: thu");
+    at("push", "-q", "origin", "main");
+
+    // Day dong do xuong cuoi + them mot muc Log moi. Dong KHONG mat, chi doi cho.
+    writeFileSync(join(kho, "HANDOFF.md"),
+      nhatKy(["# HANDOFF", "", ...CU.slice(10), "", "## luot moi", "", "## luot moi hon", "", "## luot moi nhat", "", DICH]), "utf8");
+    chamViec();
+    at("add", "-A");
+    at("commit", "-q", "-m", "dich cho mot dong" + NL + NL + "Lane: thu");
+    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "XANH",
+      `dong DICH CHO trong cung file KHONG phai dong bi xoa — cong khong duoc bat oan, dang: ${m.chiTiet}`);
+
+    // VE DOI CHUNG: xoa HAN dong do di (khong con o dau ca) thi VAN phai DO.
+    writeFileSync(join(kho, "HANDOFF.md"),
+      nhatKy(["# HANDOFF", "", ...CU.slice(10), "", "## luot moi", "", "## luot moi hon", "", "## luot moi nhat", "", "## luot cuoi"]), "utf8");
+    chamViec();
+    at("add", "-A");
+    at("commit", "-q", "-m", "xoa han dong do" + NL + NL + "Lane: thu");
+    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    assert.equal(m.trangThai, "ĐỎ",
+      `xoa HAN mot dong (khong con trong file, khong co trong kho) VAN phai DO, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
-  ok("9 · dời nhật ký sang kho lưu trữ: khớp byte thì XANH · lệch một ký tự vẫn ĐỎ · sửa dòng cũ tại chỗ vẫn ĐỎ");
+  ok("9 · dời nhật ký sang kho lưu trữ: khớp byte XANH · lệch một ký tự ĐỎ · sửa dòng cũ ĐỎ · dịch chỗ KHÔNG bắt oan");
 }
 
 

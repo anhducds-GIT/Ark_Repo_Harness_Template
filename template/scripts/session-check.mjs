@@ -634,11 +634,23 @@ const dongXoaChuaLuuTru = (rel) => {
   const ra = git(...args);
   if (ra === null || ra === undefined) return null;
   const kho = khoLuuTru();
+
+  /* DÒNG DỊCH CHỖ TRONG CÙNG FILE KHÔNG PHẢI DÒNG BỊ XOÁ — và `git diff` không phân biệt
+     được hai thứ đó: nó in ra một cặp `-` / `+`. Đo thật 06/09, lượt dọn đầu tiên: dòng trỏ
+     sang kho lưu trữ của lượt trước bị đẩy từ giữa file lên đầu file, và cổng báo ĐỎ oan với
+     đúng dòng đó. Một cổng bắt oan cũng nguy hiểm như một cổng bỏ sót: người ta học cách
+     bỏ qua nó. Nên trước khi kết luận "mất chữ", hỏi thêm: dòng đó có còn trong chính file
+     không? Còn thì không mất gì cả. */
+  let conTrongFile = new Set();
+  try {
+    conTrongFile = new Set(fs.readFileSync(path.join(ROOT, rel), "utf8").replace(/\r\n?/g, "\n").split("\n"));
+  } catch { /* file vừa bị xoá hẳn: để vế dưới báo mất */ }
+
   const thieu = [];
   for (const dong of ra.replace(/\r\n?/g, "\n").split("\n")) {
     if (!dong.startsWith("-") || dong.startsWith("---")) continue;
     const noiDung = dong.slice(1);
-    if (!kho.has(noiDung)) thieu.push(noiDung);
+    if (!kho.has(noiDung) && !conTrongFile.has(noiDung)) thieu.push(noiDung);
   }
   return thieu;
 };

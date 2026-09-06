@@ -3,6 +3,26 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.10 — 2026-09-06 — Cổng KHUNG-25 thôi bắt oan dòng chỉ ĐỔI CHỖ trong file
+
+Bản 1.3.8 cho `HANDOFF.md` xoá dòng khi có bản khớp byte trong kho lưu trữ. Chạy thật
+ngay hôm sau thì nó **ĐỎ OAN**: một dòng bị đẩy từ giữa file lên đầu file bị tính là
+dòng bị xoá.
+
+`git diff` không phân biệt "xoá" với "dịch chỗ" — cả hai đều in ra một cặp `-`/`+`.
+Bản đầu chỉ đọc cái `-` rồi kết luận mất chữ.
+
+**Một cổng bắt oan cũng nguy hiểm như một cổng bỏ sót: người ta học cách bỏ qua nó.**
+
+Nay trước khi kết luận "mất chữ", cổng hỏi thêm một câu: *dòng đó có còn trong chính
+file không?* Còn thì không mất gì cả. Xoá hẳn — không còn trong file, không có trong
+kho — thì **vẫn ĐỎ**.
+
+Vế 6 của khối 9 ở [tests/cong-do-that.mjs](tests/cong-do-that.mjs) ghim cả hai chiều,
+và **hai nửa điều kiện được đột biến kiểm RIÊNG**: bỏ vế "còn trong file" thì đỏ oan
+trở lại; bỏ vế "có trong kho lưu trữ" thì việc dời chỗ thật bị chặn. Không nửa nào thừa.
+
+
 ## 1.3.9 — 2026-09-06 — Nhịp dọn chạy thật lần đầu, và nó lôi ra hai lỗ của chính nó
 
 Bản 1.3.8 dựng `npm run don` với bốn vế test. Chạy nó trên **dữ liệu thật** cùng ngày

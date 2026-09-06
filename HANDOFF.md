@@ -538,3 +538,19 @@ thật lôi ra hết*.
 
 **Còn mở:** KHUNG-26 · KHUNG-27 · KHUNG-11 phần đuôi · thời gian chạy phép kiểm vượt trần.
 Không mục nào chặn ai, không mục nào chờ Đức chốt.
+
+### Tiếp lượt `claude-don` — cổng KHUNG-25 BẮT OAN ngay lần chạy thật đầu tiên
+
+Bản vá 1.3.8 cho xoá dòng khỏi nhật ký khi có bản khớp byte trong kho lưu trữ. Chạy nhịp dọn
+thật thì cổng **ĐỎ OAN**: một dòng bị đẩy từ giữa file lên đầu file bị tính là dòng bị xoá.
+
+`git diff` **không phân biệt** "xoá" với "dịch chỗ" — cả hai in ra một cặp `-`/`+`. Bản đầu chỉ
+đọc cái `-`.
+
+**Một cổng bắt oan cũng nguy hiểm như một cổng bỏ sót: người ta học cách bỏ qua nó.**
+Đã vá (bản **1.3.10**), ghim ở vế 6 khối 9, và **hai nửa điều kiện đột biến kiểm riêng** —
+không nửa nào thừa.
+
+Đây là lần thứ **ba trong một ngày** cùng một bài học: bản vá viết xong, test xanh, rồi **chạy
+trên dữ liệu thật mới lộ**. Ba lần đó là — vòng lặp chết trong `don.mjs` · tên file lưu trữ và
+ghi đè im lặng · và lần này.

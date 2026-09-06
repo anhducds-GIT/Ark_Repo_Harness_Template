@@ -13,11 +13,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": null,
+      "owner": "claude-don",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "ho so migrate ALL_SKILL_MANAGEMENT",
-      "released_at": "2026-09-06",
+      "task": "cap nhat ban do + nhat ky",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
