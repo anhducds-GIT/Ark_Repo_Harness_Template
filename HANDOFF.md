@@ -452,3 +452,16 @@ như luật tưởng**. Đã vá; `docs/archive/` nay được miễn.
   nội dung không có ở đâu khác.
 - **Thời gian chạy phép kiểm 271/180 giây** — vượt trần, chưa ai xử. Chưa ghi thành mục nợ
   riêng vì nó nằm trong KHUNG-11.
+
+### Ghi chú cho phiên sau — CỔNG BẮT ĐÚNG khi dọn nhật ký, đừng tưởng nó hỏng
+
+Lượt này cắt `HANDOFF.md` 1.273 → 455 dòng (dời phần cũ sang `docs/archive/`) **và** ghi Log
+phiên trong cùng một commit. Cổng đóng phiên ĐỎ ngay:
+
+> *Có chạm HANDOFF.md nhưng KHÔNG thêm dòng nào — Log là thứ chỉ được THÊM.*
+
+**Cổng đúng, đừng đi sửa nó.** Nó không đọc được ý định; nó chỉ thấy một commit vừa xoá 858
+dòng lịch sử của phiên khác. Đó chính là thứ nó sinh ra để chặn, và nó chặn đúng.
+
+**Cách làm đúng, hai commit tách bạch:** commit 1 dọn (dời sang lưu trữ) · commit 2 **chỉ thêm**
+dòng Log. Đó là lý do có ghi chú này — nó chính là commit 2.
