@@ -45,7 +45,18 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
    Thuần để test ghim dựng được ca hỏng bằng chuỗi, không phải bằng repo thật. Phép kiểm nào
    dựa vào repo thật thì chỉ chứng minh *hôm nay* đang khớp — vô nghĩa ngày mai. */
 
-const MA_VIEC = /^###\s+~*\s*([A-Z]+-\d+)~*\s*[·:]?\s*(.*)$/;
+/* Tiền tố được phép chứa SỐ, nhưng phải BẮT ĐẦU bằng chữ cái: `[A-Z][A-Z0-9]*`.
+   Vấp thật 05/09 lượt migrate `n8n-orchestrator`: mã tự nhiên là `N8N-1`, bản cũ đòi tiền tố
+   TOÀN chữ cái nên mục biến mất khỏi bảng mà không báo gì, phải lách sang `CP-`. Repo nào tên
+   chứa số — n8n · s3 · web3 · i18n — đều vấp.
+   Bắt buộc chữ cái ở đầu là có lý do: cho phép số ở đầu thì `### 2026-09 · ...` (một mốc ngày
+   trong sổ) sẽ bị đọc thành mã việc `2026-09`. */
+const MA_VIEC = /^###\s+~*\s*([A-Z][A-Z0-9]*-\d+)~*\s*[·:]?\s*(.*)$/;
+/* Mọi dòng `###` trong sổ nợ ĐỀU phải là một mục việc — quy ước sổ nói thế, và đo ở repo nhà
+   06/09: 24/24 dòng `###` là mục việc, không có ngoại lệ nào. Nên dòng `###` mà không đọc ra
+   mã việc là SAI QUY ƯỚC, và phải bị NÊU TÊN. Đây mới là gốc bệnh của KHUNG-18: không phải
+   regex hẹp, mà là bỏ qua IM LẶNG — hình dạng lạ lần sau vẫn sẽ biến mất nếu chỉ nới regex. */
+const DANG_MUC = /^###\s+(.+)$/;
 const UU_TIEN = /^##\s+(P[1-9])\b/;
 
 /* HAI cách nhận một mục đã đóng, và chúng KHÔNG ngang hàng.
@@ -70,10 +81,13 @@ const CHO_CHOT = /\*\*CHỜ NGƯỜI CHỐT:?\*\*/;
 const TU_DONG = /(ĐÃ ĐÓNG|ĐÓNG|ĐÃ XONG|XONG|ĐÃ VÁ)/;
 
 /** Mục nợ MỞ trong một `BACKLOG.md`. Mục đã đóng bị bỏ — sổ giữ chúng để tra lịch sử.
-    Trả `{ mo, khaiSai }`; `khaiSai` = mục đóng bằng từ khoá mà không gạch, sai quy ước sổ. */
+    Trả `{ mo, khaiSai, khongHieu }`.
+    `khaiSai`   = mục đóng bằng từ khoá mà không gạch, sai quy ước sổ.
+    `khongHieu` = dòng `###` mà KHÔNG đọc ra mã việc — bản cũ nuốt im, giờ bị nêu tên. */
 export function parseBacklog(text) {
   const ra = [];
   const khaiSai = [];
+  const khongHieu = [];
   let uuTien = "P?";
   let hienTai = null;
   for (const dong of String(text).split(/\r?\n/)) {
@@ -81,6 +95,10 @@ export function parseBacklog(text) {
     if (moc) { uuTien = moc[1]; continue; }
     const viec = MA_VIEC.exec(dong);
     if (!viec) {
+      // Dòng `###` mà không ra mã việc: KHÔNG được lặng lẽ đi tiếp. Nó trông như một mục
+      // việc với mắt người đọc, nên nếu bảng bỏ qua thì người viết không bao giờ biết.
+      const dangMuc = DANG_MUC.exec(dong);
+      if (dangMuc) { hienTai = null; khongHieu.push(lamSach(dangMuc[1])); continue; }
       // CO CHO NGUOI CHOT — khai TUONG MINH trong than muc, khong do ten trong van xuoi.
       // Do ten la phep do bang chuoi: doi cach xung ho mot chu la muc bien mat, va khong ai biet.
       // Co thi hoac co hoac khong.
@@ -93,7 +111,7 @@ export function parseBacklog(text) {
     hienTai = { ma: viec[1], tieuDe: lamSach(viec[2]), uuTien, choChot: false };
     ra.push(hienTai);
   }
-  return { mo: ra, khaiSai };
+  return { mo: ra, khaiSai, khongHieu };
 }
 
 
@@ -246,7 +264,7 @@ export function dangBiChan(vungs) {
 
 const KE = (n) => "".padEnd(n, "─");
 
-export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], tenNguoiChot = "", noChoChot = [] }) {
+export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], khongHieu = [], tenNguoiChot = "", noChoChot = [] }) {
   const d = [];
   d.push("BẢN ĐỒ VIỆC — trạng thái sống, đọc lúc " + now.toISOString().slice(0, 16).replace("T", " "));
   d.push(KE(78));
@@ -258,6 +276,13 @@ export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], tenNguoi
     d.push("");
     d.push("⚠ " + khaiSai.length + " mục đã đóng nhưng KHÔNG gạch ngang: " + khaiSai.join(" · "));
     d.push("  Quy ước sổ nợ là `~~mã~~`. Không gạch thì bảng này phải đoán, và đoán sẽ sai.");
+  }
+  if (khongHieu.length) {
+    d.push("");
+    d.push("⚠ " + khongHieu.length + " dòng `###` KHÔNG đọc ra mã việc — các mục này KHÔNG có trong bảng dưới:");
+    for (const dong of khongHieu) d.push("  · " + dong);
+    d.push("  Mã việc phải là `### <CHỮ><chữ-số>-<số> · <tiêu đề>`, ví dụ `KHUNG-7`, `N8N-1`.");
+    d.push("  Tiền tố BẮT ĐẦU bằng chữ cái, sau đó được lẫn số. Bắt đầu bằng số thì không nhận.");
   }
 
   const laVungLa = vungs.filter((v) => v.khongCoTrongBang && (v.viec.length || v.tieuDiem.length));
@@ -432,10 +457,13 @@ function main() {
 
   const rel = (abs) => path.relative(ROOT, abs).split(path.sep).join("/");
   const khaiSai = [];
+  const khongHieu = [];
 
   const viecTheoFile = timSo(ROOT, units, structure, "BACKLOG.md").map((abs) => {
     const doc = parseBacklog(fs.readFileSync(abs, "utf8"));
     khaiSai.push(...doc.khaiSai);
+    // Kèm tên file: repo nhiều đơn vị con thì "dòng này ở sổ nào" mới là thông tin dùng được.
+    for (const d of doc.khongHieu) khongHieu.push(rel(abs) + " → " + d);
     return { relPath: rel(abs), viec: doc.mo };
   });
 
@@ -450,7 +478,7 @@ function main() {
   const vungs = banDoVung({ viecTheoFile, tieuDiemTheoFile, claims, structure, prefixes });
   const noChoChot = viecTheoFile.flatMap((x) => x.viec);
   process.stdout.write(render({
-    vungs, ideas, now: new Date(), dauNiemPhong: canhBao, khaiSai,
+    vungs, ideas, now: new Date(), dauNiemPhong: canhBao, khaiSai, khongHieu,
     tenNguoiChot: tenNguoiChotTu(structure), noChoChot,
   }) + "\n");
 }

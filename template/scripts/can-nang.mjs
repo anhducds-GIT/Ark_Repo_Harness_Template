@@ -91,6 +91,19 @@ function docSoNo() {
   return { tong: muc.length, daDong: daDong.length };
 }
 
+/* `docs/archive/` KHÔNG tính vào ngân sách tài liệu — và đây là bản vá của một mâu thuẫn
+   THẬT trong chính file này (đo 06/09).
+
+   Bản trước bảo người dùng "chuyển các lượt CŨ sang docs/archive/HANDOFF-<năm>-<tháng>.md",
+   trong khi `liet("docs")` quét ĐỆ QUY cả `docs/`. Nghĩa là làm đúng lời khuyên thì 673 dòng
+   nhật ký vượt ngân sách được dời từ một chỗ KHÔNG bị đếm (`HANDOFF.md` có ngân sách riêng)
+   vào một chỗ ĐANG bị đếm — tổng tài liệu TĂNG, và người làm đúng bị phạt.
+
+   Vì sao miễn là đúng chứ không phải nới lỏng: ngân sách này đo THỨ MỌI PHIÊN PHẢI NẠP.
+   Lưu trữ theo định nghĩa là thứ không nạp mỗi lần — cất gọn để tra khi cần. Đếm nó là đo
+   sai thứ mình định đo. Chữ vẫn còn nguyên trong repo, luật "chỉ thêm dòng" không bị vi phạm. */
+const THU_MUC_LUU_TRU = "archive";
+
 const liet = (thuMuc) => {
   const ra = [];
   const di = (d) => {
@@ -98,7 +111,7 @@ const liet = (thuMuc) => {
     try { mucs = fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }); } catch { return; }
     for (const m of mucs) {
       const p = `${d}/${m.name}`;
-      if (m.isDirectory()) di(p);
+      if (m.isDirectory()) { if (m.name !== THU_MUC_LUU_TRU) di(p); }
       else if (m.name.endsWith(".md")) ra.push(p);
     }
   };

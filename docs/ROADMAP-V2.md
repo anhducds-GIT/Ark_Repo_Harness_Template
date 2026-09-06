@@ -10,7 +10,7 @@ ttl_days: 120
 > mục ở [BACKLOG.md](../BACKLOG.md) — file này **không chép lại**, chỉ nói *làm cái nào trước,
 > cái nào chạy cùng lúc được, và vì sao*.
 >
-> [ROADMAP-V1](ROADMAP-V1.md) là **lịch sử** (bốn khối A→D dẫn tới v1.0, đã xong). File này là
+> [ROADMAP-V1](archive/ROADMAP-V1.md) là **lịch sử** (bốn khối A→D dẫn tới v1.0, đã xong). File này là
 > việc **đang mở**, sau bản 1.3.1.
 >
 > Luật song song cưỡng chế chỉ một câu ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 2): **hai

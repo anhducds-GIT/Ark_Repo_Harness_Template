@@ -21,11 +21,12 @@ const REQUIRED = ["schema", "id", "name", "lifecycle", "version_source", "curren
 const RETIRED_LIFECYCLES = new Set(["superseded", "archived"]);
 const BEHAVIOUR_EXTENSIONS = new Set([".js", ".mjs", ".json", ".html", ".css"]);
 const EVIDENCE_ZONE = /(^|\/)(evidence[^/]*|pilot-[^/]*|batch-[^/]*)\//i;
-export const STAMP_PREFIX = "Trang được sinh tại commit";
-// Dòng "Phiên gần nhất" của Khối A cũng mang mã commit, nên cũng đổi theo TỪNG commit.
-// Không lọc thì artifact cũ ngay sau mỗi lần commit và cổng kiểm đỏ vĩnh viễn —
-// đúng lý do STAMP_PREFIX ra đời. Hai dòng này là DẤU SINH TRANG, không phải số đo.
-export const SESSION_STAMP_PREFIX = "2. **Phiên gần nhất**";
+// Trang KHÔNG mang mã commit — Đức chốt 2026-09-06 (KHUNG-16). Trang nhúng mã HEAD thì
+// commit chính trang đó làm HEAD đổi, nên trang vừa commit đã cũ: KHÔNG thứ tự commit nào
+// hội tụ. Lối cũ là lọc hai dòng đó khỏi phép so — tức để phép kiểm thôi canh một phần nội
+// dung. Bỏ hẳn mã commit thì trang hội tụ THẬT và phép so canh lại được TOÀN BỘ dòng.
+// Không mất thông tin: `git log -- DASHBOARD.md` vẫn cho biết trang sinh tại commit nào.
+export const STAMP_PREFIX = "Trang được sinh ngày";
 const compareText = (left, right) => left < right ? -1 : left > right ? 1 : 0;
 
 /* --- S2: cổng vào cho AI mới ---------------------------------------------
@@ -53,10 +54,9 @@ export function readUnits(deps) {
   return unitsFrom(parsed);
 }
 
-// Hai trường này đổi theo TỪNG commit. So sánh nguyên văn thì cổng kiểm sẽ đỏ
-// ngay sau mỗi commit dù nội dung thật không đổi. Lọc ra khi so, giống hệt cách
-// STAMP_PREFIX được lọc khỏi DASHBOARD.
-export const REPO_MAP_VOLATILE_KEYS = ["generated_at", "generated_commit"];
+// `generated_commit` đã bị BỎ HẲN khỏi bản đồ máy đọc cùng lý do với trang (KHUNG-16),
+// nên chỉ còn `generated_at` phải miễn — nó là NGÀY, đổi theo đồng hồ chứ không theo nội dung.
+export const REPO_MAP_VOLATILE_KEYS = ["generated_at"];
 
 // Chỉ bỏ qua thứ KHÔNG được track. Cố tình không miễn trừ `scripts/`, `tests/`,
 // `docs/`: miễn trừ là cách êm ái nhất để một con số nợ trông như đã trả. Thà để
@@ -427,9 +427,17 @@ function duoiTuGlob(globs) {
   return ra.size ? ra : null;
 }
 
+/* Bảng chủ sở hữu KHÔNG phải hành vi. `.agents/claims.json` mang đuôi `.json` nên bản trước
+   đếm nó là file hành vi — mà nhận/trả quyền là việc MỌI phiên đều phải làm, nên MỌI phiên
+   đều làm trang cũ đi và cổng "sự thật máy sinh còn tươi" đỏ lại. Đo thật 06/09: commit
+   `fa7e8a7` chạm ĐÚNG MỘT file là `claims.json`, và bộ đếm nhảy 4 → 5.
+   Luật mục 1 của `AGENTS.md` đã miễn file này khỏi luật khoá vùng vì cùng lý do — "nhận/trả
+   quyền là thao tác hành chính". Đây chỉ là cho phép đo trùng với luật đã viết. */
+const HANH_CHINH = new Set([".agents/claims.json"]);
+
 export function isBehaviourFile(file, opts = {}) {
   const normalized = String(file).replaceAll("\\", "/");
-  if (MAY_SINH.has(normalized)) return false;
+  if (MAY_SINH.has(normalized) || HANH_CHINH.has(normalized)) return false;
   // Sản phẩm của bộ sinh do REPO tự khai (`generated_files`). Ba file cứng ở `MAY_SINH` là mặc
   // định cho repo chưa khai gì; repo nào sinh thêm trang thì khai thêm, đừng sửa code.
   if (Array.isArray(opts.generatedFiles) && opts.generatedFiles.includes(normalized)) return false;
@@ -997,7 +1005,7 @@ export function buildDashboard(model) {
     "",
     "> **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.",
     "",
-    `${STAMP_PREFIX} \`${model.shortHead}\` (${model.headDate}). Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.`,
+    `${STAMP_PREFIX} ${model.headDate}. Đây là lúc sinh trang, **KHÔNG phải lúc bất kỳ extension nào được kiểm chứng**.`,
     "",
     ...blockA(model),
     "## B · Có gì trong repo",
@@ -1056,7 +1064,7 @@ function blockA(model) {
     "## A · Bắt đầu từ đâu",
     "",
     `1. **Việc ưu tiên #1** — ${priorityLine}`,
-    `2. **Phiên gần nhất** — ${model.headDate} @ \`${model.shortHead}\` · ${link("HANDOFF.md", "HANDOFF.md")}`,
+    `2. **Phiên gần nhất** — ${model.headDate} · ${link("HANDOFF.md", "HANDOFF.md")}`,
     `3. **Luật phải đọc trước khi sửa gì** — ${link("AGENTS.md", "AGENTS.md")} · cổng vào cho AI: ${link(LLMS_FILE, LLMS_FILE)}`,
     `4. **Ai đang giữ package nào** — \`.agents/claims.json\` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)`,
     ""
@@ -1104,7 +1112,7 @@ export function buildLlmsTxt(model) {
     "",
     `> **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng \`node scripts/build-dashboard.mjs\`.`,
     "",
-    `${STAMP_PREFIX} \`${model.shortHead}\` (${model.headDate}).`,
+    `${STAMP_PREFIX} ${model.headDate}.`,
     "",
     "## Việc ưu tiên #1",
     "",
@@ -1149,7 +1157,6 @@ export function buildRepoMap(model) {
   const map = {
     schema_version: REPO_MAP_SCHEMA_VERSION,
     generated_at: model.headDate,
-    generated_commit: model.shortHead,
     profile: model.profile,
     entry_point: LLMS_FILE,
     law_files: ["AGENTS.md", "CLAUDE.md"],
@@ -1231,8 +1238,7 @@ export function compareRepoMap(expected, actual) {
           && !Number.isNaN(Date.parse(`${value}T00:00:00Z`))
           && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value,
         want: "ngày CÓ THẬT dạng YYYY-MM-DD"
-      },
-      generated_commit: { test: (value) => /^[0-9a-f]{7,40}$/.test(value), want: "mã commit hệ 16, 7–40 ký tự" }
+      }
     };
     for (const key of REPO_MAP_VOLATILE_KEYS) {
       const value = parsed[key];
@@ -1263,15 +1269,14 @@ export function compareRepoMap(expected, actual) {
   return { matches: false, reason: "khác nhau nhưng không định vị được dòng" };
 }
 
-// Giữ SỐ DÒNG THẬT trong file, không phải số thứ tự sau khi lọc. Dòng dấu commit bị lọc ra,
-// nên nếu đếm theo danh sách đã lọc thì mọi dòng phía sau bị lùi một — và `--check` sẽ bảo
-// Đức "lệch tại dòng 8" trong khi mở file ra thì nó nằm ở dòng 9. Lời nhắn dẫn sai chỗ cũng
-// là bug, đúng luật vàng số 5.
+// KHÔNG lọc dòng nào nữa. Bản trước miễn hai dòng dấu commit khỏi phép so — tức phép kiểm
+// thôi canh một phần nội dung. Từ 2026-09-06 trang không còn mã commit (KHUNG-16), nên phép
+// so canh lại được TOÀN BỘ dòng, và `lineNumber` khớp thẳng số dòng khi mở file ra xem.
+// Giữ nguyên hình dạng `{text, lineNumber}` để `compareDashboard` không phải đổi.
 // `\r\n?` chứ không phải `\r\n`: bắt cả CR đơn lẻ, cùng cách `parseStatus` đang làm.
 function comparableLines(text) {
   return String(text).replace(/\r\n?/g, "\n").split("\n")
-    .map((text, index) => ({ text, lineNumber: index + 1 }))
-    .filter((entry) => !entry.text.startsWith(STAMP_PREFIX) && !entry.text.startsWith(SESSION_STAMP_PREFIX));
+    .map((text, index) => ({ text, lineNumber: index + 1 }));
 }
 
 export function compareDashboard(expected, actual) {

@@ -25,7 +25,7 @@ nhau — extension trình duyệt, tài liệu, hạ tầng, điều phối.
 
 Nó **chưa** là v1.0. Audit độc lập vòng một trả về **REJECT** với 6 phát hiện mức NẶNG.
 
-Lộ trình hiện tại nằm ở `docs/ROADMAP-V1.md`.
+Lộ trình hiện tại nằm ở `docs/archive/ROADMAP-V1.md`.
 
 ## Việc của bạn — brainstorm, KHÔNG phải audit
 
@@ -90,7 +90,7 @@ cần xác nhận. Câu trả lời hữu ích nhất bạn có thể đưa là 
 |---|---|
 | `README.md` | harness gồm gì |
 | `AGENTS.md` | luật — hiến pháp một trang |
-| `docs/ROADMAP-V1.md` | còn thiếu gì để tới v1.0, và vì sao chưa gọi là v1.0 |
+| `docs/archive/ROADMAP-V1.md` | còn thiếu gì để tới v1.0, và vì sao chưa gọi là v1.0 |
 | `docs/LEGEND.md` | thuật ngữ, nếu có từ nào lạ |
 | `docs/workflows/` | ba workflow, có lưu đồ |
 | `docs/adr/` | quyết định đã chốt và lý do |

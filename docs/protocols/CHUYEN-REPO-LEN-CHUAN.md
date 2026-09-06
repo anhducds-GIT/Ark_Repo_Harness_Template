@@ -137,6 +137,37 @@ wc -l AGENTS.md DASHBOARD.md decisions.md handoff.md    # sau, phải >= trướ
 
 Số dòng **giảm** ở bất kỳ file nào trong bốn = đã đè mất nội dung. Dừng, hoàn nguyên.
 
+### Repo đích ĐÃ CÓ cơ chế hiệp đồng riêng — bộ khung là chuẩn, Đức chốt 2026-09-06
+
+Ca này đã gặp ở **cả hai** repo chạm tới: `n8n-orchestrator` đặt `lock` ngay trong từng task,
+`ALL_SKILL_MANAGEMENT` có `authority_matrix.md` + `discussion_protocol.md` + `rounds/`. Tức
+không phải một bộ luật gặp một repo trống, mà **hai bộ luật chồng nhau**.
+
+**Luật:** sau khi lắp bộ khung, **khoá vùng + cổng đóng phiên là chuẩn**. Cơ chế cũ thôi hiệu lực.
+
+**Vì sao phải chốt một cái thắng, chứ không "giữ cả hai":** hai hệ song song thì một AI có thể
+**hợp lệ theo hệ này mà vi phạm hệ kia**, và không ai sai cả. Đo thật ở `n8n-orchestrator`:
+`npm run what-next` chỉ đọc khoá vùng, nên khoá nằm trong task **bị che khuất hoàn toàn** —
+người điều phối nhìn bảng và không thấy nửa số khoá đang giữ. Một bảng thiếu nửa dữ liệu tệ hơn
+không có bảng, vì nó tạo lòng tin.
+
+**KHAI TỬ luật cũ, GIỮ văn bản cũ — hai việc khác nhau, đừng gộp.**
+
+| Được làm | Không được làm |
+|---|---|
+| Thêm dòng *"KHÔNG CÒN HIỆU LỰC từ &lt;ngày&gt; — xem `AGENTS.md`"* ở đầu file luật cũ | Xoá file luật cũ |
+| Trỏ từ file cũ sang luật mới | Ghi đè nội dung cũ bằng nội dung bộ khung |
+| Ghi một dòng vào `decisions.md` của repo đích | Coi quyết định này là giấy phép xoá |
+
+Quyết định của Đức chốt **cơ chế nào là chuẩn** — nó KHÔNG lật `AGENTS.md` mục 2 hàng 1 (xoá
+file / sửa dữ liệu gốc phải hỏi), cũng không lật luật bốn file ở trên. Lý do rất cụ thể: riêng
+`ALL_SKILL_MANAGEMENT`, bốn file trùng tên đang giữ **1824 dòng** nội dung không có ở đâu khác.
+Một luật hết hiệu lực vẫn là **bằng chứng vì sao repo từng chạy như thế** — và bộ khung này
+sống bằng bằng chứng.
+
+**Mỗi lượt thi hành ở từng repo vẫn phải hỏi người chốt riêng.** Luật ở đây nói *đi hướng nào*,
+không nói *được đi mà không xin phép*.
+
 ### Kiểm chứng lại audit, đừng tin thẳng
 
 Luật vàng số 4 áp cho cả audit của AI khác. Trial 05/09: Codex báo ba lệnh thoát mã `2/1/1` ở

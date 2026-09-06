@@ -57,4 +57,4 @@ kiểu xuống dòng. Việc này từng là `next_step`; đã xong, không ph�
 **Repo nay có `BACKLOG.md`** — trước đó luật bắt ghi nợ vào một file không tồn tại, nên bản đồ
 việc báo "0 việc mở" suốt. Nay 6 mục nợ có thật, xem [BACKLOG.md](BACKLOG.md).
 
-**Việc kế:** đọc `next_step` ở đầu file này. Lộ trình cũ tới v1.0 — [ROADMAP-V1.md](docs/ROADMAP-V1.md) — **đã xong**, giữ lại làm lịch sử.
+**Việc kế:** đọc `next_step` ở đầu file này. Lộ trình cũ tới v1.0 — [ROADMAP-V1.md](docs/archive/ROADMAP-V1.md) — **đã xong**, giữ lại làm lịch sử.

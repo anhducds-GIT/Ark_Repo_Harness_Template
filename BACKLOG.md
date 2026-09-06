@@ -162,9 +162,20 @@ Chú ý mục thứ ba: đó chính là mục đang đỏ vĩnh viễn (KHUNG-1)
 là đỏ-thật-được, vừa đang đỏ thật — và không ai bắt được sự trớ trêu đó cho tới khi audit ngoài
 vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng chứng. Vùng: `_docs`.
 
-### KHUNG-11 · Repo đã vượt ngân sách cân nặng của chính nó
+### KHUNG-11 · Repo đã vượt ngân sách cân nặng của chính nó — ĐÃ DỌN MỘT VÒNG 06/09, CÒN VƯỢT 799
 
-> **CHỜ NGƯỜI CHỐT:** bớt cái gì trong 998 dòng vượt ngân sách — đây là tài liệu của repo, không phải code thừa.
+> **Đức chốt 06/09:** cắt gọn + dời sang lưu trữ, KHÔNG xoá. Đã làm một vòng, mỗi bước có md5
+> chứng minh không mất byte: `HANDOFF.md` 1.273→415 · `CHANGELOG.md` 806→241 · `ROADMAP-V1`
+> vào lưu trữ. Tổng tài liệu **3.681 → 2.999**. Kèm theo phải vá một mâu thuẫn trong chính
+> `can-nang.mjs`: nó bảo dời sang `docs/archive/` trong khi vẫn quét đệ quy cả `docs/` — làm
+> đúng lời khuyên thì tổng TĂNG. Nay `docs/archive/` được miễn.
+>
+> **CHỜ NGƯỜI CHỐT — vòng hai:** còn vượt **799 dòng**, và lối duy nhất còn lại là gọt
+> `docs/protocols/ORCHESTRATOR.md` (426 dòng). Tôi KHÔNG tự gọt: mỗi mục trong đó gắn một sự
+> cố có thật, khối chú thích cuối file bị `tests/template-null-repo.mjs` ghim, và gọt hết 276
+> dòng cũng chỉ còn 2.723 — **vẫn vượt**. Tức 2.200 là con số đặt theo mong muốn, chưa từng
+> đặt theo số đo. Hai lối: (a) gọt thật và chấp nhận mất nội dung; (b) đặt lại ngân sách theo
+> số đo hôm nay + biên, và ghi rõ vì sao.
 
 `can-nang.mjs` đặt ngân sách tài liệu **2.200 dòng**. **Đo lại độc lập 05/09: 3.198 dòng — vượt
 998 dòng, 45%.** (Codex báo 3.169; chênh vì `BACKLOG.md` vừa thêm. Hai lượt đo khớp nhau.)
@@ -226,7 +237,7 @@ kết quả suite từ đâu, và cái gì khác nhau giữa hai lượt chạy*
 trạng thái cây làm việc, hay output bị cắt. Ghi lại lượt nào đỏ lượt nào xanh trước khi đổi
 bất cứ dòng nào.
 
-### KHUNG-16 · `DASHBOARD.md` nhúng mã commit HEAD nên KHÔNG THỂ hội tụ
+### ~~KHUNG-16~~ · ĐÓNG 06/09 · `DASHBOARD.md` nhúng mã commit HEAD nên KHÔNG THỂ hội tụ
 
 > **CHỜ NGƯỜI CHỐT:** chọn một trong ba lối (bỏ mã commit · nhúng mã commit cha · miễn hai dòng khỏi phép so) — là quyết định kiến trúc, không phải bản vá.
 
@@ -283,7 +294,7 @@ tay trong mục nợ; hay (b) giữ nguyên phạm vi nhưng **đổi câu chữ
 tưởng; mục nợ KHÔNG được lọc ở đây"*. Hướng (b) rẻ hơn nhiều và đã đủ chặn cái hại chính.
 Vùng: `_code`.
 
-### KHUNG-18 · Mã việc không nhận tiền tố có SỐ — repo tên chứa số vấp ngay
+### ~~KHUNG-18~~ · ĐÓNG 06/09 · Mã việc không nhận tiền tố có SỐ — repo tên chứa số vấp ngay
 
 **Vấp thật 05/09, lượt migrate `n8n-orchestrator`.** Mã việc tự nhiên cho repo đó là `N8N-1`.
 Bản đồ việc **bỏ qua im lặng** — `MA_VIEC = /^###\s+~*\s*([A-Z]+-\d+)~*.../` đòi tiền tố CHỈ
@@ -366,7 +377,14 @@ chế phân quyền và hiệp đồng nhiều AI trước khi bộ khung đến
 `authority_matrix` làm chuẩn và bộ khung chỉ thêm khoá vùng, hay ngược lại. Cùng câu hỏi với
 CP-1 ở repo n8n, nhưng nặng hơn vì repo này lấy chính việc điều phối AI làm nghề.
 
-> **CHỜ NGƯỜI CHỐT:** hai cơ chế hiệp đồng nhiều AI (authority_matrix + discussion_protocol của repo, và khoá vùng + cổng đóng phiên của bộ khung) — gộp thế nào, cái nào là chuẩn?
+> **ĐÃ CHỐT 06/09 — Đức chọn: BỘ KHUNG THẮNG, bỏ luật cũ.** Luật đã viết thành một mục của
+> [quy trình migrate](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md), áp cho cả repo này lẫn `n8n`.
+>
+> **Còn treo là THI HÀNH, không phải quyết định.** Quyết định chốt *cơ chế nào là chuẩn*, nó
+> KHÔNG phải giấy phép xoá file: `AGENTS.md` mục 2 hàng 1 vẫn nguyên, và BƯỚC 0 vẫn cấm đè bốn
+> file đang giữ 1824 dòng. Đường đi: **khai tử luật cũ, giữ văn bản cũ** — dán một dòng "không
+> còn hiệu lực từ 06/09" lên đầu `authority_matrix.md` và `discussion_protocol.md`. Mỗi lượt
+> thi hành vẫn phải hỏi Đức riêng.
 
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
 

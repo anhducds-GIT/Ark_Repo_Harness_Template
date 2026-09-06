@@ -61,3 +61,73 @@ với **đúng bằng chứng trên**. Nó KHÔNG mở ra luật *"tin rằng c�
 mỗi phiên tự phán cổng sai rồi tự đẩy thì cổng thôi là cổng. Điều kiện tối thiểu để viện dẫn
 lại: **đo được suite exit 0 bằng lệnh trực tiếp**, **ghi mục nợ trước khi đẩy**, và **người chốt
 chốt từng lượt**.
+
+---
+
+## 2026-09-06 · Đức chốt bốn việc trong một lượt
+
+Bốn mục nợ đã treo vì cần người chốt. Đức trả lời trong một lượt sau khi đọc giải thích từng
+mục. Ghi nguyên văn lựa chọn, kèm chỗ tôi đã báo trước là số đo trong sổ nợ đã cũ.
+
+### 1 · Hai cơ chế hiệp đồng: **BỘ KHUNG THẮNG, bỏ luật cũ**
+
+Áp cho cả `n8n-orchestrator` (CP-1) và `ALL_SKILL_MANAGEMENT` (KHUNG-23). Repo nào đã có cơ
+chế phân việc nhiều AI của riêng nó — `lock` trong task, `authority_matrix.md`,
+`discussion_protocol.md` — thì sau khi lắp bộ khung, **khoá vùng + cổng đóng phiên là chuẩn**,
+cơ chế cũ thôi có hiệu lực.
+
+**Đức đã đọc rủi ro trước khi chọn**: lối này phá cơ chế `ALL_SKILL_MANAGEMENT` đang dùng thật,
+mà điều phối AI chính là NGHỀ của repo đó. Chọn vẫn là chọn — ghi lại để phiên sau không tưởng
+là quyết vội.
+
+**GIỚI HẠN — quyết định này chốt CƠ CHẾ NÀO LÀ CHUẨN, KHÔNG phải cho phép xoá file.**
+`AGENTS.md` mục 2 hàng 1 (xoá file / sửa dữ liệu gốc) vẫn nguyên hiệu lực, và BƯỚC 0 của quy
+trình migrate vẫn cấm ghi đè bốn file đang giữ 1824 dòng nội dung riêng ở
+`ALL_SKILL_MANAGEMENT`. Đường đi đúng: **luật cũ bị KHAI TỬ, văn bản cũ được GIỮ** — đánh dấu
+"không còn hiệu lực từ 2026-09-06, xem AGENTS.md" ở đầu file, chứ không xoá file. Mỗi lượt
+thi hành ở từng repo vẫn phải hỏi Đức riêng.
+
+### 2 · KHUNG-16: **bỏ mã commit khỏi trang, giữ ngày**
+
+Đã thi hành cùng ngày. Kèm theo, tôi đo ra **đường thứ hai mà sổ nợ không mô tả**: hai dòng
+dấu commit vốn đã được miễn khỏi phép so từ trước, nên chúng chỉ làm cây làm việc bẩn chứ
+không làm cổng đỏ. Thứ **thật sự** làm cổng đỏ là bộ đếm `CÓ (N commit)`, và nó nhảy vì
+`.agents/claims.json` mang đuôi `.json` nên bị đếm là file hành vi — mà nhận/trả quyền là việc
+MỌI phiên đều làm. Đo: commit `fa7e8a7` chạm đúng một file là `claims.json`, bộ đếm 4 → 5.
+Đã vá cả hai. Phép so nay canh lại **toàn bộ** dòng, không còn miễn dòng nào.
+
+### 3 · KHUNG-11: **cắt gọn + dời sang lưu trữ, không xoá**
+
+**Số đo trong sổ nợ đã cũ — tôi báo trước khi làm.** Sổ nợ nói vượt 998 dòng; đo lại 06/09 là
+**vượt 1.481**, và có thêm **hai chỗ vượt mới** sổ nợ chưa nhắc: nhật ký `HANDOFF.md`
+1.273/600, thời gian chạy phép kiểm 271/180 giây.
+
+Đã làm, mỗi bước có md5 chứng minh không mất byte nào:
+
+| Việc | Trước | Sau |
+|---|---|---|
+| `HANDOFF.md` → `docs/archive/HANDOFF-2026-09.md` | 1.273 | **415** / 600 ✓ |
+| `CHANGELOG.md` → `docs/archive/CHANGELOG-0.1.0-1.2.20.md` | 806 | **241** |
+| `docs/ROADMAP-V1.md` → `docs/archive/` | — | −117 |
+| **Tổng tài liệu** | 3.681 | **2.999** / 2.200 |
+
+**Và một lỗi trong chính công cụ đo, phải vá trước thì lời khuyên của nó mới có tác dụng:**
+`can-nang.mjs` bảo người dùng dời nhật ký cũ sang `docs/archive/`, trong khi nó quét ĐỆ QUY cả
+`docs/`. Làm đúng lời khuyên thì dòng bị dời từ chỗ KHÔNG bị đếm sang chỗ ĐANG bị đếm — tổng
+tài liệu TĂNG, người làm đúng bị phạt. Nay `docs/archive/` được miễn: ngân sách này đo **thứ
+mọi phiên phải nạp**, mà lưu trữ theo định nghĩa là thứ không nạp mỗi lần.
+
+**CÒN VƯỢT 799 DÒNG, và tôi KHÔNG cắt tiếp — đây là chỗ cần Đức biết.** Lối duy nhất còn lại
+là gọt `docs/protocols/ORCHESTRATOR.md` (426 dòng, file to nhất). Nhưng gọt nó là **xoá nội
+dung thật**, trái đúng luật *dời chỗ chứ không xoá* mà chính Đức vừa chọn: mỗi mục trong đó
+gắn với một sự cố có thật, và khối chú thích cuối file **bị một phép kiểm ghim** (
+`tests/template-null-repo.mjs` cần nó chứa chuỗi cấm để nhánh miễn trừ chạy tới được).
+Kể cả gọt hết 276 dòng cũng chỉ còn 2.723 — **vẫn vượt**. Tức con số 2.200 không đạt được bằng
+cách dọn; nó là con số đặt theo mong muốn, chưa từng đặt theo số đo. Ghi lại thành mục nợ.
+
+### 4 · KHUNG-18: **làm cả hai — nới regex VÀ nêu tên mục bị bỏ qua**
+
+Đã thi hành. Tiền tố nay được lẫn số nhưng **phải bắt đầu bằng chữ cái** (`N8N-1` nhận;
+`### 2026-09 · …` không nhận, để một mốc ngày không bị đọc thành mã việc). Và mọi dòng `###`
+không đọc ra mã việc đều **bị nêu tên kèm tên sổ**, thay vì biến mất im lặng — đó mới là gốc
+bệnh: nới regex chỉ chữa ca đã vấp, hình dạng lạ lần sau vẫn sẽ mất tăm.

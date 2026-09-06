@@ -25,6 +25,7 @@ import { blockingCodes, checkB10, createBootstrapDeps } from "../scripts/check-b
 import { behaviourGlobsFrom, kiemKhoaLa } from "../scripts/repo-structure.mjs";
 import { readClaims } from "../scripts/claim.mjs";
 import { nganSachTu, NGAN_SACH_MAC_DINH } from "../scripts/can-nang.mjs";
+import { parseBacklog } from "../scripts/what-next.mjs";
 
 const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -551,6 +552,78 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     "so tay bao tri phai co muc nhip DON — phan giu repo RE, khong chi giu repo DUNG");
 
   ok("F14 - ngan sach can nang khai duoc, tu choi go sai ten; ban trich mang ca thuoc lan so tay");
+}
+
+/* F15 — BA BAN VA CUA 2026-09-06, moi cai kem VE DOI CHUNG.
+   Vi sao gop mot khoi: ca ba deu la mot HINH DANG loi duy nhat — "phep do dem nham thu no
+   khong dinh do", va ba lan bieu hien khac nhau. Tach ba khoi thi hinh dang bien mat. */
+{
+  // --- 1. Bang chu so huu KHONG phai file hanh vi (KHUNG-16, duong THAT lam cong do) ---
+  // Do that 06/09: commit fa7e8a7 cham DUNG MOT file la claims.json, bo dem nhay 4 -> 5.
+  // Nhan/tra quyen la viec MOI phien deu phai lam, nen moi phien deu lam trang cu di.
+  assert.equal(isBehaviourFile(".agents/claims.json"), false,
+    "claims.json la thao tac HANH CHINH — dem no la hanh vi thi cong do lai sau moi phien");
+  // VE DOI CHUNG: ban va phai HEP. Neu no lam mo ca .json thi hai dong duoi xanh oan.
+  assert.equal(isBehaviourFile("package.json"), true,
+    "mien claims.json KHONG duoc mien ca duoi .json — package.json van la hanh vi");
+  assert.equal(isBehaviourFile("scripts/claim.mjs"), true,
+    "MA cua co che khoa van la hanh vi; chi BANG TRANG THAI moi duoc mien");
+
+  // --- 2. Trang khong con nhung ma commit (KHUNG-16, Duc chot 06/09) ---
+  const nguon = readFileSync(join(ROOT, "scripts/build-dashboard.mjs"), "utf8");
+  // Do o cho GAN GIA TRI (`generated_commit:` co dau hai cham), khong do ten tran: chinh khoi
+  // chu thich giai thich vi sao da bo cung nhac ten do. Do ten tran thi phep kiem nay chi day
+  // nguoi ta xoa loi giai thich — dung cai bay ma tests/template-null-repo.mjs da mac mot lan.
+  assert.ok(!/generated_commit:/.test(nguon),
+    "ban do may doc khong duoc nhung generated_commit — no doi theo TUNG commit");
+  // VE DOI CHUNG QUAN TRONG NHAT: phep so KHONG con mien dong nao.
+  // Loi cu la "mien hai dong khoi phep so" = cong thoi canh mot phan noi dung. Bo ma commit
+  // roi thi phai bo luon mien tru; khong bo thi da doi mot lo hong lay mot lo hong.
+  assert.ok(!/SESSION_STAMP_PREFIX/.test(nguon),
+    "bo ma commit roi thi mien tru dong phai bi go — neu khong, cong van thoi canh mot phan");
+
+  // --- 3. can-nang: docs/archive/ KHONG tinh vao ngan sach tai lieu ---
+  // Mau thuan THAT trong chinh cong cu: no bao "doi sang docs/archive/" trong khi quet de quy
+  // ca docs/. Lam dung loi khuyen thi tong tai lieu TANG — nguoi lam dung bi phat.
+  const canNang = readFileSync(join(ROOT, "scripts/can-nang.mjs"), "utf8");
+  assert.match(canNang, /THU_MUC_LUU_TRU/,
+    "can-nang phai mien docs/archive — neu khong, loi khuyen cua chinh no phan tac dung");
+  assert.match(canNang, /m\.name !== THU_MUC_LUU_TRU/,
+    "mien tru phai nam o vong DUYET THU MUC, khong phai o cho khac");
+
+  ok("F15 - bang quyen khong la hanh vi; trang bo ma commit va bo luon mien tru; luu tru khong tinh ngan sach");
+}
+
+/* F16 — MA VIEC: tien to duoc lan SO, va dong `###` la khong bao gio bi nuot im.
+   Vap that 05/09 luot migrate n8n-orchestrator: ma `N8N-1` bien mat khoi ban do viec ma
+   khong bao gi, phai lach sang `CP-`. Goc benh KHONG phai regex hep — la BO QUA IM LANG. */
+{
+  const so = [
+    "## P1", "",
+    "### N8N-1 · repo ten chua so",           // phai NHAN
+    "### KHUNG-9 · binh thuong",              // phai NHAN
+    "### 2026-09 · moc ngay, khong phai ma viec",  // phai BI NEU TEN
+    "### ~~CU-1~~ · da dong",                 // phai bo qua, KHONG bi neu ten
+    ""
+  ].join("\n");
+  const r = parseBacklog(so);
+  const ma = r.mo.map((v) => v.ma);
+  assert.deepEqual(ma, ["N8N-1", "KHUNG-9"],
+    "tien to duoc lan so (N8N-1) — repo ten chua so: n8n, s3, web3, i18n deu vap cai nay");
+
+  // VE DOI CHUNG 1: bat dau bang SO thi KHONG duoc nhan, neu khong mot moc ngay
+  // `### 2026-09 · ...` bi doc thanh ma viec `2026-09` va so nay moc mot muc ma.
+  assert.ok(!ma.includes("2026-09"), "tien to BAT DAU bang so khong duoc nhan");
+
+  // VE DOI CHUNG 2 — VE QUAN TRONG NHAT: no phai BI NEU TEN, khong phai lang le bien mat.
+  assert.equal(r.khongHieu.length, 1, "dong `###` khong doc ra ma viec phai bi NEU TEN");
+  assert.match(r.khongHieu[0], /2026-09/, "phai neu dung dong nao, de nguoi viet biet sua o dau");
+
+  // VE DOI CHUNG 3: muc da GACH la dung quy uoc, khong duoc keu oan.
+  assert.ok(!r.khongHieu.some((d) => /CU-1/.test(d)),
+    "muc da gach ngang la DUNG quy uoc — keu oan thi canh bao thanh tieng on va bi bo qua");
+
+  ok("F16 - ma viec nhan tien to co so, va dong `###` la bi neu ten thay vi bien mat im lang");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
