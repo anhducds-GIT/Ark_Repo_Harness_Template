@@ -170,7 +170,7 @@ vào đọc. Việc rẻ nhất: sửa câu trong bảng tra cho khớp bằng c
 > `can-nang.mjs`: nó bảo dời sang `docs/archive/` trong khi vẫn quét đệ quy cả `docs/` — làm
 > đúng lời khuyên thì tổng TĂNG. Nay `docs/archive/` được miễn.
 >
-> **CHỜ NGƯỜI CHỐT — vòng hai:** còn vượt **799 dòng**, và lối duy nhất còn lại là gọt
+> **CHỜ NGƯỜI CHỐT:** vòng hai — còn vượt **799 dòng**, và lối duy nhất còn lại là gọt
 > `docs/protocols/ORCHESTRATOR.md` (426 dòng). Tôi KHÔNG tự gọt: mỗi mục trong đó gắn một sự
 > cố có thật, khối chú thích cuối file bị `tests/template-null-repo.mjs` ghim, và gọt hết 276
 > dòng cũng chỉ còn 2.723 — **vẫn vượt**. Tức 2.200 là con số đặt theo mong muốn, chưa từng
@@ -385,6 +385,43 @@ CP-1 ở repo n8n, nhưng nặng hơn vì repo này lấy chính việc điều 
 > file đang giữ 1824 dòng. Đường đi: **khai tử luật cũ, giữ văn bản cũ** — dán một dòng "không
 > còn hiệu lực từ 06/09" lên đầu `authority_matrix.md` và `discussion_protocol.md`. Mỗi lượt
 > thi hành vẫn phải hỏi Đức riêng.
+
+### KHUNG-25 · Sổ tay bảo trì bảo DỌN nhật ký, cổng đóng phiên CẤM — thử thật, cổng thắng
+
+> **CHỜ NGƯỜI CHỐT:** bản vá này đổi một luật an toàn (`AGENTS.md` mục 2 hàng 6), nên không AI nào tự làm được.
+
+**Đo thật 06/09, không phải suy luận.**
+
+| Luật | Nói gì |
+|---|---|
+| `can-nang.mjs` + [sổ tay bảo trì](docs/BAO-TRI-DINH-KY.md) | nhật ký quá **600 dòng** thì **phải dời** phần cũ sang `docs/archive/` |
+| `session-check.mjs`, hàm `coDongMoi` | `HANDOFF.md` phải **thêm > 0 dòng VÀ xoá = 0 dòng** |
+
+Nhật ký đang **1.273 dòng**. Làm đúng luật thứ nhất là xoá 858 dòng, tức luật thứ hai chặn —
+và chặn **vĩnh viễn**, không phải một lượt: mọi lượt sau vẫn thấy `xoa > 0` khi so với `origin/main`.
+
+**Đã thử, không phải đoán:** cắt xuống 455 dòng → cổng ĐỎ ở mục *"HANDOFF đã ghi Log phiên này"*.
+Ghi thêm một commit **chỉ-thêm** để cứu → **vẫn đỏ**, vì `coDongMoi` cộng dồn cả dải chưa đẩy
+chứ không đọc riêng commit cuối. Đã hoàn nguyên, md5 khớp bản `fa7e8a7`.
+
+**Vì sao cổng ĐÚNG, đừng vội gọi nó là bug.** Nó không đọc được ý định; nó thấy một commit xoá
+858 dòng lịch sử của phiên khác. Đó chính là thứ nó sinh ra để chặn. Luật vàng 3 cấm gỡ bảo vệ
+cho test xanh, và "gỡ điều kiện `xoa === 0`" chính là gỡ bảo vệ.
+
+**Bản vá đề xuất — SIẾT chứ không nới.** Cho phép xoá **khi và chỉ khi** từng dòng bị xoá xuất
+hiện **nguyên văn** trong một file dưới `docs/archive/` trong cùng lượt đẩy. Xoá mà không có bản
+sao lưu trữ khớp byte thì **vẫn đỏ**. Tức cổng thôi giả định "không dời được", và bắt đầu **kiểm
+chứng** luật *dời chỗ chứ không xoá* thay vì cấm cả hai.
+
+Ca hỏng phải dựng nổi trước khi vá — ba vế, thiếu vế nào thì bản vá là đồ trang trí:
+1. xoá 10 dòng, **không** có file lưu trữ → phải ĐỎ
+2. xoá 10 dòng, có file lưu trữ nhưng **lệch một ký tự** → phải ĐỎ
+3. xoá 10 dòng, có file lưu trữ **khớp byte** → XANH
+
+**Không chốt thì hậu quả cụ thể:** nhật ký phình mãi. Nó là thứ **mọi phiên AI phải nạp**, ở
+**mọi repo** dùng bộ khung — nên phí nhân theo (số repo × số phiên), khác hẳn tài liệu tra cứu
+chỉ đọc khi cần. Hiện 1.310 dòng và chỉ có một chiều: tăng. Vùng: `_code` + luật.
+
 
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
 

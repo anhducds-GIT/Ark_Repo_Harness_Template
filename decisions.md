@@ -106,10 +106,19 @@ MỌI phiên đều làm. Đo: commit `fa7e8a7` chạm đúng một file là `cl
 
 | Việc | Trước | Sau |
 |---|---|---|
-| `HANDOFF.md` → `docs/archive/HANDOFF-2026-09.md` | 1.273 | **415** / 600 ✓ |
+| `HANDOFF.md` → lưu trữ | 1.273 | **HOÀN NGUYÊN** — xem dưới |
 | `CHANGELOG.md` → `docs/archive/CHANGELOG-0.1.0-1.2.20.md` | 806 | **241** |
 | `docs/ROADMAP-V1.md` → `docs/archive/` | — | −117 |
 | **Tổng tài liệu** | 3.681 | **2.999** / 2.200 |
+
+**NHƯNG VIỆC DỌN NHẬT KÝ ĐÃ PHẢI HOÀN NGUYÊN — hai luật của repo cắn nhau.**
+`can-nang.mjs` + sổ tay bảo trì bảo: nhật ký quá 600 dòng thì **phải dời** phần cũ sang lưu trữ.
+Cổng đóng phiên đòi `HANDOFF.md` **xoá đúng 0 dòng**. Làm đúng luật thứ nhất thì **vĩnh viễn
+không đóng được phiên**. Đã thử thật: cắt 1.273 → 455, cổng ĐỬe; ghi thêm một commit chỉ-thêm
+cũng không cứu được vì phép đo cộng dồn cả dải chưa đẩy.
+
+Tôi **không tự sửa cổng** — `AGENTS.md` mục 2 hàng 6: đổi luật an toàn phải hỏi Đức. Hoàn
+nguyên `HANDOFF.md` (md5 khớp bản `fa7e8a7`), giữ phần cắt sổ phát hành. Ghi thành **KHUNG-25**.
 
 **Và một lỗi trong chính công cụ đo, phải vá trước thì lời khuyên của nó mới có tác dụng:**
 `can-nang.mjs` bảo người dùng dời nhật ký cũ sang `docs/archive/`, trong khi nó quét ĐỆ QUY cả

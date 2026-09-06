@@ -44,13 +44,12 @@ ca đã vấp; hình dạng lạ lần sau vẫn sẽ mất tăm nếu không c�
 Tiền tố phải **bắt đầu bằng chữ cái**: cho phép số ở đầu thì `### 2026-09 · …` bị đọc
 thành mã việc `2026-09`.
 
-### Repo nhẹ đi 1.481 dòng nạp mỗi phiên, không mất chữ nào
+### Repo nhẹ đi 572 dòng nạp mỗi phiên, không mất chữ nào — và MỘT VIỆC DỌN BỊ CHÍNH CỔNG CHẶN
 
 | Chỗ | Trước | Sau |
 |---|---|---|
-| `HANDOFF.md` | 1.273 | **415** / 600 ✓ |
 | `CHANGELOG.md` | 806 | **241** |
-| Tổng tài liệu | 3.681 | **2.999** / 2.200 |
+| Tổng tài liệu | 3.681 | **3.109** / 2.200 |
 
 Chữ giữ nguyên từng dòng trong `docs/archive/`, có md5 đối chiếu với bản trong git.
 
@@ -65,6 +64,21 @@ thứ không nạp mỗi lần.
 `ORCHESTRATOR.md`, tức xoá nội dung thật, trái luật *dời chỗ chứ không xoá*. Ghi lại
 thành vòng hai của KHUNG-11 kèm số đo: gọt hết 276 dòng cũng vẫn vượt, nên 2.200 là
 con số đặt theo mong muốn chứ chưa từng đặt theo số đo.
+
+### Hai luật của repo cắn nhau — phát hiện bằng cách thử thật, CHƯA vá
+
+Nhật ký `HANDOFF.md` 1.273 dòng / ngân sách 600. Sổ tay bảo trì bảo **phải dời** phần
+cũ sang lưu trữ. Cổng đóng phiên đòi file đó **xoá đúng 0 dòng**. Làm đúng luật thứ
+nhất thì **vĩnh viễn không đóng được phiên**.
+
+Đã thử thật trong lượt này: cắt 1.273 → 455, cổng ĐỎ; thêm một commit **chỉ-thêm** cũng
+không cứu được, vì phép đo cộng dồn cả dải chưa đẩy chứ không chỉ commit cuối.
+
+**Bản này hoàn nguyên việc dọn, KHÔNG sửa cổng.** Sửa cổng là đổi luật an toàn, mà
+`AGENTS.md` mục 2 hàng 6 bắt hỏi người chốt. Ghi thành KHUNG-25 kèm bản vá đã thiết kế sẵn.
+
+Lần thứ tư cùng một hình dạng: **luật trỏ tới một thứ không hoạt động như luật tưởng**.
+
 
 ### Repo đích đã có cơ chế hiệp đồng riêng — bộ khung là chuẩn
 
