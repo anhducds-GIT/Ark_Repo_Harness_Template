@@ -1,6 +1,6 @@
 {
   "name": "repo-harness",
-  "version": "1.3.16",
+  "version": "1.3.18",
   "private": true,
   "type": "module",
   "description": "Bộ khung repo: cổng vào máy đọc, cổng kiểm cấu trúc, cổng đóng phiên, đẩy an toàn.",
@@ -13,6 +13,7 @@
     "what-next": "node scripts/what-next.mjs",
     "can-nang": "node scripts/can-nang.mjs",
     "don": "node scripts/don.mjs",
-    "test": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs"
+    "overview": "node scripts/build-overview.mjs",
+    "test": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs"
   }
 }

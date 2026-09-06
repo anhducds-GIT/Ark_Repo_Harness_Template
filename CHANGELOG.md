@@ -3,6 +3,46 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.18 — 2026-09-06 — Bảng ĐI THEO BẢN TRÍCH: gỡ bốn chỗ nối, phát sang repo đã lắp
+
+Đức chốt 06/09: bảng phải là **MỘT bảng cho mọi repo**, không để mỗi nơi một kiểu. `Y-09` xong.
+
+### Bốn chỗ nối, không phải một
+
+Bản 1.3.16 nhập từ `giao-viec.mjs` và `build-so-migrate.mjs` — **hai lệnh ở lại repo nhà** — và
+dùng `md-mini.mjs` vốn chưa từng được phát. Phát trang đi mà không gỡ là repo đích **nạp trang
+chết ngay dòng import**, với một câu lỗi không nói gì về nguyên nhân thật.
+
+Lối ra là **đảo chiều phụ thuộc**: hằng số `VIEC` và bộ đọc hồ sơ migrate dời sang
+`overview-doc.mjs` (file đi theo), rồi hai lệnh ở lại thì nhập từ đó. Chiều phụ thuộc nay chảy
+từ thứ **ở lại** sang thứ **đi theo** — chứ không ngược. Một nguồn cho mỗi thứ.
+
+### Tên trang suy từ cấu hình
+
+`DASHBOARD-<tên-repo>.html`, lấy từ `repo.name`. Tên đóng cứng là mọi repo đích cùng sinh ra một
+file mang tên repo **nhà** — đúng đống file trùng tên mà quy ước đặt tên sinh ra để tránh, chỉ
+tệ hơn: chúng còn nói sai tên chủ. Repo đích đã có file trùng tên thì khai
+`generated_names.overview`; khoá này nhận `null` nghĩa là *để bộ sinh tự suy*, khác hẳn "không có".
+
+Chữ `Đ` được xử riêng: nó là một chữ cái, không phải `D` có dấu, nên NFD không tách được — bỏ
+qua chỗ này thì "Đầu tư" ra "au-tu", mất luôn chữ đầu của tên repo.
+
+### Hai khối chỉ đúng ở repo nhà, tự ẩn
+
+Tab **Mô hình** mô tả bộ khung *phát bản* ra sao, mà repo đích là **người nhận** chứ không phải
+nơi phát. Khối **Giao một việc cho AI khác** dạy gõ `npm run giao-viec` — lệnh ở lại repo nhà.
+Vẽ chúng ở repo đích là bảng tự nhận một vai không phải của mình, và dạy người ta một lệnh không
+tồn tại. Dấu nhận biết: chỉ repo nhà mới có bộ sinh bản trích.
+
+### Một lỗi bắt được nhờ THỬ THẬT, không nhờ đọc lại code
+
+Dựng một repo giả cố tình khác hình dạng repo nhà rồi chạy — và suite vừa phát đi **chết ngay**:
+nó đọc `IDEAS.md` và tên trang của repo nhà, hai thứ repo đích không có. Tức là tôi vừa phát đi
+đúng cái bệnh bộ khung này đếm được sáu lần: *một thứ trỏ tới thứ không tồn tại*.
+
+Nay ba vế đó **bỏ qua CÓ TÊN** khi thiếu nguồn, và tổng kết in ra số vế bỏ qua. Bỏ qua im lặng
+trông giống hệt đã chạy và xanh — mà bảng thì luôn xanh.
+
 ## 1.3.16 — 2026-09-06 — Migrate thành một TAB, và mỗi lượt một tab con
 
 Đức mở bảng mẹ và **không thấy đường nào dẫn sang sổ migrate**. Đường đó có thật — nó nằm trong

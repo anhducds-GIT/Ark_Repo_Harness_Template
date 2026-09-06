@@ -50,7 +50,21 @@ const PORTABLE_SCRIPTS = [
   // mang theo thước. Ngân sách khai được trong `.repo-structure.json` nên repo khác kích thước
   // không bị ép theo số của bộ khung.
   "can-nang.mjs",
-  "don.mjs"
+  "don.mjs",
+  // BẢNG CHO NGƯỜI XEM (bản 1.3.17) — Đức chốt 06/09 sau khi mở bảng của repo Chrome Extension
+  // và thấy bảng bộ khung thiếu hẳn năm tab: "đưa cách triển khai, UI, UX vào repo template".
+  //
+  // Trước bản này mỗi repo tự dựng bảng của mình, và repo Chrome Extension đã đi trước với chín
+  // tab mà bộ khung không có. Để nguyên là N repo có N bảng, và lúc chúng lệch nhau thì không ai
+  // biết tin bản nào — đúng cái bệnh cả chương trình này sinh ra để chữa.
+  //
+  // BA FILE ĐI CÙNG NHAU, không tách được: `build-overview` dựng trang, `overview-doc` là bộ đọc
+  // (phần kiểm được bằng phép kiểm thuần), `md-mini` đổi markdown sang HTML. Thiếu một là hai
+  // file kia nạp không nổi. Suite ghim đi kèm là `tests/overview-doc-smoke.mjs` ở khối VERBATIM —
+  // phát một lệnh mà không phát phép ghim của nó là phát một lời hứa.
+  "md-mini.mjs",
+  "overview-doc.mjs",
+  "build-overview.mjs"
 ];
 
 /* Chép nguyên văn, không đổi một ký tự. */
@@ -103,7 +117,10 @@ const VERBATIM = [
   // Repo nhà vá 05/09; bản trích thì tới 05/09 mới mang theo, nên mọi repo dựng trước đó vẫn
   // dính nguyên. Không nằm trong tầng máy (`scripts/` · `tests/`) nên KHÔNG đổi dấu vân tay
   // bản phát — đã đo trước khi làm, chính vì thế lượt này không phải cắt bản mới.
-  [".gitattributes", ".gitattributes"]
+  [".gitattributes", ".gitattributes"],
+  // Phép ghim của bộ đọc bảng. Phát ba file máy mà không phát suite ghim của chúng là phát một
+  // lời hứa: repo đích sẽ có bảng, và sẽ không có gì bắt được lúc bảng đọc sai.
+  ["tests/overview-doc-smoke.mjs", "tests/overview-doc-smoke.mjs"]
 ];
 
 /* ADR-0000 CỐ Ý KHÔNG chép nguyên văn. Bản gốc kể lại lịch sử di trú của riêng repo gốc — ba
@@ -840,10 +857,14 @@ function packageJson(version) {
       "what-next": "node scripts/what-next.mjs",
     "can-nang": "node scripts/can-nang.mjs",
     "don": "node scripts/don.mjs",
+      // BẢNG CHO NGƯỜI XEM. Không khai lệnh thì file nằm đó mà không ai chạy — và bảng là thứ
+      // người chốt mở, không phải AI. Trang ghi ra `DASHBOARD-<tên-repo>.html` ở gốc repo, suy
+      // từ `repo.name`; muốn tên khác thì khai `generated_names.overview`.
+      overview: "node scripts/build-overview.mjs",
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
-      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs"
+      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs"
     }
   }, null, 2) + "\n";
 }

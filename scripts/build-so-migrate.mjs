@@ -40,7 +40,9 @@ import { md, esc, tachFrontmatter } from "./md-mini.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
-const THU_MUC = "docs/migrations";
+import { readHoSo, THU_MUC_MIGRATE } from "./overview-doc.mjs";
+
+const THU_MUC = THU_MUC_MIGRATE;
 
 /* HAI NGUỒN HỒ SƠ — và chỉ một trong hai được dùng cho bản đem commit.
  *
@@ -69,20 +71,14 @@ export function nguonHEAD(root = ROOT) {
   };
 }
 
+/* MỘT BỘ ĐỌC, HAI TRANG ĐỌC. Bộ đọc thật nằm ở `overview-doc.mjs` vì file đó **đi theo bản
+ * trích** còn trang này thì ở lại — chiều phụ thuộc phải chảy từ thứ ở lại sang thứ đi theo.
+ * Giữ tên cũ ở đây để mọi chỗ gọi cũ và phép kiểm cũ không phải đổi.
+ *
+ * Hai bộ đọc cùng một thư mục là hai bộ sẽ trôi khỏi nhau, và lúc chúng nói khác nhau thì
+ * không ai biết tin bản nào — đúng cái bệnh cả bộ khung này sinh ra để chữa. */
 export function docHoSo(root = ROOT, nguon = nguonDia(root)) {
-  const ra = [];
-  for (const f of nguon.liet()) {
-    const raw = nguon.doc(f);
-    // `tachFrontmatter` tra ve `than`, khong phai `body`. Destructure sai ten thi `body` la
-    // undefined, roi `body ?? raw` nga ve CA FILE — nen frontmatter bi in lai trong than bai.
-    const { fm, than } = tachFrontmatter(raw);
-    // Hồ sơ thiếu `repo` hoặc `ngay` thì KHÔNG bỏ qua im lặng — nó vẫn hiện, và tự khai là
-    // thiếu. Bỏ qua im lặng nghĩa là một lần migrate biến mất khỏi lịch sử, đúng thứ sổ này
-    // sinh ra để chặn.
-    ra.push({ file: `${THU_MUC}/${f}`, fm: fm ?? {}, body: than ?? raw });
-  }
-  // Mới nhất lên đầu: người mở sổ gần như luôn hỏi "lần gần nhất thế nào".
-  return ra.sort((a, b) => String(b.fm.ngay ?? "").localeCompare(String(a.fm.ngay ?? "")));
+  return readHoSo(nguon);
 }
 
 const DEN = { "xanh": "xanh", "đỏ": "do", "chưa chạy": "vang" };

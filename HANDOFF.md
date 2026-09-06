@@ -830,3 +830,43 @@ nhãn của đúng commit đó. Nghiêng về lối 1.
 **Bài học cho phiên sau: đừng bịa một nhãn phiên thứ hai để thử một cơ chế.** Thử bằng nhãn của
 chính mình, hoặc thử trong kho tạm. Một commit mang nhãn lạ là một commit không đẩy đi được nữa
 nếu không có người chốt.
+
+## 2026-09-06 · `claude-y09` — BẢNG NAY ĐI THEO BẢN TRÍCH (Y-09 xong ở tầng bộ khung)
+
+**Đức chốt:** *"làm Y-09 luôn đi, gỡ chỗ nối rồi phát sang ba repo."*
+
+### Bốn chỗ nối, không phải một
+
+Đo ra mới thấy: bảng nhập từ `giao-viec.mjs` **và** `build-so-migrate.mjs` — cả hai **ở lại repo
+nhà** — cộng `md-mini.mjs` vốn chưa từng được phát. Phát đi mà không gỡ là repo đích **nạp trang
+chết ngay dòng import**.
+
+Lối ra là **đảo chiều phụ thuộc**: hằng số `VIEC` và bộ đọc hồ sơ migrate dời sang
+`overview-doc.mjs` (file đi theo), hai lệnh ở lại thì nhập từ đó. Chiều chảy từ thứ **ở lại**
+sang thứ **đi theo**, không ngược. Đây là luật đáng nhớ cho mọi lượt phát sau.
+
+### Tên trang suy từ cấu hình, và hai khối tự ẩn
+
+`DASHBOARD-<tên-repo>.html` từ `repo.name`; khai `generated_names.overview` để đè. Tab **Mô
+hình** và khối **Giao việc cho AI khác** tự ẩn ở repo đích — repo đích là *người nhận* bản phát,
+không phải nơi phát, và `giao-viec` không có ở đó.
+
+### Lỗi bắt được nhờ THỬ THẬT, không nhờ đọc lại code
+
+Dựng một repo giả cố tình khác hình dạng repo nhà rồi chạy — suite vừa phát đi **chết ngay**: nó
+đọc `IDEAS.md` và tên trang của repo nhà. Tức là tôi vừa phát đi đúng cái bệnh repo này đếm được
+sáu lần: **một thứ trỏ tới thứ không tồn tại**.
+
+Nay ba vế đó **bỏ qua CÓ TÊN** khi thiếu nguồn. Bỏ qua im lặng trông giống hệt đã chạy và xanh.
+
+**Bài học:** đọc lại code không bắt được lỗi này. Chỉ dựng một repo khác hình dạng rồi chạy thật
+mới bắt được — và việc đó mất đúng năm phút.
+
+### Số
+
+`npm test` ở nhà **181 vế xanh** · repo trống dựng từ bản trích chạy `npm test` **exit 0**
+(8 vế xanh · 2 vế bỏ qua có tên) · bản khung **1.3.16 → 1.3.18**.
+
+*Vì sao nhảy qua 1.3.17:* sổ phát hành đã ghi 1.3.17, rồi tôi phải sửa suite cho nó chạy được ở
+repo lạ — mà sửa file đi theo bản trích là đổi dấu vân tay. Sổ **chỉ thêm**, không sửa dòng cũ,
+nên cắt bản mới. Cổng chặn đúng.

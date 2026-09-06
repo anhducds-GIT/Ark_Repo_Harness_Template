@@ -503,7 +503,11 @@ export function behaviourGlobsFrom(parsed) {
 export const TEN_MAY_SINH_MAC_DINH = Object.freeze({
   dashboard: "DASHBOARD.md",
   llms: "llms.txt",
-  repo_map: "repo-map.json"
+  repo_map: "repo-map.json",
+  /* `overview` = trang HTML cho người xem. `null` nghĩa là **suy từ `repo.name`**, không phải
+   * "không có" — bộ sinh tự đặt `DASHBOARD-<tên-repo>.html`. Khai một chuỗi ở đây chỉ khi repo
+   * đích đã có sẵn file trùng tên, đúng lý do khối `generated_names` tồn tại. */
+  overview: null
 });
 
 export function tenMaySinhFrom(parsed) {
@@ -518,6 +522,7 @@ export function tenMaySinhFrom(parsed) {
     if (!(k in TEN_MAY_SINH_MAC_DINH)) {
       throw new Error(`TEN_MAY_SINH_HONG: không có khoá \`${k}\`. Chỉ nhận: ${Object.keys(TEN_MAY_SINH_MAC_DINH).join(", ")}. Gõ sai tên khoá mà lặng lẽ bỏ qua thì người viết tưởng đã khai.`);
     }
+    if (v === null) { ra[k] = null; continue; }   // `null` = để bộ sinh tự suy, xem TEN_MAY_SINH_MAC_DINH
     if (typeof v !== "string" || !v.trim() || v.includes("/") || v.includes("\\")) {
       throw new Error(`TEN_MAY_SINH_HONG: \`${k}\` phải là TÊN FILE ở gốc repo, không có dấu gạch chéo. Đang là: ${JSON.stringify(v)}`);
     }
@@ -526,7 +531,7 @@ export function tenMaySinhFrom(parsed) {
   /* HAI ARTIFACT TRÙNG TÊN NHAU LÀ TỰ ĐÈ CHÍNH MÌNH — bộ sinh ghi ba file theo thứ tự, nên
      khai trùng thì file ghi sau nuốt file ghi trước và cổng "còn tươi" đỏ vĩnh viễn mà không
      ai hiểu vì sao. Bắt ngay lúc đọc cấu hình, chỗ người ta còn đang nhìn cái tên mình vừa gõ. */
-  const ten = Object.values(ra);
+  const ten = Object.values(ra).filter((x) => x !== null);
   if (new Set(ten).size !== ten.length) {
     throw new Error(`TEN_MAY_SINH_HONG: ba artifact phải có ba tên KHÁC nhau. Đang là: ${JSON.stringify(ra)}`);
   }

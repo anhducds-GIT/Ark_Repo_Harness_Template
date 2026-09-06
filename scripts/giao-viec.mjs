@@ -26,12 +26,14 @@ import { fileURLToPath } from "node:url";
 const NL = String.fromCharCode(10);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-/* Ba loại việc. `doc` = file nửa dưới; `ghi` = lượt này có ghi vào repo đích không. */
-export const VIEC = {
-  nang: { doc: "docs/briefs/NANG-BO-KHUNG.md", nhan: "nâng bộ khung", ghi: true },
-  migrate: { doc: "docs/briefs/MIGRATE-REPO.md", nhan: "đưa repo lên chuẩn", ghi: true },
-  audit: { doc: "docs/briefs/AUDIT-REPO.md", nhan: "audit trước migrate", ghi: false }
-};
+/* Ba loại việc — hằng số nằm ở `overview-doc.mjs`, không nằm ở đây.
+ *
+ * Vì sao ngược đời như vậy: lệnh này **ở lại repo nhà**, còn bảng thì **đi theo bản trích**.
+ * Bảng cần biết ba loại việc để in ra; nếu hằng số ở đây thì bảng phải nhập từ đây, và mọi
+ * repo đích nạp trang sẽ chết ngay dòng import vì file này không có ở đó. Chiều phụ thuộc phải
+ * chảy từ thứ Ở LẠI sang thứ ĐI THEO. Xuất lại để người gọi cũ không phải đổi. */
+export { VIEC } from "./overview-doc.mjs";
+import { VIEC } from "./overview-doc.mjs";
 
 const CHUNG = "docs/briefs/GIAO-VIEC-CHUNG.md";
 
