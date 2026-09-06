@@ -174,4 +174,51 @@ const kholuu = (kho) => {
   ok("4 · vòng đời thật (dọn → phình lại → dọn tiếp): vẫn ĐÚNG MỘT dấu chân, không cuốn dấu chân vào kho");
 }
 
+/* ---- 5. Tên file lưu trữ: đọc được, và KHÔNG BAO GIỜ đè bản cũ ------------ */
+{
+  /* Hai lỗi thật, phát hiện lúc chạy lệnh này lần đầu trên repo thật 06/09.
+
+     (a) TÊN VÔ NGHĨA. Bản đầu lọc mọi ký tự không phải số rồi cắt 6 chữ số đầu của tiêu đề
+         khối cũ nhất. Trên `## Lượt · Đẩy hộ 12 commit của bốn lane` nó ra `HANDOFF-12.md`.
+         Một file lưu trữ tên vô nghĩa là một file không ai mở — chữ vẫn còn mà coi như đã mất.
+
+     (b) GHI ĐÈ IM LẶNG — lỗ nguy hiểm nhất của cả lệnh. Hai lượt dọn cùng một tháng cho ra
+         cùng một nhãn, nên bản đầu ĐÈ MẤT file lưu trữ của lượt trước: chính lệnh dọn làm mất
+         đúng thứ nó sinh ra để giữ, và không báo gì. */
+  const kho = khoThu({ soNhatKy: 20, soPhatHanh: 5000 });
+  try {
+    const dung = (n, tu) => writeFileSync(join(kho, "HANDOFF.md"),
+      ["# HANDOFF", "", "## Log", ""]
+        .concat(...Array.from({ length: n }, (_, i) => [`## 2026-0${tu} · lượt ${i + 1}`, `nội dung ${tu}-${i + 1}`, ""]))
+        .join(NL) + NL, "utf8");
+
+    dung(12, 3);
+    chay(kho, "--apply");
+    const ten1 = kholuu(kho);
+    assert.deepEqual(ten1, ["HANDOFF-2026-03.md"],
+      `ten phai doc duoc va lay tu NGAY trong tieu de, dang: ${JSON.stringify(ten1)}`);
+    const noiDung1 = readFileSync(join(kho, "docs/archive/HANDOFF-2026-03.md"), "utf8");
+
+    // Lượt hai, CÙNG THÁNG → cùng nhãn. Bản đầu sẽ đè mất file trên.
+    dung(12, 3);
+    chay(kho, "--apply");
+    assert.equal(readFileSync(join(kho, "docs/archive/HANDOFF-2026-03.md"), "utf8"), noiDung1,
+      "file luu tru cua luot TRUOC khong duoc bi de — day la lo nguy hiem nhat cua lenh don");
+    assert.ok(kholuu(kho).includes("HANDOFF-2026-03-2.md"),
+      `trung ten thi phai them hau to, dang: ${JSON.stringify(kholuu(kho))}`);
+
+    // VẾ ĐỐI CHỨNG: tiêu đề KHÔNG có ngày thì vẫn phải ra một tên đọc được, không phải rác.
+    writeFileSync(join(kho, "HANDOFF.md"),
+      ["# HANDOFF", "", "## Log", ""]
+        .concat(...Array.from({ length: 12 }, (_, i) => [`## Lượt · Đẩy hộ 12 commit của bốn lane`, `x${i}`, ""]))
+        .join(NL) + NL, "utf8");
+    chay(kho, "--apply");
+    const moi = kholuu(kho).filter((f) => !f.startsWith("HANDOFF-2026-03"));
+    assert.equal(moi.length, 1, `phai tao dung mot file moi, dang: ${JSON.stringify(moi)}`);
+    assert.match(moi[0], /^HANDOFF-\d{4}-\d{2}(-\d+)?\.md$/,
+      `tieu de khong co ngay thi lay thang CAT, khong duoc ra rac nhu HANDOFF-12.md — dang: ${moi[0]}`);
+  } finally { rmSync(kho, { recursive: true, force: true }); }
+  ok("5 · tên file lưu trữ đọc được, lấy từ ngày trong tiêu đề · trùng tên thì THÊM HẬU TỐ, không bao giờ đè");
+}
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

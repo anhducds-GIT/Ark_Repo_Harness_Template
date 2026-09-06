@@ -138,7 +138,7 @@ function donMotFile({ ten, nganSach, moiNhatOTren, mocDau, tieuDeLuu, viSao, ten
 
   return {
     ...chua, doi,
-    fileLuu: `${LUU_TRU}/${tenFile(doi)}`,
+    fileLuu: tenChuaDung(`${LUU_TRU}/${tenFile(doi)}`),
     noiDungLuu: [...DAU_LUU_TRU_CHO(tieuDeLuu(doi), ten, viSao(goc.length)), ...doi.flatMap((k) => k.dong)],
     noiDungMoi: ra
   };
@@ -156,6 +156,39 @@ function ghepLai({ dau, giu, tuDong, moiNhatOTren }) {
   return [...dau.slice(0, tuDong), ...DUOI(false), ...dau.slice(tuDong), ...than];
 }
 
+/* NHÃN NGÀY cho file lưu trữ. Quét MỌI khối bị dời, lấy `YYYY-MM` đầu tiên tìm được.
+   Bản đầu lọc mọi ký tự không phải số rồi cắt 6 chữ số đầu — nghe thì hợp lý, nhưng chạy thật
+   06/09 trên tiêu đề `## Lượt · Đẩy hộ 12 commit của bốn lane` thì nó ra `HANDOFF-12.md`.
+   Bản thứ hai chỉ xem tiêu đề khối CŨ NHẤT — và đúng khối đó không có ngày, ra `HANDOFF-cu.md`.
+   Nên quét cả danh sách: chỉ cần MỘT khối có ngày là đủ đặt tên.
+   Một file lưu trữ tên vô nghĩa là một file không ai mở — chữ vẫn còn mà coi như đã mất.
+   Luật vàng số 5: tên file cũng là chữ người đọc nhìn thấy. */
+const nhanNgay = (doi) => {
+  for (const k of doi) {
+    const m = String(k.tieuDe).match(/(\d{4})-(\d{2})/);
+    if (m) return `${m[1]}-${m[2]}`;
+  }
+  /* KHÔNG khối nào có ngày — xảy ra thật: một lượt bàn giao đặt tiêu đề `## Lượt · Đẩy hộ…`.
+     Lúc đó lấy tháng CẤT, vì câu hỏi người đọc đặt ra khi nhìn kho lưu trữ là *"cái này cất hồi nào"*.
+     Đây KHÔNG phải cái bẫy "bộ sinh nhìn đồng hồ": đồng hồ chỉ quyết định MỘT CÁI TÊN lúc ghi, không
+     đi vào bất kỳ phép so nào — nên sang ngày mới không phiên nào bị chặn. Và `tenChuaDung`
+     bên dưới đảm bảo hai lượt cùng tháng không đè nhau. */
+  return new Date().toISOString().slice(0, 7);
+};
+
+/* KHÔNG ĐƯỢC GHI ĐÈ MỘT FILE LƯU TRỮ ĐÃ CÓ. Hai lượt dọn trong cùng một tháng cho ra cùng một
+   nhãn, nên bản đầu sẽ **ghi đè lượt trước** — tức chính lệnh dọn làm mất đúng thứ nó sinh ra để
+   giữ. Đây là lỗ nguy hiểm nhất của cả lệnh này, và nó IM LẶNG: file cũ biến mất, không báo gì.
+   Thấy trùng thì thêm hậu tố `-2`, `-3`… chứ tuyệt đối không đè. */
+const tenChuaDung = (rel) => {
+  if (!fs.existsSync(path.join(ROOT, rel))) return rel;
+  for (let i = 2; i < 100; i += 1) {
+    const thu = rel.replace(/\.md$/, `-${i}.md`);
+    if (!fs.existsSync(path.join(ROOT, thu))) return thu;
+  }
+  throw new Error(`DON_SAI: quá nhiều file lưu trữ trùng tên quanh ${rel}`);
+};
+
 const tinhNhatKy = (NS) => donMotFile({
   ten: "HANDOFF.md",
   nganSach: NS.soNhatKy,
@@ -165,7 +198,7 @@ const tinhNhatKy = (NS) => donMotFile({
   mocDau: /^## Log\b/,
   tieuDeLuu: () => "Nhật ký bàn giao — LƯU TRỮ",
   viSao: (n) => `Nhật ký gốc đã ${n} dòng / ngân sách ${NS.soNhatKy} — mà nhật ký là thứ MỌI phiên AI phải nạp mỗi lần mở.`,
-  tenFile: (doi) => `HANDOFF-${doi[0].tieuDe.replace(/[^0-9]/g, "").slice(0, 6) || "cu"}.md`
+  tenFile: (doi) => `HANDOFF-${nhanNgay(doi)}.md`
 });
 
 const banSo = (k) => (k.tieuDe.match(/^##\s+([0-9][0-9.]*)/) || [])[1] || "cu";
