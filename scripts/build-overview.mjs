@@ -31,6 +31,8 @@ import { fileURLToPath } from "node:url";
 
 import { esc, md, tachFrontmatter } from "./md-mini.mjs";
 
+import { VIEC } from "./giao-viec.mjs";
+
 const NL = String.fromCharCode(10);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -167,6 +169,38 @@ const CSS = `
 .vong .b.nay .ten{color:var(--nhan);font-weight:600}
 .vong .noi{height:2px;background:var(--vien);flex:1;margin-bottom:19px;min-width:14px}
 .vong .noi.qua{background:var(--xanh)}
+
+/* MÔ HÌNH BA KHỐI — Đức mô tả 06/09: một khối DỮ LIỆU LÕI, một khối PROTOCOL, một khối
+   REPO ĐÍCH, và luồng chạy cả BÊN TRONG từng khối lẫn GIỮA các khối.
+
+   Vẽ bằng lưới CSS chứ không bằng thư viện vẽ sơ đồ: trang này là file tĩnh đem gửi cho
+   người khác mở, nên nó không được phụ thuộc vào một CDN còn sống hay không. */
+.mh{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:stretch;margin:14px 0 6px}
+.mh-cot{background:var(--mat);border:1px solid var(--vien);border-radius:11px;padding:14px 15px;
+  display:flex;flex-direction:column;gap:9px;min-width:0}
+.mh-cot.loi{border-color:var(--nhan)}
+.mh-so{font-family:var(--mono);font-size:10.2px;letter-spacing:.11em;text-transform:uppercase;color:var(--mo)}
+.mh-ten{font-family:var(--disp);font-size:16.5px;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:var(--chu)}
+.mh-mota{font-size:13px;color:var(--chu2);line-height:1.45;margin:-3px 0 2px}
+.mh-hop{background:var(--nen);border:1px solid var(--vien);border-radius:8px;padding:9px 11px}
+.mh-hop h4{margin:0 0 5px;font-family:var(--mono);font-size:10.2px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--mo);font-weight:600}
+.mh-hop ul{margin:0;padding-left:16px}
+.mh-hop li{font-size:13.2px;line-height:1.5;color:var(--chu)}
+.mh-hop li code{font-size:12px}
+.mh-mui{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 9px;gap:4px;min-width:56px}
+.mh-mui .ky{font-size:20px;color:var(--nhan);line-height:1}
+.mh-mui .nh{font-family:var(--mono);font-size:9.6px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--mo);text-align:center;line-height:1.3}
+.mh-vong{margin:8px 0 0;background:var(--nhan-nen);border:1px dashed var(--nhan);border-radius:9px;
+  padding:10px 13px;font-size:13px;line-height:1.5;color:var(--chu)}
+.mh-vong b{color:var(--nhan)}
+@media (max-width:860px){
+  .mh{grid-template-columns:1fr}
+  .mh-mui{flex-direction:row;padding:7px 0;min-width:0}
+  .mh-mui .ky{transform:rotate(90deg)}
+}
 
 .batdau pre.code{margin:6px 0 4px}
 .lienquan{margin:6px 0 0;padding-left:20px}
@@ -445,6 +479,95 @@ export function khoiBatDau(dl) {
    Nay tìm LIÊN KẾT MARKDOWN `[chữ](file.html)`, và chỉ nhận khi file đó CÓ THẬT trong HEAD —
    một link chết trên trang mẹ còn tệ hơn không có link. Đòi dạng ngoặc đầy đủ là để
    `<file-tạm.html>` và `bang.html` viết trong câu văn không lọt vào. */
+/* MÔ HÌNH VẬN HÀNH — ba khối, Đức mô tả 06/09.
+ *
+ * Vì sao khối này đáng có: mọi tab khác của trang trả lời "repo đang thế nào". Không tab nào
+ * trả lời "cái này VẬN HÀNH ra sao" — mà đó lại là câu đầu tiên của bất kỳ ai mới nhìn thấy
+ * nó, kể cả một phiên AI mới mở. Trước khi có khối này, câu trả lời nằm rải ở bốn file
+ * protocol, và muốn hiểu phải đọc hết cả bốn.
+ *
+ * SUY TỪ DỮ LIỆU, KHÔNG GÕ TAY. Danh sách protocol đọc từ `docs/protocols`, đề bài đọc từ
+ * `docs/briefs`, repo đích đọc từ `docs/migrations`. Gõ tay thì ba tháng nữa nó nói về một bộ
+ * khung không còn tồn tại — đúng bệnh mà cả repo này sinh ra để chữa. */
+export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [], soPhepKiem = null }) {
+  const muc = (x) => `<li>${x}</li>`;
+  const hop = (ten, items) => items.length
+    ? `<div class="mh-hop"><h4>${esc(ten)}</h4><ul>${items.join("")}</ul></div>` : "";
+  const mui = (nhan) => `<div class="mh-mui"><span class="ky">&#9654;</span><span class="nh">${esc(nhan)}</span></div>`;
+
+  /* Khối 1 — DỮ LIỆU LÕI. Ba tầng của repo nhà, đúng ba tầng mà cổng đóng phiên canh. */
+  const loi = [
+    hop("Luật", [muc("<code>AGENTS.md</code> — hiến pháp, một trang"),
+      muc("<code>decisions.md</code> + <code>docs/adr/</code> — đã chốt gì, vì sao")]),
+    hop("Máy", [muc(`<b>${lenh.length}</b> lệnh chạy được`),
+      muc(soPhepKiem === null ? "suite phép kiểm ghim hành vi" : `<b>${soPhepKiem}</b> suite phép kiểm ghim hành vi`),
+      muc("cổng đóng phiên · cổng xuất bản · bảng chủ sở hữu")]),
+    hop("Trạng thái", [muc("<code>STATUS.md</code> · <code>HANDOFF.md</code> · <code>BACKLOG.md</code>"),
+      muc("<code>.agents/claims.json</code> — ai đang giữ vùng nào")])
+  ].join("");
+
+  /* Khối 2 — PROTOCOL. Đây là thứ ĐI RA NGOÀI: việc lặp lại, có checklist, giao được cho AI khác. */
+  /* Tên ba việc lấy THẲNG từ bảng `VIEC` của `giao-viec.mjs`, không suy từ tên file. Suy từ
+   * tên file thì `BRAINSTORM-GPT-V1.md` hoá ra một `--viec brainstorm` không tồn tại, và trang
+   * dạy người ta gõ một lệnh chạy không được. */
+  const tenFile = new Map(briefs.map((b) => [b.file, b.tieuDe]));
+  const dsBrief = Object.entries(VIEC).map(([khoa, cf]) => {
+    const tieuDe = tenFile.get(String(cf.doc).split("/").pop()) || cf.nhan;
+    return muc(`<code>--viec ${esc(khoa)}</code> — ${esc(tieuDe.replace(/^PHẦN VIỆC — /, ""))}`);
+  });
+  const proto = [
+    hop("Ba việc giao được", dsBrief.length ? dsBrief : [muc("chưa khai đề bài nào")]),
+    hop("Quy trình đầy đủ", protocols.map((p) => muc(esc(p.tieuDe.replace(/^QUY TRÌNH — /, "")))) ),
+    hop("Ai thực thi", [muc("Claude Code · Codex CLI · GPT — cùng một đề bài"),
+      muc("<code>npm run giao-viec</code> đo repo đích rồi mới ghép đề bài")])
+  ].join("");
+
+  /* Khối 3 — REPO ĐÍCH. Đọc từ hồ sơ migrate: đó là bằng chứng, không phải trí nhớ. */
+  const dsDich = dichDen.length
+    ? dichDen.map((d) => muc(`${esc(d.ten)} <span class="ref">${esc(d.trangThai || "—")}</span>`))
+    : [muc("chưa repo nào")];
+  const dich = [
+    hop(`${dichDen.length} repo đã lắp`, dsDich),
+    hop("Ở repo đích có gì", [muc("cùng bộ luật, cùng cổng kiểm, cùng bảng chủ sở hữu"),
+      muc("<code>.ark/harness.lock.json</code> — ghim đang dùng bản khung nào")])
+  ].join("");
+
+  return `<div class="the">
+  <h2>Mô hình vận hành — ba khối</h2>
+  <p>Bộ khung không phải một thư mục file đem chép. Nó là <strong>một khối dữ liệu lõi</strong>
+  tự cải tiến, <strong>một lớp protocol</strong> biến việc lặp lại thành đề bài giao được, và
+  <strong>các repo đích</strong> nhận bản phát rồi gửi ngược chỗ vấp về lõi.</p>
+  <div class="mh">
+    <div class="mh-cot loi">
+      <span class="mh-so">Khối 1</span>
+      <span class="mh-ten">Dữ liệu lõi</span>
+      <p class="mh-mota">Repo nhà. Một nguồn sự thật cho luật, bộ máy và trạng thái.</p>
+      ${loi}
+    </div>
+    ${mui("phát bản")}
+    <div class="mh-cot">
+      <span class="mh-so">Khối 2</span>
+      <span class="mh-ten">Protocol</span>
+      <p class="mh-mota">Việc lặp lại, có checklist, đo được bằng máy — nên giao được cho AI khác.</p>
+      ${proto}
+    </div>
+    ${mui("thi hành")}
+    <div class="mh-cot">
+      <span class="mh-so">Khối 3</span>
+      <span class="mh-ten">Repo đích</span>
+      <p class="mh-mota">Repo đang sống, có việc và người dùng riêng. Bộ khung là khách.</p>
+      ${dich}
+    </div>
+  </div>
+  <div class="mh-vong">
+    <b>Vòng ngược — đây mới là chỗ bộ khung lớn lên.</b> Repo đích vấp ở đâu thì chỗ đó thành
+    một mục trong sổ nợ của lõi, rồi thành một bản vá, rồi thành một phép kiểm ghim để nó không
+    tái diễn. Ba lượt migrate đầu tìm ra <b>9 · 8 · và một loạt</b> lỗi <em>của chính bộ khung</em>
+    — không phải của repo đích. Không có vòng ngược thì lõi chỉ đúng trên giấy.
+  </div>
+</div>`;
+}
+
 export function khoiLienQuan(banDo, trangCo) {
   const co = trangCo instanceof Set ? trangCo : new Set(trangCo || []);
   const item = [];
@@ -462,12 +585,13 @@ export function khoiLienQuan(banDo, trangCo) {
 }
 
 export function trang(dl) {
-  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st } = dl;
+  const { ten, ban, ngay, so, lenh, banDo, workflows, protocols, adrs, legend, nhatKy, daXong = [], huongDan, st, briefs = [], dichDen = [], soPhepKiem = null } = dl;
 
   const tabs = [
     // Thứ tự = tần suất dùng, không phải thứ tự viết ra. "Cách vận hành" và "Sổ tay" là hai
     // tab mở hằng ngày; "Làm được gì" chỉ đọc một lần lúc mới vào.
     ["tong-quan", "Tổng quan"],
+    ["mo-hinh", "Mô hình"],
     ["cach-van-hanh", "Cách vận hành"],
     ["so-tay", "Sổ tay"],
     ["lam-duoc-gi", "Làm được gì"],
@@ -562,6 +686,23 @@ export function trang(dl) {
         </div>
       </div>
     </details>
+  </section>
+
+  <section class="tab" id="tab-mo-hinh" hidden>
+    ${khoiMoHinh({ lenh, protocols, briefs, dichDen, soPhepKiem })}
+    <div class="the">
+      <h2>Một lượt giao việc, ba lệnh</h2>
+      <p>Đề bài <strong>không viết tay</strong>. Lệnh dưới đây đo repo đích trước — nhánh, cây
+      làm việc, bảng quyền, bản khung đang ghim — rồi mới ghép đề bài quanh những con số đó.
+      Đo không được thì nó <strong>không in gì cả</strong>.</p>
+      <pre class="code">cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; git fetch
+npm run giao-viec -- --viec nang --repo "&lt;REPO ĐÍCH&gt;" --as codex-nang &gt; de-bai.txt
+cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.txt</pre>
+      <p><strong>Vì sao phải đo trước:</strong> lượt giao đầu tiên (06/09) dùng một đề bài viết
+      trước khi ai đo repo đích. Nó dạy <code>git add -A</code> trong khi repo đó đang có ba file
+      sửa dở của phiên khác — tức dạy phiên nhận việc cuốn việc của người khác vào commit của
+      mình rồi đẩy đi. Lỗi đó không phải của phiên nhận việc.</p>
+    </div>
   </section>
 
   ${dl.tinhNang ? `<section class="tab" id="tab-lam-duoc-gi" hidden>
@@ -688,6 +829,12 @@ export function gomDuLieu() {
   const daXong = tachDaXong(doc("BACKLOG.md"));
   const workflows = docTaiLieu("docs/workflows");
   const protocols = docTaiLieu("docs/protocols");
+  const briefs = docTaiLieu("docs/briefs");
+  /* REPO ĐÍCH đọc từ hồ sơ migrate — bằng chứng, không phải trí nhớ. Mỗi lượt migrate một hồ
+   * sơ, chỉ thêm; nên danh sách này không thể cũ hơn thực tế mà không ai biết. */
+  const dichDen = docTaiLieu("docs/migrations")
+    .map((m) => ({ ten: m.fm.repo || m.file, trangThai: m.fm.trang_thai || null, ngay: m.fm.ngay || null }))
+    .sort((a, b) => String(b.ngay || "").localeCompare(String(a.ngay || "")));
   const adrs = docTaiLieu("docs/adr");
   const legendRaw = doc("docs/LEGEND.md");
   const st = tachFrontmatter(doc("STATUS.md") || "").fm;
@@ -768,7 +915,10 @@ export function gomDuLieu() {
     lenh: Object.entries(pkg.scripts || {}),
     banDo: docBanDo(doc("AGENTS.md")),
     trangCo: new Set(lietHTML()),
-    workflows, protocols, adrs, nhatKy, daXong,
+    workflows, protocols, adrs, nhatKy, daXong, briefs, dichDen,
+    // Số suite phép kiểm = số lần `node tests/...` trong lệnh `test`. Đếm từ đó chứ không đếm
+    // file trong `tests/`: một file không được lệnh `test` gọi thì nó không canh gì cả.
+    soPhepKiem: (String((pkg.scripts || {}).test || "").match(/node tests\//g) || []).length || null,
     legend: legendRaw ? tachFrontmatter(legendRaw).than : null,
     st,
     tinhNang: tinhNangRaw ? tachFrontmatter(tinhNangRaw).than : null,

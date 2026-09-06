@@ -197,7 +197,13 @@ Luật vàng số 4 áp cho cả audit của AI khác. Trial 05/09: Codex báo b
 repo `n8n-orchestrator` — đo lại thì **cả ba exit 0**. Nếu tin thẳng thì đã đi sửa ba thứ không
 hỏng. Mỗi phát hiện phải tự chạy lại trước khi đưa vào kế hoạch migrate.
 
-## Sáu bước, theo đúng thứ tự
+## Tám bước, theo đúng thứ tự
+
+> Tiêu đề này nói **Sáu** suốt từ lúc viết, trong khi bên dưới có tám bước đánh số — hai bước
+> cuối (hồ sơ migrate · ghim phiên bản) thêm vào sau mà không ai sửa tiêu đề. Bắt được 06/09
+> lúc rà lại quy trình để giao cho AI khác: một phiên đọc "sáu bước" rồi dừng ở bước 6 là
+> **bỏ đúng hai bước không được bỏ**. Đây là hình dạng lỗi quen thuộc của repo này — luật trỏ
+> tới một thứ không khớp thực tế — nay đếm được **lần thứ sáu**.
 
 ### 1. Đo trước, và ghi lại con số
 

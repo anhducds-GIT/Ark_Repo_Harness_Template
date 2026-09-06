@@ -23,6 +23,7 @@ ttl_days: 365
 | Sửa một lỗi | [3](#3) | tuỳ lỗi |
 | Thêm một công cụ hoặc tài liệu mới | [4](#4) | 10 phút |
 | Nhờ một AI khác audit | [5](#5) | 15 phút chuẩn bị |
+| **Giao hẳn một việc cho AI khác làm** (nâng · migrate · audit) | [5b](#5b) | 2 phút |
 | Chạy bảo trì định kỳ | [6](#6) | 20 phút |
 | Dựng repo mới / đưa repo cũ lên chuẩn | [7](#7) | xem workflow |
 
@@ -92,6 +93,26 @@ Dưới đây chỉ là **lệnh chính xác**, để khỏi phải nhớ. Thứ
 
 > Vòng audit đầu tiên của repo này trả về `REJECT — STALE_EVIDENCE` vì mốc đổi **ba lần** trong
 > lúc auditor đang chạy. Không ai nghiệm thu nổi một mục tiêu đang di chuyển.
+
+## 5b. Giao hẳn một việc cho AI khác {#5b}
+
+**Đừng viết đề bài bằng tay.** Đức chốt 06/09: Claude Code không làm hết một mình được, nên ba
+việc lặp lại — **nâng · migrate · audit** — giao cho Codex CLI là mặc định.
+
+- [ ] `cd "<REPO ĐÍCH>" && git fetch` — **người giao phải làm**, `codex exec` không chạy được
+      `git fetch` (sandbox từ chối ghi `.git/FETCH_HEAD`)
+- [ ] `npm run giao-viec -- --viec <nang|migrate|audit> --repo "<REPO ĐÍCH>" --as <tên-phiên> > de-bai.txt`
+- [ ] Lệnh **DỪNG và không in gì** thì đọc mã lỗi trên stderr — đừng lách, mỗi mã là một chỗ
+      thật sự không được đi tiếp
+- [ ] `cd "<REPO ĐÍCH>" && codex exec -s workspace-write - < de-bai.txt` — **phải chạy từ TRONG
+      repo đích**, Codex từ chối thư mục không phải kho git
+- [ ] Nhận báo cáo năm dòng → **tự kiểm chứng lại từng con số** (luật vàng 4). Báo cáo là lời
+      tự khai, chưa có lệnh nào đo lại — đó là `KHUNG-31`
+- [ ] Phiên nhận việc báo **DỪNG vì luật của repo đích** → đó là kết quả ĐÚNG, không phải thất
+      bại. Đưa lên người chốt, đừng bảo nó làm tiếp
+
+> Đo thật 06/09: lượt giao đầu tiên dùng đề bài viết tay, và đề bài đó dạy `git add -A` vào một
+> repo đang có ba file sửa dở của phiên khác. Lỗi ở đề bài, không ở phiên nhận việc.
 
 ## 6. Bảo trì định kỳ {#6}
 

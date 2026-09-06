@@ -585,6 +585,26 @@ và bộ luật của chủ nhà thắng — đúng như phải thế. Cái đá
 đọc trạng thái nhánh xa đều phải `git fetch` **trước** rồi mới giao. Ghi vào đề bài.
 
 
+### KHUNG-31 · Báo cáo năm dòng của phiên nhận việc là LỜI TỰ KHAI, không ai kiểm
+
+**Hình dạng:** cùng hình dạng với KHUNG-6 (danh tính phiên là thứ tự khai).
+
+`npm run giao-viec` nay đo repo đích rất kỹ **trước** khi giao. Nhưng sau khi giao thì không có
+gì cả: phiên nhận việc trả về năm dòng `REPO / VIỆC / MÁY / CỔNG / CÒN MỞ`, và **cả năm dòng
+đều là lời phiên đó tự khai**. Trial 05/09 đã cho thấy chuyện này không lý thuyết — một phiên
+audit báo ba lệnh thoát mã `2/1/1`, đo lại thì cả ba exit 0.
+
+Luật vàng số 4 bảo phải tự kiểm chứng lại. Nhưng "phải tự kiểm chứng" là một câu chữ, và câu
+chữ thì lần thứ ba có người bỏ qua — đúng lý do `giao-viec.mjs` được viết ra.
+
+**Lối đi có thể:** một lệnh `nghiem-thu` chạy ở repo nhà, trỏ vào repo đích, tự đo lại đúng năm
+con số ấy rồi in bảng `KHAI / ĐO ĐƯỢC / KHỚP?`. Nó đọc được `git log` của repo đích để biết
+phiên kia đã commit gì, chạy lại `npm test` và cổng, và so với những gì phiên kia khai.
+
+**Chưa làm vì:** mới có đúng MỘT lượt giao thật. Luật mục 8 bảo chưa có chuyện xảy ra thật thì
+đừng thêm — mà chuyện *đã* xảy ra một lần (mã thoát khai sai) là ở lượt **audit**, không phải
+lượt giao qua đề bài mới này. Đợi thêm hai ba lượt nữa rồi hẵng quyết hình dạng của lệnh.
+
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
 
 Tab mới (05/09) chiếu mục nợ đã gạch mã — 7 việc. Nhưng nó chỉ đọc `BACKLOG.md` ở gốc; repo có

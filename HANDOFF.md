@@ -649,3 +649,71 @@ chặn ở tầng *commit*, không cứu được nếu đã trộn chung **mộ
 
 Đã vá: đề bài nay hỏi *"file sửa dở nằm TRONG hay NGOÀI vùng bộ khung"* và cho hai lối đi khác
 nhau. **Đây là lý do phải đo repo đích trước khi viết đề bài, không phải viết xong rồi mới đo.**
+
+## 2026-09-06 · `claude-giaoviec` — RÀ LẠI BỐN PROTOCOL, VÀ ĐỀ BÀI THÔI VIẾT TAY
+
+**Đức giao hai việc:** (1) rà lại mọi protocol AI thực thi và tối ưu cho **Codex CLI là người
+thực thi**, không phải Claude Code; (2) mô hình hoá cách repo vận hành bằng **ba khối** — dữ
+liệu lõi · protocol · repo đích — đưa lên bảng.
+
+### Việc 1 — `npm run giao-viec`
+
+Rà bốn protocol (`CHUYEN-REPO-LEN-CHUAN` · `KIEM-MOT-REPO` · `MULTIFLOW` · `ORCHESTRATOR`) đối
+chiếu với **thứ Codex thật sự làm được**. Kết luận: chúng viết cho một người đọc **duyệt được
+repo**, còn `codex exec` chạy **một lượt, không hỏi lại được**. Nên đề bài phải tự đủ.
+
+**Lỗi gốc của lượt giao đầu không phải ở Codex — nó ở chỗ đề bài viết TRƯỚC khi ai đo repo
+đích.** Nay việc đo thành lệnh: `giao-viec.mjs` đo nhánh · lệch nhánh mặc định · file sửa dở
+trong/ngoài vùng (kể đích danh) · bảng quyền · bản khung đang ghim, rồi mới ghép đề bài. Sáu mã
+DỪNG, và **dừng thì `stdout` rỗng**.
+
+Đề bài tách hai nửa: `GIAO-VIEC-CHUNG.md` (luật chung, 1 bản cho 3 việc) + ba phần việc
+(`NANG-BO-KHUNG` 231→95 dòng · `MIGRATE-REPO` · `AUDIT-REPO`).
+
+**Hai lỗi thật bắt được lúc viết phép kiểm cho chính lệnh này** — cả hai chỉ lộ khi chạy trên
+kho git thật: `git status --porcelain` gộp thư mục chưa theo dõi thành `?? dashboard/` (vá bằng
+`-uall`); `execFileSync` để stderr của git chảy ra màn hình, `fatal:` rơi vào giữa đề bài.
+
+**Và nó tự dựng lại được KHUNG-30 mà không cần ai nhớ:** nhánh tính năng của
+`Project 3 AI Agent Unify` khớp upstream của chính nó (`0 sau · 0 trước`) nhưng lệch
+`origin/main` **5 sau · 48 trước**. Nay in cả hai con số.
+
+### Việc 2 — tab **Mô hình** trên bảng HTML
+
+Ba khối + **vòng ngược** (repo đích vấp → sổ nợ của lõi → bản vá → phép kiểm ghim). Suy hoàn
+toàn từ dữ liệu: protocol đọc `docs/protocols`, ba việc đọc bảng `VIEC` của `giao-viec.mjs`,
+repo đích đọc `docs/migrations`.
+
+### Rà protocol lôi ra một lỗi cũ
+
+`CHUYEN-REPO-LEN-CHUAN.md` để tiêu đề **"Sáu bước"** trên danh sách **tám** bước. Phiên nào đọc
+tiêu đề rồi dừng ở bước 6 là bỏ hồ sơ migrate + ghim phiên bản. **Lần thứ sáu** đúng hình dạng
+lỗi ấy: luật trỏ tới thứ không khớp thực tế. Đã vá, kèm ghi chú vì sao.
+
+### Số
+
+`npm test` **13 suite xanh** (thêm `giao-viec-smoke` 9 vế) · `npm run bootstrap` **0 chỗ ĐỎ** ·
+cổng đóng phiên XANH TOÀN BỘ · bản khung **1.3.13 → 1.3.14**.
+
+**Đột biến kiểm 2 lượt, cả hai ĐỎ đúng chỗ:** bỏ `-uall` → vế "nêu đích danh file" đỏ; bỏ khối
+chặn ở `main()` → vế "stdout phải rỗng" đỏ.
+
+### Còn mở
+
+**KHUNG-31 mới** — báo cáo năm dòng của phiên nhận việc vẫn là **lời tự khai**, không lệnh nào
+đo lại. Cùng hình dạng KHUNG-6. Chưa làm vì mới có một lượt giao thật; luật mục 8 bảo chờ.
+
+**KHUNG-30 vẫn chờ Đức** — `Project 3 AI Agent Unify` chưa nâng được.
+
+### Một bẫy nữa suýt sập, cổng bắt được
+
+Tôi thêm một đoạn vào `MULTIFLOW.md` trỏ sang `npm run giao-viec`. Nhưng `MULTIFLOW.md` **đi
+theo bản trích**, còn `giao-viec.mjs` thì **ở lại repo nhà**. Tức là mọi repo dựng từ khuôn sẽ
+nhận một dòng luật trỏ tới một lệnh không tồn tại ở đó — đúng hình dạng lỗi mà repo này đã đếm
+được sáu lần. `npm test` đỏ ở `build-template.mjs --check`, tôi gỡ lại đoạn ấy.
+
+**Bài học cho phiên sau:** trước khi sửa bất kỳ file nào trong khối `VERBATIM` của
+`build-template.mjs`, hỏi *"câu này còn đúng ở một repo KHÔNG có repo nhà bên cạnh không?"*
+
+**Ngân sách tài liệu xấu đi:** 3640 → ~4000 dòng / 2200. Ba đề bài mới là phần lớn. Chỗ bù được
+ngay là `npm run don` cho `HANDOFF.md` (652/600) — chưa chạy lượt này.

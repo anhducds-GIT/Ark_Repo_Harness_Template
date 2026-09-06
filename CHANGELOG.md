@@ -3,6 +3,71 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.14 — 2026-09-06 — Đề bài KHÔNG viết tay nữa, và trang có mô hình ba khối
+
+Lượt giao việc đầu tiên cho Codex CLI (06/09) không hỏng vì Codex. Nó hỏng vì **đề bài
+được viết trước khi ai đo repo đích**. Bản này biến việc đo đó thành một lệnh.
+
+### `npm run giao-viec` — đo repo đích RỒI mới ghép đề bài
+
+```bash
+node scripts/giao-viec.mjs --viec <nang|migrate|audit> --repo "<repo-đích>" --as <tên-phiên>
+```
+
+In ra stdout một đề bài dán trọn được, mở đầu bằng khối **ĐO ĐƯỢC LÚC GIAO VIỆC**: nhánh ·
+lệch nhánh mặc định · file sửa dở nằm TRONG hay NGOÀI vùng bộ khung, **kể đích danh** ·
+bảng quyền · bản khung đang ghim.
+
+**Fail-closed.** Năm chỗ bắt DỪNG, và dừng thì `stdout` **rỗng** — không in đề bài kèm một
+dòng cảnh báo, vì người ta hứng stdout vào file rồi đưa thẳng cho AI:
+
+| Mã | Khi nào |
+|---|---|
+| `KHONG_TIM_THAY_REPO` · `KHONG_PHAI_KHO_GIT` | đường dẫn sai — cũng là một trong ba giới hạn của `codex exec` |
+| `FILE_SUA_DO_TRONG_VUNG` | có việc đang dở ngay trong vùng lượt này sẽ ghi |
+| `VUNG_CO_CHU_KHAC` | khoá đang bị phiên khác giữ |
+| `CHUA_GHIM_BAN_KHUNG` | `--viec nang` vào một repo chưa lắp bộ khung |
+| `KHONG_DO_DUOC_NHANH_XA` · `BANG_QUYEN_HONG` | đọc được nửa vời thì coi như không đọc được |
+
+**Hai lỗi thật bắt được ngay lúc viết phép kiểm cho chính nó:** `git status --porcelain`
+gộp một thư mục chưa theo dõi thành đúng một dòng `?? dashboard/` — đề bài đi bảo stage cả
+thư mục mà không biết trong đó có việc của ai (vá bằng `-uall`); và `execFileSync` mặc định
+để stderr của git chảy thẳng ra màn hình, nên mỗi lần dò `@{u}` là một dòng `fatal:` rơi vào
+giữa đề bài.
+
+**Và nó tự dựng lại được KHUNG-30.** Repo `Project 3 AI Agent Unify` đứng trên nhánh tính
+năng: so với upstream của chính nhánh đó là `0 sau · 0 trước`, nhưng so với `origin/main` là
+**5 sau · 48 trước**. In mỗi con số thứ nhất là trấn an người đọc về một thứ không ai hỏi rồi
+giấu mất thứ làm cả lượt phải dừng. Nay in cả hai.
+
+### Đề bài tách làm hai nửa — một luật, ba việc
+
+| File | Là gì |
+|---|---|
+| `docs/briefs/GIAO-VIEC-CHUNG.md` | nửa TRÊN — tên phiên · khoá vùng · cây làm việc bẩn · hai lượt đẩy · năm việc cấm · mẫu báo cáo năm dòng · **ba giới hạn đo được của `codex exec`** |
+| `docs/briefs/NANG-BO-KHUNG.md` | nửa DƯỚI — nâng (231 → 95 dòng, phần chung cắt ra) |
+| `docs/briefs/MIGRATE-REPO.md` | nửa DƯỚI — migrate |
+| `docs/briefs/AUDIT-REPO.md` | nửa DƯỚI — audit, chỉ đọc, chạy trên bản clone |
+
+Chép luật chung ba lần là ba bản sẽ trôi khỏi nhau — repo này đã có ba bản chép tay của một
+danh sách nói ba kiểu khác nhau. `tests/giao-viec-smoke.mjs` ghim ba câu **đã cứu được một
+lượt thật** phải còn nguyên trong cả ba đề bài ghép ra.
+
+### Trang có tab **Mô hình** — ba khối, và vòng ngược
+
+Mọi tab khác trả lời *"repo đang thế nào"*. Không tab nào trả lời *"cái này VẬN HÀNH ra sao"*
+— mà đó là câu đầu tiên của bất kỳ ai mới nhìn thấy nó. Ba khối: **dữ liệu lõi** (luật · máy ·
+trạng thái) → **protocol** (ba việc giao được) → **repo đích**, cộng **vòng ngược** từ repo
+đích về sổ nợ của lõi. Suy hoàn toàn từ dữ liệu: protocol đọc từ `docs/protocols`, ba việc
+đọc từ bảng `VIEC` của `giao-viec.mjs`, repo đích đọc từ `docs/migrations`.
+
+### Rà lại bốn protocol: một lỗi cũ lộ ra
+
+`CHUYEN-REPO-LEN-CHUAN.md` để tiêu đề **"Sáu bước"** trên một danh sách **tám** bước — hai
+bước thêm sau mà không ai sửa tiêu đề. Một phiên đọc "sáu bước" rồi dừng ở bước 6 là bỏ đúng
+hai bước không được bỏ (hồ sơ migrate · ghim phiên bản). **Lần thứ sáu** repo gặp đúng hình
+dạng lỗi này: luật trỏ tới một thứ không khớp thực tế.
+
 ## 1.3.13 — 2026-09-06 — Bộ nâng cấp mang cả tài liệu, và bộ sinh DỪNG trước khi ghi nhầm
 
 Hai lỗi do lượt nâng `ALL_SKILL_MANAGEMENT` lôi ra, vá cả hai. Cùng một hình dạng:

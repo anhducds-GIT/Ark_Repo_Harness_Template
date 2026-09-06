@@ -211,3 +211,41 @@ Lý do: áp quyết định quá tay ở đây là xoá một quy trình đang c
 
 Cả ba đều **chỉ lộ khi chạm một repo thật**. Bảy phiên ở repo nhà không tìm ra cái nào — lý do
 rất cụ thể: repo nhà đặt tên file đúng chuẩn từ đầu, và chưa bao giờ có bảng viết tay.
+
+---
+
+## 2026-09-06 · Codex CLI là AI THỰC THI, và đề bài phải do MÁY ghép
+
+**Đức chốt.** Nguyên văn: *"tôi cần protocol này hoạt động được, vì Claude code ko thể làm hết
+1 mình tất cả, sẽ hết usage"* — và tiếp: *"tối ưu việc sử dụng CodeCLI như một AI agent thực thi
+chứ không phải là Claude code nữa"*.
+
+**Hệ quả về vai, áp cho MỌI phiên từ nay:**
+
+| Vai | Ai làm |
+|---|---|
+| Thực thi việc lặp lại (nâng · migrate · audit) | **Codex CLI** là mặc định |
+| Thiết kế, phản biện, audit độc lập, điều phối | Claude |
+| Chốt | Đức |
+
+Đây **không** lật bảng vai ở `AGENTS.md` mục 5 — nó nói rõ *việc nào* của Codex là mặc định.
+
+### Đề bài KHÔNG viết tay — luật, không phải lời khuyên
+
+Lượt giao đầu tiên hỏng vì đề bài viết **trước** khi ai đo repo đích, nên nó dạy `git add -A`
+vào một repo đang có ba file sửa dở của phiên khác. Từ nay đề bài ghép bằng
+`npm run giao-viec`, và lệnh đó **đo repo đích trước, đo không được thì không in gì**.
+
+Vì sao thành lệnh chứ không thành một dòng dặn dò trong tài liệu: repo này đã đếm được **sáu**
+lần cùng một hình dạng lỗi — *một luật trỏ tới thứ không tồn tại hoặc không hoạt động như luật
+giả định*. Luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua.
+
+### Luật của chủ nhà thắng đề bài
+
+Repo đích có luật riêng chọi với đề bài thì phiên nhận việc **DỪNG và báo**, không tự chọn.
+Đo thật 06/09: Codex gặp luật *"Cloud Sync Hold"* của `Project 3 AI Agent Unify` và dừng đúng.
+Đó là kết quả TỐT, không phải một lượt thất bại.
+
+Lưu ý cách đọc: quyết định 06/09 *"bộ khung là chuẩn, cơ chế cũ thôi hiệu lực"* nói về **cơ chế
+hiệp đồng SAU KHI đã migrate**. Nó không cho phép một phiên nhận việc tự ý bước qua luật của
+repo đích ngay trong lượt đang làm.
