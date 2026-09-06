@@ -3,6 +3,59 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.13 — 2026-09-06 — Bộ nâng cấp mang cả tài liệu, và bộ sinh DỪNG trước khi ghi nhầm
+
+Hai lỗi do lượt nâng `ALL_SKILL_MANAGEMENT` lôi ra, vá cả hai. Cùng một hình dạng:
+**một lớp bảo vệ chỉ chạy được nửa đường.**
+
+### `upgrade.mjs` nay so cả tầng TÀI LIỆU
+
+Trước bản này nó chỉ đẩy tầng máy, nên mọi repo đã lắp **đóng băng ở tầng tài liệu**
+tại thời điểm lắp — bộ khung thêm sổ tay bao nhiêu cũng chỉ tới repo dựng mới.
+
+Ba trạng thái, in **riêng** khỏi bảng tầng máy:
+
+| | Làm gì |
+|---|---|
+| `THIẾU` | mang sang — không có gì để mất |
+| `KHÁC` | **chỉ kể tên, KHÔNG BAO GIỜ ghi đè** |
+| `ĐÃ MỚI` | không làm gì |
+
+In riêng là cố ý: trộn vào bảng tầng máy là mời người đọc tưởng `KHÁC` ở tài liệu cũng
+sẽ bị ghi đè như `CŨ` ở máy. Tài liệu là chữ repo đích **được phép sửa** cho nghề của
+mình — ghi đè là xoá việc của người ta, và `upgrade.mjs` tồn tại chính vì nó từ chối làm thế.
+
+### Bộ sinh DỪNG TRƯỚC KHI GHI khi `generated_names` trên đĩa khác HEAD
+
+Bộ sinh đọc cấu hình **từ HEAD** — cố ý, để trang luôn suy ra từ trạng thái đã commit.
+Nhưng `generated_names` quyết định **nó ghi vào file nào**. Nên khai tên mới rồi chạy
+ngay trước khi commit thì nó dùng tên CŨ, và **ghi đè đúng cái file mà `generated_names`
+sinh ra để bảo vệ**.
+
+Vấp thật, và vấp bởi chính người vừa vá KHUNG-26: bảng viết tay 123 dòng ở
+`ALL_SKILL_MANAGEMENT` bị đè, md5 đổi từ `0b41e4d3…` sang `673f36df…`.
+
+Bộ sinh **có** cảnh báo thứ tự — nhưng in ra **SAU khi đã ghi**.
+**Cảnh báo sau khi mất là biên bản, không phải cảnh báo.**
+
+Nay: mã thoát **2**, **không ghi một byte nào**, và nói rõ HEAD định ghi vào đâu, đĩa
+định ghi vào đâu. Chỉ chặn đúng khối đó — sửa dở phần khác của cấu hình không làm mất
+file nào nên vẫn chỉ cảnh báo như cũ.
+
+Đọc đĩa là một **ngoại lệ hẹp** (`readDia`), dùng đúng MỘT chỗ. `F19` **đếm số lần gọi**
+để lời hứa *"trang suy ra từ HEAD"* không bị nới dần.
+
+### Đột biến kiểm bắt được HAI phép kiểm trang trí của chính lượt này
+
+1. Vế kiểm thứ tự dò chuỗi `tenMaySinhLech(deps)` — mà chính **dòng khai báo hàm** cũng
+   chứa chuỗi đó và luôn nằm trước chỗ ghi. Nên nó **luôn xanh** dù có đổi chỗ hay không.
+2. Vế kiểm KHUNG-28 chỉ gọi hàm so sánh, không chạm vòng ghi. Phá hẳn vòng ghi mà không
+   gì đỏ. Phải thêm một vế chạy `--apply` **thật** trên một repo đích thật.
+
+*Một phép kiểm không thể đỏ và một phép kiểm đúng trông giống hệt nhau trên bảng* — lần
+thứ hai trong một ngày.
+
+
 ## 1.3.11 — 2026-09-06 — Bộ khung thôi bắt chủ nhà dọn phòng, và bản trích mang đủ hai file repo mới cần nhất
 
 Hai lỗi do lượt migrate `ALL_SKILL_MANAGEMENT` lôi ra hôm qua, vá cả hai.

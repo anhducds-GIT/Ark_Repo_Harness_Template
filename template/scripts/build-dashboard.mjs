@@ -1306,6 +1306,50 @@ export function compareDashboard(expected, actual) {
   return { matches: true };
 }
 
+/* CHẶN TRƯỚC KHI GHI khi khối `generated_names` trên ĐĨA khác với bản ở HEAD.
+
+   VÌ SAO. Bộ sinh đọc cấu hình từ HEAD chứ không đọc cây làm việc — cố ý, để trang luôn suy ra
+   từ một trạng thái đã commit. Nhưng `generated_names` quyết định NÓ GHI VÀO FILE NÀO. Nên khai
+   tên mới rồi chạy ngay trước khi commit thì bộ sinh dùng tên CŨ, và ghi đè đúng cái file mà
+   `generated_names` sinh ra để bảo vệ.
+
+   Vấp thật 06/09 ở `ALL_SKILL_MANAGEMENT`, và vấp bởi chính người vừa vá KHUNG-26: bảng theo
+   dõi viết tay 123 dòng bị đè, md5 đổi từ 0b41e4d3… sang 673f36df…. Cứu được vì nội dung còn
+   trong git — nếu file đó chưa từng commit thì mất hẳn.
+
+   Bộ sinh CÓ cảnh báo thứ tự, nhưng nó in ra SAU khi đã ghi. Cảnh báo sau khi mất là biên bản,
+   không phải cảnh báo.
+
+   CHỈ chặn đúng khối này. Sửa dở phần khác của cấu hình (thêm một vùng, đổi ngân sách) không
+   làm mất file nào, nên vẫn chỉ cảnh báo như cũ — chặn cả lượt sinh vì một thay đổi vô hại là
+   cách nhanh nhất để người ta học cách vô hiệu hoá phép kiểm. */
+function tenMaySinhLech(deps) {
+  if (typeof deps.readDia !== "function") return null;    // fixture không dựng đĩa: không đo được
+  let tren = null;
+  try { tren = deps.readDia(STRUCTURE_FILE); } catch { return null; }
+  if (tren === null || tren === undefined) return null;   // chưa có file trên đĩa
+  let khaiDia;
+  try { khaiDia = JSON.parse(tren)?.generated_names; }
+  catch {
+    return `\`${STRUCTURE_FILE}\` trên đĩa đang KHÔNG PHẢI JSON đọc được. Sinh trang lúc này là sinh từ một cấu hình bạn đang sửa dở — sửa xong rồi chạy lại.`;
+  }
+  let khaiHead;
+  try { khaiHead = deps.fileExists(STRUCTURE_FILE) ? JSON.parse(deps.readFile(STRUCTURE_FILE))?.generated_names : undefined; }
+  catch { return null; }
+  const chuan = (v) => JSON.stringify(tenMaySinhFrom({ generated_names: v }));
+  let a, b;
+  try { a = chuan(khaiDia); b = chuan(khaiHead); }
+  catch (e) { return `\`generated_names\` khai sai: ${e.message}`; }
+  if (a === b) return null;
+  return [
+    "`generated_names` trên ĐĨA khác với bản ở HEAD, mà bộ sinh đọc cấu hình TỪ HEAD.",
+    `  HEAD nói ghi vào : ${b}`,
+    `  đĩa  nói ghi vào : ${a}`,
+    "Chạy tiếp là ghi vào tên CŨ — đúng cái file mà tên MỚI sinh ra để nhường.",
+    "Sửa: commit `.repo-structure.json` TRƯỚC, rồi chạy lại lệnh này."
+  ].join(String.fromCharCode(10));
+}
+
 export function runDashboard({ check = false, deps = createDefaultDeps(), output = console } = {}) {
   try {
     const model = collectModel(deps);
@@ -1313,6 +1357,13 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
     const generatedLlms = buildLlmsTxt(model);
     const generatedMap = buildRepoMap(model);
     if (!check) {
+      /* CHẶN TRƯỚC KHI GHI — xem `tenMaySinhLech`. Phải nằm ở đây, SAU khi dựng model (để có
+         thông báo đầy đủ) nhưng TRƯỚC dòng ghi đầu tiên. Đặt sau lệnh ghi là biên bản. */
+      const lech = tenMaySinhLech(deps);
+      if (lech) {
+        output.error("KHONG_SINH_TRANG: " + lech);
+        return 2;
+      }
       deps.writeFile(model.ten.dashboard, generated);
       deps.writeFile(model.ten.llms, generatedLlms);
       deps.writeFile(model.ten.repo_map, generatedMap);
@@ -1421,6 +1472,10 @@ export function createDefaultDeps(root = ROOT) {
     // (chuẩn hoá + phải nằm trong package) vẫn chạy và vẫn chặn `..`.
     // Gỡ một lớp chắn cho một kênh đã bịt thì không phải là gỡ bảo vệ.
     writeFile: (relPath, text) => fs.writeFileSync(absolute(relPath), text, "utf8"),
+    /* ĐỌC TỪ ĐĨA — cố ý CHỈ dùng cho một việc: so `generated_names` trên đĩa với bản ở HEAD
+       trước khi ghi (KHUNG-29). Mọi dữ liệu dựng trang vẫn đọc từ HEAD qua `readFile`, và
+       lời hứa đó không được nới. Trả `null` khi không có file, KHÔNG ném. */
+    readDia: (relPath) => { try { return fs.readFileSync(absolute(relPath), "utf8"); } catch { return null; } },
     git: {
       ...head.git,
       // `--no-renames` BẮT BUỘC. Mặc định git gộp đổi tên thành một dòng chỉ ghi tên MỚI,

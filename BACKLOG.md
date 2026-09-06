@@ -64,7 +64,9 @@ nên hai quy trình đó **ở lại nhà**. Nhưng lượt migrate nay gồm **
 migrate + audit + bring assistant onboard — và checklist tính năng đã viết vào
 `docs/protocols/CHUYEN-REPO-LEN-CHUAN.md`. Việc còn lại tách thành KHUNG-13.
 
-### KHUNG-13 · Bản trích phát đi luật bắt dùng HAI file mà nó không mang theo
+### ~~KHUNG-13~~ · ĐÓNG 06/09 · Bản trích phát đi luật bắt dùng HAI file mà nó không mang theo
+
+> **ĐÓNG 06/09 — đo lại: bản trích ĐÃ mang cả `BACKLOG.md` lẫn `decisions.md`.** Và `F12` (`tests/core-contract.mjs`) nay chặn **hình dạng** lỗi này chứ không chỉ hai file cụ thể: luật trong khuôn trỏ tới file bản trích không mang thì đỏ.
 
 **Đo 05/09, chưa vá.** `template/AGENTS.md:11` bắt ghi việc ngoài phạm vi vào `BACKLOG.md`;
 `template/AGENTS.md:175` bắt ghi quyết định vào `decisions.md`. **Bản trích không mang file nào
@@ -125,7 +127,9 @@ chữ ký, tức một hạng mục khác hẳn. Việc đáng làm trước m�
 vào `MULTIFLOW.md`**, để không ai đọc bốn cơ chế kia như một lớp bảo mật. Vùng: `_docs`
 (nếu chỉ ghi giới hạn) hoặc `_code` (nếu muốn siết thật).
 
-### KHUNG-7 · Luật đóng phiên bắt ghi vào `decisions.md` — file không tồn tại
+### ~~KHUNG-7~~ · ĐÓNG 06/09 · Luật đóng phiên bắt ghi vào `decisions.md` — file không tồn tại
+
+> **ĐÓNG 06/09 — đo lại thì không còn đúng.** `decisions.md` đã có ở repo này từ 05/09 và đang được ghi đều; bản trích cũng mang nó. Mục này để mở thêm một ngày sau khi đã được vá — **sổ nợ cũng mục được**, và đó là lý do `npm run what-next` phải được đọc cùng số đo chứ không đọc một mình.
 
 `AGENTS.md` mục 7 bước 2: *"Quyết định mới của Đức → `decisions.md`"*. Repo **không có file này**,
 và Bản đồ file cũng không khai nó. Nên khi Đức chốt một việc thật, phiên AI không có đích hợp lệ
@@ -491,7 +495,7 @@ giới thiệu "bộ khung này".
 Ghim ở `F18`, kèm vế đối chứng *"bộ lọc cắt quá tay"* — ba mục phải còn nguyên sau khi lọc.
 
 
-### KHUNG-28 · `upgrade.mjs` CHỈ đẩy tầng máy — file tài liệu mới không bao giờ tới repo đã lắp
+### ~~KHUNG-28~~ · ĐÓNG 06/09 · `upgrade.mjs` CHỈ đẩy tầng máy — file tài liệu mới không bao giờ tới repo đã lắp
 
 **Vấp thật 06/09, lượt nâng `ALL_SKILL_MANAGEMENT` từ 1.3.8 lên 1.3.11.**
 `npm run upgrade -- --apply` mang **4 file `scripts/`** và cập nhật sổ ghim. Nó **không** mang
@@ -509,9 +513,16 @@ tay). Tài liệu thì repo đích **được phép sửa** cho nghề của mì
 2. Mang tất, nhưng file đã sửa tay thì ghi ra `<tên>.moi` cạnh bản cũ.
 3. Không mang, nhưng **liệt kê** tài liệu bản trích có mà repo đích thiếu, kèm câu lệnh chép.
 
-Lối 1 rẻ nhất và đúng ca đã vấp (repo đích **không có** hai file đó). Vùng: `_code`.
+**ĐÃ VÁ 06/09, bản 1.3.13 — lối 1.** `upgrade.mjs` nay so thêm **tầng tài liệu**, in riêng, ba
+trạng thái: `THIẾU` (mang sang) · `KHÁC` (**chỉ kể tên, không bao giờ ghi đè**) · `ĐÃ MỚI`.
 
-### KHUNG-29 · Bộ sinh đọc cấu hình từ HEAD — khai `generated_names` rồi chạy ngay là ĐÈ MẤT
+In riêng chứ không trộn vào bảng tầng máy — hai tầng hai luật, trộn lại là mời người đọc tưởng
+`KHÁC` ở tài liệu cũng sẽ bị ghi đè như `CŨ` ở máy.
+
+Ghim ở `F19`. Đột biến kiểm bắt được **một phép kiểm trang trí của chính tôi**: vế đầu chỉ gọi hàm so
+sánh, nên phá hẳn vòng ghi đi mà không gì đỏ. Phải thêm một vế chạy `--apply` THẬT trên repo thật.
+
+### ~~KHUNG-29~~ · ĐÓNG 06/09 · Bộ sinh đọc cấu hình từ HEAD — khai `generated_names` rồi chạy ngay là ĐÈ MẤT
 
 **Vấp thật 06/09, và vấp bởi chính người vừa vá KHUNG-26.**
 
@@ -529,8 +540,16 @@ sau khi mất là biên bản, không phải cảnh báo.
 HEAD** thì **DỪNG TRƯỚC KHI GHI**, mã thoát khác 0, nói rõ "commit cấu hình trước". Chỉ chặn
 đúng khối đó — sửa dở phần khác của cấu hình không đáng chặn cả lượt sinh.
 
-Ca hỏng phải dựng nổi: (a) đổi `generated_names` chưa commit rồi chạy bộ sinh → **phải dừng, không
-ghi file nào**; (b) sửa dở phần khác của cấu hình → vẫn chạy, vẫn chỉ cảnh báo như cũ. Vùng: `_code`.
+**ĐÃ VÁ 06/09, bản 1.3.13.** Bộ sinh dừng với mã thoát **2** và **không ghi một byte nào**, kèm
+thông báo nói rõ HEAD định ghi vào đâu và đĩa định ghi vào đâu. Đo thật ở repo nhà: md5 của
+`DASHBOARD.md` không đổi, không file mới nào được tạo.
+
+Chỉ chặn đúng khối `generated_names`. Đọc đĩa là một **ngoại lệ hẹp** (`readDia`), dùng đúng MỘT chỗ —
+`F19` đếm số lần gọi để lời hứa *"trang suy ra từ HEAD"* không bị nới dần.
+
+Đột biến kiểm cũng bắt được một phép kiểm **vô hiệu**: vế kiểm thứ tự dò chuỗi `tenMaySinhLech(deps)`,
+mà chính dòng **khai báo hàm** cũng chứa chuỗi đó và luôn nằm trước — nên nó LUÔN xanh dù có đổi chỗ hay
+không. Đã đổi sang dò **chỗ gọi**.
 
 
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ

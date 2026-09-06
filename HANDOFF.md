@@ -606,3 +606,25 @@ thêm không theo, phải chép tay. Nghĩa là mọi repo đã lắp **đóng b
 
 **Còn mở:** KHUNG-28 · KHUNG-29 · KHUNG-11 phần đuôi · thời gian chạy phép kiểm vượt trần.
 Không mục nào chặn ai, không mục nào chờ Đức chốt.
+
+## 2026-09-06 · `claude-1.3.12` (tiếp) — BẢN 1.3.13: hai lớp bảo vệ chạy nốt nửa đường còn lại
+
+**Làm gì:** vá KHUNG-28 (`upgrade.mjs` mang cả tầng tài liệu) và KHUNG-29 (bộ sinh dừng trước
+khi ghi nhầm). Cập nhật `docs/ROADMAP-V2.md`. Đóng thêm KHUNG-7 và KHUNG-13 — **đo lại thì
+chúng không còn đúng nữa**, sổ nợ cũng mục được.
+
+**Kết quả số:** `npm test` **exit 0** · `core-contract` **19 xanh** · bốn đột biến kiểm đều đỏ
+đúng chỗ · sổ nợ **17 đóng / 12 mở**.
+
+**BÀI HỌC — đột biến kiểm bắt được HAI phép kiểm trang trí của chính lượt này:**
+
+1. Vế kiểm thứ tự dò chuỗi `tenMaySinhLech(deps)` — mà chính **dòng khai báo hàm** cũng chứa
+   chuỗi đó và luôn nằm trước chỗ ghi. Nên nó **luôn xanh** dù có đổi chỗ hay không.
+2. Vế kiểm KHUNG-28 chỉ gọi hàm so sánh. Phá hẳn vòng ghi mà **không gì đỏ**. Phải thêm một vế
+   chạy `--apply` THẬT trên repo thật.
+
+Cộng ba lần trước trong ngày, **năm lần** cùng một hình dạng: viết xong, test xanh, rồi mới lộ.
+**Từ nay một mục nợ chỉ đóng được khi đã chạy trên dữ liệu thật VÀ đã qua đột biến kiểm.**
+
+**Còn mở — 12 mục, không mục nào chặn ai, không mục nào chờ Đức.** Xếp theo nhóm ở
+[docs/ROADMAP-V2.md](docs/ROADMAP-V2.md), mục cập nhật 06/09.

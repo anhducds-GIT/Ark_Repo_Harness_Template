@@ -16,6 +16,67 @@ ttl_days: 120
 > Luật song song cưỡng chế chỉ một câu ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 2): **hai
 > việc chạy song song được khi và chỉ khi thuộc hai khoá khác nhau và cả hai khoá đang trống.**
 
+## Cập nhật 2026-09-06 — MƯỜI BẢN PHÁT TRONG MỘT NGÀY, và bộ khung đổi chất
+
+> Ngày 06/09 đi từ **1.3.4** tới **1.3.13**. Mục này thay phần xếp đợt bên dưới ở những chỗ
+> mâu thuẫn — đọc mục này trước.
+
+### Bộ khung nay có ba thứ nó chưa từng có
+
+| | Trước 06/09 | Sau |
+|---|---|---|
+| **Dọn** | repo phình vô hạn, dọn tay từng lượt | `npm run don` — **nhịp**, đi theo bản trích |
+| **Nhường tên** | ba artifact đóng cứng tên, repo đích phải né | `generated_names` — **bộ khung nhường** |
+| **Nâng cấp tài liệu** | `upgrade.mjs` chỉ đẩy tầng máy | mang cả tài liệu THIẾU, không đụng tài liệu KHÁC |
+
+### Ba repo đã lên chuẩn, và repo thứ ba là ca khó nhất
+
+`Project 3 AI Agent Unify` · `n8n-orchestrator` · **`ALL_SKILL_MANAGEMENT`**.
+
+Repo thứ ba khó vì nó **đã có sẵn cơ chế hiệp đồng nhiều AI trước khi bộ khung tới**, và điều
+phối AI chính là *nghề* của nó. Đức chốt: **bộ khung thắng**, luật cũ **khai tử nhưng giữ văn
+bản**. Bốn file trùng tên giữ **1824 dòng** — không file nào bị đè.
+
+### Bài học chi phối mọi việc còn lại
+
+**Lỗi chỉ lộ khi chạm dữ liệu thật.** Đếm được trong một ngày:
+
+| Thứ đã viết xong, test xanh | Lộ khi nào |
+|---|---|
+| Vòng lặp hội tụ trong `don.mjs` | đột biến kiểm — nó **chưa từng chạy tới lần nào** |
+| Tên file lưu trữ + ghi đè im lặng | chạy nhịp dọn thật trên nhật ký thật |
+| Cổng KHUNG-25 **bắt oan** dòng dịch chỗ | chạy nhịp dọn thật lần đầu |
+| Vế kiểm thứ tự của KHUNG-29 | đột biến kiểm — dò chuỗi trúng cả **dòng khai báo hàm**, nên LUÔN xanh |
+| Vòng ghi tài liệu của KHUNG-28 | đột biến kiểm — vế đầu chỉ gọi hàm so sánh |
+
+**Hệ quả cho thứ tự việc:** một mục nợ chỉ đóng được khi **đã chạy trên dữ liệu thật** và **đã
+qua đột biến kiểm**. "Viết xong, test xanh" từ nay không phải điều kiện đủ.
+
+### Việc còn mở, xếp theo thứ RẺ NHẤT trước
+
+Không mục nào chặn ai, và **không mục nào chờ Đức chốt**.
+
+**Nhóm A — phép đo đang nói dối (làm trước, vì nó làm mọi số đo khác đáng tin hơn)**
+`KHUNG-15` (cổng báo "Test xanh ĐỎ" trong khi mọi suite exit 0 — chập chờn, phải ghi lượt nào
+đỏ lượt nào xanh trước khi sửa) · `KHUNG-9` (`can-nang` xác nhận "đã có ca hỏng" bằng cách TÌM
+CHUỖI) · `KHUNG-10` (bảng nói 6/11 mục có ca đỏ, chưa đối chiếu lại).
+
+**Nhóm B — chỗ hở còn lại của bản trích và migrate**
+`KHUNG-14` (chưa lượt migrate nào đi qua phép thử "assistant onboard") · `KHUNG-3` (hai pilot cũ
+chưa đo lại ở bản khung hiện tại) · `KHUNG-24` (tab "Đã xong" chỉ đọc sổ nợ repo NHÀ).
+
+**Nhóm C — nợ kỹ thuật nhỏ**
+`KHUNG-17` · `KHUNG-22` · `KHUNG-8`.
+
+**Nhóm D — cần Đức nếu muốn làm, nhưng KHÔNG chặn gì**
+`KHUNG-11` phần đuôi (`ORCHESTRATOR.md` 426 dòng — gọt là mất nội dung thật) ·
+`KHUNG-6` (danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin, đổi nó là đổi luật
+an toàn) · `KHUNG-4` (ba luật lớn của vai điều phối chưa có phép kiểm máy).
+
+**Một con số vượt trần, chưa ai xử:** thời gian chạy trọn bộ phép kiểm **~350/180 giây**. Nó
+nằm trong `KHUNG-11` nhưng thực chất là việc riêng: mỗi bản phát lại thêm một suite.
+
+
 ## Cập nhật 2026-09-05 — pilot đổi thứ tự ưu tiên
 
 Lượt migrate thật `n8n-orchestrator` cộng audit độc lập đã **đóng 8 mục** (KHUNG-1, 2, 5, 12,

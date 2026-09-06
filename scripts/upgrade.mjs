@@ -91,6 +91,36 @@ export function soSanh(repo, chuan, soGhim) {
   return ra;
 }
 
+
+/* TÀI LIỆU BẢN TRÍCH MÀ REPO ĐÍCH CHƯA CÓ — chỉ mang cái THIẾU, không đụng cái đã có.
+
+   VÌ SAO CÓ. Vấp thật 06/09, lượt nâng `ALL_SKILL_MANAGEMENT` từ 1.3.8 lên 1.3.11: bản trích
+   vừa thêm `docs/LEGEND.md` và `docs/HUONG-DAN.md`, nhưng `upgrade.mjs` chỉ đẩy tầng MÁY nên
+   hai file đó không tới, phải chép tay. Nghĩa là mọi repo đã lắp **đóng băng ở tầng tài liệu**
+   tại thời điểm lắp — mà repo đang sống mới là chỗ cần sổ tay.
+
+   VÌ SAO CHỈ MANG CÁI THIẾU. Tài liệu là chữ mà repo đích ĐƯỢC PHÉP sửa cho nghề của mình —
+   khác hẳn tầng máy. Ghi đè một `MULTIFLOW.md` đã được sửa cho repo đó là xoá việc của người
+   ta, và `upgrade.mjs` tồn tại chính vì nó TỪ CHỐI làm thế. Nên: thiếu thì mang, có thì kể tên
+   và để người tự trộn.
+
+   Cố ý KHÔNG tính vào dấu vân tay bản phát: dấu vân tay chỉ gồm tầng máy, vì chỉ tầng máy được
+   nâng tự động và chỉ nó quyết định danh tính một bản. */
+export function fileTaiLieu(chuan) {
+  return [...chuan.keys()].filter((rel) => rel.startsWith("docs/"));
+}
+
+export function soSanhTaiLieu(repo, chuan) {
+  const ra = [];
+  for (const rel of fileTaiLieu(chuan)) {
+    let dangCo = null;
+    try { dangCo = fs.readFileSync(path.join(repo, ...rel.split("/")), "utf8"); } catch { /* thiếu */ }
+    if (dangCo === null) { ra.push({ rel, trangThai: "THIẾU" }); continue; }
+    ra.push({ rel, trangThai: bam(dangCo) === bam(chuan.get(rel)) ? "ĐÃ MỚI" : "KHÁC" });
+  }
+  return ra;
+}
+
 /* `giuLai` = file bản khung ĐÃ BỎ nhưng vẫn còn nằm ở repo đích.
  *
  * Không có tham số này thì `ĐÃ BỎ` chỉ kể tên được ĐÚNG MỘT LẦN: sổ ghim mới dựng lại `managed`
@@ -220,6 +250,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     console.log("    Tăng phiên bản ở repo nhà trước, rồi nâng cấp — đừng để một số trỏ tới hai nội dung.");
   }
   console.log("");
+  const tl = soSanhTaiLieu(repo, chuan);
+  const tlThieu = tl.filter((d) => d.trangThai === "THIẾU");
+  const tlKhac = tl.filter((d) => d.trangThai === "KHÁC");
+
   for (const t of ["ĐÃ BỎ", "SỬA TAY", "CŨ", "THIẾU", "CHƯA GHIM", "ĐÃ MỚI"]) {
     const ds = dem(t);
     if (!ds.length) continue;
@@ -231,6 +265,20 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     console.log(`${NL}  ⚠ ${suaTay.length} file máy đã bị SỬA TAY sau lần ghim. Nâng cấp sẽ xoá các sửa đó.`);
     console.log("    Đọc `git diff` ở repo đích trước. Cố ý muốn bỏ thì chạy lại kèm --force.");
   }
+
+  /* TẦNG TÀI LIỆU in RIÊNG, không trộn vào bảng trên — hai tầng có hai luật khác nhau, và trộn
+     chúng lại là mời người đọc tưởng `KHÁC` ở tài liệu cũng sẽ bị ghi đè như `CŨ` ở máy. */
+  if (tlThieu.length || tlKhac.length) {
+    console.log("");
+    console.log("  TÀI LIỆU:");
+    if (tlThieu.length) console.log(`    THIẾU  ${String(tlThieu.length).padStart(2)} file: ${tlThieu.map((d) => d.rel).join(", ")}`);
+    if (tlKhac.length) {
+      console.log(`    KHÁC   ${String(tlKhac.length).padStart(2)} file: ${tlKhac.map((d) => d.rel).join(", ")}`);
+      console.log("           → CHỈ kể tên, KHÔNG bao giờ ghi đè. Tài liệu là chữ repo đích được phép");
+      console.log("             sửa cho nghề của mình; ghi đè là xoá việc của người ta.");
+    }
+  }
+
 
   /* CÂU CUỐI CỦA `--plan` PHẢI LÀ ĐIỀU `--apply` SẼ LÀM THẬT.
    *
@@ -247,7 +295,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     if (lechNoiDung) cau = "`--apply` sẽ TỪ CHỐI: số phiên bản ở repo nhà không trỏ đúng nội dung. Tăng phiên bản ở nhà trước.";
     else if (dem("SỬA TAY").length) cau = "`--apply` sẽ TỪ CHỐI vì có file bị sửa tay. Đọc `git diff` ở repo đích, rồi quyết — cố ý bỏ thì thêm `--force`.";
     else if (dem("CHƯA GHIM").length) cau = "`--apply` sẽ TỪ CHỐI: file đã khác mà repo chưa có sổ ghim, không đủ căn cứ. Đọc `git diff` ở đích, chắc chắn thì thêm `--force`.";
-    else if (canLam) cau = `Chạy lại với --apply để ghi ${canLam} file.`;
+    else if (canLam || tlThieu.length) cau = `Chạy lại với --apply để ghi ${canLam} file máy`
+      + (tlThieu.length ? ` và mang thêm ${tlThieu.length} file tài liệu repo đích chưa có.` : ".");
     else if (canChot) cau = `Nội dung đã khớp, không phải ghi file nào — nhưng sổ ghim ở đích còn ghi ${soGhim.version}. Chạy --apply để đóng lại dấu ${TEMPLATE_VERSION}.`;
     else cau = "Không có gì để nâng cấp.";
     console.log(`${NL}${cau}${NL}`);
@@ -303,6 +352,18 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     fs.renameSync(tam, dest);
     daGhi += 1;
   }
+  /* Tài liệu THIẾU thì mang sang — không có gì để mất. Tài liệu KHÁC thì tuyệt đối không đụng:
+     đã kể tên ở trên, người quyết. Đây là toàn bộ khác biệt giữa tầng tài liệu và tầng máy. */
+  let daGhiTaiLieu = 0;
+  for (const d of tlThieu) {
+    const dest = path.join(repo, ...d.rel.split("/"));
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    const tam = `${dest}.tam-${process.pid}`;
+    fs.writeFileSync(tam, chuan.get(d.rel), "utf8");
+    fs.renameSync(tam, dest);
+    daGhiTaiLieu += 1;
+  }
+
   // Nhớ tiếp những file ĐÃ BỎ còn nằm trên đĩa, để lần xem sau vẫn kể được tên chúng.
   const giuLai = {};
   for (const d of dem("ĐÃ BỎ")) giuLai[d.rel] = d.bamGhim ?? null;
@@ -313,6 +374,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     `${JSON.stringify(soGhimMoi(chuan, soGhim, giuLai), null, 2)}${NL}`, "utf8");
 
   console.log(`${NL}Đã ghi ${daGhi} file máy và cập nhật ${SO_GHIM} → ${TEMPLATE_VERSION}.`);
+  if (daGhiTaiLieu) console.log(`Đã mang thêm ${daGhiTaiLieu} file tài liệu repo đích chưa có — nhớ khai vào Bản đồ file, cổng đóng phiên bắt.`);
+  if (tlKhac.length) console.log(`${tlKhac.length} file tài liệu khác bản trích — KHÔNG đụng tới, xem danh sách ở trên.`);
   if (Object.keys(giuLai).length) {
     console.log(`${Object.keys(giuLai).length} file ĐÃ BỎ vẫn còn ở repo — ghi vào khối \`retired\` của sổ ghim, chưa xoá.`);
   }

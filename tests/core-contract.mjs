@@ -751,4 +751,97 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok("F18 - ban trich mang LEGEND + HUONG-DAN, da loc thu repo dich khong co, va Ban do tro toi ca hai");
 }
 
+/* F19 — HAI BAN VA CUA 2026-09-06 (chieu): KHUNG-28 va KHUNG-29.
+   Gop mot khoi vi ca hai la MOT hinh dang: mot lop bao ve chi chay MOT NUA duong.
+   KHUNG-28: upgrade.mjs bao ve tang may rat ky, va bo quen tang tai lieu hoan toan.
+   KHUNG-29: bo sinh CO canh bao thu tu, nhung in ra SAU khi da ghi. */
+{
+  const up = await import("../scripts/upgrade.mjs");
+  const files = buildTemplateFiles();
+
+  // --- KHUNG-28: tang tai lieu duoc so, va so DUNG ba trang thai ---
+  const tl = up.fileTaiLieu(files);
+  assert.ok(tl.includes("docs/LEGEND.md") && tl.includes("docs/HUONG-DAN.md"),
+    "tang tai lieu phai gom docs/ cua ban trich");
+  // VE DOI CHUNG: tang MAY khong duoc lot vao tang tai lieu, neu khong `KHAC` se tha cho
+  // mot file may bi sua tay — dung cai ma upgrade.mjs sinh ra de chan.
+  assert.ok(!tl.some((f) => f.startsWith("scripts/") || f.startsWith("tests/")),
+    "file may KHONG duoc tinh la tai lieu — hai tang co hai luat khac han");
+
+  const cha = mkdtempSync(join(tmpdir(), "upgrade-tl-"));
+  try {
+    const dich = join(cha, "dich");
+    mkdirSync(join(dich, "docs", "protocols"), { recursive: true });
+    // Repo dich co MOT file tai lieu, va no DA BI SUA TAY.
+    writeFileSync(join(dich, "docs", "protocols", "MULTIFLOW.md"),
+      files.get("docs/protocols/MULTIFLOW.md") + "\nDONG REPO DICH TU THEM\n", "utf8");
+
+    const ra = up.soSanhTaiLieu(dich, files);
+    const theo = (t) => ra.filter((d) => d.trangThai === t).map((d) => d.rel);
+    assert.ok(theo("THIẾU").includes("docs/LEGEND.md"),
+      "file ban trich co ma repo dich khong co phai la THIEU");
+    assert.deepEqual(theo("KHÁC"), ["docs/protocols/MULTIFLOW.md"],
+      "file da sua tay phai la KHAC — va KHAC thi KHONG BAO GIO bi ghi de");
+    assert.equal(theo("ĐÃ MỚI").length, 0, "repo dich chua co gi khop thi khong co ĐÃ MỚI nao");
+
+    // VE DOI CHUNG QUAN TRONG NHAT: chep dung ban trich vao thi phai thanh ĐÃ MỚI, khong phai KHAC.
+    // Khong co ve nay thi `soSanhTaiLieu` co the luon tra KHAC va van xanh.
+    writeFileSync(join(dich, "docs", "LEGEND.md"), files.get("docs/LEGEND.md"), "utf8");
+    const ra2 = up.soSanhTaiLieu(dich, files);
+    assert.equal(ra2.find((d) => d.rel === "docs/LEGEND.md").trangThai, "ĐÃ MỚI",
+      "chep dung ban trich thi phai la ĐÃ MỚI");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+
+  /* VE NANG NHAT CUA KHUNG-28: chay `--apply` THAT tren mot repo dich that.
+     Ve tren chi kiem HAM SO SANH — no khong phan biet duoc "so dung" voi "co ghi dung".
+     Dot bien kiem 06/09 chung minh dieu do: pha vong ghi (`for (const d of [])`) ma khong
+     phep kiem nao do. Mot ham so sanh dung ma vong ghi khong dung thi tai lieu van khong toi. */
+  const cha2 = mkdtempSync(join(tmpdir(), "upgrade-apply-"));
+  try {
+    const dich = join(cha2, "dich");
+    mkdirSync(join(dich, "scripts"), { recursive: true });
+    mkdirSync(join(dich, "tests"), { recursive: true });
+    mkdirSync(join(dich, "docs", "protocols"), { recursive: true });
+    // Tang MAY chep dung ban trich -> khong co gi de tranh cai, `--apply` chay tron.
+    for (const rel of up.fileMay(files)) {
+      const dest = join(dich, ...rel.split("/"));
+      mkdirSync(dirname(dest), { recursive: true });
+      writeFileSync(dest, files.get(rel), "utf8");
+    }
+    // MOT file tai lieu bi SUA TAY, cac file khac THIEU.
+    const SUA = files.get("docs/protocols/MULTIFLOW.md") + "\nDONG REPO DICH TU THEM\n";
+    writeFileSync(join(dich, "docs", "protocols", "MULTIFLOW.md"), SUA, "utf8");
+
+    const ra = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), "--apply", dich],
+      { encoding: "utf8" });
+    assert.equal(ra.status, 0, `--apply phai chay duoc: ${ra.stderr || ra.stdout}`);
+
+    // File THIEU phai duoc mang sang, dung noi dung ban trich.
+    assert.equal(readFileSync(join(dich, "docs", "LEGEND.md"), "utf8"), files.get("docs/LEGEND.md"),
+      "file tai lieu THIEU phai duoc mang sang, dung noi dung ban trich");
+    assert.ok(existsSync(join(dich, "docs", "HUONG-DAN.md")), "docs/HUONG-DAN.md cung phai toi");
+
+    // VE DOI CHUNG QUAN TRONG NHAT: file SUA TAY khong duoc dung toi, DU LA MOT BYTE.
+    assert.equal(readFileSync(join(dich, "docs", "protocols", "MULTIFLOW.md"), "utf8"), SUA,
+      "file tai lieu da sua tay KHONG DUOC ghi de — day la toan bo ly do upgrade.mjs ton tai");
+  } finally { rmSync(cha2, { recursive: true, force: true }); }
+
+  // --- KHUNG-29: bo sinh DUNG TRUOC KHI GHI khi generated_names tren dia khac HEAD ---
+  const nguon = readFileSync(join(ROOT, "scripts/build-dashboard.mjs"), "utf8");
+  /* Do o CHO GOI, khong do o ten ham: `function tenMaySinhLech(deps) {` cung chua chuoi
+     "tenMaySinhLech(deps)", va khai bao ham thi LUON nam truoc cho ghi — nen phep kiem ban dau
+     LUON XANH du co doi cho hay khong. Dot bien kiem bat dung cho do 06/09. */
+  const i = nguon.indexOf("const lech = tenMaySinhLech(deps);");
+  const j = nguon.indexOf("deps.writeFile(model.ten.dashboard");
+  assert.ok(i > 0 && j > 0 && i < j,
+    "phep chan PHAI goi TRUOC dong ghi dau tien — dat sau la bien ban, khong phai canh bao");
+  assert.match(nguon, /KHONG_SINH_TRANG/, "phai co ma loi rieng de tra cuu");
+  // Doc dia la mot NGOAI LE HEP: chi de so cau hinh, moi du lieu dung trang van doc tu HEAD.
+  assert.match(nguon, /readDia/, "phai co duong doc dia rieng, khong nhap nhem voi readFile");
+  assert.equal((nguon.match(/deps\.readDia\(/g) || []).length, 1,
+    "readDia chi duoc dung DUNG MOT CHO — noi rong ra la pha loi hua 'dung trang suy tu HEAD'");
+
+  ok("F19 - upgrade mang tai lieu THIEU va khong dung file KHAC; bo sinh dung TRUOC khi ghi khi ten lech");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
