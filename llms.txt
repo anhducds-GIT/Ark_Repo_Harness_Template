@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-06.
 
 ## Việc ưu tiên #1
 
-- **_root** — KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới.
+- **_root** — Y-09 trong IDEAS.md — đưa `build-overview.mjs` vào bản trích rồi phát bảng chín tab sang ba repo đã lắp. Chín tab đã dựng xong ở repo nhà 06/09; phần còn lại là bỏ chữ riêng của repo nhà, thêm phép kiểm, rồi mới phát.
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh ngày 2026-09-06.
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — Bản 1.3.1 
+- [ark-repo-harness](STATUS.md): active — Bản 1.3.14 
 
 ## Luật bắt buộc trước khi sửa gì
 

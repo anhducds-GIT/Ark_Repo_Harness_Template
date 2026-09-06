@@ -31,21 +31,21 @@
       "path": ".",
       "lifecycle": "active",
       "status_md": "STATUS.md",
-      "owner": "harness-vong2",
-      "next_step": "KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới.",
-      "human_action": "CÓ — KHUNG-11: bớt cái gì trong 998 dòng tài liệu vượt ngân sách. Mọi việc còn lại đều THÊM chữ, nên chốt càng muộn càng vượt xa. Xem BACKLOG.md.",
+      "owner": "claude-bang9tab",
+      "next_step": "Y-09 trong IDEAS.md — đưa `build-overview.mjs` vào bản trích rồi phát bảng chín tab sang ba repo đã lắp. Chín tab đã dựng xong ở repo nhà 06/09; phần còn lại là bỏ chữ riêng của repo nhà, thêm phép kiểm, rồi mới phát.",
+      "human_action": "CÓ — bốn mục đang mang dấu chờ, xem tab \\\"AI điều phối\\\" của bảng: KHUNG-11 và KHUNG-6 và KHUNG-30 cần Đức CHỐT, KHUNG-14 cần Đức BẤM. Bảng quét dấu `@Đức:` ngay trên dòng của mục, nên danh sách này không cần ai nhớ cập nhật.",
       "priority_rank": 1,
       "superseded_by": null,
-      "last_verified": "2026-09-05",
+      "last_verified": "2026-09-06",
       "last_verified_commit": "baebd07fafa3a5e1435977894372a2ba76a76599",
-      "open_item": "Bản 1.3.1 · migrate nay là BA việc trong một (migrate + audit + bring AI assistant onboard), Đức chốt 05/09 — xong không còn nghĩa là cổng xanh"
+      "open_item": "Bản 1.3.14 · bảng nay có chín tab và đọc thêm năm nguồn (sổ ý tưởng · dấu chờ người chốt · bảng chủ sở hữu · sổ nợ · luật đa phiên). Đức chốt 06/09: bảng phải đi theo bản trích, không để mỗi repo một kiểu."
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "KHUNG-13 trong BACKLOG.md — bản trích phát đi luật bắt dùng BACKLOG.md và decisions.md mà không mang theo file nào trong hai, nên mọi repo dựng từ khuôn sinh ra đã mang sẵn bệnh repo nhà vừa vá cùng ngày. Đây là lần thứ TƯ cùng hình dạng lỗi, và lần này nó nhân bản sang mọi repo đích. Đã đo: không buộc cắt bản mới.",
+      "title": "Y-09 trong IDEAS.md — đưa `build-overview.mjs` vào bản trích rồi phát bảng chín tab sang ba repo đã lắp. Chín tab đã dựng xong ở repo nhà 06/09; phần còn lại là bỏ chữ riêng của repo nhà, thêm phép kiểm, rồi mới phát.",
       "rank": 1,
       "claim": null
     }
