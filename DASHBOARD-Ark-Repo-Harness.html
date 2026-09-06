@@ -156,7 +156,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   <div class="cu" data-sinh="2026-09-06"></div>
   <header>
     <div class="nhan-hang">
-      <span class="chip">v1.3.9</span>
+      <span class="chip">v1.3.10</span>
       <span>sinh ngày 2026-09-06</span>
     </div>
     <h1>Ark Repo Harness</h1>
@@ -885,6 +885,13 @@ npm run overview                  # sinh lại bảng HTML ở gốc repo, rồi
 
   <section class="tab" id="tab-nhat-ky" hidden>
     <details open>
+      <summary><strong>v1.3.10</strong><span class="ngay">2026-09-06</span><span class="tt">Cổng KHUNG-25 thôi bắt oan dòng chỉ ĐỔI CHỖ trong file</span></summary>
+      <p>Bản 1.3.8 cho <code>HANDOFF.md</code> xoá dòng khi có bản khớp byte trong kho lưu trữ. Chạy thật ngay hôm sau thì nó <strong>ĐỎ OAN</strong>: một dòng bị đẩy từ giữa file lên đầu file bị tính là dòng bị xoá.</p>
+<p><code>git diff</code> không phân biệt &quot;xoá&quot; với &quot;dịch chỗ&quot; — cả hai đều in ra một cặp <code>-</code>/<code>+</code>. Bản đầu chỉ đọc cái <code>-</code> rồi kết luận mất chữ.</p>
+<p><strong>Một cổng bắt oan cũng nguy hiểm như một cổng bỏ sót: người ta học cách bỏ qua nó.</strong></p>
+<p>Nay trước khi kết luận &quot;mất chữ&quot;, cổng hỏi thêm một câu: <em>dòng đó có còn trong chính file không?</em> Còn thì không mất gì cả. Xoá hẳn — không còn trong file, không có trong kho — thì <strong>vẫn ĐỎ</strong>.</p>
+<p>Vế 6 của khối 9 ở <span class="ref">tests/cong-do-that.mjs</span> ghim cả hai chiều, và <strong>hai nửa điều kiện được đột biến kiểm RIÊNG</strong>: bỏ vế &quot;còn trong file&quot; thì đỏ oan trở lại; bỏ vế &quot;có trong kho lưu trữ&quot; thì việc dời chỗ thật bị chặn. Không nửa nào thừa.</p>
+    </details><details>
       <summary><strong>v1.3.9</strong><span class="ngay">2026-09-06</span><span class="tt">Nhịp dọn chạy thật lần đầu, và nó lôi ra hai lỗ của chính nó</span></summary>
       <p>Bản 1.3.8 dựng <code>npm run don</code> với bốn vế test. Chạy nó trên <strong>dữ liệu thật</strong> cùng ngày thì lộ hai lỗ mà <strong>không vế nào trong bốn vế bắt được</strong> — vì cả hai chỉ xuất hiện khi gặp dữ liệu thật.</p>
 <h4>Tên file lưu trữ vô nghĩa</h4>
@@ -991,7 +998,7 @@ npm run don -- --apply     # ghi thật</code></pre>
   </section>
 
   <footer>
-    <span>Ark Repo Harness v1.3.9</span>
+    <span>Ark Repo Harness v1.3.10</span>
     <span>sinh ngày 2026-09-06 — không gõ tay</span>
     <span>mọi con số đọc từ repo</span>
   </footer>
