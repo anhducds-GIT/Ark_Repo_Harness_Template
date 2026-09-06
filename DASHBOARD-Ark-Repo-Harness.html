@@ -156,7 +156,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   <div class="cu" data-sinh="2026-09-06"></div>
   <header>
     <div class="nhan-hang">
-      <span class="chip">v1.3.8</span>
+      <span class="chip">v1.3.9</span>
       <span>sinh ngày 2026-09-06</span>
     </div>
     <h1>Ark Repo Harness</h1>
@@ -193,7 +193,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
     <div class="the"><h2>Vòng đời</h2><div class="vong"><div class="b qua"><div class="cham"></div><div class="ten">Ý tưởng</div></div><div class="noi qua"></div><div class="b qua"><div class="cham"></div><div class="ten">Đang dựng</div></div><div class="noi qua"></div><div class="b nay"><div class="cham"></div><div class="ten">Đã chứng minh</div></div><div class="noi"></div><div class="b "><div class="cham"></div><div class="ten">Dừng / nghỉ</div></div></div></div>
     <div class="the"><h2>Sức khoẻ</h2>
     <div class="luoi">
-      <div class="o ok"><b>0</b><span>tài liệu quá hạn</span></div><div class="o canh"><b>16</b><span>nợ cấu trúc (đỏ + vàng)</span></div><div class="o ok"><b>0</b><span>việc lớn chưa chứng minh</span></div>
+      <div class="o ok"><b>0</b><span>tài liệu quá hạn</span></div><div class="o canh"><b>18</b><span>nợ cấu trúc (đỏ + vàng)</span></div><div class="o ok"><b>0</b><span>việc lớn chưa chứng minh</span></div>
       <div class="o"><b><span class="den do"></span></b><span>tổng thể</span></div>
     </div>
     <p style="font-size:13.2px;color:var(--mo)">Đèn xanh chỉ khi cả ba đều bằng 0. Dấu <b>?</b> nghĩa là phép đo không chạy được — đó không phải điểm 0, và đèn không xanh. Không có phần trăm ở đây — một con số như "đạt 94%" thì không ai hành động được.</p>
@@ -885,6 +885,19 @@ npm run overview                  # sinh lại bảng HTML ở gốc repo, rồi
 
   <section class="tab" id="tab-nhat-ky" hidden>
     <details open>
+      <summary><strong>v1.3.9</strong><span class="ngay">2026-09-06</span><span class="tt">Nhịp dọn chạy thật lần đầu, và nó lôi ra hai lỗ của chính nó</span></summary>
+      <p>Bản 1.3.8 dựng <code>npm run don</code> với bốn vế test. Chạy nó trên <strong>dữ liệu thật</strong> cùng ngày thì lộ hai lỗ mà <strong>không vế nào trong bốn vế bắt được</strong> — vì cả hai chỉ xuất hiện khi gặp dữ liệu thật.</p>
+<h4>Tên file lưu trữ vô nghĩa</h4>
+<p>Cách đặt tên lọc mọi ký tự không phải số rồi cắt 6 chữ số đầu của tiêu đề. Trên <code>## Lượt · Đẩy hộ 12 commit của bốn lane</code> nó ra <strong><code>HANDOFF-12.md</code></strong>.</p>
+<p>Một file lưu trữ tên vô nghĩa là một file <strong>không ai mở</strong> — chữ vẫn còn trong repo mà coi như đã mất. Luật vàng 5 áp cả cho tên file.</p>
+<p>Nay quét <strong>mọi</strong> khối bị dời tìm <code>YYYY-MM</code>; không khối nào có ngày thì lấy tháng CẤT.</p>
+<h4>Ghi đè im lặng — lỗ nguy hiểm nhất của cả lệnh</h4>
+<p>Hai lượt dọn trong cùng một tháng cho ra cùng một nhãn, nên bản trước <strong>đè mất file lưu trữ của lượt trước</strong>. Tức chính lệnh dọn làm mất đúng thứ nó sinh ra để giữ, và <strong>không báo gì</strong>.</p>
+<p>Nay trùng tên thì thêm hậu tố <code>-2</code>, <code>-3</code>… — tuyệt đối không đè.</p>
+<h4>Chạy thật: hai bản vá của hôm nay lần đầu chạy cùng nhau</h4>
+<p><code>HANDOFF.md</code> <strong>654 → 509</strong> · <code>CHANGELOG.md</code> <strong>326 → 263</strong>, không mất byte nào. Lệnh dọn xoá dòng khỏi nhật ký, cổng KHUNG-25 đối chiếu byte với kho lưu trữ và cho qua — đây là lần đầu vòng đó khép kín trên repo thật.</p>
+<p>Nhật ký phình lại từ 415 lên 654 <strong>trong đúng một ngày</strong>. Đó là lý do Đức đòi một <em>nhịp</em> chứ không phải một <em>lượt</em>.</p>
+    </details><details>
       <summary><strong>v1.3.8</strong><span class="ngay">2026-09-06</span><span class="tt">Repo có NHỊP DỌN, và cổng thôi cấm chính việc nó bảo phải làm</span></summary>
       <p>Hai luật của repo cắn nhau — sổ tay bảo trì bắt <strong>dời</strong> nhật ký cũ đi, cổng đóng phiên <strong>cấm</strong> <code>HANDOFF.md</code> xoá dòng nào. Bản 1.3.7 phát hiện, hoàn nguyên và ghi nợ. Bản này Đức chốt cả hai vế: vá cổng, và dựng cơ chế dọn.</p>
 <h4>Cổng KIỂM CHỨNG luật &quot;dời chỗ chứ không xoá&quot;, thay vì cấm cả hai</h4>
@@ -973,31 +986,12 @@ npm run don -- --apply     # ghi thật</code></pre>
 <p><strong>Luật DỜI CHỖ, không phải XOÁ.</strong> <em>&quot;Chỉ thêm dòng, không sửa dòng cũ&quot;</em> cấm <strong>viết lại lịch sử</strong>, không cấm <strong>cất gọn</strong> nó. Ba điều kiện, thiếu một là thành xoá lịch sử: giữ nguyên chữ (không tóm tắt — tóm tắt là diễn giải, và diễn giải của người dọn thay thế lời người viết) · để lại một dòng trỏ sang kho lưu · khai kho lưu vào Bản đồ file.</p>
 <p><strong>Ngân sách nay khai được</strong> ở <code>budget</code> trong <code>.repo-structure.json</code> — repo khác có kích thước khác, ép chúng theo số của một bộ khung 3000 dòng là bắt chúng im lặng chịu đỏ. Gõ sai tên mục ngân sách thì <strong>bị từ chối kèm danh sách hợp lệ</strong>, không im lặng bỏ qua: một ngân sách gõ sai tên là một lớp bảo vệ biến mất mà không ai biết — đúng ca đã xảy ra thật ở repo này 03/09.</p>
 <p><strong>Đột biến kiểm, ba ca, cả ba đỏ đúng chỗ:</strong> bỏ thước khỏi bản trích · bỏ sổ tay khỏi bản trích · bỏ hàng kiểm gõ sai tên ngân sách. <code>1.3.3</code> → <code>1.3.4</code>, bản trích <strong>32 file</strong>.</p>
-    </details><details>
-      <summary><strong>v1.3.3</strong><span class="ngay">2026-09-05</span><span class="tt">Ba lỗi mà bảy phiên ở repo nhà không tìm ra, một lượt migrate thật lôi ra hết</span></summary>
-      <p>Bản này không sửa gì do đọc lại code mà thấy. <strong>Cả ba lỗi đều do lắp bộ khung vào một repo thật khác nghề</strong> — <code>n8n-orchestrator</code>, Control Plane bằng Python + YAML. Repo nhà không dính lỗi nào trong ba, và đó chính là lý do chúng sống sót qua bảy phiên.</p>
-<p><strong>(A) <code>units.behaviour_globs</code> bị validator TỪ CHỐI, trong khi chú thích trong code dạy đúng trường đó.</strong> Khai vào là lệnh nổ: <code>CAU_TRUC_HONG: units.behaviour_globs — không phải trường hợp lệ</code>. Nhưng <code>build-dashboard.mjs</code> viết nguyên văn <em>&quot;repo tự khai <code>units.behaviour_globs</code>&quot;</em>. Chú thích dạy một trường, bộ kiểm cấm trường ấy, không ai đối chiếu hai chỗ. Đo tiếp thì lỗi còn sâu hơn: lớp đó <strong>chưa từng được truyền vào luồng thật</strong> — bộ đếm gọi <code>isBehaviourFile</code> không kèm tham số nào. Tức repo Python bị đo là <em>&quot;code không đổi&quot;</em> dù <code>tools/*.py</code> sửa cả ngày, và <strong>không ai biết cột đó đang mù</strong>. Nay trường hợp lệ, có hàm đọc riêng (<code>behaviourGlobsFrom</code>), và <strong>đã nối vào luồng</strong>.</p>
-<p><strong>(B) <code>claim.mjs</code> NỔ khi bảng quyền có mục <code>null</code>.</strong> Viết <code>{&quot;_root&quot;: null}</code> — cách viết tự nhiên cho <em>&quot;chưa ai giữ&quot;</em> — làm <code>--list</code> ném <code>TypeError: Cannot read properties of null (reading 'owner')</code>, rơi stack trace vào mặt người dùng. Nay nói rõ mã lỗi <code>CLAIMS_MUC_HONG</code> <strong>kèm khuôn đúng để sửa</strong>. Không nhận <code>null</code> là &quot;trống&quot;, cố ý: hai cách biểu diễn cùng một trạng thái làm phép đối chiếu bảng-trên-máy ↔ bảng-trên-remote có hai kết quả cho cùng một sự thật.</p>
-<p><strong>(C) Cổng đóng cứng vị trí &quot;Bản đồ file&quot; ở <code>AGENTS.md</code>.</strong> Repo đích để bản đồ ở <code>design_brief.md</code> mục 8 — hợp lệ theo luật của chính nó, và luật đó <strong>có trước</strong> bộ khung. Cổng đỏ cho tới khi phải thêm một mục thứ hai vào <code>AGENTS.md</code>, nên repo đó nay có <strong>hai</strong> bản đồ ở hai file: hai nguồn cho một khái niệm, đúng bệnh mà cả bộ khung sinh ra để chữa — và lần này <strong>bộ khung là thủ phạm</strong>. Nay repo khai <code>docs.file_map</code> trong <code>.repo-structure.json</code>; không khai thì vẫn là <code>AGENTS.md</code>, repo cũ không phải đổi gì.</p>
-<p><strong>Đột biến kiểm — và một ca KHÔNG đỏ, ghi lại thay vì giấu.</strong> Ba đột biến: bỏ <code>behaviour_globs</code> khỏi danh sách trường hợp lệ → đỏ · bỏ hàng kiểm mục bảng quyền → đỏ · <strong>gỡ dòng truyền opts trong <code>collectModel</code> → VẪN XANH</strong>. Ca thứ ba lộ ra rằng phép ghim mới chỉ canh được <em>hàm dựng opts</em>, không canh được <em>bộ sinh có gọi hàm đó không</em> — đúng hình dạng lỗi vừa vá. Đã ghi thành mục nợ riêng và <strong>nói thẳng giới hạn ngay trong chú thích của phép kiểm</strong>, để người sau không tưởng nó đã phủ.</p>
-<p><code>1.3.2</code> → <code>1.3.3</code>. Bốn mục nợ đóng: lớp nghề chưa nối · cổng đóng cứng bản đồ · trường bị từ chối · bảng quyền nổ vì <code>null</code>.</p>
-    </details><details>
-      <summary><strong>v1.3.2</strong><span class="ngay">2026-09-05</span><span class="tt">Bảng việc thôi nói &quot;không có gì phải quyết&quot; khi thực ra có</span></summary>
-      <p><strong>Ca hỏng đo được:</strong> <code>npm run what-next</code> in ra <code>C · ĐANG CHỜ NGƯỜI CHỐT — 0 mục, không ai làm thay được</code>, trong khi sổ nợ đang có <strong>hai</strong> mục cần người chốt. Người chốt đọc bảng rồi tin mình không phải quyết gì.</p>
-<p><strong>Nguyên nhân:</strong> mục C chỉ đọc <strong>sổ ý tưởng</strong> (<code>IDEAS.md</code>). Repo không có sổ đó thì mục C luôn rỗng. Nặng hơn một mục hiển thị thiếu, vì dòng in ra <strong>khẳng định đã kiểm và không có gì</strong> — mà chính công cụ này ở chỗ khác phân biệt rất kỹ giữa <em>&quot;0 vì đã kiểm&quot;</em> và <em>&quot;KHÔNG LỌC ĐƯỢC&quot;</em>.</p>
-<p><strong>Vá hai vế:</strong></p>
-<ul><li>Mục C nay đọc <strong>cả sổ nợ</strong>, và khi một nguồn không lọc được thì <strong>không in con số tổng</strong> — con</li></ul>
-<p>  số tổng hàm ý &quot;đã kiểm hết&quot;, ở đó mới kiểm được một nửa. In số kèm cảnh báo vẫn khiến người   đọc nhớ con số.</p>
-<ul><li>Nhận diện bằng <strong>cờ khai tường minh</strong> <code>&gt; <strong>CHỜ NGƯỜI CHỐT:</strong> …</code> trong thân mục, **không dò tên</li></ul>
-<p>  người chốt trong văn xuôi** như bản cũ. Dò chữ là phép đo bằng chuỗi: đổi cách xưng hô một chữ   là mục biến mất khỏi bảng, và không ai biết.</p>
-<p><strong>Đột biến kiểm — hai chiều, cả hai đỏ đúng chỗ:</strong> bỏ hàng dò cờ → mục khai tường minh không còn được nhận; nới cờ thành dò văn xuôi → mục chỉ có văn xuôi bị nhận nhầm. Vế đối chứng là phần khiến phép ghim này không thể xanh giả.</p>
-<p><strong>Bản trích cũng nhận:</strong> hạt giống sổ nợ nay <strong>dạy luôn quy ước cờ</strong>, nên repo dựng từ khuôn không phải phát minh lại. <code>1.3.1</code> → <code>1.3.2</code>, dấu vân tay <code>f2344159c4e3c28e</code>.</p>
-<p><strong>Bản cũ hơn đã dời sang</strong> <span class="ref">docs/archive/CHANGELOG-1.3.1.md</span> — chữ giữ nguyên từng dòng.</p>
+<p><strong>Phần CŨ hơn đã dời sang kho lưu trữ</strong> — <span class="ref"><code>docs/archive/</code></span> · chữ giữ nguyên từng dòng, cắt bằng <code>npm run don</code>.</p>
     </details>
   </section>
 
   <footer>
-    <span>Ark Repo Harness v1.3.8</span>
+    <span>Ark Repo Harness v1.3.9</span>
     <span>sinh ngày 2026-09-06 — không gõ tay</span>
     <span>mọi con số đọc từ repo</span>
   </footer>
