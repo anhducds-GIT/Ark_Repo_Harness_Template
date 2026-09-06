@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-bang9tab",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "IDEAS.md + nhat ky + ban do file",
-      "released_at": "2026-09-06",
+      "task": "nhat ky + sinh lai trang",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,10 +23,10 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-thu-khoa",
+      "owner": "claude-bang9tab",
       "ai": null,
       "claimed_at": "2026-09-06",
-      "task": "thu bo loc dong bien dong",
+      "task": "dong phien 1.3.15",
       "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",

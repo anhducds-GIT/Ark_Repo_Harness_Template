@@ -769,3 +769,18 @@ mà không gỡ chỗ nối này thì repo đích nạp trang là **chết ngay 
 `TRANG_FILE` đang đóng cứng tên file của repo nhà.
 
 Ghi thành **Y-09** trong sổ ý tưởng, kèm ba lối đi. Đây là việc kế tiếp của repo.
+
+### Một hệ quả CHẶN CẢ REPO, lộ ra ngay lượt đầu — và đã vá
+
+Đưa bảng chủ sở hữu lên trang là đưa một thứ **đổi nhiều lần một ngày** vào một artifact mà cổng
+so với HEAD mỗi phiên. Hệ quả: **trả khoá xong là trang lệch HEAD**, và phiên tiếp theo bị chặn
+đẩy vì một thứ nó không hề đụng tới. Đo được ngay: `state-check` báo `MISMATCH` sau đúng một lượt
+trả khoá.
+
+Lối ra **không** phải bỏ khối bảng quyền — đó là khối Đức hỏi tới đầu tiên. Lối ra là đánh dấu
+những dòng ấy (`NHAN_KHOA`) rồi **bỏ qua chúng ở phép SO, không bỏ qua ở phép GHI**. Ghi vô điều
+kiện nên trang luôn hiện trạng thái mới nhất; chỉ câu hỏi *"trang này có cũ không"* là không tính
+mấy dòng đó. Lọc cả hai vế thì trang đứng yên ở một quá khứ mà cổng vẫn báo sạch — tệ hơn hẳn.
+
+**Đã thử thật:** nhận một khoá → commit → `--check-head` **vẫn xanh**. Phép kiểm ghim CẢ HAI
+chiều, vì ghim một chiều thì một bộ lọc bỏ qua TẤT CẢ cũng xanh.
