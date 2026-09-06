@@ -467,7 +467,11 @@ function mucLuc(muc) {
 function khoiNowNext(st) {
   if (!st || !Object.keys(st).length) return "";
   const o = (nhan, gt, to, lop) => gt
-    ? `<div class="m ${lop || ""}"><span class="nhan">${esc(nhan)}</span><span class="gt${to ? " to" : ""}">${esc(String(gt).replace(/^"|"$/g, ""))}</span></div>`
+    // LỌC TÊN FILE MÃ NGUỒN. Ba ô này in thẳng chữ do phiên trước gõ vào hồ sơ trạng thái, và
+    // phiên trước là một AI — nó gõ tên file rất tự nhiên. Nhưng đây là ô đầu tiên của tab đầu
+    // tiên, tức chỗ người KHÔNG đọc code nhìn trước hết. Lọc ở đây thay vì bắt mọi phiên nhớ
+    // viết khác: bắt người nhớ là sẽ có ngày quên, và lúc quên thì không ai thấy.
+    ? `<div class="m ${lop || ""}"><span class="nhan">${esc(nhan)}</span><span class="gt${to ? " to" : ""}">${esc(boTenFile(String(gt).replace(/^"|"$/g, "")))}</span></div>`
     : "";
   return `<div class="nn">
     ${o("đang ở đâu", VONG_DOI[st.lifecycle]?.ten || st.lifecycle, true)}
@@ -683,7 +687,7 @@ export function khoiCanDuc(canDuc, tenNguoi) {
   const chot = canDuc.length - bam;
   const dong = canDuc.map((c) => '<div class="cd">'
     + '<span class="lo ' + c.loai + '">' + (c.loai === "bam" ? "BẤM" : "CHỐT") + '</span>'
-    + '<span class="c">' + esc(c.cau)
+    + '<span class="c">' + esc(boTenFile(c.cau))
     + '<span class="tu">' + esc(c.tuoi) + ' · nêu trong ' + esc(c.file) + '</span></span></div>').join("");
   return '<div class="the"><h2>Cần ' + esc(tenNguoi) + ' — ' + canDuc.length + ' việc · '
     + bam + ' bấm · ' + chot + ' chốt</h2>' + dong
@@ -745,12 +749,24 @@ function thanhBac(bac) {
   return '<span class="bac' + (nghi ? " nghi" : "") + '">' + o.join("") + '</span>';
 }
 
+/* BỎ TÊN FILE MÃ NGUỒN khỏi chữ hiện ở tab đầu.
+ *
+ * Tab đầu viết cho người KHÔNG đọc code — một phép kiểm cũ ghim đúng chỗ đó, và nó bắt được
+ * bản đầu của khối này: sổ ý tưởng có mục nhắc tên một file `.mjs` ngay trong dòng "việc kế",
+ * và dòng đó chảy thẳng ra trang đầu. Lọc ở ĐÂY chứ không sửa sổ: sổ là chữ của người viết,
+ * và ở tab Ý tưởng thì tên file lại đúng chỗ. Cùng một câu, hai nơi đọc, hai mức chi tiết. */
+export function boTenFile(t) {
+  return String(t)
+    .replace(/`?[\w./-]+\.(mjs|js|json|ts|py|sh)`?/g, "một file mã nguồn")
+    .replace(/\s+/g, " ").trim();
+}
+
 /* "Những hướng đang mở của repo đang ở bước nào?" — bản rút gọn, cho tab Tổng quan. */
 export function khoiYTuongGon(ideas) {
   if (!ideas.length) return "";
   const dong = ideas.map((y) => '<div class="yt"><span>'
-    + '<a href="#y-' + esc(slug(y.ma)) + '" data-goto="y-tuong">' + esc(y.ma) + ' · ' + esc(y.ten) + '</a>'
-    + (y.viecKe ? '<span class="ke">' + esc(y.viecKe) + '</span>' : "")
+    + '<a href="#y-' + esc(slug(y.ma)) + '" data-goto="y-tuong">' + esc(y.ma) + ' · ' + esc(boTenFile(y.ten)) + '</a>'
+    + (y.viecKe ? '<span class="ke">' + esc(boTenFile(y.viecKe)) + '</span>' : "")
     + '</span>' + thanhBac(y.bac) + '</div>').join("");
   return '<div class="the"><h2>Ý tưởng đang ở bước nào — ' + ideas.length + ' hướng</h2>' + dong
     + '<p class="ghi">Ba bước là đường đi thật của một ý tưởng. <strong>Nghỉ</strong> không phải '
