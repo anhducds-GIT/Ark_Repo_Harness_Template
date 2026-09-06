@@ -552,6 +552,39 @@ mà chính dòng **khai báo hàm** cũng chứa chuỗi đó và luôn nằm tr
 không. Đã đổi sang dò **chỗ gọi**.
 
 
+### KHUNG-30 · `Project 3 AI Agent Unify` chưa nâng được — luật của CHÍNH REPO ĐÓ chặn
+
+> **CHỜ NGƯỜI CHỐT:** nhánh đang lệch `origin/main` **5 sau / 48 trước**. Nâng bộ khung trên một
+> nhánh lệch xa như thế là quyết định của Đức, không phải của AI.
+
+**Đo 06/09, và đây là lượt giao việc cho Codex CLI đầu tiên có kết quả dùng được.**
+
+Codex đọc đề bài [NANG-BO-KHUNG.md](briefs/NANG-BO-KHUNG.md), rồi **DỪNG** với đúng mẫu báo cáo
+năm dòng. Hai lý do nó nêu, **tôi đã kiểm chứng độc lập, cả hai ĐÚNG**:
+
+| Codex nói | Đo lại |
+|---|---|
+| nhánh lệch `origin/main` 48/5 commit | `git rev-list --left-right --count` → **5 / 48**. Đúng |
+| repo có luật *"Cloud Sync Hold"* bắt dừng | `AGENTS.md` mục **8A** của repo đó. Có thật |
+
+Luật 8A nói: *trước khi ghi bất kỳ file local nào, phải `git fetch origin main` và kiểm tra
+Local có đang sau `origin/main` không*. Local đang sau **5 commit**, nên luật bắt dừng.
+
+**Đây KHÔNG phải lỗi của bộ khung, cũng không phải lỗi của Codex.** Nó là hai bộ luật gặp nhau
+và bộ luật của chủ nhà thắng — đúng như phải thế. Cái đáng ghi là **Codex đã đọc luật của repo
+đích và tuân**, chứ không cắm đầu chạy đề bài.
+
+**Ba lối, cần Đức chọn:**
+1. Nâng trên nhánh `main` thay vì nhánh tính năng — sạch nhất, nhưng nhánh tính năng vẫn phải
+   nâng riêng khi merge.
+2. `git pull` 5 commit của cloud xuống trước theo đúng luật 8A, rồi nâng.
+3. Hoãn — repo đó đang có việc dở của phiên khác (3 file), nâng sau khi việc đó xong.
+
+**Kèm một giới hạn kỹ thuật đo được:** `codex exec -s workspace-write` **không chạy được
+`git fetch`** — sandbox từ chối ghi `.git/FETCH_HEAD`. Nghĩa là mọi việc giao cho Codex mà cần
+đọc trạng thái nhánh xa đều phải `git fetch` **trước** rồi mới giao. Ghi vào đề bài.
+
+
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
 
 Tab mới (05/09) chiếu mục nợ đã gạch mã — 7 việc. Nhưng nó chỉ đọc `BACKLOG.md` ở gốc; repo có

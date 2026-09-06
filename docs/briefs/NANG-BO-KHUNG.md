@@ -21,6 +21,21 @@ ttl_days: 180
 
 Lệnh nâng cấp **chạy ở repo bộ khung**, trỏ vào repo đích. Đừng chạy ngược lại.
 
+## 0b. NGƯỜI GIAO VIỆC phải làm hai thứ TRƯỚC khi dán đề bài này
+
+Đo thật 06/09, lượt giao đầu tiên cho Codex CLI — cả hai đều làm phiên đó dừng giữa chừng:
+
+1. **Chạy `git fetch` ở repo đích trước.** `codex exec -s workspace-write` **không** chạy được
+   `git fetch` — sandbox từ chối ghi `.git/FETCH_HEAD`. Phiên AI sẽ không đọc được trạng thái
+   nhánh xa, và nếu repo đích có luật kiểu *"phải đồng bộ với cloud trước khi ghi"* thì nó dừng.
+
+2. **Chạy lệnh từ TRONG repo đích, không từ thư mục cha.** Codex từ chối chạy ở thư mục không
+   phải kho git (`Not inside a trusted directory`).
+
+Và một câu nhắc cho **phiên nhận việc**: repo đích có luật riêng của nó. **Luật của chủ nhà
+thắng đề bài này.** Thấy repo đích cấm điều đề bài bảo làm thì **DỪNG và báo**, đừng chọn một
+trong hai — đó là quyết định của người chốt.
+
 ## 1. Trước khi chạm gì — đo, và nhận quyền
 
 ```bash
