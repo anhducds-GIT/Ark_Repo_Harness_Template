@@ -491,6 +491,48 @@ giới thiệu "bộ khung này".
 Ghim ở `F18`, kèm vế đối chứng *"bộ lọc cắt quá tay"* — ba mục phải còn nguyên sau khi lọc.
 
 
+### KHUNG-28 · `upgrade.mjs` CHỈ đẩy tầng máy — file tài liệu mới không bao giờ tới repo đã lắp
+
+**Vấp thật 06/09, lượt nâng `ALL_SKILL_MANAGEMENT` từ 1.3.8 lên 1.3.11.**
+`npm run upgrade -- --apply` mang **4 file `scripts/`** và cập nhật sổ ghim. Nó **không** mang
+`docs/LEGEND.md` và `docs/HUONG-DAN.md` — hai file bản trích 1.3.11 vừa thêm. Phải chép tay.
+
+**Hậu quả nếu để nguyên:** mọi repo đã lắp đóng băng ở tầng tài liệu tại thời điểm lắp. Bộ khung
+thêm sổ tay mới bao nhiêu cũng chỉ tới **repo dựng mới**, không tới repo đang sống — mà repo
+đang sống mới là chỗ cần sổ tay.
+
+Nó không phải bug: `upgrade.mjs` sinh ra để **vá tầng máy an toàn** (từ chối ghi đè file đã sửa
+tay). Tài liệu thì repo đích **được phép sửa** cho nghề của mình, nên ghi đè thẳng là sai.
+
+**Ba lối, chọn một là quyết định kiến trúc:**
+1. Chỉ mang file tài liệu **repo đích CHƯA CÓ** — file đã có thì kể tên, để người tự trộn.
+2. Mang tất, nhưng file đã sửa tay thì ghi ra `<tên>.moi` cạnh bản cũ.
+3. Không mang, nhưng **liệt kê** tài liệu bản trích có mà repo đích thiếu, kèm câu lệnh chép.
+
+Lối 1 rẻ nhất và đúng ca đã vấp (repo đích **không có** hai file đó). Vùng: `_code`.
+
+### KHUNG-29 · Bộ sinh đọc cấu hình từ HEAD — khai `generated_names` rồi chạy ngay là ĐÈ MẤT
+
+**Vấp thật 06/09, và vấp bởi chính người vừa vá KHUNG-26.**
+
+Khai `generated_names` vào `.repo-structure.json` rồi chạy `npm run overview` **trước khi
+commit**: bộ sinh đọc cấu hình **từ HEAD**, nên nó dùng cấu hình CŨ và ghi đè đúng cái file mà
+`generated_names` sinh ra để bảo vệ. Md5 bảng viết tay đổi từ `0b41e4d3…` sang `673f36df…`.
+
+Cứu được vì nội dung còn trong git. **Nhưng nếu file đó chưa từng được commit thì mất hẳn.**
+
+Bộ sinh **có** cảnh báo — *"CẢNH BÁO THỨ TỰ: 3 file đầu vào đang sửa dở chưa commit"* — nhưng
+nó **in ra SAU khi đã ghi**, và không kể tên `.repo-structure.json` là loại đặc biệt. Cảnh báo
+sau khi mất là biên bản, không phải cảnh báo.
+
+**Cách sửa:** thấy `.repo-structure.json` sửa dở mà **khối `generated_names` khác với bản ở
+HEAD** thì **DỪNG TRƯỚC KHI GHI**, mã thoát khác 0, nói rõ "commit cấu hình trước". Chỉ chặn
+đúng khối đó — sửa dở phần khác của cấu hình không đáng chặn cả lượt sinh.
+
+Ca hỏng phải dựng nổi: (a) đổi `generated_names` chưa commit rồi chạy bộ sinh → **phải dừng, không
+ghi file nào**; (b) sửa dở phần khác của cấu hình → vẫn chạy, vẫn chỉ cảnh báo như cũ. Vùng: `_code`.
+
+
 ### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
 
 Tab mới (05/09) chiếu mục nợ đã gạch mã — 7 việc. Nhưng nó chỉ đọc `BACKLOG.md` ở gốc; repo có

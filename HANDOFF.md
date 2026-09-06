@@ -581,3 +581,28 @@ KHỐI: bỏ một dòng lệnh mà để lại tiêu đề với bảng giải 
 - `ALL_SKILL_MANAGEMENT` vẫn mang cách lách cũ (`DASHBOARD-THU-CONG.md`). Nâng repo đó lên
   1.3.11 rồi khai `generated_names` là trả được tên `DASHBOARD.md` về cho bảng viết tay.
 - KHUNG-11 phần đuôi · thời gian chạy phép kiểm vượt trần.
+
+## 2026-09-06 · `claude-1.3.12` — NÂNG `ALL_SKILL_MANAGEMENT` LÊN 1.3.11, và hai chỗ hở mới
+
+**Làm gì:** nâng repo đó 1.3.8 → 1.3.11 và khai `generated_names` để trả tên `DASHBOARD.md`
+về cho bảng viết tay. Xong: `npm test` **53 xanh** · cổng cấu trúc **0 đỏ** · cổng đóng phiên
+**XANH TOÀN BỘ** · đã đẩy, đã trả ba khoá.
+
+Bảng viết tay 123 dòng nay mang lại đúng tên cũ, **md5 `0b41e4d3…` chưa đổi lần nào qua CẢ HAI
+lượt đổi tên**. Bản máy sinh dời sang `BANG-MAY-SINH.md`.
+
+**TÔI VẤP ĐÚNG CÁI TAI NẠN MÀ MÌNH VỪA VÁ — đây là phần đáng đọc nhất của lượt này.**
+Khai `generated_names` rồi chạy `npm run overview` **trước khi commit**. Bộ sinh đọc cấu hình
+**từ HEAD, không đọc cây làm việc**, nên nó dùng cấu hình CŨ và ghi đè đúng cái file mà
+`generated_names` sinh ra để bảo vệ. Md5 đổi từ `0b41e4d3…` sang `673f36df…`.
+
+Cứu được vì nội dung còn trong git. **Nếu file đó chưa từng được commit thì mất hẳn.**
+Bộ sinh CÓ cảnh báo thứ tự — nhưng nó in ra **SAU khi đã ghi**. *Cảnh báo sau khi mất là biên
+bản, không phải cảnh báo.* → **KHUNG-29**.
+
+**Chỗ hở thứ hai:** `upgrade.mjs` chỉ đẩy **tầng máy**. Hai file tài liệu bản trích 1.3.11 vừa
+thêm không theo, phải chép tay. Nghĩa là mọi repo đã lắp **đóng băng ở tầng tài liệu** tại thời
+điểm lắp. → **KHUNG-28**.
+
+**Còn mở:** KHUNG-28 · KHUNG-29 · KHUNG-11 phần đuôi · thời gian chạy phép kiểm vượt trần.
+Không mục nào chặn ai, không mục nào chờ Đức chốt.
