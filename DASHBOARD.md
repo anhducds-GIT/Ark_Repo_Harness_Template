@@ -15,7 +15,7 @@ Trang được sinh ngày 2026-09-06. Đây là lúc sinh trang, **KHÔNG phải
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.3.15 | active | 0 | 13 | 2026-09-06 @ `baebd07` — npm test 145/145 xanh · cổng đóng phiên XANH TOÀN BỘ 11/11 · bản 1.3.1 đã phát, dấu vân tay 5b2b74c0eee8e3b6 trong sổ phát hành · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái ([bằng chứng](HANDOFF.md)) | CÓ (11 commit) | Bản 1.3.14 · bảng nay có chín tab và đọc thêm năm nguồn (sổ ý tưởng · dấu chờ người chốt · bảng chủ sở hữu · sổ nợ · luật đa phiên). Đức chốt 06/09: bảng phải đi theo bản trích, không để mỗi repo một kiểu. | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.3.15 | active | 0 | 13 | 2026-09-06 @ `baebd07` — npm test 145/145 xanh · cổng đóng phiên XANH TOÀN BỘ 11/11 · bản 1.3.1 đã phát, dấu vân tay 5b2b74c0eee8e3b6 trong sổ phát hành · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái ([bằng chứng](HANDOFF.md)) | CÓ (12 commit) | Bản 1.3.14 · bảng nay có chín tab và đọc thêm năm nguồn (sổ ý tưởng · dấu chờ người chốt · bảng chủ sở hữu · sổ nợ · luật đa phiên). Đức chốt 06/09: bảng phải đi theo bản trích, không để mỗi repo một kiểu. | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 
