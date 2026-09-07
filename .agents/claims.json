@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T12:06:48.447Z",
-      "task": "package.json: noi suite quyen vao npm test",
-      "released_at": "2026-09-07T12:38:13.300Z",
+      "claimed_at": "2026-09-07T14:20:07.018Z",
+      "task": "xep Duc Scouter vao so y tuong (Y-11)",
+      "released_at": "2026-09-07T14:22:33.472Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
