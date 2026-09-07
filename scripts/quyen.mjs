@@ -321,11 +321,24 @@ function lenhThuHoi({ vung, lane, duc, remote }) {
   return MA.OK;
 }
 
-// Cửa tích hợp. Lượt KIỂM và lượt GHI là cùng một lượt đẩy — đó là cả điểm của lệnh này.
-function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
-  // Bắt buộc điền là CHƯA ĐỦ — phải kiểm điều đã điền có khớp commit thật.
-  // Phiên Codex đẩy được ba thứ qua cửa này ngày 07/09: kết quả cũ bỏ trống `--co-so` ·
-  // kết quả cũ khai một nền mà chính nó không chứa · một SHA bịa ra hoàn toàn.
+/* SIÊU DỮ LIỆU CỦA MỘT KẾT QUẢ — kiểm ở MỘT CHỖ cho cả `--xac-nhan` lẫn `--tich-hop`.
+ *
+ * Bản đầu cài ba phép kiểm này HAI LẦN, một bản trong mỗi lệnh. Bộ đột biến bắt được: năm lượt
+ * đột biến báo *"neo khớp 2 chỗ, không xác định"* thay vì đo được gì — tức nếu chỉ gỡ MỘT bản thì
+ * lệnh kia vẫn chặn và test vẫn xanh, và cái xanh đó không nói gì về bản bị gỡ. Đúng hình dạng
+ * "hai bản của một luật sớm muộn nói hai câu khác nhau" (giới hạn ② Đức chốt 07/09).
+ *
+ * Trả về `null` khi mọi thứ ổn, hoặc mã lỗi để chỗ gọi in ra. */
+/* THẾ HỆ khai có khớp thế hệ đang hiệu lực không — cũng MỘT bản cho cả hai lệnh, cùng lý do
+ * như `kiemSieuDuLieu`: bộ đột biến không đo được một luật cài hai chỗ. */
+function kiemTheHe(dangGiu, theHe, danh) {
+  if (String(dangGiu.the_he) === String(theHe)) return null;
+  console.error(`TỪ CHỐI [STALE_GENERATION] — ${danh} thế hệ ${theHe}, quyền hiện tại là thế hệ ${dangGiu.the_he}.`);
+  console.error('Quyền đã bị thu hồi rồi cấp lại giữa lúc bạn làm. Kiểm lại rồi dựng lại.');
+  return MA.TU_CHOI;
+}
+
+function kiemSieuDuLieu({ theHe, sha, coSo }) {
   if (!theHe || !sha || !coSo) {
     console.error('TỪ CHỐI [MISSING_DATA] — cần cả --the-he, --sha và --co-so.');
     console.error('`--co-so` là SHA mà kết quả được dựng trên. Không có nó thì không kiểm được');
@@ -345,6 +358,75 @@ function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
     console.error('Không có vế này thì khai nền nào cũng đi qua được lượt so "đích đã đổi".');
     return MA.TU_CHOI;
   }
+  return null;
+}
+
+/* BÊN THỨ BA XÁC NHẬN MỘT KẾT QUẢ. Lệnh này KHÔNG cấp quyền và KHÔNG tích hợp gì.
+ *
+ * Nó tồn tại vì một câu tôi tự nêu rồi tự quên: *"một status check chỉ là hàng rào thật nếu thứ
+ * GỬI trạng thái không phải thứ ĐANG BỊ kiểm."* Nên `--as` ở đây là **bên kiểm**, và nó bị TỪ CHỐI
+ * nếu trùng với lane đang giữ vùng.
+ *
+ * Tờ xác nhận vào chính sổ quyền, nên nó thừa hưởng thứ tự và phép so-và-đổi của sổ. Đó là thứ cho
+ * cửa tích hợp hỏi được câu *"đây có phải điều cuối cùng xảy ra với vùng này không"* — xem chốt ở
+ * `lenhTichHop`. Trong bản thật, bên kiểm là workflow `cong-kiem` chạy trên máy GitHub. */
+function lenhXacNhan({ vung, lane, theHe, sha, coSo, remote }) {
+  const hong = kiemSieuDuLieu({ theHe, sha, coSo });
+  if (hong !== null) return hong;
+
+  const db = dongBo(remote);
+  if (!db.ok) return bao(db);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+  const so = ds.so;
+  const { chu } = trangThai(so);
+  const dangGiu = chu.get(vung);
+
+  if (!dangGiu) {
+    console.error(`TỪ CHỐI [NOT_HELD] — ${vung} không có chủ, không có kết quả nào để xác nhận.`);
+    return MA.TU_CHOI;
+  }
+  /* CHỖ NÀY SO MỘT THAM SỐ TỰ KHAI, KHÔNG SO DANH TÍNH. Phiên Codex (#21) chỉ đúng, và đây là
+   * giới hạn nặng nhất của bản hiện tại — ghi vào mã để lượt sau đọc mã là thấy, không phải đi
+   * tìm trong ADR:
+   *
+   *   Cùng một Assistant gọi lại lệnh này bằng một cái tên `--as` khác là qua được.
+   *
+   * Nên vế dưới cưỡng chế được **hình dạng** của luật (tờ xác nhận phải mang tên một bên khác),
+   * chứ KHÔNG chứng minh *"đã có bên thứ ba thật"*. Lúc nối vào Actions, danh tính bên xác nhận
+   * phải đến từ **nguồn được xác thực** — token của workflow chạy trên máy GitHub — không từ tham
+   * số này. Đó là điều kiện TRƯỚC KHI dùng thật, và nó chưa được thoả. */
+  if (dangGiu.lane === lane) {
+    console.error(`TỪ CHỐI [SELF_ATTESTATION] — ${lane} đang giữ ${vung}, nên nó không được tự xác nhận`);
+    console.error('kết quả của chính mình. Một tờ xác nhận do bên bị kiểm ký là lời tự khai,');
+    console.error('không phải hàng rào. Bên kiểm phải là một bên khác.');
+    console.error('(Lưu ý: chỗ này so TÊN tự khai, chưa so danh tính được xác thực — xem chú thích mã.)');
+    return MA.TU_CHOI;
+  }
+  const lechTheHe = kiemTheHe(dangGiu, theHe, 'xác nhận cho');
+  if (lechTheHe !== null) return lechTheHe;
+
+  const sk = {
+    viec: 'xac-nhan', vung, boi: lane, cho: dangGiu.lane,
+    the_he: Number(theHe), sha, co_so: coSo, luc: moc()
+  };
+  const d = daySuKien(so, sk, `quyen: ${lane} xac nhan ${vung} @ ${sha.slice(0, 8)}`, remote, db.co_ref);
+  if (!d.ok) {
+    console.error('TỪ CHỐI [LOST_RACE] — sổ đổi đúng lúc ghi tờ xác nhận. Chạy lại.');
+    return MA.TU_CHOI;
+  }
+  console.log(`đã xác nhận: ${vung} @ ${sha.slice(0, 8)} cho ${dangGiu.lane} (bởi ${lane})`);
+  return MA.OK;
+}
+
+// Cửa tích hợp. Lượt KIỂM và lượt GHI là cùng một lượt đẩy — đó là cả điểm của lệnh này.
+function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
+  // Bắt buộc điền là CHƯA ĐỦ — phải kiểm điều đã điền có khớp commit thật.
+  // Phiên Codex đẩy được ba thứ qua cửa này ngày 07/09: kết quả cũ bỏ trống `--co-so` ·
+  // kết quả cũ khai một nền mà chính nó không chứa · một SHA bịa ra hoàn toàn.
+  // Ba phép kiểm đó ở `kiemSieuDuLieu` — MỘT bản dùng cho cả lệnh này lẫn `--xac-nhan`.
+  const hong = kiemSieuDuLieu({ theHe, sha, coSo });
+  if (hong !== null) return hong;
 
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
@@ -366,11 +448,8 @@ function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
     return MA.TU_CHOI;
   }
 
-  if (String(dangGiu.the_he) !== String(theHe)) {
-    console.error(`TỪ CHỐI [STALE_GENERATION] — kết quả mang thế hệ ${theHe}, quyền hiện tại là thế hệ ${dangGiu.the_he}.`);
-    console.error('Quyền đã bị thu hồi rồi cấp lại giữa lúc bạn làm. Kiểm lại rồi dựng lại.');
-    return MA.TU_CHOI;
-  }
+  const lechTheHe = kiemTheHe(dangGiu, theHe, 'kết quả mang');
+  if (lechTheHe !== null) return lechTheHe;
 
   // Đích đã đổi? So với lượt TÍCH HỢP gần nhất của cùng vùng — không so với cây làm việc của ai.
   // Cố ý: một checkout khác đang làm dở KHÔNG phải cơ sở để chặn ai (ADR-0019 ⑶).
@@ -382,7 +461,43 @@ function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
     return MA.TU_CHOI;
   }
 
-  const sk = { viec: 'tich-hop', vung, lane, the_he: Number(theHe), sha, co_so: coSo, luc: moc() };
+  /* XÁC NHẬN CỦA BÊN THỨ BA PHẢI LÀ SỰ KIỆN LIỀN TRƯỚC — chốt trả lời phiên Codex (#14, #19).
+   *
+   * Chuỗi Codex dựng ra và cả ba lượt đều thành công:
+   *   A được ghi nhận kết quả → B thu hồi quyền A → A đẩy mã vào `main`.
+   * Và câu tôi kết luận sớm: *"bật `enforce_admins` cộng một bước Actions là bịt được khe"*.
+   * SAI, và Codex chỉ đúng lý do: **một required status check gắn vào COMMIT.** Nó xanh cho C thì
+   * nó xanh mãi cho C, còn nguồn quyền thì đổi ĐỘC LẬP sau đó. Không gì chấm lại lúc tích hợp.
+   *
+   * Chốt ở đây không cần GitHub chấm lại, vì nó đổi cách hỏi: thay vì hỏi *"có tờ xác nhận nào
+   * không"*, cửa hỏi **"tờ xác nhận có phải là điều CUỐI CÙNG xảy ra với vùng này không"**.
+   *
+   * Vì sao vế đó đủ: sổ quyền là một hàng đợi có thứ tự, và mọi lượt ghi đi qua đúng một phép
+   * so-và-đổi. Nên một lượt thu hồi chen vào giữa xác nhận và tích hợp **buộc phải** nằm sau tờ
+   * xác nhận trong sổ — và lúc đó tờ xác nhận không còn là sự kiện liền trước nữa. Cửa từ chối
+   * mà không cần biết lượt thu hồi ấy nói gì.
+   *
+   * Vế thứ hai, và nó là vế làm cho tờ xác nhận có nghĩa: **bên xác nhận không được là bên đang
+   * bị kiểm.** Hai vai tự gửi "đạt" cho chính mình là tự khai, không phải hàng rào. Cưỡng chế ở
+   * `--xac-nhan`, không ở đây. */
+  const cuoiCuaVung = [...so].reverse().find((e) => e.vung === vung);
+  if (!cuoiCuaVung || cuoiCuaVung.viec !== 'xac-nhan') {
+    console.error(`TỪ CHỐI [NO_CHECK] — chưa có xác nhận của bên thứ ba cho ${vung}, hoặc đã có việc`);
+    console.error(`khác xảy ra sau nó (việc cuối: "${cuoiCuaVung?.viec ?? 'không có'}").`);
+    console.error('Xin xác nhận lại: node scripts/quyen.mjs --xac-nhan <vùng> --as <bên-kiểm> ...');
+    return MA.TU_CHOI;
+  }
+  if (cuoiCuaVung.sha !== sha || String(cuoiCuaVung.the_he) !== String(theHe) || cuoiCuaVung.cho !== lane) {
+    console.error('TỪ CHỐI [CHECK_MISMATCH] — tờ xác nhận cuối không ứng với kết quả này.');
+    console.error(`Nó xác nhận ${String(cuoiCuaVung.sha).slice(0, 8)} thế hệ ${cuoiCuaVung.the_he} cho ${cuoiCuaVung.cho};`);
+    console.error(`bạn đang đưa ${sha.slice(0, 8)} thế hệ ${theHe} cho ${lane}.`);
+    return MA.TU_CHOI;
+  }
+
+  const sk = {
+    viec: 'tich-hop', vung, lane, the_he: Number(theHe), sha, co_so: coSo,
+    xac_nhan_boi: cuoiCuaVung.boi, luc: moc()
+  };
   const d = daySuKien(so, sk, `quyen: ${lane} tich hop ${vung} @ ${sha.slice(0, 8)}`, remote, db.co_ref);
   if (!d.ok) {
     // Thu hồi chen vào ĐÚNG giữa lượt kiểm và lượt ghi. Git từ chối, nên không lọt.
@@ -391,6 +506,54 @@ function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
     return MA.TU_CHOI;
   }
   console.log(`đã nhận kết quả: ${vung} @ ${sha.slice(0, 8)} (thế hệ ${theHe})`);
+  return MA.OK;
+}
+
+/* CỬA CHO ĐƯỜNG CẬP NHẬT `main` — trả lời đúng một câu: SHA này đã được phép công bố chưa?
+ *
+ * Phiên Codex (#21) chỉ đúng chỗ mọi ca trước còn thiếu: chúng kiểm **việc ghi sổ**, không kiểm
+ * **việc cập nhật `main`**. *"Được ghi nhận"* và *"đã vào `main`"* là hai chuyện, và bản trước để
+ * chúng rời nhau hoàn toàn.
+ *
+ * Điều kiện: sự kiện CUỐI CÙNG của vùng phải là một lượt `tich-hop` cho đúng SHA này. Cùng lý lẽ
+ * như ở cửa tích hợp — sổ có thứ tự, nên một lượt thu hồi chen vào sau lượt ghi nhận sẽ đẩy lượt
+ * ghi nhận ra khỏi vị trí cuối, và câu trả lời thành KHÔNG.
+ *
+ * RANH GIỚI, tuyệt đối không đọc rộng hơn: lệnh này là **thứ mà bên đẩy phải GỌI**. Nó KHÔNG chặn
+ * được một lượt `git push` không gọi nó. Bộ kiểm có một ca đo đúng chỗ đó — đẩy bỏ qua cửa thì mã
+ * VẪN vào `main` — và ca ấy tồn tại để con số đó nằm trên giấy, chứ không để chứng minh điều ta
+ * muốn tin. Chặn thật vẫn cần cờ `enforce_admins` cộng một bước đọc sổ quyền chạy trên máy GitHub. */
+function lenhChoDay({ vung, lane, sha, remote }) {
+  if (!sha) {
+    console.error('TỪ CHỐI [MISSING_DATA] — cần --sha là commit sắp đưa vào `main`.');
+    return MA.TU_CHOI;
+  }
+
+  const db = dongBo(remote);
+  if (!db.ok) return bao(db);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+
+  const cuoi = [...ds.so].reverse().find((e) => e.vung === vung);
+  if (!cuoi || cuoi.viec !== 'tich-hop') {
+    console.error(`TỪ CHỐI [NOT_CLEARED] — ${vung}: việc cuối cùng trong sổ là "${cuoi?.viec ?? 'không có'}",`);
+    console.error('không phải một lượt ghi nhận tích hợp. Chưa được phép công bố.');
+    if (cuoi?.viec === 'thu-hoi') {
+      console.error(`Quyền đã bị thu hồi lúc ${cuoi.luc}${cuoi.lane ? ` bởi ${cuoi.lane}` : ''}.`);
+      if (cuoi.duc_chot) console.error(`Đức chốt: ${cuoi.duc_chot}`);
+    }
+    return MA.TU_CHOI;
+  }
+  if (cuoi.sha !== sha) {
+    console.error(`TỪ CHỐI [SHA_MISMATCH] — sổ ghi nhận ${String(cuoi.sha).slice(0, 8)}, bạn đang đẩy ${sha.slice(0, 8)}.`);
+    return MA.TU_CHOI;
+  }
+  if (cuoi.lane !== lane) {
+    console.error(`TỪ CHỐI [NOT_YOURS] — lượt ghi nhận đó của ${cuoi.lane}, không phải ${lane}.`);
+    return MA.TU_CHOI;
+  }
+
+  console.log(`được phép công bố: ${vung} @ ${sha.slice(0, 8)} (ghi nhận lúc ${cuoi.luc}, xác nhận bởi ${cuoi.xac_nhan_boi})`);
   return MA.OK;
 }
 
@@ -411,6 +574,8 @@ function docDoiSo(argv) {
     else if (a === '--tra') { o.lenh = 'tra'; o.vung = ke(); i += 1; }
     else if (a === '--thu-hoi') { o.lenh = 'thu-hoi'; o.vung = ke(); i += 1; }
     else if (a === '--tich-hop') { o.lenh = 'tich-hop'; o.vung = ke(); i += 1; }
+    else if (a === '--xac-nhan') { o.lenh = 'xac-nhan'; o.vung = ke(); i += 1; }
+    else if (a === '--cho-day') { o.lenh = 'cho-day'; o.vung = ke(); i += 1; }
     else if (a === '--xem') o.lenh = 'xem';
     else if (a === '--as') { o.lane = ke(); i += 1; }
     else if (a === '--viec') { o.moTa = ke(); i += 1; }
@@ -430,7 +595,10 @@ function huongDan() {
   node scripts/quyen.mjs --nhan <vùng> --as <lane> --viec "một câu"
   node scripts/quyen.mjs --tra <vùng> --as <lane>
   node scripts/quyen.mjs --thu-hoi <vùng> --as <lane> --duc "<câu chốt của Đức>"
+  node scripts/quyen.mjs --xac-nhan <vùng> --as <bên-kiểm> --the-he <n> --sha <sha> --co-so <sha>
   node scripts/quyen.mjs --tich-hop <vùng> --as <lane> --the-he <n> --sha <sha> --co-so <sha>
+
+Cửa tích hợp đòi tờ xác nhận của BÊN KHÁC, và đòi nó là điều CUỐI CÙNG xảy ra với vùng đó.
 
 Mã thoát: 0 xong · 2 gọi sai · 3 TỪ CHỐI · 4 không tới được remote · 5 sổ quyền hỏng.
 Ba mã cuối đều là fail-closed: không chắc thì KHÔNG cấp và KHÔNG nhận.`);
@@ -450,6 +618,8 @@ const chay = {
   tra: () => lenhTra(o),
   'thu-hoi': () => lenhThuHoi(o),
   'tich-hop': () => lenhTichHop(o),
+  'xac-nhan': () => lenhXacNhan(o),
+  'cho-day': () => lenhChoDay(o),
 };
 
 process.exit(chay[o.lenh]());

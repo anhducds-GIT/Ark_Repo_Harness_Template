@@ -73,6 +73,23 @@ function dungSuKienTay(cwd, cha, soCu, suKien) {
   return git(cwd, args);
 }
 
+/* Bên kiểm là một BÊN KHÁC, và đó là cả điểm của nó: một tờ xác nhận do bên bị kiểm ký là lời
+ * tự khai. Trong bản thật bên kiểm là workflow `cong-kiem` chạy trên máy GitHub; ở đây nó là một
+ * cái tên khác gọi cùng lệnh. */
+function xacNhan(cwd, remoteDuong, vung, boi, theHe, sha, coSo) {
+  /* Bên kiểm phải LẤY VỀ trước: nó kiểm commit của bên khác, và cửa từ chối một SHA nó không tự
+   * kiểm được (`UNKNOWN_COMMIT`). Bản thật cũng vậy — workflow clone rồi mới chấm.
+   *
+   * Lấy cả `refs/ark/*`, vì ỨNG VIÊN không nằm trên `main`. Phát hiện lúc dựng ca ⑪: nếu ứng viên
+   * chỉ nằm trong checkout của A thì bên kiểm **không thấy được nó**, và cửa từ chối đúng
+   * (`UNKNOWN_COMMIT`). Nên luồng phải có một chỗ công bố ứng viên **không phải `main`** — y như
+   * nhánh của một pull request. Ở đây là `refs/ark/ung-vien/<lane>`. */
+  gitThu(cwd, ['fetch', '--quiet', 'origin']);
+  gitThu(cwd, ['fetch', '--quiet', 'origin', '+refs/ark/ung-vien/*:refs/ark/ung-vien/*']);
+  return chayQuyen(cwd, ['--xac-nhan', vung, '--as', boi, '--the-he', theHe,
+    '--sha', sha, '--co-so', coSo, '--remote', remoteDuong]);
+}
+
 function docSoTu(cwd, ref = REF) {
   const r = gitThu(cwd, ['show', `${ref}:${TEP}`]);
   if (r.ma !== 0) return [];
@@ -187,6 +204,10 @@ console.log('\nCa ③b — thu hồi chen vào khe fetch/push của chính lện
   const r = chayQuyen(A, ['--nhan', 'goi-r', '--as', 'lane-A', '--viec', 'A lam goi R', '--remote', remote]);
   const g = /THE_HE=(\d+)/.exec(r.ra)[1];
 
+  // Phải có tờ xác nhận trước, không thì lệnh dừng ở `NO_CHECK` và không tới lượt đẩy — tức hook
+  // không nổ và ca đua này không kiểm được gì. Một ca đua dừng trước cửa đua là ca đua rỗng.
+  xacNhan(B, remote, 'goi-r', 'lane-B', g, SHA_GOC, SHA_GOC);
+
   const co = path.join(san, 'da-chen').replace(/\\/g, '/');
   const hook = path.join(A, '.git', 'hooks', 'pre-push');
   fs.writeFileSync(hook, [
@@ -228,6 +249,8 @@ console.log('\nCa ③c — remote tiến lên sau lượt fetch, trước lượ
 {
   const r = chayQuyen(A, ['--nhan', 'goi-q', '--as', 'lane-A', '--viec', 'A lam goi Q', '--remote', remote]);
   const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  xacNhan(B, remote, 'goi-q', 'lane-B', g, SHA_GOC, SHA_GOC);
 
   const nap = path.join(san, 'nap-chen-q').replace(/\\/g, '/');
   const daNo = path.join(san, 'da-no-q').replace(/\\/g, '/');
@@ -323,6 +346,7 @@ console.log('\nCa ④b — cùng lane nhưng kết quả mang thế hệ cũ');
   const rCu = chayQuyen(B, ['--tich-hop', 'goi-s', '--as', 'lane-B', '--the-he', g1, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   xong('kết quả mang thế hệ cũ bị từ chối dù vẫn đúng chủ', rCu.ma === 3 && /STALE_GENERATION/.test(rCu.ra));
 
+  xacNhan(A, remote, 'goi-s', 'lane-A', g2, SHA_GOC, SHA_GOC);
   const rMoi = chayQuyen(B, ['--tich-hop', 'goi-s', '--as', 'lane-B', '--the-he', g2, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   xong('thế hệ đúng thì vào được', rMoi.ma === 0);
   chayQuyen(B, ['--tra', 'goi-s', '--as', 'lane-B', '--remote', remote]);
@@ -339,6 +363,7 @@ console.log('\nCa ⑤ — đích đã đổi khiến kết quả không còn tư
   git(B, ['reset', '--quiet', '--hard', 'origin/main']);
   const sha1 = git(B, ['rev-parse', 'HEAD']);
 
+  xacNhan(A, remote, 'goi-v', 'lane-A', g, sha1, sha1);
   const r1 = chayQuyen(B, ['--tich-hop', 'goi-v', '--as', 'lane-B', '--the-he', g, '--sha', sha1, '--co-so', sha1, '--remote', remote]);
   xong('lượt tích hợp đầu vào được', r1.ma === 0);
 
@@ -351,6 +376,7 @@ console.log('\nCa ⑤ — đích đã đổi khiến kết quả không còn tư
   const banA = git(A, ['status', '--porcelain']);
   xong('checkout A thật sự đang bẩn', banA.length > 0);
 
+  xacNhan(A, remote, 'goi-v', 'lane-A', g, sha1, sha1);
   const r3 = chayQuyen(B, ['--tich-hop', 'goi-v', '--as', 'lane-B', '--the-he', g, '--sha', sha1, '--co-so', sha1, '--remote', remote]);
   xong('B vẫn tích hợp được dù A đang làm dở (không chặn quá rộng)', r3.ma === 0);
   fs.rmSync(path.join(A, 'dang-lam-do.txt'));
@@ -370,6 +396,7 @@ console.log('\nCa ⑥ — đường hợp lệ đi hết được');
   git(A, ['push', '--quiet', 'origin', 'main']);
   const sha = git(A, ['rev-parse', 'HEAD']);
 
+  xacNhan(B, remote, 'goi-u', 'lane-B', g, sha, sha);
   const rTich = chayQuyen(A, ['--tich-hop', 'goi-u', '--as', 'lane-A', '--the-he', g, '--sha', sha, '--co-so', sha, '--remote', remote]);
   xong('ghi nhận tích hợp', rTich.ma === 0);
 
@@ -425,6 +452,7 @@ console.log('\nCa ⑦ — thông tin kết quả phải khớp commit thật');
   xong('nền khai KHÔNG nằm trong commit kết quả thì bị từ chối',
     rLech.ma === 3 && /BASE_NOT_IN_RESULT/.test(rLech.ra));
 
+  xacNhan(B, remote, 'goi-n', 'lane-B', g, dinh, dinh);
   const rDung = chayQuyen(A, ['--tich-hop', 'goi-n', '--as', 'lane-A', '--the-he', g,
     '--sha', dinh, '--co-so', dinh, '--remote', remote]);
   xong('thông tin khớp thật thì vào được', rDung.ma === 0);
@@ -492,6 +520,189 @@ console.log('\nCa ⑨ — hai lượt nhận quyền cạnh tranh thật');
   const rXem = chayQuyen(B, ['--xem', '--remote', remote]);
   const chuP = /GIỮ  goi-p  →  (\S+)/.exec(rXem.ra);
   xong('đúng MỘT bên giữ goi-p, và đó là bên vào trước', chuP?.[1] === 'lane-B', chuP?.[1] || 'không ai giữ');
+}
+
+// ── Ca ⑩ — CHUỖI CODEX: xác nhận đã xanh, rồi quyền bị thu hồi TRƯỚC lúc tích hợp ─────────────
+
+/* Đây là ca phiên Codex đặt ra ở #14 và nhắc lại ở #19, và nó bác một câu tôi kết luận sớm:
+ * *"bật `enforce_admins` cộng một bước Actions là bịt được khe quyền/main."* Codex chỉ đúng lý do:
+ * **required status check gắn vào COMMIT** — xanh cho C thì xanh mãi cho C, còn nguồn quyền đổi
+ * ĐỘC LẬP sau đó, và không gì chấm lại lúc tích hợp.
+ *
+ * Chốt ở đây không đòi GitHub chấm lại. Nó đổi CÂU HỎI: không hỏi *"có tờ xác nhận nào không"*
+ * mà hỏi *"tờ xác nhận có phải điều CUỐI CÙNG xảy ra với vùng này không"*. Sổ quyền có thứ tự và
+ * mọi lượt ghi đi qua một phép so-và-đổi, nên một lượt thu hồi chen vào **buộc phải** nằm sau tờ
+ * xác nhận — và lúc đó tờ xác nhận hết hiệu lực. */
+console.log('\nCa ⑩ — xác nhận xanh rồi quyền bị thu hồi trước lúc tích hợp  ⬅ chuỗi Codex');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-k', '--as', 'lane-A', '--viec', 'A lam goi K', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  const rXac = xacNhan(B, remote, 'goi-k', 'lane-B', g, SHA_GOC, SHA_GOC);
+  xong('bên thứ ba xác nhận được kết quả của A', rXac.ma === 0 && /đã xác nhận/.test(rXac.ra));
+
+  // Kết quả KHÔNG đổi. Chỉ nguồn quyền đổi — đúng ca Codex mô tả.
+  const rThu = chayQuyen(B, ['--thu-hoi', 'goi-k', '--as', 'lane-B', '--duc', 'Duc chot: K sang B', '--remote', remote]);
+  xong('quyền của A bị thu hồi SAU khi xác nhận đã xanh', rThu.ma === 0);
+
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-k', '--as', 'lane-A', '--the-he', g,
+    '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
+  xong('tích hợp BỊ TỪ CHỐI dù tờ xác nhận vẫn còn trong sổ', rTich.ma === 3);
+  xong('lý do là mất quyền, không phải "thiếu xác nhận"',
+    /AUTHORITY_REVOKED/.test(rTich.ra), /\[([A-Z_]+)\]/.exec(rTich.ra)?.[1] || '');
+
+  const so = docSoTu(A);
+  xong('sổ KHÔNG có lượt tích hợp nào cho goi-k',
+    !so.some((e) => e.viec === 'tich-hop' && e.vung === 'goi-k'));
+  xong('tờ xác nhận vẫn nằm đó — nó hết hiệu lực, không bị xoá',
+    so.some((e) => e.viec === 'xac-nhan' && e.vung === 'goi-k'));
+}
+
+// ── Ca ⑩b — tờ xác nhận CŨ: có việc khác xảy ra sau nó ────────────────────────────────────────
+
+/* Ca ⑩ bị chặn bởi phép kiểm "còn là chủ không", tức lớp cũ. Ca này kiểm ĐÚNG lớp mới: A VẪN là
+ * chủ, thế hệ VẪN đúng, tờ xác nhận VẪN của A — nhưng có một việc khác chen vào sau nó. */
+console.log('\nCa ⑩b — tờ xác nhận không còn là điều cuối cùng xảy ra');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-j', '--as', 'lane-A', '--viec', 'A lam goi J', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  xacNhan(B, remote, 'goi-j', 'lane-B', g, SHA_GOC, SHA_GOC);
+  // Việc khác chen vào CÙNG VÙNG: một tờ xác nhận thứ hai cho một SHA khác.
+  git(A, ['fetch', '--quiet', 'origin']);
+  const shaKhac = git(A, ['rev-parse', 'HEAD']);
+  xacNhan(B, remote, 'goi-j', 'lane-B', g, shaKhac, SHA_GOC);
+
+  const rCu = chayQuyen(A, ['--tich-hop', 'goi-j', '--as', 'lane-A', '--the-he', g,
+    '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
+  xong('tờ xác nhận bị tờ mới hơn thay thế thì không dùng được',
+    rCu.ma === 3 && /CHECK_MISMATCH/.test(rCu.ra));
+
+  const rMoi = chayQuyen(A, ['--tich-hop', 'goi-j', '--as', 'lane-A', '--the-he', g,
+    '--sha', shaKhac, '--co-so', SHA_GOC, '--remote', remote]);
+  xong('tờ xác nhận MỚI NHẤT thì dùng được', rMoi.ma === 0, `mã ${rMoi.ma}`);
+  chayQuyen(A, ['--tra', 'goi-j', '--as', 'lane-A', '--remote', remote]);
+}
+
+// ── Ca ⑩c — bên bị kiểm không được tự xác nhận mình ──────────────────────────────────────────
+
+/* Vế làm cho tờ xác nhận có nghĩa gì cả. Chính tôi nêu câu này rồi tự quên nó ở bản đầu:
+ * *"một status check chỉ là hàng rào thật nếu thứ GỬI trạng thái không phải thứ ĐANG BỊ kiểm."* */
+console.log('\nCa ⑩c — tự xác nhận cho chính mình');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-h', '--as', 'lane-A', '--viec', 'A lam goi H', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  const rTu = xacNhan(A, remote, 'goi-h', 'lane-A', g, SHA_GOC, SHA_GOC);
+  xong('chủ vùng KHÔNG tự xác nhận được', rTu.ma === 3 && /SELF_ATTESTATION/.test(rTu.ra));
+
+  const rKhongXac = chayQuyen(A, ['--tich-hop', 'goi-h', '--as', 'lane-A', '--the-he', g,
+    '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
+  xong('không có xác nhận thì không tích hợp được', rKhongXac.ma === 3 && /NO_CHECK/.test(rKhongXac.ra));
+
+  const rBen = xacNhan(B, remote, 'goi-h', 'lane-B', g, SHA_GOC, SHA_GOC);
+  xong('bên KHÁC thì xác nhận được', rBen.ma === 0);
+
+  const rXong = chayQuyen(A, ['--tich-hop', 'goi-h', '--as', 'lane-A', '--the-he', g,
+    '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
+  xong('có xác nhận của bên khác thì đi được', rXong.ma === 0);
+
+  const so = docSoTu(A);
+  const th = [...so].reverse().find((e) => e.viec === 'tich-hop' && e.vung === 'goi-h');
+  xong('sổ ghi lại AI đã xác nhận', th?.xac_nhan_boi === 'lane-B', th?.xac_nhan_boi || 'không ghi');
+  chayQuyen(A, ['--tra', 'goi-h', '--as', 'lane-A', '--remote', remote]);
+}
+
+// ── Ca ⑩d — việc ở vùng KHÁC không làm hỏng tờ xác nhận ──────────────────────────────────────
+
+/* Vế chống chặn quá rộng. Nếu "điều cuối cùng xảy ra" tính trên CẢ SỔ thì hai vai chạy song song
+ * sẽ liên tục làm hết hiệu lực tờ xác nhận của nhau — đúng thứ kiến trúc này sinh ra để tránh. */
+console.log('\nCa ⑩d — việc ở vùng khác không làm hết hiệu lực tờ xác nhận');
+{
+  const rG = chayQuyen(A, ['--nhan', 'goi-g', '--as', 'lane-A', '--viec', 'A lam goi G', '--remote', remote]);
+  const gG = /THE_HE=(\d+)/.exec(rG.ra)[1];
+  xacNhan(B, remote, 'goi-g', 'lane-B', gG, SHA_GOC, SHA_GOC);
+
+  // Vùng khác hoạt động rôm rả ở giữa.
+  chayQuyen(B, ['--nhan', 'goi-f', '--as', 'lane-B', '--viec', 'B lam goi F', '--remote', remote]);
+  chayQuyen(B, ['--tra', 'goi-f', '--as', 'lane-B', '--remote', remote]);
+
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-g', '--as', 'lane-A', '--the-he', gG,
+    '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
+  xong('A vẫn tích hợp được dù vùng khác vừa có hai lượt ghi', rTich.ma === 0, `mã ${rTich.ma}`);
+  chayQuyen(A, ['--tra', 'goi-g', '--as', 'lane-A', '--remote', remote]);
+}
+
+// ── Ca ⑪ — QUAN SÁT `main` THẬT: xác nhận → ghi nhận → thu hồi → thử đưa mã vào `main` ────────
+
+/* Phiên Codex (#21) chỉ đúng chỗ mọi ca trên còn thiếu: chúng kiểm **việc ghi sổ**, không kiểm
+ * **việc cập nhật `main`**. Ca này đọc **SHA thật của `main`** ở cả hai phía mỗi lượt thử.
+ *
+ * Và nó cố ý đo CẢ HAI ĐƯỜNG. Nếu chỉ đo đường "đi qua cửa" thì tôi đang chứng minh đúng cái mình
+ * muốn tin; đường "bỏ qua cửa" là đường nói ra khoảng trống còn lại, và con số đó phải nằm trên
+ * giấy. */
+console.log('\nCa ⑪ — thu hồi sau khi đã ghi nhận, rồi thử đưa mã vào `main`  ⬅ quan sát main thật');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-m2', '--as', 'lane-A', '--viec', 'A lam goi M2', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  git(A, ['fetch', '--quiet', 'origin']);
+  git(A, ['reset', '--quiet', '--hard', 'origin/main']);
+  const nen = git(A, ['rev-parse', 'HEAD']);
+  fs.writeFileSync(path.join(A, 'goi-m2.txt'), 'ket qua cua A\n');
+  git(A, ['add', '-A']);
+  git(A, ['commit', '--quiet', '-m', 'A: ket qua goi M2']);
+  const C = git(A, ['rev-parse', 'HEAD']);
+
+  // Công bố ỨNG VIÊN ở một ref riêng — bên kiểm đọc được mà `main` không bị chạm.
+  git(A, ['push', '--quiet', 'origin', `${C}:refs/ark/ung-vien/lane-A`]);
+  const mainSauCongBo = git(A, ['ls-remote', remote, 'main']).split(/\s+/)[0];
+
+  xacNhan(B, remote, 'goi-m2', 'lane-B', g, C, nen);
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-m2', '--as', 'lane-A', '--the-he', g,
+    '--sha', C, '--co-so', nen, '--remote', remote]);
+  xong('công bố ứng viên KHÔNG chạm `main`', mainSauCongBo === nen,
+    `main vẫn ở ${String(mainSauCongBo).slice(0, 8)}`);
+  xong('ghi nhận tích hợp xong', rTich.ma === 0, rTich.ma === 0 ? '' : `mã ${rTich.ma}`);
+
+  const rTruoc = chayQuyen(A, ['--cho-day', 'goi-m2', '--as', 'lane-A', '--sha', C, '--remote', remote]);
+  xong('trước khi thu hồi: cửa CHO công bố', rTruoc.ma === 0 && /được phép công bố/.test(rTruoc.ra));
+
+  // Giấy phép gắn vào ĐÚNG MỘT SHA và ĐÚNG MỘT lane — không phải một tấm vé dùng chung.
+  const rLechSha = chayQuyen(A, ['--cho-day', 'goi-m2', '--as', 'lane-A', '--sha', nen, '--remote', remote]);
+  xong('giấy phép không dùng được cho SHA khác', rLechSha.ma === 3 && /SHA_MISMATCH/.test(rLechSha.ra));
+
+  const rLechLane = chayQuyen(B, ['--cho-day', 'goi-m2', '--as', 'lane-B', '--sha', C, '--remote', remote]);
+  xong('giấy phép của lane khác không dùng được', rLechLane.ma === 3 && /NOT_YOURS/.test(rLechLane.ra));
+
+  // Thu hồi SAU khi đã ghi nhận. Kết quả C không đổi một byte.
+  const rThu = chayQuyen(B, ['--thu-hoi', 'goi-m2', '--as', 'lane-B', '--duc', 'Duc chot: dung lai M2', '--remote', remote]);
+  xong('quyền bị thu hồi SAU lượt ghi nhận', rThu.ma === 0);
+
+  const mainTruoc = git(A, ['ls-remote', remote, 'main']).split(/\s+/)[0];
+
+  // ĐƯỜNG 1 — đi qua cửa.
+  const rSau = chayQuyen(A, ['--cho-day', 'goi-m2', '--as', 'lane-A', '--sha', C, '--remote', remote]);
+  xong('sau khi thu hồi: cửa TỪ CHỐI công bố', rSau.ma === 3 && /NOT_CLEARED/.test(rSau.ra));
+  xong('câu từ chối nói rõ quyền bị thu hồi lúc nào', /Quyền đã bị thu hồi lúc/.test(rSau.ra));
+  xong('kèm câu chốt của Đức', /dung lai M2/.test(rSau.ra));
+
+  const mainGiua = git(A, ['ls-remote', remote, 'main']).split(/\s+/)[0];
+  xong('`main` KHÔNG đổi khi bên đẩy tuân thủ cửa', mainGiua === mainTruoc,
+    `${String(mainTruoc).slice(0, 8)} → ${String(mainGiua).slice(0, 8)}`);
+
+  // ĐƯỜNG 2 — BỎ QUA cửa. Đây là khoảng trống, và nó phải được đo chứ không được che.
+  const rDay = gitThu(A, ['push', 'origin', 'main']);
+  const mainSau = git(A, ['ls-remote', remote, 'main']).split(/\s+/)[0];
+  xong('BỎ QUA cửa thì mã VẪN vào `main` — khoảng trống còn nguyên',
+    rDay.ma === 0 && mainSau === C,
+    `main ${String(mainTruoc).slice(0, 8)} → ${String(mainSau).slice(0, 8)}`);
+
+  // Và sổ quyền nói ngược lại với `main`: đó chính là hình dạng của khoảng trống.
+  const rVanTuChoi = chayQuyen(A, ['--cho-day', 'goi-m2', '--as', 'lane-A', '--sha', C, '--remote', remote]);
+  xong('sổ quyền VẪN nói không được phép, dù mã đã nằm trong `main`', rVanTuChoi.ma === 3);
+  xong('nên khoảng trống PHÁT HIỆN ĐƯỢC, chỉ chưa NGĂN được',
+    mainSau === C && rVanTuChoi.ma === 3);
 }
 
 // ── Fail-closed ────────────────────────────────────────────────────────────────────────────────
