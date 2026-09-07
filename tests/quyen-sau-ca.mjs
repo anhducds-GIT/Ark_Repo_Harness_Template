@@ -174,6 +174,91 @@ console.log('\nCa ③ — thu hồi chen vào ĐÚNG giữa lượt kiểm và l
     `${soThat.length} sự kiện`);
 }
 
+// ── Ca ③b — chen ĐÚNG vào khe giữa `fetch` và `push` của chính lệnh ────────────────────────────
+
+// Ca ③ ở trên dựng commit bằng tay, nên nó kiểm hành vi của GIT, không kiểm lượt đẩy của MÃ.
+// Đột biến đo 07/09: đổi lượt đẩy thành `--force` thì cả 33 phép kiểm vẫn xanh — tức phép
+// so-và-đổi, thứ chịu toàn bộ việc phân xử, KHÔNG có gì canh.
+//
+// Chen được deterministic bằng hook `pre-push`: hook chạy TRƯỚC khi lượt đẩy được gửi, nên nó
+// là chỗ duy nhất từ bên ngoài chạm được vào khe giữa `fetch` và `push` bên trong lệnh.
+console.log('\nCa ③b — thu hồi chen vào khe fetch/push của chính lệnh');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-r', '--as', 'lane-A', '--viec', 'A lam goi R', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  const co = path.join(san, 'da-chen').replace(/\\/g, '/');
+  const hook = path.join(A, '.git', 'hooks', 'pre-push');
+  fs.writeFileSync(hook, [
+    '#!/bin/sh',
+    `[ -f "${co}" ] && exit 0`,
+    `: > "${co}"`,
+    `cd "${B}" && node "${QUYEN.replace(/\\/g, '/')}" --thu-hoi goi-r --as lane-B --duc "chen giua khe" --remote "${remote}" >/dev/null 2>&1`,
+    'exit 0',
+  ].join('\n'));
+  fs.chmodSync(hook, 0o755);
+
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-r', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--remote', remote]);
+  fs.rmSync(hook);
+
+  xong('hook thật sự đã chen', fs.existsSync(co));
+  xong('lượt đẩy của lệnh bị từ chối tại cửa', rTich.ma === 3 && /RACE_AT_GATE/.test(rTich.ra));
+
+  git(B, ['fetch', '--quiet', remote, `+${REF}:${REF}`]);
+  const so = docSoTu(B);
+  xong('lượt thu hồi của B KHÔNG bị ghi đè',
+    so.some((e) => e.viec === 'thu-hoi' && e.vung === 'goi-r'));
+  xong('kết quả của A KHÔNG có trong sổ',
+    !so.some((e) => e.viec === 'tich-hop' && e.vung === 'goi-r'));
+}
+
+// ── Ca ③c — bản ref cục bộ hoá cũ NGAY SAU lượt fetch ─────────────────────────────────────────
+
+// Ca ③b chen vào trong MỘT kết nối đẩy, và ở đó git tự bảo vệ: nó gửi kèm giá-trị-cũ lấy từ
+// lượt quảng bá ref, nên server từ chối kể cả khi có `--force`. Đo 07/09: đột biến đổi lượt đẩy
+// thành `--force` vẫn xanh cả 37 phép kiểm vì thế.
+//
+// Cửa sổ THẬT nằm ở chỗ khác: remote tiến lên SAU lượt `fetch` mà TRƯỚC lúc mở kết nối đẩy.
+// Lúc đó bản cục bộ đã cũ, và `--force` ghi đè — xoá luôn sự kiện thu hồi của bên kia. Đo tay:
+// đẩy trần bị từ chối, `--force` "forced update" thành công.
+//
+// Chen được deterministic bằng hook `reference-transaction`: nó nổ đúng lúc lượt `fetch` bên
+// trong lệnh cập nhật ref cục bộ.
+console.log('\nCa ③c — remote tiến lên sau lượt fetch, trước lượt đẩy');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-q', '--as', 'lane-A', '--viec', 'A lam goi Q', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  const nap = path.join(san, 'nap-chen-q').replace(/\\/g, '/');
+  const daNo = path.join(san, 'da-no-q').replace(/\\/g, '/');
+  const hook = path.join(A, '.git', 'hooks', 'reference-transaction');
+  fs.writeFileSync(hook, [
+    '#!/bin/sh',
+    '[ "$1" = "committed" ] || exit 0',
+    `[ -f "${nap}" ] || exit 0`,
+    `[ -f "${daNo}" ] && exit 0`,
+    `: > "${daNo}"`,
+    `cd "${B}" && node "${QUYEN.replace(/\\/g, '/')}" --thu-hoi goi-q --as lane-B --duc "chen sau fetch" --remote "${remote}" >/dev/null 2>&1`,
+    'exit 0',
+  ].join('\n'));
+  fs.chmodSync(hook, 0o755);
+  fs.writeFileSync(nap, '');
+
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-q', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--remote', remote]);
+  fs.rmSync(hook);
+  fs.rmSync(nap);
+
+  xong('hook nổ đúng khe sau fetch', fs.existsSync(daNo));
+  xong('lệnh KHÔNG báo thành công', rTich.ma !== 0, `mã ${rTich.ma}`);
+
+  git(B, ['fetch', '--quiet', remote, `+${REF}:${REF}`]);
+  const so = docSoTu(B);
+  xong('lượt thu hồi của B còn nguyên trên remote',
+    so.some((e) => e.viec === 'thu-hoi' && e.vung === 'goi-q'));
+  xong('kết quả của A không lọt vào sổ',
+    !so.some((e) => e.viec === 'tich-hop' && e.vung === 'goi-q'));
+}
+
 // ── Ca ④ — CA CHỊU TẢI: quyền cũ SAU fetch + rebase ────────────────────────────────────────────
 
 console.log('\nCa ④ — quyền cũ sau fetch + rebase  ⬅ ca đã bác được ADR-0018');

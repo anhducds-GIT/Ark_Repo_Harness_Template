@@ -17,9 +17,14 @@
 //   ⑵ LƯỢT TÍCH HỢP CŨNG LÀ MỘT SỰ KIỆN trên chính ref đó. Nên lượt kiểm quyền và lượt ghi kết
 //      quả là MỘT lượt đẩy — không có khe giữa hai bước để một lượt thu hồi chen vào.
 //
-//   ⑶ Đẩy TRẦN, không `--force`. Đẩy tới một ref chỉ đi được khi remote đang ở đúng commit mà ta
-//      lấy làm cha. Ai vào trước thì người sau BỊ TỪ CHỐI và biết ngay. Đó là phép phân xử, và nó
-//      do git làm, không do mã ở đây làm.
+//   ⑶ Đẩy TRẦN, không `--force`. Phép phân xử do git làm, không do mã ở đây làm — nhưng nó là
+//      HAI lớp khác nhau, và đo 07/09 mới tách được:
+//        · Trong MỘT kết nối đẩy: git gửi kèm giá-trị-cũ lấy từ lượt quảng bá ref, nên remote
+//          đổi giữa lúc quảng bá và lúc ghi thì server từ chối — `--force` KHÔNG tắt được vế này.
+//        · Sau lượt `fetch` mà TRƯỚC lúc mở kết nối: bản cục bộ hoá cũ. Ở đây đẩy trần bị từ
+//          chối vì không fast-forward, còn `--force` thì GHI ĐÈ và xoá mất sự kiện của bên kia.
+//      Nên "không `--force`" là lớp bảo vệ duy nhất ở cửa sổ thứ hai, và nó có phép kiểm riêng
+//      (ca ③c). Đừng thêm `--force` để chữa một lượt `LOST_RACE` khó chịu.
 //
 // Ranh giới — khai thẳng, đừng để lượt sau tin sai chỗ:
 //   CHẶN ĐƯỢC:            nhận quyền · thu hồi · ghi nhận tích hợp (git phân xử trên một ref).
@@ -130,7 +135,7 @@ function daySuKien(so, suKien, moTa, remote, coRef) {
   if (coRef) args.push('-p', git(['rev-parse', REF]));
   const commit = git(args);
 
-  // Đẩy TRẦN. Không fast-forward thì git từ chối — đó chính là phép so-và-đổi ta cần.
+  // Đẩy TRẦN. KHÔNG thêm `--force` — xem chốt ⑶ ở đầu file và ca ③c của bộ kiểm.
   const p = thu(['push', '--quiet', remote, `${commit}:${REF}`]);
   if (!p.ok) return { ok: false, ma: MA.TU_CHOI, ly_do: 'LOST_RACE', chi_tiet: p.ra };
 
