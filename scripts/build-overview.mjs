@@ -239,6 +239,12 @@ const CSS = `
 .mh-mui .ky{font-size:20px;color:var(--nhan);line-height:1}
 .mh-mui .nh{font-family:var(--mono);font-size:9.6px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--mo);text-align:center;line-height:1.3}
+.mh-vai{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 0}
+.mh-vai .mh-cot{gap:8px}
+.mh-vai .giu{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--nhan)}
+.mh-bat{margin:8px 0 0;background:var(--nen);border:1px solid var(--vien);border-radius:9px;
+  padding:9px 12px;font-size:13px;line-height:1.5;color:var(--chu)}
 .mh-vong{margin:8px 0 0;background:var(--nhan-nen);border:1px dashed var(--nhan);border-radius:9px;
   padding:10px 13px;font-size:13px;line-height:1.5;color:var(--chu)}
 .mh-vong b{color:var(--nhan)}
@@ -246,6 +252,7 @@ const CSS = `
   .mh{grid-template-columns:1fr}
   .mh-mui{flex-direction:row;padding:7px 0;min-width:0}
   .mh-mui .ky{transform:rotate(90deg)}
+  .mh-vai{grid-template-columns:1fr}
 }
 
 /* ---- NĂM TAB MỚI (06/09) — mượn hình từ bảng repo Chrome Extension -------------------
@@ -859,6 +866,57 @@ export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [
       muc("<code>.ark/harness.lock.json</code> — ghim đang dùng bản khung nào")])
   ].join("");
 
+  /* HAI VAI ASSISTANT — Đức phân vai 08/09, và ranh giới suy THẲNG từ ba khối ở trên.
+   *
+   * Vì sao khối này nằm CHUNG tab với mô hình vận hành, không thành tab riêng: nó không phải một
+   * câu chuyện thứ hai, nó là câu *"ai giữ khối nào"* của đúng sơ đồ ngay trên nó. Tách ra tab
+   * riêng thì người đọc phải tự ghép hai trang lại, và mỗi lần một khối đổi thì hai trang lệch
+   * nhau — đúng bệnh mà trang này sinh ra để chữa.
+   *
+   * TÊN VAI VÀ TRÁCH NHIỆM LÀ GÕ TAY, và đó không phải chỗ lười: nó là một QUYẾT ĐỊNH của Đức,
+   * không phải một số đo. Nhưng mỗi thẻ vai phải chở một con số SUY TỪ REPO — nếu không thì ba
+   * tháng nữa nó nói về một bộ khung không còn tồn tại. Ranh giới rõ ràng: chữ là quyết định,
+   * số là đo được. */
+  const soSuite = soPhepKiem === null ? "suite" : `<b>${soPhepKiem}</b> suite`;
+  const vai = `<div class="mh-vai">
+    <div class="mh-cot loi">
+      <span class="mh-so">Vai ①</span>
+      <span class="mh-ten">Giữ lõi</span>
+      <span class="giu">giữ Khối 1</span>
+      <p class="mh-mota">Bộ khung phải còn đúng với chính nó. Vai này không đi ra ngoài.</p>
+      ${hop("Việc chính", [
+    muc("luật · bộ máy · trạng thái — ba tầng cổng đóng phiên canh"),
+    muc(`<b>${lenh.length}</b> lệnh và ${soSuite} phải còn chạy đúng`),
+    muc("mỗi bản vá kèm <b>một phép kiểm ghim</b>, không vá trần"),
+    muc("<b>xoá luật không nổ lần nào</b> — thêm luật phải kể tên luật nó thay")
+  ])}
+      ${hop("Không được làm", [
+    muc("không tự nới một lớp bảo vệ cho cổng xanh"),
+    muc("không tự ký nghiệm thu việc của chính mình")
+  ])}
+    </div>
+    <div class="mh-cot">
+      <span class="mh-so">Vai ②</span>
+      <span class="mh-ten">Phát &amp; thu</span>
+      <span class="giu">giữ hai mũi + vòng ngược</span>
+      <p class="mh-mota">Cửa duy nhất giữa bộ khung và thế giới. Vai này đi ra ngoài, rồi mang chỗ vấp về.</p>
+      ${hop("Việc chính", [
+    muc(`thi hành <b>${protocols.length}</b> quy trình lên <b>${dichDen.length}</b> repo đích`),
+    muc("gói bản phát, đo repo đích, ghép đề bài rồi giao"),
+    muc("<b>mang chỗ vấp về</b> thành mục sổ nợ của lõi — đây là việc chịu tải"),
+    muc("<b>tối ưu chính quy trình</b>: cửa nào chặn 0 lượt thì cửa đó là thuế")
+  ])}
+      ${hop("Không được làm", [
+    muc("không tự sửa lõi để repo đích chạy được — chỗ vấp phải về Vai ①"),
+    muc("không báo một quy trình là ĐẠT khi chưa chạy thật trên một repo đích")
+  ])}
+    </div>
+  </div>
+  <div class="mh-bat"><b>Ranh giới chịu tải, và nó chỉ có một câu:</b> Vai ② được <em>phát hiện</em>,
+  Vai ① được <em>sửa</em>. Vai ② mang một chỗ vấp về; Vai ① biến nó thành bản vá cộng một phép kiểm
+  ghim. Gộp hai vai lại thì người tìm ra lỗi cũng là người tự chấm bản sửa của mình — và một tờ
+  nghiệm thu do bên bị kiểm ký là lời tự khai, không phải hàng rào.</div>`;
+
   return `<div class="the">
   <h2>Mô hình vận hành — ba khối</h2>
   <p>Bộ khung không phải một thư mục file đem chép. Nó là <strong>một khối dữ liệu lõi</strong>
@@ -892,6 +950,11 @@ export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [
     tái diễn. Ba lượt migrate đầu tìm ra <b>9 · 8 · và một loạt</b> lỗi <em>của chính bộ khung</em>
     — không phải của repo đích. Không có vòng ngược thì lõi chỉ đúng trên giấy.
   </div>
+  <h3 style="margin:16px 0 0">Hai vai Assistant — ai giữ khối nào</h3>
+  <p class="mh-mota" style="margin:4px 0 0">Ba khối trên cần <strong>hai vai</strong>, không phải
+  ba: Khối 1 là việc ở nhà, còn hai mũi và vòng ngược là <strong>cùng một việc</strong> —
+  đi ra rồi mang về. Chia theo khối thì vai giữa không có gì làm; chia theo hướng đi thì đủ.</p>
+  ${vai}
 </div>`;
 }
 

@@ -55,6 +55,12 @@
 .mh-mui .ky{font-size:20px;color:var(--nhan);line-height:1}
 .mh-mui .nh{font-family:var(--mono);font-size:9.6px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--mo);text-align:center;line-height:1.3}
+.mh-vai{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 0}
+.mh-vai .mh-cot{gap:8px}
+.mh-vai .giu{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--nhan)}
+.mh-bat{margin:8px 0 0;background:var(--nen);border:1px solid var(--vien);border-radius:9px;
+  padding:9px 12px;font-size:13px;line-height:1.5;color:var(--chu)}
 .mh-vong{margin:8px 0 0;background:var(--nhan-nen);border:1px dashed var(--nhan);border-radius:9px;
   padding:10px 13px;font-size:13px;line-height:1.5;color:var(--chu)}
 .mh-vong b{color:var(--nhan)}
@@ -62,6 +68,7 @@
   .mh{grid-template-columns:1fr}
   .mh-mui{flex-direction:row;padding:7px 0;min-width:0}
   .mh-mui .ky{transform:rotate(90deg)}
+  .mh-vai{grid-template-columns:1fr}
 }
 
 /* ---- NĂM TAB MỚI (06/09) — mượn hình từ bảng repo Chrome Extension -------------------
@@ -368,7 +375,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
 @keyframes hien{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 </style>
 <div class="wrap">
-  <div class="cu" data-sinh="2026-09-07"></div>
+  <div class="cu" data-sinh="2026-09-08"></div>
   <header>
     <h1>Ark Repo Harness</h1>
     <p class="sub">Bộ khung để một repo tự trông coi lấy mình — cửa kiểm chặn việc dở, luật cho AI đọc, lịch bảo trì. Dựng xong thì AI là người ở lại trông nhà.</p>
@@ -380,7 +387,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
     </details>
     <div class="nhan-hang">
       <span class="chip">v1.3.37</span>
-      <span>sinh 2026-09-07</span>
+      <span>sinh 2026-09-08</span>
     </div>
   </header>
 
@@ -389,18 +396,18 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   </nav>
 
   <section class="tab" id="tab-tong-quan" hidden>
-    <div class="the ba-cau"><div class="bc" data-cau="dang-lam-gi" data-den="vang"><span class="n">Đang làm gì</span><span class="c"><span class="cham vang"></span>Bảng gom 10 tab thành BỐN nhóm, mỗi khái niệm một chỗ canonical — xem ADR-0006. Đây là lượt CẮT: thước đo của lượt là số dòng luật GIẢM, không phải số tính năng tăng. — 1 luồng đang giữ vùng: claude-loi-hai-vai.</span><a class="hieu ban" href="#dang-lam-gi" data-goto="cong-viec">AI NÀO ĐANG GIỮ VÙNG</a></div><div class="bc" data-cau="can-nguoi-chot" data-den="vang"><span class="n">Cần Đức làm gì</span><span class="c"><span class="cham vang"></span>7 việc đang chờ — 2 việc cần BẤM, 5 việc cần CHỐT.</span><a class="hieu ban" href="#can-nguoi-chot" data-goto="cong-viec">XEM 7 VIỆC</a></div><div class="bc" data-cau="cho-dang-chan" data-den="vang"><span class="n">Chỗ đang chặn</span><span class="c"><span class="cham vang"></span>7 nợ cấu trúc (đỏ + vàng) · 19 mục nợ đang mở.</span><a class="hieu ban" href="#so-no" data-goto="cong-viec">SỔ NỢ</a></div><p class="ghi">Ba câu này là <strong>tóm tắt, không phải bản sao</strong> — mỗi khái niệm chỉ vẽ đầy đủ ở <strong>một</strong> chỗ, và liên kết bên phải dẫn tới đúng chỗ đó. Câu đầu lấy chữ từ hồ sơ trạng thái (chỉ người biết đang làm gì); <strong>hai câu sau MÁY ĐẾM</strong>, không lấy chữ gõ tay — một bản đếm gõ tay là nguồn sự thật thứ hai, và ngày 07/09 nó đã lệch thật: nó nói bốn việc trong khi máy đếm mười ba. Xem <code>docs/adr/0006-bang-mot-khai-niem-mot-cho.md</code>.</p></div>
+    <div class="the ba-cau"><div class="bc" data-cau="dang-lam-gi" data-den="xanh"><span class="n">Đang làm gì</span><span class="c"><span class="cham xanh"></span>Bảng gom 10 tab thành BỐN nhóm, mỗi khái niệm một chỗ canonical — xem ADR-0006. Đây là lượt CẮT: thước đo của lượt là số dòng luật GIẢM, không phải số tính năng tăng. — không luồng nào đang giữ vùng trong repo này.</span><a class="hieu mo" href="#dang-lam-gi" data-goto="cong-viec">AI NÀO ĐANG GIỮ VÙNG</a></div><div class="bc" data-cau="can-nguoi-chot" data-den="vang"><span class="n">Cần Đức làm gì</span><span class="c"><span class="cham vang"></span>7 việc đang chờ — 2 việc cần BẤM, 5 việc cần CHỐT.</span><a class="hieu ban" href="#can-nguoi-chot" data-goto="cong-viec">XEM 7 VIỆC</a></div><div class="bc" data-cau="cho-dang-chan" data-den="vang"><span class="n">Chỗ đang chặn</span><span class="c"><span class="cham vang"></span>7 nợ cấu trúc (đỏ + vàng) · 19 mục nợ đang mở.</span><a class="hieu ban" href="#so-no" data-goto="cong-viec">SỔ NỢ</a></div><p class="ghi">Ba câu này là <strong>tóm tắt, không phải bản sao</strong> — mỗi khái niệm chỉ vẽ đầy đủ ở <strong>một</strong> chỗ, và liên kết bên phải dẫn tới đúng chỗ đó. Câu đầu lấy chữ từ hồ sơ trạng thái (chỉ người biết đang làm gì); <strong>hai câu sau MÁY ĐẾM</strong>, không lấy chữ gõ tay — một bản đếm gõ tay là nguồn sự thật thứ hai, và ngày 07/09 nó đã lệch thật: nó nói bốn việc trong khi máy đếm mười ba. Xem <code>docs/adr/0006-bang-mot-khai-niem-mot-cho.md</code>.</p></div>
   </section>
 
   <section class="tab" id="tab-cong-viec" hidden>
-    <div class="the" id="can-nguoi-chot"><h2>Cần Đức — 7 việc · 2 bấm · 5 chốt</h2><div class="cd"><span class="lo bam">BẤM</span><span class="c">`` — mở một phiên AI mới ở một repo đã migrate, KHÔNG nhắc gì, và xem nó có tự làm trọn một việc nhỏ tới lúc cổng xanh không. Chừng 15 phút. Không tự động hoá được: cả giá trị của phép thử nằm ở chỗ không ai mớm.<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">`` — chọn một: (a) chỉ GHI RÕ giới hạn vào sổ tay, hay (b) siết thật bằng chữ ký. Hai lối khác hẳn nhau về quy mô.<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">`` — chọn một: (a) gọt thật và chấp nhận mất nội dung, hay (b) đặt lại ngân sách theo SỐ ĐO hôm nay cộng biên. Nới ngân sách là nới một luật an toàn, mục 2 hàng 6 bắt hỏi.<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">CHỜ NGƯỜI CHỐT: `` — nhánh đang lệch `origin/main` 5 sau / 48 trước. Nâng bộ khung trên một<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo bam">BẤM</span><span class="c">KHUNG-37 · Tiến trình nền của phiên đã kết thúc KHÔNG ai dọn — đo được 5 thế hệ còn sống<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">KHUNG-40 · Bảy giới hạn Đức chốt 07/09 — cái nào phổ quát, cái nào riêng repo tiêu thụ<span class="tu">nêu hôm nay · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">KHUNG-42 · Khoá hết hạn khi CÓ NGƯỜI CHỜ, và vai điều phối không thể bị chặn<span class="tu">nêu hôm nay · nêu trong BACKLOG.md</span></span></div><p class="ghi"><strong>BẤM</strong> là việc tay vài phút, gom được thành một buổi. <strong>CHỐT</strong> là việc cần nghĩ, mỗi cái một lượt. Số ngày treo <strong>đo bằng lịch sử kho mã</strong>, không đọc đồng hồ. Bảng <strong>không giữ danh sách này</strong>: nó quét dấu ngay trên dòng của mục, nên mục đóng thì dấu mất theo — không ai phải nhớ đi xoá ở một chỗ thứ hai.</p></div>
-    <!--khoa--><div class="the" id="dang-lam-gi"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · 1 luồng</h2>
-<!--khoa--><div class="kh"><span class="t">claude-loi-hai-vai<small>va ba loi P1 Codex tim duoc o quyen.mjs · giữ khoá <code>_code</code> · giữ 48 phút</small></span><span class="hieu ban">ĐANG GIỮ</span></div>
-<p class="ghi"><strong>Khối này không thấy hai thứ.</strong> Một: <em>luồng đang chạy ở repo khác</em> — bảng của repo này chỉ thấy repo của nó. Hai: <em>luồng vừa được giao mà chưa kịp nhận vùng</em> — lúc đó nó chưa để lại dấu vết nào trong repo. Nên dòng "không luồng nào đang chạy" đọc đúng là <strong>"không luồng nào đang giữ vùng trong repo này"</strong>. Đây là ảnh chụp theo lần ghi gần nhất vào repo (2026-09-07), không phải số liệu thời gian thực.</p>
+    <div class="the" id="can-nguoi-chot"><h2>Cần Đức — 7 việc · 2 bấm · 5 chốt</h2><div class="cd"><span class="lo bam">BẤM</span><span class="c">`` — mở một phiên AI mới ở một repo đã migrate, KHÔNG nhắc gì, và xem nó có tự làm trọn một việc nhỏ tới lúc cổng xanh không. Chừng 15 phút. Không tự động hoá được: cả giá trị của phép thử nằm ở chỗ không ai mớm.<span class="tu">treo 2 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">`` — chọn một: (a) chỉ GHI RÕ giới hạn vào sổ tay, hay (b) siết thật bằng chữ ký. Hai lối khác hẳn nhau về quy mô.<span class="tu">treo 2 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">`` — chọn một: (a) gọt thật và chấp nhận mất nội dung, hay (b) đặt lại ngân sách theo SỐ ĐO hôm nay cộng biên. Nới ngân sách là nới một luật an toàn, mục 2 hàng 6 bắt hỏi.<span class="tu">treo 2 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">CHỜ NGƯỜI CHỐT: `` — nhánh đang lệch `origin/main` 5 sau / 48 trước. Nâng bộ khung trên một<span class="tu">treo 2 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo bam">BẤM</span><span class="c">KHUNG-37 · Tiến trình nền của phiên đã kết thúc KHÔNG ai dọn — đo được 5 thế hệ còn sống<span class="tu">treo 2 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">KHUNG-40 · Bảy giới hạn Đức chốt 07/09 — cái nào phổ quát, cái nào riêng repo tiêu thụ<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><div class="cd"><span class="lo chot">CHỐT</span><span class="c">KHUNG-42 · Khoá hết hạn khi CÓ NGƯỜI CHỜ, và vai điều phối không thể bị chặn<span class="tu">treo 1 ngày · nêu trong BACKLOG.md</span></span></div><p class="ghi"><strong>BẤM</strong> là việc tay vài phút, gom được thành một buổi. <strong>CHỐT</strong> là việc cần nghĩ, mỗi cái một lượt. Số ngày treo <strong>đo bằng lịch sử kho mã</strong>, không đọc đồng hồ. Bảng <strong>không giữ danh sách này</strong>: nó quét dấu ngay trên dòng của mục, nên mục đóng thì dấu mất theo — không ai phải nhớ đi xoá ở một chỗ thứ hai.</p></div>
+    <!--khoa--><div class="the" id="dang-lam-gi"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · 0 luồng</h2>
+<!--khoa--><p>Không luồng nào đang giữ vùng trong repo này.</p>
+<p class="ghi"><strong>Khối này không thấy hai thứ.</strong> Một: <em>luồng đang chạy ở repo khác</em> — bảng của repo này chỉ thấy repo của nó. Hai: <em>luồng vừa được giao mà chưa kịp nhận vùng</em> — lúc đó nó chưa để lại dấu vết nào trong repo. Nên dòng "không luồng nào đang chạy" đọc đúng là <strong>"không luồng nào đang giữ vùng trong repo này"</strong>. Đây là ảnh chụp theo lần ghi gần nhất vào repo (2026-09-08), không phải số liệu thời gian thực.</p>
 <!--khoa--><p class="ghi"><strong>"Repo chưa thấy dấu vết" KHÔNG có nghĩa là luồng đó rảnh.</strong> Repo chỉ thấy được thứ đã chạm repo, mà một luồng cẩn thận thì dựng nháp ở ngoài rồi mới ghi vào. Ngày 06/09 một luồng bị đọc nhầm đúng như vậy và bị nhả khoá hộ, phải hoàn nguyên phần đã xong. <strong>Đừng nhả khoá của luồng khác vì con số này</strong> — hỏi luồng đó, hoặc hỏi Đức.</p></div>
-    <!--khoa--><details class="the"><summary>Khoá làm việc — 4 khoá, 3 đang mở<span class="tt">mở ra khi cần giao việc song song</span></summary>
+    <!--khoa--><details class="the"><summary>Khoá làm việc — 4 khoá, 4 đang mở<span class="tt">mở ra khi cần giao việc song song</span></summary>
 <div class="in">
-<!--khoa--><div class="kh"><span class="t">_code</span><span class="hieu ban">BẬN</span></div>
+<!--khoa--><div class="kh"><span class="t">_code</span><span class="hieu mo">MỞ</span></div>
 <!--khoa--><div class="kh"><span class="t">_docs</span><span class="hieu mo">MỞ</span></div>
 <!--khoa--><div class="kh"><span class="t">_root</span><span class="hieu mo">MỞ</span></div>
 <!--khoa--><div class="kh"><span class="t">_template</span><span class="hieu mo">MỞ</span></div>
@@ -631,6 +638,32 @@ git mv handoff-tam.md HANDOFF.md</code></pre>
     tái diễn. Ba lượt migrate đầu tìm ra <b>9 · 8 · và một loạt</b> lỗi <em>của chính bộ khung</em>
     — không phải của repo đích. Không có vòng ngược thì lõi chỉ đúng trên giấy.
   </div>
+  <h3 style="margin:16px 0 0">Hai vai Assistant — ai giữ khối nào</h3>
+  <p class="mh-mota" style="margin:4px 0 0">Ba khối trên cần <strong>hai vai</strong>, không phải
+  ba: Khối 1 là việc ở nhà, còn hai mũi và vòng ngược là <strong>cùng một việc</strong> —
+  đi ra rồi mang về. Chia theo khối thì vai giữa không có gì làm; chia theo hướng đi thì đủ.</p>
+  <div class="mh-vai">
+    <div class="mh-cot loi">
+      <span class="mh-so">Vai ①</span>
+      <span class="mh-ten">Giữ lõi</span>
+      <span class="giu">giữ Khối 1</span>
+      <p class="mh-mota">Bộ khung phải còn đúng với chính nó. Vai này không đi ra ngoài.</p>
+      <div class="mh-hop"><h4>Việc chính</h4><ul><li>luật · bộ máy · trạng thái — ba tầng cổng đóng phiên canh</li><li><b>21</b> lệnh và <b>17</b> suite phải còn chạy đúng</li><li>mỗi bản vá kèm <b>một phép kiểm ghim</b>, không vá trần</li><li><b>xoá luật không nổ lần nào</b> — thêm luật phải kể tên luật nó thay</li></ul></div>
+      <div class="mh-hop"><h4>Không được làm</h4><ul><li>không tự nới một lớp bảo vệ cho cổng xanh</li><li>không tự ký nghiệm thu việc của chính mình</li></ul></div>
+    </div>
+    <div class="mh-cot">
+      <span class="mh-so">Vai ②</span>
+      <span class="mh-ten">Phát &amp; thu</span>
+      <span class="giu">giữ hai mũi + vòng ngược</span>
+      <p class="mh-mota">Cửa duy nhất giữa bộ khung và thế giới. Vai này đi ra ngoài, rồi mang chỗ vấp về.</p>
+      <div class="mh-hop"><h4>Việc chính</h4><ul><li>thi hành <b>4</b> quy trình lên <b>3</b> repo đích</li><li>gói bản phát, đo repo đích, ghép đề bài rồi giao</li><li><b>mang chỗ vấp về</b> thành mục sổ nợ của lõi — đây là việc chịu tải</li><li><b>tối ưu chính quy trình</b>: cửa nào chặn 0 lượt thì cửa đó là thuế</li></ul></div>
+      <div class="mh-hop"><h4>Không được làm</h4><ul><li>không tự sửa lõi để repo đích chạy được — chỗ vấp phải về Vai ①</li><li>không báo một quy trình là ĐẠT khi chưa chạy thật trên một repo đích</li></ul></div>
+    </div>
+  </div>
+  <div class="mh-bat"><b>Ranh giới chịu tải, và nó chỉ có một câu:</b> Vai ② được <em>phát hiện</em>,
+  Vai ① được <em>sửa</em>. Vai ② mang một chỗ vấp về; Vai ① biến nó thành bản vá cộng một phép kiểm
+  ghim. Gộp hai vai lại thì người tìm ra lỗi cũng là người tự chấm bản sửa của mình — và một tờ
+  nghiệm thu do bên bị kiểm ký là lời tự khai, không phải hàng rào.</div>
 </div></details>
     <div class="the">
       <h2>Giao một việc cho AI khác — ba lệnh</h2>
@@ -1802,7 +1835,7 @@ npm run don -- --apply     # ghi thật</code></pre>
 
   <footer>
     <span>Ark Repo Harness v1.3.37</span>
-    <span>sinh ngày 2026-09-07 — không gõ tay</span>
+    <span>sinh ngày 2026-09-08 — không gõ tay</span>
     <span>mọi con số đọc từ repo</span>
   </footer>
 </div>

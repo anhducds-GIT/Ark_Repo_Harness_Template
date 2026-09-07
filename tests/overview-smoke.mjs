@@ -12,7 +12,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { gomDuLieu, khoiLienQuan, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
+import { gomDuLieu, khoiLienQuan, khoiMoHinh, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -251,6 +251,45 @@ const html = trang(dl);
   assert.deepEqual(tachDaXong(""), [], "so rong -> khong co gi, khong duoc no");
 
   ok("tab Đã xong: chỉ lấy mục đã gạch mã, việc còn mở và văn xuôi không lọt");
+}
+
+/* ---- Hai vai Assistant: SỐ phải suy từ repo, CHỮ mới được gõ tay ------------
+ *
+ * Vì sao ghim đúng chỗ này: khối hai vai là khối duy nhất của trang trộn hai loại nội dung —
+ * trách nhiệm từng vai là QUYẾT ĐỊNH của Đức (gõ tay, đúng), còn mỗi thẻ vai phải chở một con số
+ * ĐO ĐƯỢC. Kiểu hỏng đắt nhất ở đây không phải trang vỡ mà là ai đó gõ cứng con số cho nhanh:
+ * lúc đó trang vẫn đẹp, vẫn đủ chữ, và **nói sai về một bộ khung không còn tồn tại**. Một phép
+ * kiểm chỉ dò "có chuỗi Vai ① không" thì KHÔNG bắt được ca đó.
+ *
+ * Nên vế chịu tải là: đổi ĐẦU VÀO thì con số trên trang phải đổi theo. Gõ cứng là ĐỎ.
+ */
+{
+  const a = khoiMoHinh({ lenh: new Array(7).fill("x"), protocols: [{ tieuDe: "A" }],
+    dichDen: [{ ten: "r1" }], soPhepKiem: 11 });
+  const b = khoiMoHinh({ lenh: new Array(23).fill("x"), protocols: [{ tieuDe: "A" }, { tieuDe: "B" }],
+    dichDen: [{ ten: "r1" }, { ten: "r2" }, { ten: "r3" }], soPhepKiem: 40 });
+
+  assert.ok(a.includes("Vai ①") && a.includes("Vai ②"), "khối phải có đủ hai vai");
+  assert.ok(a.includes("<b>7</b> lệnh và <b>11</b> suite"), "Vai ① phải chở số lệnh/suite của ĐẦU VÀO");
+  assert.ok(b.includes("<b>23</b> lệnh và <b>40</b> suite"), "đổi đầu vào thì số Vai ① phải đổi theo");
+  assert.ok(a.includes("<b>1</b> quy trình lên <b>1</b> repo đích"), "Vai ② phải chở số quy trình/repo đích");
+  assert.ok(b.includes("<b>2</b> quy trình lên <b>3</b> repo đích"), "đổi đầu vào thì số Vai ② phải đổi theo");
+
+  // RANH GIỚI CHỊU TẢI, không phải trang trí: Vai ② phát hiện, Vai ① sửa. Gộp lại thì người tìm
+  // ra lỗi tự chấm bản sửa của mình. Câu đó mất khỏi trang là mất chính lý do có hai vai.
+  const iPhat = a.indexOf("Vai ② được");
+  const iSua = a.indexOf("Vai ① được");
+  assert.ok(iPhat > 0 && iSua > iPhat, "trang phải nói rõ Vai ② phát hiện rồi Vai ① sửa, đúng thứ tự đó");
+
+  // Và nó phải nằm CHUNG khối với mô hình ba khối — tách ra là hai trang lệch nhau về sau.
+  assert.ok(a.includes("Mô hình vận hành — ba khối") && a.includes("Hai vai Assistant"),
+    "hai vai phải ở cùng khối với mô hình ba khối, không thành khối rời");
+
+  // Đầu vào RỖNG không được nổ: trang phải sinh được cả khi repo chưa có protocol/repo đích nào.
+  const trong = khoiMoHinh({});
+  assert.ok(trong.includes("Vai ①") && trong.includes("Vai ②"), "repo trống vẫn phải ra đủ hai vai");
+
+  ok("hai vai Assistant: chữ là quyết định, số suy từ repo — gõ cứng số là đỏ");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
