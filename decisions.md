@@ -356,3 +356,28 @@ giết theo tên sẽ giết luôn `node` của một phiên AI đang làm việ
 **cùng cổng 4747**, cũng có mục tự chạy. Bản đầu gặp cổng bận thì **thoát im lặng** — tức Đức mở
 trình duyệt sẽ thấy bảng của REPO KIA và tin là bảng repo này. Nay nó né sang cổng kế và **nói to**
 cổng nào đang dùng.
+
+## 2026-09-07 — Danh mục tính năng thành CHECKLIST ĐO ĐƯỢC, và AI repo đích phải go live
+
+Đức nêu: *"tôi muốn tổng hợp feature list hiện có thành checklist… khi block thành các tính năng
+lớn như vậy thì tune và protocol migrate của chúng ta cũng sẽ clear hơn rất nhiều"*, và chốt điểm
+quan trọng nhất: *"AI assistant cần được go live & well onboard ở repo đích để nó sẽ là người tiếp
+tục đảm nhiệm."*
+
+**Chốt hình dạng: danh mục phải ĐO ĐƯỢC, không phải một danh sách chữ.** Mỗi mục khai file và lệnh
+phải tồn tại, nên nó chạy được ở bất kỳ repo nào và trả lời được *"tính năng này ở đây có sống
+không"*. Lý do: một danh mục tự khai nói repo có gì lúc ai đó viết nó rồi im lặng mãi — và không ai
+phát hiện, vì nó luôn "đúng".
+
+**Ba trạng thái, không hai.** `MỘT PHẦN` đếm riêng vì nó nguy hiểm hơn `THIẾU`: mục đó trông như
+đang chạy nhưng hỏng ở chỗ không ai nhìn.
+
+**Đề bài `onboard` thành việc thứ tư của lệnh giao việc.** Đo được: 3 lượt migrate xong, 0 lượt có
+phiên AI ở repo đích chạy trọn một vòng. Bước cuối của migrate không phải "cổng xanh" — mà là **một
+phiên AI ở repo đó tự chạy được trọn một vòng, và biết ngày mai làm gì.**
+
+**Đức chốt thêm cùng ngày:** *"mỗi repo cần 1 bảng chính, có hay không có bảng phụ tùy tình huống,
+tôi ko ép."* — bảng chính là file đã commit (suy từ HEAD); bảng sống là tuỳ chọn, chỉ chạy khi ai đó
+nhấp đúp. Danh mục khai `F1.3` là `tuy_chon: true` cho đúng câu này.
+
+Chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.34 · danh mục ở [features.json](features.json).

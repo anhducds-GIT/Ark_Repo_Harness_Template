@@ -13,7 +13,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildTemplateFiles, kiemSoPhatHanh, loiSoPhatHanh, soVoiLichSu } from "../scripts/build-template.mjs";
-import { docSoGhim, fileMay, soGhimMoi, soSanh } from "../scripts/upgrade.mjs";
+import { docSoGhim, fileMay, fileTaiLieu, fileTuyChon, soGhimMoi, soSanh } from "../scripts/upgrade.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -39,12 +39,62 @@ const dungRepo = (ghiSoGhim) => {
   // Luật và trạng thái là chữ của repo đích. Ghi đè chúng là xoá công của người ta — đúng thứ
   // quy trình migrate cấm ("thêm vào, đừng thay thế").
   const ds = fileMay(chuan);
-  assert.ok(ds.every((r) => r.startsWith("scripts/") || r.startsWith("tests/")),
-    "chi duoc nang cap scripts/ va tests/");
-  assert.ok(!ds.includes("AGENTS.md") && !ds.includes("STATUS.md") && !ds.includes("HANDOFF.md"),
+  const tap = new Set(ds);
+
+  /* CHIỀU 1 — KHÔNG được nuốt chữ của repo đích. Đây là vế cũ, giữ nguyên sức. */
+  assert.ok(ds.every((r) => !r.endsWith(".md")),
+    `tai lieu KHONG duoc nam trong tap tu dong ghi de: ${ds.filter((r) => r.endsWith(".md")).join(", ")}`);
+  assert.ok(!tap.has("AGENTS.md") && !tap.has("STATUS.md") && !tap.has("HANDOFF.md"),
     "luat va trang thai KHONG duoc nam trong tap tu dong ghi de");
+  assert.ok(!ds.some((r) => r.endsWith(".json")),
+    "cau hinh la thu repo dich khai cho nghe cua no, khong duoc ghi de");
+
+  /* CHIỀU 2 — và KHÔNG được bỏ sót thứ chạy được. Vế này thêm sau khi nó cắn thật.
+   *
+   * Bản trước hỏi "mọi file máy có nằm trong scripts/ hay tests/ không" — tức nó ghim CHÍNH cái
+   * định nghĩa đang sai, nên nó xanh trong khi `upgrade.mjs` bỏ quên cả một thư mục mã. Bản 1.3.26
+   * thêm `bang-song/`; hệ quả: repo đích nhận `tests/bang-song.mjs` mà KHÔNG nhận thứ nó kiểm, và
+   * suite của repo đích gãy ngay lượt đầu vì một lý do không nói gì về nguyên nhân.
+   *
+   * Hỏi ngược lại mới có răng: quét bản trích tìm MỌI file chạy được, rồi đòi từng cái phải nằm
+   * trong tập nâng cấp. Câu hỏi này còn đúng khi bộ khung mọc thêm thư mục mã lần sau. */
+  const chayDuoc = [...chuan.keys()].filter((r) => /\.(mjs|cmd)$/.test(r));
+  const bo = chayDuoc.filter((r) => !tap.has(r));
+  assert.deepEqual(bo, [],
+    `${bo.length} file chay duoc bi BO QUEN khoi tap nang cap: ${bo.join(", ")} — repo dich se nhan phep ghim ma khong nhan thu no kiem`);
+
   assert.ok(ds.length >= 6, `phai co it nhat 6 file may, dang ${ds.length}`);
-  ok("chỉ tầng máy được nâng cấp — luật và trạng thái không bị đụng");
+  ok(`chỉ tầng máy được nâng cấp — ${ds.length} file chạy được, 0 file chữ`);
+}
+
+/* ---- 1b. PHỤ LỤC NGHỀ: kể tên, KHÔNG tự mang ----------------------------
+ *
+ * Vấp thật 07/09, bắt được lúc đọc bản `--plan` cho một repo CHỨNG KHOÁN: lệnh định mang sang
+ * phụ lục nghề "tự động hoá trình duyệt". Ngay dòng đầu của chính file đó viết *"Repo bạn không
+ * lái trình duyệt thì XOÁ file này… giữ một phụ lục sai nghề còn tệ hơn không có phụ lục"*.
+ *
+ * File TỰ NÓI RA là nó không dành cho repo đó, mà lệnh vẫn mang. Luật "thiếu thì mang" đúng với
+ * sổ tay dùng chung, KHÔNG đúng với phụ lục nghề — và khác biệt ấy đã khai sẵn ở frontmatter,
+ * chỉ là chưa ai đọc.
+ *
+ * Đột biến đã chạy: cho `laTuyChon` luôn trả `false` → vế này ĐỎ.
+ */
+{
+  const tuyChon = fileTuyChon(chuan);
+  const tuDong = new Set(fileTaiLieu(chuan));
+
+  assert.ok(tuyChon.length >= 1, "ban trich phai co it nhat mot phu luc nghe de ve nay co viec ma lam");
+  for (const rel of tuyChon) {
+    assert.ok(!tuDong.has(rel), `${rel} tu khai 'status: optional' nhung VAN nam trong tap tu dong mang sang`);
+    assert.match(chuan.get(rel), /status:\s*optional/, `${rel} phai that su tu khai optional`);
+  }
+
+  // Chiều ngược: sổ tay dùng chung thì VẪN phải được mang. Không có vế này thì một bản "không mang
+  // gì cả" cũng qua được vế trên.
+  assert.ok(tuDong.has("docs/protocols/MULTIFLOW.md"),
+    "so tay dung chung PHAI duoc mang sang — repo da lap ma khong nhan so tay la dong bang o tang tai lieu");
+  assert.ok(tuDong.size >= 4, `phai mang it nhat 4 tai lieu dung chung, dang ${tuDong.size}`);
+  ok(`phụ lục nghề (${tuyChon.length}) chỉ kể tên · sổ tay dùng chung (${tuDong.size}) vẫn mang`);
 }
 
 /* ---- 2. Repo khớp bản khung → không có việc gì --------------------------- */

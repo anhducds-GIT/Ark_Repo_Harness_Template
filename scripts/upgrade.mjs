@@ -107,7 +107,29 @@ export function soSanh(repo, chuan, soGhim) {
    Cố ý KHÔNG tính vào dấu vân tay bản phát: dấu vân tay chỉ gồm tầng máy, vì chỉ tầng máy được
    nâng tự động và chỉ nó quyết định danh tính một bản. */
 export function fileTaiLieu(chuan) {
-  return [...chuan.keys()].filter((rel) => rel.startsWith("docs/"));
+  return [...chuan.keys()].filter((rel) => rel.startsWith("docs/") && !laTuyChon(chuan.get(rel)));
+}
+
+/* TÀI LIỆU TỰ KHAI `status: optional` THÌ KHÔNG TỰ MANG SANG.
+ *
+ * Vấp thật 07/09, bắt được lúc đọc bản `--plan` cho một repo CHỨNG KHOÁN: lệnh định mang sang
+ * `docs/ANNEX-tu-dong-hoa-trinh-duyet.md` — phụ lục nghề lái trình duyệt. Ngay dòng đầu của
+ * chính file đó viết: *"Repo bạn không lái trình duyệt thì XOÁ file này… Giữ một phụ lục sai
+ * nghề còn tệ hơn không có phụ lục: nó dạy phiên AI sau tuân luật cho một việc repo này không
+ * làm."*
+ *
+ * Tức file tự nói ra là nó không dành cho repo đó, mà lệnh vẫn mang. "Thiếu thì mang" đúng với
+ * sổ tay dùng chung; nó KHÔNG đúng với phụ lục nghề — và khác biệt ấy đã được khai sẵn trong
+ * frontmatter, chỉ là chưa ai đọc.
+ *
+ * Vẫn KỂ TÊN ở bản kế hoạch, để người đọc biết bộ khung có sẵn nó mà tự quyết chép hay không. */
+export function laTuyChon(noiDung) {
+  const kh = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(noiDung || ""));
+  return kh ? /^status:\s*optional\s*$/m.test(kh[1]) : false;
+}
+
+export function fileTuyChon(chuan) {
+  return [...chuan.keys()].filter((rel) => rel.startsWith("docs/") && laTuyChon(chuan.get(rel)));
 }
 
 export function soSanhTaiLieu(repo, chuan) {
@@ -268,7 +290,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
 
   /* TẦNG TÀI LIỆU in RIÊNG, không trộn vào bảng trên — hai tầng có hai luật khác nhau, và trộn
      chúng lại là mời người đọc tưởng `KHÁC` ở tài liệu cũng sẽ bị ghi đè như `CŨ` ở máy. */
-  if (tlThieu.length || tlKhac.length) {
+  /* Phụ lục nghề tự khai `status: optional`: KỂ TÊN nhưng KHÔNG tự mang. Xem `laTuyChon`. */
+  const tuyChon = fileTuyChon(chuan).filter((rel) => {
+    try { fs.readFileSync(path.join(repo, ...rel.split("/"))); return false; } catch { return true; }
+  });
+
+  if (tlThieu.length || tlKhac.length || tuyChon.length) {
     console.log("");
     console.log("  TÀI LIỆU:");
     if (tlThieu.length) console.log(`    THIẾU  ${String(tlThieu.length).padStart(2)} file: ${tlThieu.map((d) => d.rel).join(", ")}`);
@@ -276,6 +303,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
       console.log(`    KHÁC   ${String(tlKhac.length).padStart(2)} file: ${tlKhac.map((d) => d.rel).join(", ")}`);
       console.log("           → CHỈ kể tên, KHÔNG bao giờ ghi đè. Tài liệu là chữ repo đích được phép");
       console.log("             sửa cho nghề của mình; ghi đè là xoá việc của người ta.");
+    }
+    if (tuyChon.length) {
+      console.log(`    TUỲ CHỌN ${String(tuyChon.length).padStart(2)} file: ${tuyChon.join(", ")}`);
+      console.log("           → bộ khung CÓ sẵn nhưng KHÔNG tự mang: đây là phụ lục NGHỀ, tự khai");
+      console.log("             `status: optional`. Repo đích không làm nghề đó thì một phụ lục sai");
+      console.log("             nghề còn tệ hơn không có — nó dạy phiên AI sau tuân luật cho một");
+      console.log("             việc repo này không làm. Cần thì tự chép sang.");
     }
   }
 

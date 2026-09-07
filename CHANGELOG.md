@@ -3,6 +3,64 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.34 — 2026-09-07 — Danh mục tính năng ĐO ĐƯỢC, và đề bài đưa AI repo đích go live
+
+Đức: *"tôi muốn tổng hợp feature list hiện có thành checklist… để đảm bảo khi migrate thì checklist
+đó cũng sẽ được go live và được migrate sang các repo"*, và điểm quan trọng nhất: *"AI assistant cần
+được go live & well onboard ở repo đích để nó sẽ là người tiếp tục đảm nhiệm."*
+
+### Danh mục: 9 khối · 41 mục · mỗi mục MỘT PHÉP ĐO
+
+`features.json` + `npm run features`. Chín khối: bảng · cấu trúc & bảo trì · đa phiên · AI điều
+phối · luật & quyết định · sổ sách · phát hành · phép kiểm · **đối chiếu và tự nâng cấp**.
+
+**Một danh mục không đo được thì nó là quảng cáo** — nó nói repo có gì lúc ai đó viết nó, rồi im
+lặng mãi. Nên mỗi mục khai `can` (file và lệnh phải tồn tại), và lệnh chỉ đi kiểm chứ không tin một
+chữ nào trong phần mô tả. Chạy được ở **bất kỳ repo nào**.
+
+**BA trạng thái, và `[~]` MỘT PHẦN nguy hiểm hơn `[ ]` THIẾU.** Ca thật đo được ngay lượt đầu ở một
+repo đã lắp: nó có `scripts/session-check.mjs` mà **thiếu `npm run gate`** — cổng có mặt mà không ai
+gọi được bằng tên chuẩn, nên trên thực tế nó không tồn tại. Ba mục như thế ở một repo.
+
+**Mỗi mục khai `tu_ban`.** Đây là chỗ phiên AI ở repo đích đối chiếu với `.ark/harness.lock.json`
+để tự biết mình thiếu tính năng nào của bản mới.
+
+### Đề bài `onboard` — việc thứ tư của lệnh giao việc
+
+**Đo được sau ba lượt migrate: 3 lượt xong, 0 lượt có phiên AI ở repo đích chạy trọn một vòng làm
+việc.** Migrate đưa CÔNG CỤ tới; nó không đưa NGƯỜI CẦM tới. Repo có cổng mà không ai chạy thì sau
+vài tuần lệch chuẩn đúng bằng repo chưa migrate — chỉ khác là nó **trông như** đã lên chuẩn.
+
+Đề bài sinh ra **mang theo checklist tính năng đã đo tại repo đích**, và bắt phiên nhận việc chạy
+**trọn một vòng thật**, không diễn tập. Báo cáo **sáu dòng** — khác khuôn năm dòng của ba việc kia,
+vì nó trả lời *"repo này từ giờ có người cầm chưa"*, không phải *"tôi đã làm gì"*.
+
+### Hai lỗ vá trước khi ghi vào repo nào
+
+Cả hai lộ ra lúc **đọc bản `--plan`**, trước khi `--apply`:
+
+- `upgrade.mjs` định nghĩa "tầng máy" là **hai thư mục tên `scripts/` và `tests/`**. Thêm
+  `bang-song/` là repo đích nhận **phép ghim mà không nhận thứ nó kiểm** → suite gãy ngay. Nay
+  định nghĩa theo **đuôi file chạy được**. Dấu vân tay bản phát cũng từng bỏ quên cả thư mục đó —
+  tức sổ phát hành nói dối về nội dung một bản đã phát.
+- Nó định mang **phụ lục nghề lái trình duyệt** sang một repo **chứng khoán**. Dòng đầu file đó tự
+  viết *"repo bạn không lái trình duyệt thì xoá file này"*. Nay phụ lục nghề chỉ **kể tên**.
+
+### Và một lỗi tôi lặp BA LẦN trong cùng một file
+
+`tests/features-smoke.mjs` đi theo bản trích nên chạy ở **hai loại repo**. Ba vế của nó đặt câu hỏi
+**chỉ đúng ở nơi phát hành** rồi đỏ trong repo hạt giống: đòi mọi tính năng phải đủ (repo vừa dựng
+thiếu `docs/migrations`, `CHANGELOG.md`… một cách **hợp lý** — nó chưa tới lúc có), và hai vế soi
+`template/` (repo dựng TỪ bản trích không có thư mục đó).
+
+Luật rút ra, ghi thẳng vào đầu file: **mỗi vế phải trả lời được câu "câu này có nghĩa gì ở repo đã
+lắp?"** Không trả lời được thì rẽ nhánh và đặt một câu tương đương cho phía kia — **đừng bỏ trắng,
+vì một vế bỏ trắng đọc y hệt một vế đã đạt.**
+
+Và bug tương ứng trong bộ đo: nó suy "đây là nơi phát hành" bằng cách **so đường dẫn với chính
+mình** — đúng ở repo nhà, sai ở mọi repo khác vì file đi theo bản trích. Nay suy bằng **hai dấu
+hiệu đo được**, và có vế ghim rằng cả hai dấu hiệu KHÔNG đi theo bản trích.
+
 ## 1.3.28 — 2026-09-07 — Nghiệm thu ba cửa trên máy thật, và một phép đo sai bị bắt
 
 Đức: *"chạy file cmd bạn có thể gọi codex cli làm cho."* Giao Codex chạy thật, rồi kiểm chứng

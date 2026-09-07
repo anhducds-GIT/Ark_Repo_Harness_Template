@@ -142,7 +142,15 @@ const VERBATIM = [
   ["tests/bang-song.mjs", "tests/bang-song.mjs"],
   /* Bản ra PHẢI nằm ngoài git ở repo đích y như ở đây, không thì repo đó commit bảng sống và
    * mọi phiên của nó thấy cây làm việc bẩn mỗi lượt có ai nhận khoá. */
-  [".gitignore", ".gitignore"]
+  [".gitignore", ".gitignore"],
+  /* DANH MỤC TÍNH NĂNG — cả ba file, và phát thiếu một là phát một nửa.
+   *
+   * Điểm của danh mục là để phiên AI ở REPO ĐÍCH tự đo mình: "tôi đang thiếu tính năng nào so
+   * với bản mới của bộ khung". Phát bộ đo mà không phát danh mục thì nó không có gì để đọc; phát
+   * danh mục mà không phát bộ đo thì nó là một file chữ. */
+  ["features.json", "features.json"],
+  ["scripts/features.mjs", "scripts/features.mjs"],
+  ["tests/features-smoke.mjs", "tests/features-smoke.mjs"]
 ];
 
 /* ADR-0000 CỐ Ý KHÔNG chép nguyên văn. Bản gốc kể lại lịch sử di trú của riêng repo gốc — ba
@@ -884,10 +892,18 @@ function packageJson(version) {
       // người chốt mở, không phải AI. Trang ghi ra `DASHBOARD-<tên-repo>.html` ở gốc repo, suy
       // từ `repo.name`; muốn tên khác thì khai `generated_names.overview`.
       overview: "node scripts/build-overview.mjs",
+      /* BẢNG SỐNG. File có mà không khai lệnh thì trên thực tế tính năng đó KHÔNG tồn tại — đo
+         được ở một repo đã lắp: có `scripts/session-check.mjs` mà thiếu `npm run gate`, nên cổng
+         có mặt mà không ai gọi được bằng tên chuẩn. `features.mjs` bắt đúng ca đó. */
+      "bang-song": "node bang-song/mot-luot.mjs",
+      "bang-song:may-chu": "node bang-song/may-chu.mjs",
+      /* DANH MỤC TÍNH NĂNG — lệnh phiên AI của repo này dùng để tự đo mình đang thiếu gì so với
+         bộ khung. Không có lệnh thì không ai chạy, và checklist migrate quay về lời tự khai. */
+      features: "node scripts/features.mjs",
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
-      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs"
+      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
     }
   }, null, 2) + "\n";
 }
@@ -958,8 +974,23 @@ export const bam = (text) => createHash("sha256")
 
 /* Chỉ tầng MÁY được nâng cấp tự động, nên chỉ tầng máy quyết định danh tính bản phát. Luật và
    trạng thái là chữ của từng repo — chúng khác nhau ở mọi repo, và không nên làm bản phát khác đi. */
+/* TẦNG MÁY = THỨ CHẠY ĐƯỢC, không phải "hai thư mục tên là scripts và tests".
+ *
+ * Bản đầu liệt kê hai tiền tố thư mục, và nó SAI ngay lần đầu bộ khung mọc thêm một thư mục mã:
+ * bản 1.3.26 thêm `bang-song/`, nên `upgrade.mjs` đẩy `tests/bang-song.mjs` sang repo đích mà
+ * KHÔNG đẩy chính thứ phép ghim đó kiểm — suite của repo đích gãy ngay lượt chạy đầu, vì một lý
+ * do không nói gì về nguyên nhân. Bắt được lúc đọc bản `--plan`, trước khi ghi.
+ *
+ * Sâu hơn: `bamBanTrich` cũng dùng hàm này, nên `bang-song/` không hề vào dấu vân tay bản phát —
+ * tức sổ phát hành nói dối về nội dung của một bản đã phát.
+ *
+ * Nên định nghĩa theo ĐUÔI FILE, không theo tên thư mục: `.mjs` và `.cmd` là thứ chạy được, phần
+ * còn lại (`.md` là chữ, `.json` là cấu hình) thì không. Quy tắc này tự đúng khi bộ khung mọc
+ * thêm thư mục mã, chứ không đợi ai nhớ sửa một danh sách. */
+export const DUOI_MAY = Object.freeze([".mjs", ".cmd"]);
+
 export function fileMay(chuan) {
-  return [...chuan.keys()].filter((rel) => rel.startsWith("scripts/") || rel.startsWith("tests/"));
+  return [...chuan.keys()].filter((rel) => DUOI_MAY.some((d) => rel.endsWith(d)));
 }
 
 export function bamBanTrich(chuan) {

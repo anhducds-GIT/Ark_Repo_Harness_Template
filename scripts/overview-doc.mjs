@@ -267,7 +267,12 @@ export function noiTuoi(ngay) {
 export const VIEC = {
   nang: { doc: "docs/briefs/NANG-BO-KHUNG.md", nhan: "nâng bộ khung", ghi: true },
   migrate: { doc: "docs/briefs/MIGRATE-REPO.md", nhan: "đưa repo lên chuẩn", ghi: true },
-  audit: { doc: "docs/briefs/AUDIT-REPO.md", nhan: "audit trước migrate", ghi: false }
+  audit: { doc: "docs/briefs/AUDIT-REPO.md", nhan: "audit trước migrate", ghi: false },
+  /* ONBOARD — việc thứ tư, và là việc DUY NHẤT giao cho phiên AI THƯỜNG TRÚ của repo đích chứ
+   * không cho một phiên đi làm rồi đi. Đo được sau ba lượt migrate: 3 lượt xong, 0 lượt có phiên
+   * AI ở repo đích chạy trọn một vòng làm việc. Bộ khung tới nơi rồi NẰM ĐÓ — migrate đưa công
+   * cụ tới, nó không đưa người cầm tới. `ghi: true` vì lượt onboard có làm một việc nhỏ thật. */
+  onboard: { doc: "docs/briefs/ONBOARD-AI-REPO-DICH.md", nhan: "đưa AI của repo đích go live", ghi: true }
 };
 
 export const THU_MUC_MIGRATE = "docs/migrations";

@@ -34,6 +34,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
  * chảy từ thứ Ở LẠI sang thứ ĐI THEO. Xuất lại để người gọi cũ không phải đổi. */
 export { VIEC } from "./overview-doc.mjs";
 import { VIEC } from "./overview-doc.mjs";
+import { demTheoTrangThai, do1Repo, docDanhMuc } from "./features.mjs";
 
 const CHUNG = "docs/briefs/GIAO-VIEC-CHUNG.md";
 
@@ -250,6 +251,31 @@ export function doRepo(repoAbs, { viec, as = null, banNha = null, fsx = fs, gitx
       "có lẽ là `--viec nang`. Vẫn migrate thì phải nói rõ vì sao.");
   } else if (banDich !== null) {
     dong.push("- **Bản khung ở repo đích:** " + banDich);
+  }
+
+  /* CHECKLIST TÍNH NĂNG — chỉ cho việc `onboard`, và đây là cái NỐI giữa hai lớp.
+   *
+   * Lượt onboard tồn tại để repo đích có người CẦM. Người cầm đó cần biết ngay repo mình vừa nhận
+   * đang thiếu gì — không phải đọc mô tả rồi tin, mà là một con số đo tại chỗ. Đo được sau ba lượt
+   * migrate: 3 lượt xong, 0 lượt có phiên AI ở repo đích chạy trọn một vòng làm việc.
+   *
+   * Đo KHÔNG ĐƯỢC thì nói KHÔNG ĐO ĐƯỢC, không bỏ dòng: một đề bài onboard thiếu dòng này đọc y
+   * hệt một đề bài onboard nói "repo đủ hết rồi". */
+  if (viec === "onboard") {
+    try {
+      const dm = docDanhMuc();
+      const kq = do1Repo(dm, repoAbs, false);
+      const d = demTheoTrangThai(kq);
+      dong.push("- **Tính năng (đo tại repo đích, danh mục bản " + dm.version + "):** "
+        + d.xong + " xong · **" + d["mot-phan"] + " một phần** · " + d.thieu + " thiếu"
+        + " *(một phần nguy hiểm hơn thiếu — xử trước)*");
+      const canXu = kq.flatMap((b) => b.muc.filter((m) => m.ket.trangThai !== "xong" && m.ket.trangThai !== "ngoai-pham-vi")
+        .map((m) => m.ma + " " + (m.ket.trangThai === "mot-phan" ? "(một phần)" : "(thiếu)")));
+      if (canXu.length) dong.push("- **Mục chưa đủ:** " + canXu.join(" · "));
+      dong.push("- **Lệnh tự đo lại:** `node scripts/features.mjs` ở repo đích");
+    } catch (e) {
+      dong.push("- **Tính năng:** KHÔNG ĐO ĐƯỢC (" + String(e.message).split(NL)[0] + ") — tự chạy `node scripts/features.mjs` rồi ghi lại số.");
+    }
   }
 
   return { chan, canh, dong };

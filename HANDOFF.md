@@ -1149,3 +1149,39 @@ ai đang giữ. Không phải kịch bản dựng — nó xảy ra vì tôi đan
 
 **Còn mở:** `KHUNG-30` (Đức hoãn) · `KHUNG-37` (`@Đức:bấm`) · `KHUNG-31` · `Y-09` phát bảng sang
 ba repo đã lắp.
+
+---
+
+## 2026-09-07 · claude-k7-tangmay · bản 1.3.34 — danh mục tính năng đo được, và đề bài onboard
+
+**Dựng danh mục: 9 khối · 41 mục · mỗi mục một phép đo.** `features.json` + `npm run features`,
+chạy được ở bất kỳ repo nào. Ba trạng thái, và `MỘT PHẦN` đếm riêng vì nó nguy hiểm hơn `THIẾU`.
+
+**Đo ngay lượt đầu đã ra kết quả dùng được:** một repo đã lắp có `scripts/session-check.mjs` mà
+**thiếu `npm run gate`** — cổng có mặt mà không ai gọi được bằng tên chuẩn, nên trên thực tế nó
+không tồn tại. Ba mục như thế. Lượt migrate trước chép file mà không chép lệnh, và **không có gì
+bắt được** cho tới khi có bộ đo này.
+
+**Đề bài `onboard`** — việc thứ tư của lệnh giao việc, và là việc duy nhất giao cho phiên AI
+**thường trú** của repo đích. Nó mang theo checklist tính năng đã đo tại repo đó.
+
+### Hai lỗ vá TRƯỚC khi ghi vào repo nào — cả hai lộ ra lúc đọc bản `--plan`
+
+- Định nghĩa "tầng máy" là hai tên thư mục, nên `bang-song/` bị bỏ quên: repo đích sẽ nhận phép
+  ghim mà không nhận thứ nó kiểm. Dấu vân tay bản phát cũng bỏ quên nó — sổ phát hành nói dối về
+  nội dung một bản đã phát.
+- Định mang phụ lục nghề **lái trình duyệt** sang một repo **chứng khoán**, trong khi dòng đầu file
+  đó tự viết *"repo bạn không lái trình duyệt thì xoá file này"*.
+
+### Một lỗi tôi lặp BA LẦN trong cùng một file, và luật rút ra
+
+`tests/features-smoke.mjs` đi theo bản trích nên chạy ở HAI loại repo. Ba vế của nó đặt câu hỏi chỉ
+đúng ở nơi phát hành rồi đỏ trong repo hạt giống. Luật ghi thẳng vào đầu file: **mỗi vế phải trả
+lời được "câu này có nghĩa gì ở repo đã lắp?"** — không trả lời được thì rẽ nhánh và đặt câu tương
+đương, **đừng bỏ trắng, vì một vế bỏ trắng đọc y hệt một vế đã đạt.**
+
+Và bug tương ứng trong bộ đo: nó suy "đây là nơi phát hành" bằng **so đường dẫn với chính mình** —
+sai ở mọi repo đích, vì file đi theo bản trích. Nay suy bằng hai dấu hiệu đo được.
+
+**Còn mở:** ghi checklist vào tab Migrate của bảng · `Y-09` phát sang hai repo (Đức đang xem bản kế
+hoạch) · `KHUNG-37` `@Đức:bấm`.

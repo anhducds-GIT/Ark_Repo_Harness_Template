@@ -10,7 +10,7 @@ ttl_days: 180
 > Lệnh `node scripts/giao-viec.mjs` ghép hai nửa lại và **đo repo đích trước khi ghép** — dùng
 > lệnh đó, đừng chép tay hai file rồi dán.
 >
-> **Vì sao tách ra làm hai nửa:** ba loại việc (nâng · migrate · audit) dùng chung đúng bộ luật
+> **Vì sao tách ra làm hai nửa:** bốn loại việc (nâng · migrate · audit · onboard) dùng chung đúng bộ luật
 > này. Chép nó ba lần là ba bản sẽ trôi khỏi nhau — repo này đã có ba bản chép tay của một danh
 > sách nói ba kiểu khác nhau, và đó là lý do luật gốc cấm chép.
 
@@ -165,3 +165,7 @@ CÒN MỞ     : <một câu, hoặc "không có">
 
 Dừng giữa chừng thì **vẫn báo đủ năm dòng**, và viết lý do dừng vào `CÒN MỞ`. Người chốt cần
 **số**, không cần nhật ký từng bước.
+
+**Ngoại lệ duy nhất — việc `onboard`** dùng khuôn SÁU dòng riêng, ghi ở nửa dưới. Lý do: lượt
+onboard không báo *"tôi đã làm gì"* mà báo *"repo này từ giờ có người cầm chưa"* — hai câu hỏi
+khác nhau, nên hai khuôn khác nhau. Nửa dưới thắng khi hai nửa nói khác.
