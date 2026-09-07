@@ -156,8 +156,8 @@ Repo Chrome Extension sẽ là **bản fork cần hợp nhất sau**, không ph�
 
 ## Y-10 · Bảng phải tự tươi — F5 là thấy, không phải nhờ AI sinh lại
 
-- **bậc:** ý tưởng
-- **việc kế:** đo xem tiến trình nền sinh lại bảng có làm cây làm việc bẩn không, vì bảng mang dữ liệu khoá SỐNG — ra "có" thì phải giải xong chỗ đó trước khi viết dòng mã nào
+- **bậc:** đã chứng minh
+- **việc kế:** không còn việc bắt buộc — đã dựng, đã nghiệm thu trên máy thật 07/09, đang chạy ở `127.0.0.1:4747`. Việc CÒN LẠI là của `Y-09`: phát sang ba repo đã lắp
 - **chủ:** chưa ai nhận
 - **phạm vi:** `_root` + `_code` + `_template`
 
@@ -174,3 +174,14 @@ Repo Chrome Extension sẽ là **bản fork cần hợp nhất sau**, không ph�
 3. **Bảng của bộ khung mang dữ liệu khoá SỐNG** (khối `NHAN_KHOA`). Bên repo kia bảng cũng thế, nhưng bộ khung có thêm một thứ họ không có: cổng đóng phiên **so artifact với HEAD** và `safe-push` **từ chối vùng bị sửa mà không ai đứng tên**. Nên nếu tiến trình nền ghi đè bảng mỗi lượt nhận/trả khoá, nó **làm bẩn cây làm việc của mọi lane** — máy của Đức chặn push của người khác. Chưa đo được điều này có xảy ra thật không; **đo xong mới thiết kế.**
 
 **đo trước khi sửa** — Bật một tiến trình sinh lại bảng, rồi cho một lane nhận và trả một khoá. Sau mỗi lượt chạy `git status --porcelain` và `node scripts/session-check.mjs`. Bảng đổi byte mà cổng vẫn xanh → đường này đi được. Cổng đỏ → phải tách khối khoá ra khỏi file có commit trước, chứ không phải nới cổng.
+
+**ĐÃ DỰNG VÀ ĐÃ NGHIỆM THU — 2026-09-07, bản 1.3.26–1.3.28.** Ba cửa ở `bang-song/`, chạy thật trên máy Đức: cửa nhấp đúp · máy chủ `127.0.0.1` chỉ đọc · tiến trình tự chạy lúc bật máy (Đức duyệt tường minh, luật mục 2 hàng 5). Gỡ bằng `Tat-tu-chay.cmd`, đã thử thật.
+
+**Chỗ chặn ghi ở trên đều SAI hoặc đã hết** — giữ nguyên chữ để đối chiếu, vì cái sai đáng đọc hơn cái đúng:
+
+- Chỗ chặn 1 (chốt an toàn) — đã dựng, bốn chốt, chín đột biến kiểm.
+- Chỗ chặn 2 (nút `giao-viec.mjs`) — **đã hết từ bản 1.3.18**, sổ ghi sai. Xem `Y-09`.
+- Chỗ chặn 3 (bảng sống làm bẩn cây làm việc rồi chặn push) — **đo ra là KHÔNG**: cột "có bảng sống" giống hệt cột "không có", vì `claims.json` vốn đã bẩn sẵn. Giá thật là **0 đồng**, với điều kiện bản ra nằm ngoài git.
+
+**Hai chỗ hỏng THẬT thì không có trong danh sách trên**, và chỉ lộ ra lúc chạy thật: file `.cmd` thuần LF làm `cmd.exe` ăn mất ký tự đầu dòng · và một repo khác trên cùng máy chiếm cùng cổng mặc định, khiến bản này thoát im lặng. Cả hai đã vá và ghim.
+

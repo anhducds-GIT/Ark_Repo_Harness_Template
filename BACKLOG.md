@@ -722,7 +722,6 @@ câu chữ này **không được biến thành tự cấp phép**.
 hơn vì nó nghe hợp lý.* Nếu tôi vá theo giả thuyết ban đầu thì đã hạ mức một phép kiểm đang XANH,
 và để nguyên chỗ hỏng thật.
 
-### KHUNG-34-cu · (giữ tiêu đề cũ để tra ngược) Tám cái bẫy đo được 06/09
 
 Tám thứ cắn repo tiêu thụ trong MỘT ngày: mỏ neo khớp 0 chỗ mà báo như đã kiểm · mỏ neo `\n` gặp
 file CRLF · `git commit -o` không chặn được cuốn sửa đổi cùng file · byte NUL làm diff biến mất (5
