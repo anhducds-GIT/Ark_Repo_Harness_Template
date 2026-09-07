@@ -1,6 +1,6 @@
 # Ark Repo Harness
 
-> 1/1 trên 1 đơn vị đã khai trạng thái. Mọi con số trong repo này là máy đếm, không gõ tay.
+> Bộ khung để một repo tự trông coi lấy mình — cửa kiểm chặn việc dở, luật cho AI đọc, lịch bảo trì. Dựng xong thì AI là người ở lại trông nhà. 1/1 đơn vị đã khai trạng thái. Mọi con số trong repo này là máy đếm, không gõ tay.
 
 > **SINH TỰ ĐỘNG — ĐỪNG SỬA TAY.** Sinh lại bằng `node scripts/build-dashboard.mjs`.
 
