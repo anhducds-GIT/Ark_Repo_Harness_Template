@@ -1023,9 +1023,15 @@ export function khoiCauTruc(vung, fileGoc, banDo) {
     + '<div class="tep">' + oFile + '</div>'
     + '<p class="ghi">Ô tô xanh là file <strong>máy sinh</strong> — đừng sửa tay, sửa là mất ở lần '
     + 'sinh sau. Số còn lại là chữ của người.</p></div>'
-    + '<div class="the"><h2>Khi cần gì thì mở file nào — ' + banDo.length + ' lối</h2>' + hangBanDo
+    /* GẬP LẠI, và đây là chỗ tốn nhất của cả tab. Đo 07/09: danh sách 54 lối chiếm 2.011px
+     * trong 3.052px của tab — tức mỗi lần vào tab này để xem MỘT thứ khác, người đọc phải
+     * cuộn qua trọn bộ bản đồ. Nó vẫn là nội dung chính của tab, nên không xoá; nhưng thứ
+     * "mở ra khi cần tra" không được nằm chắn đường thứ "đọc một lần là hiểu". */
+    + '<details class="the gap"><summary>Khi cần gì thì mở file nào — ' + banDo.length + ' lối</summary>'
+    + hangBanDo
     + '<p class="ghi">Bảng này <strong>đọc lại từ luật gốc</strong>, không phải bản chép — nên nó '
-    + 'không thể nói khác luật.</p></div>';
+    + 'không thể nói khác luật. Câu ở cột giữa bị <strong>cắt ở ranh giới câu</strong> cho gọn; '
+    + 'muốn nguyên văn và bấm được thì mở khối <em>Bản đồ file đầy đủ</em> ở dưới.</p></details>';
 }
 
 /* "Repo đang nợ gì, và những con số 0 kia là sạch hay là chưa dò?" */

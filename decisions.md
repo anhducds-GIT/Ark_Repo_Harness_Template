@@ -415,3 +415,32 @@ là chưa có chứ không vẽ một cửa không tồn tại.
 cũng như là ngày phiên bản."*
 
 Chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.35 · quy trình kiểm: [docs/SO-TAY-AGENT.md](docs/SO-TAY-AGENT.md) mục 8.
+
+---
+
+## 2026-09-07 — Một đột biến chết vì lý do khác thì nó chứng minh KHÔNG GÌ CẢ
+
+Không phải Đức chốt — đây là **luật rút ra từ một lần đo sai của chính tôi**, ghi vào đây vì nó
+đổi cách làm cho mọi lượt sau.
+
+`AGENTS.md` mục 3 luật 2 bắt mỗi fix có một test ghim, và `MULTIFLOW.md` mục 5 bắt cơ chế đa phiên
+phải qua **đột biến kiểm**. Ngày 07/09 tôi chạy bốn đột biến cho một vế mới, **cả bốn đều "chết"**,
+và tôi gần như ghi luôn là đạt.
+
+Nhưng chúng chết vì **cổng dấu vân tay bản phát nổ trước** — vế mới chưa hề chạy. Trên màn hình,
+một đột biến chết vì lý do khác **đọc y hệt** một đột biến bị vế đó bắt: cùng exit khác 0, cùng
+một dòng `AssertionError`.
+
+Phải chạy **riêng** bốn phép của vế đó mới thấy. Và lúc đó lộ ra một phép trong bốn đang **hỏng**:
+nó ghép một biểu thức chính quy từ chuỗi, dấu chéo bị ăn một lớp, nên nó **ném SyntaxError chứ
+không assert** — và không lộ ra ở lần chạy xanh, vì nhánh đó chỉ vào khi có ca hỏng thật.
+
+**Luật, áp cho mọi đột biến kiểm từ nay:**
+
+1. Đột biến phải **DỪNG lại ở đúng vế mình đang đo**. Không đủ khi biết "suite đỏ" — phải đọc được
+   **dòng assert nào** đỏ, và nó phải là dòng của vế đó.
+2. Đột biến chết ở một cổng **phía trước** vế đang đo thì **không tính**. Chạy riêng vế đó ra.
+3. Mỗi đột biến nên chết ở **một phép khác nhau**. Bốn đột biến cùng chết ở một phép nghĩa là ba
+   phép còn lại chưa được đo lần nào.
+
+Ghi chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.36.

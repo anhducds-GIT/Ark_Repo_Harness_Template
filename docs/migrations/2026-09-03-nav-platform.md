@@ -134,3 +134,87 @@ Bốn lỗi NẶNG đáng nhớ:
 > **Khối này THÊM VÀO ngày 2026-09-07**, sau lượt migrate — bởi phiên `claude-bang-gon`.
 > Danh mục tính năng chưa tồn tại lúc lượt ấy chạy, nên hồ sơ gốc không có checklist. Chữ phần
 > trên **không sửa một dòng nào**: hồ sơ migrate là vùng chỉ thêm.
+
+---
+
+## Checklist tính năng đã migrate — danh mục bản 1.3.31 · đo ngày 2026-09-07
+
+> Khối này do `node scripts/features.mjs --migrate <repo>` sinh ra. **Đo, không tự khai.**
+> `[x]` đủ · `[~]` một phần (xử trước) · `[ ]` thiếu · `[-]` chỉ cần ở repo phát hành.
+
+**F1 · Bảng trạng thái** — 3/4
+
+- [x] `F1.1` Bảng chính HTML, sinh hoàn toàn từ HEAD *(từ bản 1.3.18)*
+- [x] `F1.2` Ba artifact máy đọc: DASHBOARD.md · llms.txt · repo-map.json *(từ bản 1.0.0)*
+- [x] `F1.3` Bảng SỐNG — F5 là thấy, ba cửa dùng một lõi *(từ bản 1.3.26)*
+- [ ] `F1.4` Tab Migrate — bảng mốc ba bước, hồ sơ gập trong toggle *(từ bản 1.3.20)* — thiếu: `docs/migrations`
+
+**F2 · Cấu trúc file và bảo trì** — 4/4
+
+- [x] `F2.1` Repo tự khai hình dạng của mình *(từ bản 0.3.0)*
+- [x] `F2.2` Cổng kiểm cấu trúc B1–B15 *(từ bản 0.3.0)*
+- [x] `F2.3` Cân nặng và ngân sách — repo phải RẺ, không chỉ ĐÚNG *(từ bản 1.1.0)*
+- [x] `F2.4` Nhịp DỌN — dời sang lưu trữ, KHÔNG xoá *(từ bản 1.3.4)*
+
+**F3 · Đa phiên — chống hai AI giẫm chân nhau** — 5/5
+
+- [x] `F3.1` Bảng chủ sở hữu và khoá vùng, nhận/trả bằng LỆNH *(từ bản 0.3.0)*
+- [x] `F3.2` Cổng đóng phiên — 11 phép kiểm, có bộ đếm chống sửa *(từ bản 0.3.0)*
+- [x] `F3.3` Cổng xuất bản — thay `git push` trần *(từ bản 0.3.0)*
+- [x] `F3.4` Tín hiệu 'repo chưa thấy dấu vết' — VÀNG, không bao giờ ĐỎ *(từ bản 1.3.20)*
+- [x] `F3.5` Trả khoá an toàn khi còn commit chưa đẩy, kèm cửa thoát khai lý do *(từ bản 1.3.26)*
+
+**F4 · AI assistant — vai điều phối** — 6/6
+
+- [x] `F4.1` Sổ tay vai điều phối — có hàng rào vai cứng *(từ bản 1.3.0)*
+- [x] `F4.2` Cổng nhất quán trạng thái — chạy TRƯỚC KHI BÁO CÁO *(từ bản 1.3.0)*
+- [x] `F4.3` Bản đồ việc — giao ba nguồn, và luật song song một câu *(từ bản 1.3.0)*
+- [x] `F4.4` Giao thức đa phiên — bốn cơ chế, năm bất biến kèm lý do *(từ bản 0.3.0)*
+- [x] `F4.5` Cửa vào riêng cho từng AI — một bản luật, nhiều cửa *(từ bản 0.3.0)*
+- [x] `F4.6` Từ điển thuật ngữ và bản hướng dẫn cho phiên AI đầu tiên *(từ bản 1.3.11)*
+
+**F5 · Luật và quyết định** — 3/4
+
+- [x] `F5.1` Hiến pháp một trang — sáu việc phải hỏi người chốt, bản DUY NHẤT *(từ bản 0.3.0)*
+- [ ] `F5.2` Sổ quyết định — chỉ thêm, tra được ngày nào chốt gì *(từ bản 0.3.0)* — thiếu: `decisions.md`
+- [x] `F5.3` ADR — ghi nhận quyết định kiến trúc, có bản mẫu *(từ bản 0.3.0)*
+- [x] `F5.4` Phụ lục NGHỀ — luật riêng của nghề repo, tách khỏi luật chung *(từ bản 1.3.6)*
+
+**F6 · Sổ sách trạng thái** — 2/5
+
+- [x] `F6.1` Nhật ký bàn giao — phiên sau đọc phần cuối là biết phiên trước làm tới đâu *(từ bản 0.3.0)*
+- [ ] `F6.2` Sổ nợ — thứ đang HỎNG, nhóm theo mức ưu tiên *(từ bản 0.3.0)* — thiếu: `BACKLOG.md`
+- [ ] `F6.3` Sổ ý tưởng — HƯỚNG ĐI, cố ý tách khỏi sổ nợ *(từ bản 1.3.2)* — thiếu: `IDEAS.md`
+- [x] `F6.4` Hồ sơ trạng thái từng đơn vị công việc, có bản mẫu *(từ bản 0.3.0)*
+- [ ] `F6.5` Sổ phát hành cho người đọc — mỗi bản một khối, chỉ thêm *(từ bản 0.3.0)* — thiếu: `CHANGELOG.md`
+
+**F7 · Phát hành bộ khung — chỉ nơi PHÁT mới cần** — 0/0
+
+- [-] `F7.1` Bản trích tự sinh, có phép kiểm không cho hai bản trôi khỏi nhau *(từ bản 1.0.0)*
+- [-] `F7.2` Sổ phát hành máy đọc — mỗi bản một dấu vân tay, CHỈ THÊM *(từ bản 1.0.0)*
+- [-] `F7.3` Nâng repo đã lắp — TỪ CHỐI ghi đè file đã bị sửa tay *(từ bản 1.1.0)*
+- [-] `F7.5` Đo một repo cách chuẩn bao xa *(từ bản 1.0.0)*
+- [-] `F7.6` Dựng repo mới từ bộ khung *(từ bản 1.0.0)*
+- [-] `F7.7` Sinh đề bài đã ĐO SẴN repo đích, cho AI khác thực thi *(từ bản 1.3.15)*
+
+**F8 · Phép kiểm và cổng chạy xa** — 4/4
+
+- [x] `F8.1` Suite hạt giống — repo nhà CHẠY THẬT đúng cái nó phát cho người khác *(từ bản 1.0.0)*
+- [x] `F8.2` Phép ghim của gói vai điều phối *(từ bản 1.3.0)*
+- [x] `F8.3` Cổng kiểm chạy trên GitHub — lớp duy nhất không ở trên máy người dùng *(từ bản 1.2.0)*
+- [x] `F8.4` Kiểu xuống dòng do REPO quyết, không do máy người clone *(từ bản 1.2.0)*
+
+**F9 · Đối chiếu và tự nâng cấp — cái nối repo đích về bộ khung** — 2/2
+
+- [x] `F9.1` Sổ ghim ở repo đích — repo này đang dùng bản nào *(từ bản 1.1.0)*
+- [x] `F9.2` Danh mục tính năng — checklist migrate, đo được ở mọi repo *(từ bản 1.3.31)*
+- [-] `F9.3` Đề bài đưa AI assistant của repo đích GO LIVE và nhận việc maintain *(từ bản 1.3.31)*
+
+**Tổng: 29 xong · 0 một phần · 5 thiếu.**
+
+
+> **Đo LẠI ngày 2026-09-07, SAU khi nhận bản khung 1.3.36** — phiên `claude-bang-gon`.
+> Sổ ghim nhảy **1.2.20 → 1.3.36**, tức 14 bản trong một lượt. Khối trên (đo trước lượt nâng)
+> giữ nguyên từng dòng: hồ sơ migrate là vùng **chỉ thêm**. **17 xong · 0 một phần · 17 thiếu**
+> → **29 xong · 0 một phần · 5 thiếu**. Thứ lớn nhất repo này vừa nhận là **bảng HTML bảy tab**
+> — trước lượt này nó chỉ có bảng markdown.

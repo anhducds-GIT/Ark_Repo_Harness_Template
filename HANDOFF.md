@@ -1185,3 +1185,61 @@ sai ở mọi repo đích, vì file đi theo bản trích. Nay suy bằng hai d�
 
 **Còn mở:** ghi checklist vào tab Migrate của bảng · `Y-09` phát sang hai repo (Đức đang xem bản kế
 hoạch) · `KHUNG-37` `@Đức:bấm`.
+
+## 2026-09-07 · claude-bang-gon · bản 1.3.35 + 1.3.36 — bảng gọn lại (đo được), checklist vào tab Migrate, và lỗ thứ ba của tầng máy
+
+**Làm gì:** năm phản hồi bố cục của Đức, checklist tính năng lên tab Migrate, `Y-09` phát bảng
+sang repo đã lắp, và hướng dẫn kiểm tra đầy đủ.
+
+**Số đo bố cục, trên màn 1440×900, đo bằng chính trình duyệt trước và sau:**
+
+| | Trước | Sau |
+|---|---|---|
+| đầu trang (header + lề + thanh tab) | 270px | **105px** |
+| tab Vận hành | **16,0 màn hình** | **3,7** |
+| tab Cấu trúc | **10,1 màn hình** | **3,5** |
+| tab Ý tưởng | 1,9 | 1,4 |
+| khung nội dung | 1080px / màn 1440 | 1280px |
+
+**Số đo chỉ ra chỗ khác hẳn chỗ đang nghi** — và đây là phần đáng giữ lại: tab Vận hành cao 16
+màn hình vì **ba tài liệu đổ thẳng ra không gập** (11.223px trong 14.442px), tab Cấu trúc cao 10
+màn hình vì **bản đồ file in HAI LẦN trên cùng một tab**. Không phải vì CSS thưa. Sửa CSS mà
+không đo thì đã gọt chỗ không đau và để nguyên chỗ đau.
+
+**Ô "Làm mới bảng"** ở tab AI điều phối: hai câu trả lời **cạnh nhau** cho cùng một cú F5 — bảng
+sống đọc bảng quyền từ đĩa (F5 là thấy), bảng đã commit suy từ HEAD (F5 không đổi số). Cổng đọc
+từ mã nguồn, đọc không ra thì nói thẳng. Mỗi thứ copy được có một nút COPY.
+
+**Checklist tính năng lên tab Migrate**, kèm ngày đo và bản danh mục. Ba hồ sơ đã đo lại và
+**thêm khối** (chỉ thêm, không sửa dòng cũ): `17/34` · `19/34` · `24/34`.
+
+**LỖ THỨ BA của tầng máy, cùng một hình dạng:**
+
+| Lần | Lỗ | Vì sao lọt |
+|---|---|---|
+| 1.3.26 | `bang-song/` không được phát | tầng máy định nghĩa theo **tên thư mục** |
+| 1.3.35 | **tên lệnh** không được phát | **không tầng nào** nhận `package.json` |
+| 1.3.36 | `features.json` không được phát | phép "theo đuôi file" chỉ nhận thứ **chạy được** |
+
+**Y-09 — phát thật, và số đo trả lời được nó:** `ALL_SKILL_MANAGEMENT` nhận `1.3.19 → 1.3.36`.
+Đo tại chính repo đó: **24 xong · 3 một phần · 7 thiếu → 30 xong · 0 MỘT PHẦN · 4 thiếu**. Ba mục
+`[~]` là cùng một bệnh — file có mà `npm run gate` không có. `npm test` ở đó exit 0, sáu suite
+xanh (đã **nối** ba suite mới vào chuỗi `test` của chính repo đó, không ghi đè). Chạy thật một
+cửa `.cmd`: nó né cổng 4747 sang 4748 và **tự dừng sinh** vì `_code` đang bị giữ.
+
+**Một lỗi lộ ra lúc đo:** bảng của repo đích **tự gọi mình là "bộ khung"** — câu tự giới thiệu gõ
+cứng vào bộ sinh, mà bộ sinh đi theo bản trích. Nay đọc từ `repo.tagline`.
+
+**Và phát hiện đáng giá nhất:** lượt đo đột biến **đầu tiên không dùng được**. Bốn đột biến đều
+"chết", nhưng chết vì **cổng dấu vân tay nổ trước** — vế đang đo chưa hề chạy. Chạy riêng ra mới
+thấy, và lúc đó lộ ra một phép trong bốn đang **hỏng**: nó ném `SyntaxError` chứ không assert, và
+không lộ ra ở lần chạy xanh vì nhánh đó chỉ vào khi có ca hỏng thật. Luật rút ra đã ghi vào
+`decisions.md`: **một đột biến chết vì lý do khác thì nó chứng minh KHÔNG GÌ CẢ.**
+
+**Phép kiểm:** `overview-doc-smoke` 10→**12 vế** · `upgrade-smoke` 22→**24 vế**. **Mười sáu đột
+biến đã chạy thật**, không cái nào sống sót. `npm test` exit 0.
+
+**Còn mở:** `nav_platform_main` chưa nâng (đang làm) · `Project 3 AI Agent Unify` **KHÔNG nâng** —
+luật 8A *Cloud Sync Hold* của chính repo đó chặn, và Đức đã hoãn `KHUNG-30`; luật chủ nhà thắng
+trên đất của nó · `KHUNG-39` mới: `.gitignore`/`.gitattributes` nằm trong bản trích mà không tầng
+nào phát, đã vá tay cho hai repo · cân nặng vượt ngân sách 3 chỗ (`npm run don` là nhịp riêng).

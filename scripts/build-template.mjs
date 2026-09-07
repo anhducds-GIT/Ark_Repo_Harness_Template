@@ -989,8 +989,32 @@ export const bam = (text) => createHash("sha256")
  * thêm thư mục mã, chứ không đợi ai nhớ sửa một danh sách. */
 export const DUOI_MAY = Object.freeze([".mjs", ".cmd"]);
 
+/* DỮ LIỆU MÁY — cùng một lỗ, lần thứ ba, và lần này là một file `.json`.
+ *
+ * `features.json` KHÔNG chạy được, nên phép "theo đuôi file" ở trên loại nó ra — mà
+ * `scripts/features.mjs` thì ĐỌC nó, và cả `npm run features` lẫn phép ghim của nó gãy nếu
+ * thiếu. Đo 07/09: `--plan` ở một repo đã lắp kể `scripts/features.mjs` là THIẾU nhưng **không
+ * kể `features.json`**, nên `--apply` gửi bộ đo tới mà không gửi thứ nó đo. Tính năng `F9.2`
+ * của chính danh mục đó không bao giờ xanh được ở repo đích.
+ *
+ * Và sâu hơn, đúng như `bang-song/` hồi 1.3.26: `bamBanTrich` dùng hàm này, nên đổi nội dung
+ * `features.json` mà không tăng phiên bản thì **sổ phát hành nói dối** về một bản đã phát.
+ *
+ * Danh sách này KHAI TAY, cố ý. Không có phép suy nào tách được "dữ liệu của bộ khung" khỏi
+ * "cấu hình của repo đích" — `package.json` · `.repo-structure.json` · `.agents/claims.json`
+ * cũng là `.json` trong bản trích, và ghi đè bất kỳ cái nào là xoá repo của người ta. Nên thà
+ * một danh sách ngắn có phép ghim canh, hơn một quy tắc rộng đoán sai một lần là mất dữ liệu. */
+export const TEP_MAY_THEM = Object.freeze(["features.json"]);
+
+/* Ba file này là CỦA REPO ĐÍCH, không bao giờ được vào tầng máy. Phép ghim đọc danh sách này
+   chứ không gõ lại tên — hai bản chép sẽ lệch. */
+export const TEP_CUA_REPO_DICH = Object.freeze([
+  "package.json", ".repo-structure.json", ".agents/claims.json"
+]);
+
 export function fileMay(chuan) {
-  return [...chuan.keys()].filter((rel) => DUOI_MAY.some((d) => rel.endsWith(d)));
+  return [...chuan.keys()].filter((rel) =>
+    DUOI_MAY.some((d) => rel.endsWith(d)) || TEP_MAY_THEM.includes(rel));
 }
 
 export function bamBanTrich(chuan) {

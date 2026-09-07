@@ -774,3 +774,36 @@ bản vá: (a) một lệnh đo *"tiến trình nào thuộc phiên đã chết"
 **Chưa tự giết cái nào** — giết tiến trình của phiên khác là việc không lùi lại được và chạm tới
 việc người khác, đúng hai nhánh bắt phải hỏi. Lệnh đo đã ghi ở [docs/BAO-TRI-DINH-KY.md](docs/BAO-TRI-DINH-KY.md).
 Vùng: `_docs`.
+
+### KHUNG-39 · `.gitignore` và `.gitattributes` nằm trong bản trích mà KHÔNG tầng nào phát
+
+**Đo 07/09** — quét bản trích rồi hỏi mỗi file thuộc tầng nào:
+
+```
+node -e "... buildTemplateFiles() vs fileMay() vs fileTaiLieu() ..."
+→ KHÔNG THUỘC TẦNG NÀO: .gitignore  .gitattributes  (và 14 file repo đích tự sở hữu)
+```
+
+14 file kia **đúng** là của repo đích (`AGENTS.md` · `HANDOFF.md` · `.repo-structure.json`…).
+Hai file này thì khác: chúng là **cấu hình repo mà bộ khung có lý do kỹ thuật để mang**.
+
+| File | Thiếu nó thì hỏng ra sao |
+|---|---|
+| `.gitattributes` | máy Windows tự đổi xuống dòng lúc lấy file ra, một commit có hai dạng byte, và `git status` nói SẠCH ở cả hai — đo thật ở repo nhà: cùng một cây làm việc, 75 file LF và 21 file CRLF |
+| `.gitignore` | repo nhận `bang-song/` sẽ **bẩn cây làm việc** ngay lần đầu ai nhấp đúp `Xem-bang.cmd`, và cổng đóng phiên của MỌI lane ở đó kêu về ba file không ai commit được |
+
+**Luật đúng gần như chắc chắn là luật của tầng tài liệu:** THIẾU thì mang sang · **CÓ rồi thì
+CHỈ kể tên**, không bao giờ trộn. Ghép hai `.gitignore` bằng máy là việc dễ hỏng im lặng — một
+dòng `!` phủ định của repo đích gặp một dòng của bộ khung thì kết quả không ai đoán được.
+
+**Vá tay 07/09 cho hai repo đã nhận `bang-song/`** (`ALL_SKILL_MANAGEMENT` ·
+`nav_platform_main`): thêm ba dòng vào `.gitignore` của chính chúng. Đó là **vá điểm**, không
+phải cơ chế — repo thứ ba nhận `bang-song/` sẽ vấp lại đúng chỗ này.
+
+**ĐÃ ĐO 07/09, và số đo đổi hình việc:** cả **3/3** repo đã lắp **đều đã có** `.gitignore` và
+`.gitattributes` của riêng chúng (`ALL_SKILL_MANAGEMENT` 11 dòng · `nav_platform_main` 78 dòng ·
+`Project 3 AI Agent Unify` có cả hai). Nghĩa là vế `THIẾU thì mang` gần như **không bao giờ chạy**
+ở thực tế, và toàn bộ việc nằm ở vế `KHÁC` — tức chỉ kể tên. Nên bản vá đúng có lẽ **nhỏ hơn**
+dự tính: chỉ cần `--plan` **KỂ TÊN** hai file này khi chúng khác bản trích, kèm một câu nói rõ
+điều gì hỏng nếu thiếu dòng nào (bảng dưới), rồi **để người quyết**. Ghép bằng máy thì đừng.
+

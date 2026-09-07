@@ -23,7 +23,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildTemplateFiles, kiemSoPhatHanh, loiSoPhatHanh, soVoiLichSu } from "../scripts/build-template.mjs";
+import { bamBanTrich, buildTemplateFiles, kiemSoPhatHanh, loiSoPhatHanh, soVoiLichSu, TEP_CUA_REPO_DICH, TEP_MAY_THEM } from "../scripts/build-template.mjs";
 import { docSoGhim, fileMay, fileTaiLieu, fileTuyChon, ghepLenh, soGhimMoi, soSanh, soSanhLenh } from "../scripts/upgrade.mjs";
 
 let passed = 0;
@@ -57,8 +57,17 @@ const dungRepo = (ghiSoGhim) => {
     `tai lieu KHONG duoc nam trong tap tu dong ghi de: ${ds.filter((r) => r.endsWith(".md")).join(", ")}`);
   assert.ok(!tap.has("AGENTS.md") && !tap.has("STATUS.md") && !tap.has("HANDOFF.md"),
     "luat va trang thai KHONG duoc nam trong tap tu dong ghi de");
-  assert.ok(!ds.some((r) => r.endsWith(".json")),
-    "cau hinh la thu repo dich khai cho nghe cua no, khong duoc ghi de");
+  /* CẤU HÌNH `.json` là thứ repo đích khai cho nghề của nó — không được ghi đè.
+   *
+   * Vế này từng là "KHÔNG file `.json` nào ở tầng máy", và nó BẮT ĐƯỢC tôi ngày 07/09 lúc tôi
+   * kéo `features.json` vào tầng máy. Đúng chỗ nó phải bắt. Nên không gỡ nó — **thu hẹp** nó:
+   * `.json` ở tầng máy phải được KHAI TƯỜNG MINH trong `TEP_MAY_THEM`, và vế 21 canh tiếp là
+   * mọi tên khai đều có thật, còn `package.json` · `.repo-structure.json` · `.agents/claims.json`
+   * thì tuyệt đối không được lọt vào. Một ngoại lệ có tên và có phép ghim khác hẳn một cái cửa
+   * mở: cửa mở thì lần sau ai cũng đẩy được một file cấu hình qua, không ai thấy. */
+  const jsonLot = ds.filter((r) => r.endsWith(".json") && !TEP_MAY_THEM.includes(r));
+  assert.deepEqual(jsonLot, [],
+    `cau hinh la thu repo dich khai cho nghe cua no, khong duoc ghi de: ${jsonLot.join(", ")}`);
 
   /* CHIỀU 2 — và KHÔNG được bỏ sót thứ chạy được. Vế này thêm sau khi nó cắn thật.
    *
@@ -780,6 +789,79 @@ const dungRepo = (ghiSoGhim) => {
     }
   }
   ok(`tên lệnh: thiếu thì mang · khác thì chỉ kể tên · đọc không ra là KHÔNG BIẾT · ${Object.keys(lenhThat).length} lệnh bản trích đều trỏ tới file có thật`);
+}
+
+/* ---- 21. DU LIEU MAY: bo do phai di CUNG thu no do -----------------------
+ *
+ * Cung mot lo, lan thu ba. 1.3.26: `bang-song/` bi loai vi tang may dinh nghia theo TEN THU MUC.
+ * 1.3.35: ten lenh khong duoc phat vi khong tang nao nhan `package.json`. 07/09: `features.json`
+ * bi loai vi phep "theo duoi file" chi nhan thu CHAY DUOC — nen `--apply` gui `features.mjs` toi
+ * ma khong gui thu no doc, va tinh nang `F9.2` cua chinh danh muc do khong bao gio xanh o repo
+ * dich. Ve nay dong lo do lai bang mot CAU HOI, khong bang mot danh sach ten file.
+ *
+ * BON DOT BIEN DA CHAY THAT (07/09) — moi cai chet o DUNG mot phep khac nhau:
+ *   1. bo `features.json` khoi tang may  -> [3] "scripts/features.mjs nhac features.json"
+ *   2. go sai ten trong danh sach        -> [1] "khai feature.json ma ban trich KHONG co"
+ *   3. keo `package.json` vao tang may   -> [2] "la cua repo dich ma tang may nhan no"
+ *   4. dau van tay chi phu file chay duoc -> [4] "dau van tay khong phu du lieu may"
+ *
+ * LUOT DO DAU TIEN KHONG DUNG. Ca bon dot bien "chet", nhung chet vi cong dau van tay ban
+ * phat no TRUOC — ve 21 chua he chay. Mot dot bien chet vi ly do khac doc y het mot dot bien
+ * bi bat, va no chung minh khong gi ca. Phai chay rieng bon phep nay moi thay duoc, va luc do
+ * lo ra rang phep [3] con dang HONG: no nem SyntaxError chu khong assert.
+ */
+{
+  const chuan = buildTemplateFiles();
+  const may = new Set(fileMay(chuan));
+
+  // 1. Moi ten khai trong danh sach phai CO THAT trong ban trich. Mot ten go sai la mot file
+  //    im lang khong bao gio duoc phat — dung kieu hong ma ve nay sinh ra de chan.
+  for (const rel of TEP_MAY_THEM) {
+    assert.ok(chuan.has(rel), `TEP_MAY_THEM khai "${rel}" mà bản trích KHÔNG có file đó`);
+    assert.ok(may.has(rel), `"${rel}" khai là dữ liệu máy mà fileMay() không nhận`);
+  }
+
+  // 2. KHONG duoc keo file CUA REPO DICH vao tang may. Ghi de `package.json` hay
+  //    `.repo-structure.json` cua ho la xoa repo cua ho, va no hong IM LANG.
+  for (const rel of TEP_CUA_REPO_DICH) {
+    assert.ok(chuan.has(rel), `phép ghim đang canh "${rel}" mà bản trích không có — sửa danh sách`);
+    assert.ok(!may.has(rel), `"${rel}" là file CỦA REPO ĐÍCH mà tầng máy lại nhận nó`);
+  }
+
+  // 3. CAU HOI TONG QUAT: file may nao DOC mot file du lieu o goc repo bang ten, thi file do
+  //    phai nam trong tang may. Quet chinh ma nguon, khong doc mot danh sach nao — them mot
+  //    file du lieu moi roi quen khai thi ve nay DO, chu khong doi ai nho.
+  const goc = [...chuan.keys()].filter((r) => !r.includes("/") && /\.(json|txt)$/.test(r));
+  const thieu = [];
+  for (const rel of fileMay(chuan)) {
+    if (!rel.endsWith(".mjs")) continue;
+    const ma = String(chuan.get(rel));
+    for (const ten of goc) {
+      if (TEP_CUA_REPO_DICH.includes(ten) || may.has(ten)) continue;
+      /* PHEP DO PHAI DON GIAN DEN MUC KHONG THE VIET SAI.
+       *
+       * Ban dau cho nay dung mot `new RegExp` ghep tu chuoi, va no HONG: dau cheo bi an mot
+       * lop nen bieu thuc thanh `Unterminated group` — tuc phep kiem NEM SyntaxError chu khong
+       * assert. Va no khong lo ra o lan chay xanh, vi nhanh nay chi vao khi co file chua duoc
+       * phat: dung mot phep kiem KHONG BAO GIO DO. Do duoc 07/09 luc dot bien that.
+       *
+       * Nen doi sang phep tim chuoi thuan: ten file co xuat hien trong ngoac o ma nguon hay
+       * khong. Tho hon — mot ten nhac trong chu cung tinh — nhung khong the viet sai, va khi
+       * no bao thi cach xu dung la PHAT file do, khong phai noi long phep kiem. */
+      const nhac = [String.fromCharCode(34), "'", "`"].some((q) => ma.includes(q + ten + q));
+      if (nhac) thieu.push(`${rel} nhắc ${ten}`);
+    }
+  }
+  assert.deepEqual(thieu, [],
+    `file máy đọc một file dữ liệu mà file đó KHÔNG được phát: ${thieu.join(" · ")}`);
+
+  // 4. Dau van tay ban phat phai PHU du lieu may. Khong phu thi doi noi dung `features.json`
+  //    ma khong tang phien ban se di lot, va so phat hanh noi doi ve mot ban DA PHAT.
+  const doi = new Map(chuan);
+  doi.set("features.json", String(chuan.get("features.json")).replace('"version"', '"ban_doi_roi"'));
+  assert.notEqual(bamBanTrich(doi), bamBanTrich(chuan),
+    "đổi features.json mà dấu vân tay bản phát không đổi — sổ phát hành sẽ nói dối");
+  ok(`dữ liệu máy: ${TEP_MAY_THEM.length} file khai đều có thật · ${TEP_CUA_REPO_DICH.length} file của repo đích đều bị loại · bộ đo đi cùng thứ nó đo · dấu vân tay phủ được`);
 }
 
 console.log(`

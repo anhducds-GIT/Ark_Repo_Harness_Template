@@ -135,9 +135,9 @@
 
 ## Y-09 · Bảng của mọi repo phải là MỘT bảng, không phải N bản fork
 
-- **bậc:** đang xây
-- **việc kế:** phát bảng sang ba repo đã lắp rồi đối chiếu (bộ sinh đã vào bản trích từ 1.3.18 — nút import đã gỡ, xem dưới)
-- **chủ:** claude-bang9tab
+- **bậc:** đã chứng minh
+- **việc kế:** không còn việc mở ở đường này — lượt phát kế tiếp làm theo `docs/SO-TAY-AGENT.md` mục 8
+- **chủ:** chưa ai nhận
 - **phạm vi:** `_code` + `_template`
 
 **nguồn** — Đức chốt 2026-09-06 sau khi mở bảng của repo Chrome Extension: *"chúng ta sẽ học và đưa các cái logic cũng như là cách triển khai, UI, UX vào trong repo dashboard template"*, và chọn phương án **đi theo bản trích**.
@@ -148,9 +148,29 @@
 
 Ghi lại chỗ này thay vì xoá, vì bài học không nằm ở cái nút: **một chỗ chặn đã hết mà sổ vẫn ghi là còn thì phiên sau đi đuổi một cái bóng** — và nó tốn đúng bằng một chỗ chặn thật.
 
-**Việc còn lại của `Y-09`** là phát bảng sang ba repo đã lắp và đối chiếu, không phải gỡ nút nữa.
+**ĐÃ PHÁT VÀ ĐÃ ĐỐI CHIẾU — 2026-09-07, bản khung 1.3.36.** Đây là chỗ đường này khép lại:
 
-Repo Chrome Extension sẽ là **bản fork cần hợp nhất sau**, không phải nguồn.
+| Repo | Sổ ghim | Tính năng trước → sau | Bảng HTML |
+|---|---|---|---|
+| `ALL_SKILL_MANAGEMENT` | 1.3.19 → 1.3.36 | 24 xong · **3 một phần** · 7 thiếu → **30 · 0 · 4** | đã có, nay bảy tab |
+| `nav_platform_main` | 1.2.20 → 1.3.36 | 17 · 0 · 17 → **29 · 0 · 5** | **bảng HTML ĐẦU TIÊN** của repo đó |
+| `Project 3 AI Agent Unify` | **không phát** | 19 · 0 · 15 (giữ nguyên) | chưa có |
+
+**Repo thứ ba KHÔNG phát, và đó là câu trả lời đúng, không phải việc còn dở:** luật mục 8A
+*Cloud Sync Hold* của **chính repo đó** bắt dừng khi Local đang sau `origin/main`. Luật chủ nhà
+thắng trên đất của nó. Đức đã hoãn `KHUNG-30`; ba lối để đi tiếp ghi ở đó.
+
+**Cả hai repo đã phát đều ra CÙNG MỘT bảng** — cùng bộ sinh, cùng lõi, khác nội dung: tên và câu
+tự giới thiệu đọc từ `repo.tagline` của từng repo, tab nào không có nguồn thì tự ẩn. Đó là điều
+`Y-09` đặt ra để chứng minh: **một bảng, nhiều repo — không phải N bản fork.**
+
+**Ba lỗ của bộ khung lộ ra đúng lúc phát** — và cả ba đều là *cùng một hình dạng*: một thứ nằm
+trong bản trích mà **không tầng nào nhận nó**, nên nó không bao giờ tới repo đích. `bang-song/`
+(1.3.26, theo tên thư mục) · **tên lệnh** trong `package.json` (1.3.35) · `features.json`
+(1.3.36, vì nó không chạy được). Cái thứ hai là gốc của lớp `MỘT PHẦN`: công cụ tới mà tên gọi
+không tới.
+
+Repo Chrome Extension vẫn là **bản fork cần hợp nhất sau**, không phải nguồn.
 
 **đo trước khi sửa** — Chạy bộ sinh trên một repo cố tình khác hình dạng repo nhà (không đơn vị con, thiếu sổ ý tưởng, tên vùng khác) và đòi nó ra trang không vỡ.
 
