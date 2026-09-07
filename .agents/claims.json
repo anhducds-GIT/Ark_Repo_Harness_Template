@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-loi-hai-vai",
       "ai": null,
-      "claimed_at": "2026-09-07T07:55:13.044Z",
-      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
-      "released_at": "2026-09-07T10:52:20.707Z",
+      "claimed_at": "2026-09-07T12:06:48.447Z",
+      "task": "package.json: noi suite quyen vao npm test",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"

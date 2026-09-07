@@ -1313,3 +1313,27 @@ chỗ**, và phép kiểm báo *"đang 0 câu"* trong khi trang có đủ ba. Co
 đo hỏng**, không phải "trang hỏng" — hai ca đọc y hệt nhau. Tin con số thì lượt sau đi sửa thứ
 đang đúng. Nay mỏ neo neo vào **khoá máy đọc** (`data-cau` · `data-den` · `data-tab`), không neo
 vào hình dạng thẻ HTML hay chữ hiển thị.
+
+## 2026-09-07 · claude-loi-hai-vai — lõi cấp quyền nguyên tử bằng ref git riêng
+
+**Làm gì.** Dựng `scripts/quyen.mjs` + `tests/quyen-sau-ca.mjs` cho kiến trúc hai vai Assistant
+(brief `LAT-CAT-HAI-VAI-01` ở repo Extension). Sổ quyền nằm trên `refs/ark/quyen`, **ngoài lịch
+sử `main`** — nên rebase `main` không chạm được nó, và lượt tích hợp cũng là một sự kiện trên
+chính ref đó nên lượt kiểm quyền và lượt ghi kết quả hợp thành **một lượt đẩy**.
+
+**Kết quả số.** 41 phép kiểm xanh · **10/10 đột biến bị bắt** · `npm test` xanh toàn bộ.
+Chín ca: xin đồng thời · mất quyền quay lại · chen giữa kiểm và ghi · chen sau `fetch` · quyền cũ
+sau `rebase` · thế hệ cũ cùng lane · đích đã đổi · đường hợp lệ · fail-closed.
+
+**Đột biến bắt được một chỗ tôi viết SAI**, đáng ghi lại vì nó dễ vấp lại: tôi viết *"đẩy trần
+chính là phép so-và-đổi"*. Sai — đó là **hai** lớp của git. Trong một kết nối đẩy, git gửi kèm
+giá-trị-cũ lấy từ lượt quảng bá ref, và `--force` **không** tắt được vế đó; nên đột biến `--force`
+xanh cả 37 phép kiểm. Cửa sổ thật nằm **sau `fetch`, trước lúc mở kết nối**: ở đó bản cục bộ đã
+cũ, đẩy trần bị từ chối còn `--force` **ghi đè và xoá mất sự kiện thu hồi của bên kia**. Ca ③c
+chen vào đúng khe đó bằng hook `reference-transaction`.
+
+**Còn mở.** Chưa nối vào `claim.mjs`, chưa vào `template/`, **chưa chuyển quy trình đang dùng** —
+đúng mục 6 của brief: chuyển trước khi lõi vượt sáu ca là để hai mô hình cùng sống.
+Ranh giới còn hở, khai thẳng: đẩy `main` mà **không** ghi sự kiện tích hợp thì lõi này không thấy.
+Chặn được chỗ đó cần **một bên thứ ba** đọc sổ quyền, và bên thứ ba phải không phải bên đang bị
+kiểm — chưa làm, và **không** tự bật branch protection.
