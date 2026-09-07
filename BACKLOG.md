@@ -807,3 +807,148 @@ phải cơ chế — repo thứ ba nhận `bang-song/` sẽ vấp lại đúng c
 dự tính: chỉ cần `--plan` **KỂ TÊN** hai file này khi chúng khác bản trích, kèm một câu nói rõ
 điều gì hỏng nếu thiếu dòng nào (bảng dưới), rồi **để người quyết**. Ghép bằng máy thì đừng.
 
+
+### KHUNG-40 · Bảy giới hạn Đức chốt 07/09 — cái nào phổ quát, cái nào riêng repo tiêu thụ @Đức:chốt
+
+> **CHỜ NGƯỜI CHỐT:** con số của từng trần phải do Đức đặt, không do AI đặt cho vừa hiện trạng.
+> `AGENTS.md` mục 2 hàng 6 bắt hỏi — đặt hay nới một ngân sách là đổi luật an toàn.
+
+**Nguồn.** Repo tiêu thụ `Chrome_Extension_AI_Agentic` được đo 07/09, và Đức đọc số rồi nói
+nguyên văn: *"thời gian để maintain dashboard và debug hệ thống chiếm phần lớn tài nguyên và
+thời gian, không add value nào cả."* Bảy giới hạn là câu trả lời của Đức cho repo ĐÓ. Việc ở đây
+là quyết cái nào phổ quát (vào bộ khung) và cái nào chỉ đúng ở đó.
+
+**ĐO Ở BỘ KHUNG, 2026-09-07** — số dưới đây là của repo NÀY, không phải của repo tiêu thụ:
+
+| # | Đo gì | Bộ khung | Ghi chú |
+|---|---|---|---|
+| ① | commit 7 ngày **chỉ chạm giấy tờ** | **194/280 = 69%** | 31% có chạm máy hoặc bản trích |
+| ② | luật-là-chữ | **1.254 dòng** (2.097 kể cả bản trích) | `AGENTS.md` 235 + 4 protocol 1.019 |
+| ③ | chốt máy cưỡng chế được | **26** (11 cổng đóng phiên + 15 cấu trúc) · 16 file test | |
+| ④ | tài liệu | **8.672 dòng** (12.329 kể cả bản trích + lưu trữ) | trần đang khai 2.200 → **vượt 3,9×** |
+| ⑤ | sổ nợ đang mở | **15** mục / 39 tổng | 62% quyển sổ là việc đã đóng |
+
+**Tỉ lệ luật/chốt: 1.254 ÷ 26 = 48 dòng văn cho mỗi cơ chế thật.** Repo tiêu thụ là 71. Cùng một
+hình dạng bệnh, nhẹ hơn — nhưng 69% commit chỉ chạm giấy tờ thì bộ khung **không được miễn**.
+
+**Bảy giới hạn, và đánh giá phổ quát/riêng:**
+
+| # | Giới hạn | Phổ quát? | Vì sao |
+|---|---|---|---|
+| ① | một đơn vị SỐNG một lúc | **chưa rõ** | bộ khung chỉ có 1 đơn vị nên nó không tự kiểm được vế này — đúng cái bẫy *"thứ gì repo nhà không dùng thì repo nhà không kiểm được"* |
+| ② | cấm cài một tính năng hai lần | **có** | và đã cắn thật ở đây: bản đồ file vẽ **3 lần** trên một tab, xem ADR-0006 |
+| ③ | tài liệu ≤ trần khai ở cấu hình | **ĐÃ CÓ** | `tongTaiLieu: 2200` — nhưng đang vượt 3,9× và **không cổng nào chặn** |
+| ④ | sổ nợ hạ tầng ≤ 10 mục | **có** | ở đây 15 mục; trần này ép CHỌN, không ép dọn |
+| ⑤ | test bắt 0 đột biến thì XOÁ | **có, và là phép cắt AN TOÀN NHẤT** | vì nó **đo được**. Chưa lượt nào chạy phép này trên 16 file test của bộ khung |
+| ⑥ | tối đa 2 phiên song song | **riêng** | bộ khung có 4 khoá và chưa lần nào chạy quá 2 lane; trần này chưa nổ ở đây |
+| ⑦ | một luật vào một luật ra | **KHÔNG thi hành được ở dạng này** | xem dưới |
+
+**Vì sao ⑦ phải đổi hình dạng.** *"Một luật"* không đếm được — một gạch đầu dòng là một luật? một
+câu? một đoạn? Không trả lời được thì không máy nào kiểm được, nên nó là **lời hứa**. Và
+`AGENTS.md` mục 7 có đúng câu *"luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua"* —
+tức mục 8 hiện tại **tự vi phạm nguyên tắc gốc của chính nó**.
+
+Đổi thành **TRẦN SỐ DÒNG cho file luật, cổng đóng phiên ĐỎ khi vượt**. Lúc file đã sát trần, muốn
+thêm 10 dòng luật thì buộc phải xoá 10 dòng khác — *"một vào một ra"* thành **tự động**, không cần
+ai tự nguyện. Và Đức kiểm được bằng một lệnh, một con số.
+
+**Lỗ của cách này, ghi rõ chứ không giấu:** trần dòng đo **độ dày**, không đo **chất lượng**. Một
+AI muốn lách sẽ cô đặc luật thành câu khó hiểu để vừa trần — mà luật khó hiểu thì **tệ hơn** luật
+dài. Chưa có cách nào máy chặn chuyện đó.
+
+**Cần Đức chốt đúng hai điều:**
+
+1. Trần cho `AGENTS.md` + `docs/protocols/` là bao nhiêu. Đặt **bằng số đo sau khi cắt** thì cửa
+   hẹp thật; đặt kèm biên rộng thì nó vô hại. Số hôm nay: **1.254**.
+2. Có đưa trần đó vào **cổng đóng phiên** không. `can-nang` hiện **cố ý nằm ngoài** cổng (nhịp
+   tháng), nên mọi trần hiện tại **chưa từng chặn được gì** — kể cả cái đang vượt 3,9×.
+
+**Việc kế, KHÔNG cần Đức:** chạy phép ⑤ trên 16 file test — mỗi file, phá một chốt nó canh, xem nó
+có đỏ. File bắt 0/n thì xoá kèm con số. Đây là phép cắt duy nhất trong bảy cái **tự chứng minh
+được**, không cần ai chốt.
+
+### KHUNG-41 · Bộ khung không có chỗ nào nói "DỪNG" — gốc bệnh, chưa vá
+
+**Chẩn đoán từ repo tiêu thụ 07/09, và nó là chẩn đoán về CÔNG SUẤT, không về hành vi sai.**
+
+Việc sản phẩm bị chặn ở tay người: bấm nút trên trình duyệt, chạy thử, chốt phạm vi. Công suất AI
+thì gần như vô hạn. Nên khi hết việc-không-cần-người, AI **không dừng** — nó tìm việc, và việc
+duy nhất còn lại là **sửa chính cái nhà máy**.
+
+*Không phải AI làm sai việc. Là AI hết việc đúng rồi tự tìm việc.*
+
+Số đo ở bộ khung: **69% commit 7 ngày chỉ chạm giấy tờ**. Ở repo tiêu thụ, tỉ lệ chạm mã sản phẩm
+là **9%**, và **không ai thấy** cho tới khi Đức tự cảm nhận rồi hỏi.
+
+**Cần một luật ngắn, đi ngược bản năng của mọi AI:** hết việc sản phẩm thì **DỪNG** và báo người
+chủ cần làm gì. Không lấp chỗ trống bằng việc hạ tầng. Vùng trống ≠ phải dùng.
+
+**Kèm một cách đo, để nó không thành một luật-là-chữ nữa:** tỉ lệ commit chạm sản phẩm; tụt dưới
+ngưỡng thì **bảng phải nói ra**, không để người chủ tự đoán.
+
+**Chỗ khó thật, phải giải TRƯỚC khi viết luật:** ở repo bộ khung, *"sản phẩm"* CHÍNH LÀ hạ tầng —
+`scripts/` và `template/` là thứ nó bán. Nên phép đo 9%-vs-91% của repo tiêu thụ **không chuyển
+thẳng sang được**. Phải định nghĩa lại "sản phẩm" theo từng repo, khai ở cấu hình; nếu không, luật
+này sẽ nói sai ở đúng repo phát hành ra nó.
+
+### KHUNG-42 · Khoá hết hạn khi CÓ NGƯỜI CHỜ, và vai điều phối không thể bị chặn @Đức:chốt
+
+> **CHỜ NGƯỜI CHỐT:** đây là đổi một trong bốn cơ chế đa phiên. `MULTIFLOW.md` mục 5 bắt đổi cơ
+> chế phải có **đột biến kiểm bắt buộc**, và `AGENTS.md` mục 2 hàng 6 bắt hỏi Đức.
+
+**Phép đo bác giả thuyết hiển nhiên.** Ở repo tiêu thụ, 375 commit / 3 ngày: 43% chỉ chạm vùng
+miễn khoá · 23% chỉ một gói · 7% chỉ docs · 6% chỉ scripts+tests. Trong 101 commit chạm một gói,
+chỉ **2** cũng chạm vùng gốc và **0** chạm docs. Việc sản phẩm và việc quản trị **gần như không
+ghi vào cùng chỗ** — phân vùng không sai.
+
+**Chỗ nghẽn thật: một phiên cầm khoá 3 giờ trong khi làm việc ở chỗ khác.** Công cụ đã in ra đúng
+điều đó — tín hiệu *"chưa thấy dấu vết trong repo"* — và mọi người bỏ qua nó.
+
+*Chỗ nghẽn không phải hai người cùng muốn ghi một chỗ. Là một người cầm chìa khoá phòng mình
+không vào.*
+
+**Đề xuất ②a — hết hạn CHỈ KHI có người đang chờ:**
+
+| Tình trạng khoá | Khi phiên khác xin |
+|---|---|
+| đang ghi (có commit trong 30 phút) | giữ, người xin chờ |
+| chưa thấy dấu vết > 30 phút | nhường |
+| có dấu vết nhưng > 2 giờ không commit | nhường, ghi lại một dòng |
+
+**Vế "chỉ khi có người chờ" là BẮT BUỘC, không phải trang trí.** Chính `AGENTS.md` mục 1 cảnh báo
+đúng chỗ đó: *"lane cẩn thận dựng nháp ngoài repo rồi mới ghi vào"* — nó không có dấu vết nhưng
+đang làm. Hết hạn vô điều kiện sẽ **cướp khoá** của nó, và 06/09 chuyện đó đã xảy ra thật: một
+khoá bị nhả hộ vì có người đọc dòng chẩn đoán ấy thành *"phiên kia đang rảnh"*, và phiên kia phải
+hoàn nguyên việc đã xong. `tests/khoa-dau-vet.mjs` vế 7 ghim đúng chỗ này.
+
+Không có ai chờ thì cầm bao lâu cũng vô hại. **Có người chờ thì mới có chuyện.**
+
+**Đề xuất ②b — vai điều phối không thể bị chặn, bằng CẤU TRÚC chứ không bằng luật:**
+
+(a) **Tạo file MỚI** trong `docs/adr/` và `docs/briefs/` thì **không cần khoá**. Nguyên lý: tạo
+file không bao giờ đụng nhau, chỉ **SỬA** file mới đụng. Cái bẫy phải chặn cùng lúc: hai phiên
+cùng tạo `0016-…` là **trùng số** — đúng loại lỗi đã xảy ra hai lần trong một ngày với mã sổ nợ ở
+repo tiêu thụ. Chặn bằng hai vế: số do vai điều phối cấp, và **một phép kiểm ở cổng: hai file
+cùng số thì ĐỎ**.
+
+(b) **File luật gốc tách thành khoá riêng**, và chỉ vai điều phối nhận khoá đó. Phiên sản phẩm
+**đọc** luật, không **viết** luật; cần đổi thì đề xuất qua một ADR — quy trình đã có.
+
+Kết quả: vai điều phối không thể bị chặn — không phải vì ai nhường, mà vì **mọi đường ghi của nó
+hoặc miễn khoá, hoặc nằm trên một khoá không ai khác nhận**.
+
+### KHUNG-43 · Một trang cho người chủ đọc — 6 ADR mà Đức không biết ADR là gì
+
+Repo tiêu thụ có **21 file ADR**, và Đức không biết ADR là gì. Bộ khung này có **6**.
+
+Một cơ chế người chủ không hiểu là cơ chế **không phục vụ được người chủ** — nó chỉ phục vụ AI.
+
+Bảng hiện chiếu ADR ra dưới dạng **bảng ba cột**: tiêu đề · trạng thái · ngày. Tiêu đề thì viết
+cho AI đọc (*"Gói Assistant phát hành từ bộ khung; repo nào dùng thì là người tiêu thụ"*), trạng
+thái là chữ tiếng Anh (`Accepted`), và **không cột nào nói đã chốt cái gì**.
+
+**Cần:** mỗi quyết định **một dòng tiếng Việt** nói đã chốt gì — không mã, không đường dẫn, không
+SHA. Giữ ADR (chúng cứu việc thật), nhưng **bổ sung cửa cho người**.
+
+Nguồn có sẵn: `decisions.md` đã là sổ tra nhanh *"Đức đã chốt gì, ngày nào"*, và bảng **chưa đọc
+file đó lần nào**. Nên đây có thể là một lượt **nối nguồn đã có**, không phải viết cơ chế mới.

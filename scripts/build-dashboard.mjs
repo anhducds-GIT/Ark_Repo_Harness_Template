@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { behaviourGlobsFrom, DEFAULT_UNITS, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, tenMaySinhFrom, unitsFrom } from "./repo-structure.mjs";
+import { behaviourGlobsFrom, DEFAULT_UNITS, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, tenMaySinhFrom, tenTrangFrom, unitsFrom } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -513,8 +513,25 @@ function measuredRow(deps, dirRelPath, manifestRelPath, tracked = trackedIndex(d
  * Tach thanh ham rieng chinh vi the: mot ham export duoc thi ghim duoc, mot bieu thuc noi trong
  * `collectModel` thi khong. */
 export function behaviourOptsFrom(structure) {
+  /* TÊN ARTIFACT SUY RA cũng phải được miễn, không chỉ tên repo tự khai.
+   *
+   * Đo 07/09 ở `nav_platform_main`: khối `generated` của nó khai ba file
+   * (`DASHBOARD.md` · `llms.txt` · `repo-map.json`) — đúng như lượt migrate 03/09 đã dựng.
+   * Nhưng từ bản 1.3.18 bộ khung sinh thêm **trang HTML**, tên suy từ `repo.name`, và không
+   * một repo đã lắp nào biết mà khai thêm. Hệ quả: bộ đếm "code đã đổi sau kiểm chứng" thấy
+   * một file `.html` lạ, +1 mỗi lượt sinh lại, và cổng *"Sự thật máy sinh còn tươi"* ĐỎ
+   * **vĩnh viễn** — sinh lại không thoát được, vì chính việc sinh lại làm nó tăng.
+   *
+   * Vá bằng cách BỎ việc phải khai: hợp `generated` (repo tự khai) với `tenMaySinhFrom`
+   * (bộ khung tự suy). Repo cũ không phải sửa cấu hình, repo mới không phải nhớ gì.
+   *
+   * Vì sao không thêm tên vào `MAY_SINH`: `MAY_SINH` là hằng số ba tên đóng cứng, mà tên
+   * trang thì **khác nhau ở mỗi repo**. Đóng cứng được cái thứ tư là đóng cứng sai. */
+  const suyRa = Object.values(tenMaySinhFrom(structure)).filter((x) => typeof x === "string");
+  const khai = generatedFrom(structure) || [];
+  const trang = tenTrangFrom(structure);
   return {
-    generatedFiles: generatedFrom(structure),
+    generatedFiles: [...new Set([...khai, ...suyRa, trang])],
     behaviourGlobs: behaviourGlobsFrom(structure) || undefined,
   };
 }

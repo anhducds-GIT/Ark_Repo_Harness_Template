@@ -42,8 +42,26 @@ import {
   BAC, docChecklistTinhNang, khoangNgay, nguonLamMoi, noiTuoi, quetDauDuc, readBatBien, readCoChe,
   readHoSo, readIdeas, readKhoa, readNo, THU_MUC_MIGRATE, VIEC
 } from "./overview-doc.mjs";
+import { tenTrangFrom } from "./repo-structure.mjs";
 
 const NL = String.fromCharCode(10);
+
+/* SỔ CÒN SỐNG — nơi DUY NHẤT được sinh ra việc chờ người chốt.
+ *
+ * `HANDOFF.md` CỐ Ý KHÔNG có trong danh sách này, và đó là cả điểm của hằng số.
+ *
+ * Đo 07/09 trên bản đã commit: 13 dấu chờ, trong đó **8 dấu đến từ `HANDOFF.md`** — mà
+ * `HANDOFF.md` là nhật ký **chỉ thêm dòng**. Nghĩa là mỗi lần một phiên *kể lại* rằng có việc
+ * chờ Đức thì lần kể đó thành một việc mới, **vĩnh viễn**: con số chỉ có một chiều là tăng, và
+ * nó tăng theo SỐ PHIÊN chứ không theo số việc thật. Ba trong tám dấu ảo còn tệ hơn — một dấu
+ * nằm trong câu giải thích CHÍNH quy ước dấu, tức bảng biến sách hướng dẫn của nó thành việc.
+ *
+ * Luật một dòng: **thứ không hành động được nữa thì không được sinh ra việc.** Nhật ký là chỗ
+ * kể lại. Sổ nợ, sổ ý tưởng, hồ sơ trạng thái là chỗ giao việc.
+ *
+ * Khai thành hằng số export được, không phải một mảng gõ trong hàm — để phép ghim đọc được
+ * chính danh sách này thay vì gõ lại tên file lần thứ hai. */
+export const SO_CON_SONG = Object.freeze(["BACKLOG.md", "IDEAS.md", "STATUS.md"]);
 
 /* Bật bằng `--khoa-song` hoặc biến môi trường `ARK_KHOA_SONG=1`. Biến môi trường có vì cửa
  * nhấp đúp gọi lệnh qua nhiều lớp và một cờ dòng lệnh dễ rơi mất giữa đường. */
@@ -233,6 +251,22 @@ const CSS = `
 /* ---- NĂM TAB MỚI (06/09) — mượn hình từ bảng repo Chrome Extension -------------------
    Không dựng bảng token thứ hai: chúng dùng lại đúng biến màu khai ở khối :root phía trên. Một bảng
    màu thứ hai là hai bảng sẽ lệch nhau, và lúc đó không ai biết màu nào là đúng. */
+
+/* BA CÂU của Tổng quan. Mỗi câu MỘT dòng — nhãn hẹp, câu giãn, liên kết bám phải.
+   Không ô đếm, không bảng: thứ gì đếm được thì đã có chỗ canonical của nó. */
+.ba-cau{padding:0}
+.bc{display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:12px;align-items:baseline;
+  padding:13px clamp(12px,1.5vw,17px);border-top:1px solid var(--vien)}
+.bc:first-child{border-top:0}
+.bc .n{font-family:var(--mono);font-size:10.4px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--mo);font-weight:600}
+.bc .c{font-size:15px;line-height:1.5;color:var(--chu)}
+.bc .c .cham{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px;
+  vertical-align:1px;flex:0 0 auto}
+.bc .c .cham.xanh{background:var(--xanh)}.bc .c .cham.vang{background:var(--vang)}.bc .c .cham.do{background:var(--do)}
+.bc a.hieu{text-decoration:none}
+.ba-cau > .ghi{padding:0 clamp(12px,1.5vw,17px) 13px;border-top:1px solid var(--vien);padding-top:11px}
+@media (max-width:700px){ .bc{grid-template-columns:1fr} }
 
 /* Ô đếm KÈM MẪU SỐ. Một số 0 đứng một mình trông giống hệt nhau ở hai ca ngược nhau:
    "đã dò hết, sạch" và "chưa dò gì cả". Mẫu số là thứ tách được hai ca đó. */
@@ -501,14 +535,6 @@ section.tab{padding-top:9px}
 .o span{font-size:12.2px;color:var(--mo);line-height:1.34}
 .o.ok b{color:var(--xanh)} .o.canh b{color:var(--vang)} .o.thieu b{color:var(--do)}
 
-.muc-luc{background:var(--mat2);border:1px solid var(--vien);border-radius:9px;padding:12px 16px;margin:12px 0}
-.muc-luc div{font-family:var(--mono);font-size:10.4px;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--mo);margin-bottom:6px}
-.muc-luc ul{margin:0;padding-left:18px;columns:2;column-gap:26px}
-.muc-luc li{font-size:13px;break-inside:avoid}
-.muc-luc a{color:var(--chu2);text-decoration:none;border-bottom:1px solid var(--vien2)}
-.muc-luc a:hover{color:var(--nhan);border-color:var(--nhan)}
-
 details{background:var(--mat);border:1px solid var(--vien);border-radius:10px;margin:7px 0;
   padding:0 14px;box-shadow:var(--bong)}
 details[open]{padding-bottom:10px}
@@ -521,7 +547,7 @@ summary .tt{font-size:13.2px;color:var(--chu2);font-weight:400}
 
 footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
   display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:11.6px;color:var(--mo)}
-@media (max-width:640px){ .muc-luc ul{columns:1} nav.tabs{position:static} }
+@media (max-width:640px){ nav.tabs{position:static} }
 @media (prefers-reduced-motion:no-preference){ section.tab{animation:hien .18s ease-out} }
 @keyframes hien{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 `;
@@ -619,39 +645,88 @@ const JS = `
       return;
     }
 
-    // Mục lục nhảy trong cùng tab
-    var a = e.target.closest && e.target.closest('.muc-luc a');
-    if (!a) return;
-    var d = document.getElementById(a.getAttribute('href').slice(1));
-    if (d) { e.preventDefault(); d.scrollIntoView({ behavior:'smooth', block:'start' }); }
   });
 })();
 `;
 
-function mucLuc(muc) {
-  if (muc.length < 3) return "";
-  return `<div class="muc-luc"><div>Mục lục</div><ul>${
-    muc.map((m) => `<li><a href="#${m.id}">${esc(m.ten)}</a></li>`).join("")}</ul></div>`;
-}
-
 /* NOW/NEXT — bốn ô, đọc từ frontmatter của STATUS.md. Ô cuối là **việc cần NGƯỜI làm**, tô khác
    màu, vì đó là thứ duy nhất trên trang mà AI không tự làm được. Chủ dự án mở trang ra chỉ cần
    nhìn đúng ô đó. */
-function khoiNowNext(st) {
-  if (!st || !Object.keys(st).length) return "";
-  const o = (nhan, gt, to, lop) => gt
-    // LỌC TÊN FILE MÃ NGUỒN. Ba ô này in thẳng chữ do phiên trước gõ vào hồ sơ trạng thái, và
-    // phiên trước là một AI — nó gõ tên file rất tự nhiên. Nhưng đây là ô đầu tiên của tab đầu
-    // tiên, tức chỗ người KHÔNG đọc code nhìn trước hết. Lọc ở đây thay vì bắt mọi phiên nhớ
-    // viết khác: bắt người nhớ là sẽ có ngày quên, và lúc quên thì không ai thấy.
-    ? `<div class="m ${lop || ""}"><span class="nhan">${esc(nhan)}</span><span class="gt${to ? " to" : ""}">${esc(boTenFile(String(gt).replace(/^"|"$/g, "")))}</span></div>`
-    : "";
-  return `<div class="nn">
-    ${o("đang ở đâu", VONG_DOI[st.lifecycle]?.ten || st.lifecycle, true)}
-    ${o("đang làm gì", st.current_focus)}
-    ${o("kế tiếp", st.next_step)}
-    ${o("cần bạn làm", st.human_action, false, "viec")}
-  </div>`;
+/* ---- TỔNG QUAN = ĐÚNG BA CÂU -----------------------------------------------
+ *
+ * Đức chốt 07/09 sau audit UX: *"Homepage chỉ giữ 3 câu: Đang làm gì / Cần Đức làm gì /
+ * Blocker-risk."*
+ *
+ * Bản trước nhồi SÁU khối vào tab đầu — now/next, Cần Đức, ý tưởng, bắt đầu, vòng đời, sức
+ * khoẻ — và **bốn trong sáu là bản vẽ LẠI của thứ đã có tab riêng**. Hậu quả không phải là dài:
+ * hậu quả là **nói hai con số khác nhau cho cùng một câu hỏi**. Ngày 07/09 tab đầu nói *"bốn mục
+ * đang mang dấu chờ"* trong khi tab AI điều phối nói *"13 việc"*. Người đọc không biết tin cái nào,
+ * nên không tin cái nào.
+ *
+ * Nên ba câu này là **TÓM TẮT, không phải bản sao**: mỗi câu một dòng, một con số, và một liên
+ * kết sang chỗ vẽ đầy đủ. Không bảng, không ô đếm phụ, không danh sách.
+ *
+ * MỖI CÂU PHẢI SUY TỪ MÁY, không lấy chữ người gõ — trừ câu thứ nhất, vì *"đang làm gì"* là
+ * việc chỉ người biết. Câu thứ hai và thứ ba mà lấy chữ gõ tay thì đó là nguồn sự thật thứ hai,
+ * và nguồn thứ hai đã lệch thật một lần rồi.
+ */
+export function khoiBaCau({ st = {}, canDuc = [], khoa = [], so = [], noMo = [], tenNguoi = "người chốt" } = {}) {
+  const giu = khoa.filter((k) => k.owner);
+
+  /* ① ĐANG LÀM GÌ — chữ của người (hồ sơ trạng thái) + số luồng máy đếm được. */
+  const focus = boTenFile(String(st.current_focus || "").replace(/^"|"$/g, "")).trim();
+  const cau1 = (focus || "Hồ sơ trạng thái chưa khai đang làm gì.")
+    + (giu.length
+      ? ` — ${giu.length} luồng đang giữ vùng: ${giu.map((k) => k.owner).join(", ")}.`
+      : " — không luồng nào đang giữ vùng trong repo này.");
+
+  /* ② CẦN NGƯỜI CHỐT — MÁY ĐẾM, và chỉ đếm ở sổ còn sống. Xem `SO_CON_SONG`. */
+  const bam = canDuc.filter((c) => c.loai === "bam").length;
+  const chot = canDuc.length - bam;
+  const cau2 = canDuc.length
+    ? `${canDuc.length} việc đang chờ — ${bam} việc cần BẤM, ${chot} việc cần CHỐT.`
+    : `Không việc nào đang chờ ${tenNguoi}.`;
+
+  /* ③ BLOCKER — thứ đang CHẶN, không phải thứ đang nợ.
+   *
+   * `so === null` nghĩa là KHÔNG ĐO ĐƯỢC, và nó nặng hơn một con số dương: một phép đo chết thì
+   * mọi con số cạnh nó đều đáng ngờ. Nên nó lên đầu danh sách, không bị làm tròn thành 0. */
+  const hong = so.filter((x) => x.so === null).map((x) => x.nhan);
+  const ban = so.filter((x) => x.so !== null && x.so > 0);
+  const cau3 = hong.length
+    ? `KHÔNG ĐO ĐƯỢC ${hong.length} phép: ${hong.join(" · ")}. Mọi con số trên trang này đang đáng ngờ.`
+    : ban.length
+      ? ban.map((x) => `${x.so} ${x.nhan}`).join(" · ") + (noMo.length ? ` · ${noMo.length} mục nợ đang mở.` : ".")
+      : `Không chỗ nào đang chặn.${noMo.length ? ` ${noMo.length} mục nợ đang mở, nhưng không mục nào chặn.` : ""}`;
+
+  const den3 = hong.length ? "do" : ban.length ? "vang" : "xanh";
+  /* LIÊN KẾT TRỎ TỚI KHỐI, không chỉ tới nhóm. `data-goto` chọn nhóm, `href` cuộn tới đúng
+   * khối canonical trong nhóm đó — một liên kết chỉ mở đúng nhóm rồi để người đọc tự tìm thì
+   * nó là nửa liên kết, và bảng lại thành một chỗ nữa phải đọc. Ba id dưới đây do chính ba
+   * hàm canonical đặt ra; một phép ghim cũ đòi mọi `href` phải trỏ tới id CÓ THẬT. */
+  /* `data-cau` + `data-den` là PHÁN QUYẾT MÁY ĐỌC ĐƯỢC, không phải trang trí.
+   *
+   * Phép ghim phải đọc được "câu này đang xanh hay đỏ" mà không phải suy từ tên lớp CSS —
+   * suy từ CSS thì đổi một lớp cho đẹp là phép ghim mù, và nó mù IM LẶNG. Trước 07/09 phép
+   * ghim đèn sức khoẻ đọc `class="den xanh"`, nên lúc khối đèn bị gộp vào ba câu thì nó đỏ
+   * với một câu lỗi không nói gì về nguyên nhân. */
+  const hang = (khoaCau, nhan, cau, den, nhom, id, nhanDi) => '<div class="bc" data-cau="' + khoaCau
+    + '" data-den="' + den + '"><span class="n">' + esc(nhan) + '</span>'
+    + '<span class="c"><span class="cham ' + den + '"></span>' + esc(cau) + '</span>'
+    + '<a class="hieu ' + (den === "xanh" ? "mo" : den === "vang" ? "ban" : "tt") + '" href="#' + id + '" data-goto="' + nhom + '">' + esc(nhanDi) + '</a></div>';
+
+  /* KHOÁ CÂU đặt tay, KHÔNG suy từ nhãn tiếng Việt. `slug()` bỏ dấu rồi gộp, nên "Đang làm gì"
+   * ra `ang-l-m-g` — một khoá máy đọc mà đổi theo cách viết nhãn thì nó không phải khoá. */
+  return '<div class="the ba-cau">'
+    + hang("dang-lam-gi", "Đang làm gì", cau1, giu.length ? "vang" : "xanh", "cong-viec", "dang-lam-gi", "AI NÀO ĐANG GIỮ VÙNG")
+    + hang("can-nguoi-chot", "Cần " + tenNguoi + " làm gì", cau2, canDuc.length ? "vang" : "xanh", "cong-viec", "can-nguoi-chot", "XEM " + (canDuc.length || 0) + " VIỆC")
+    + hang("cho-dang-chan", "Chỗ đang chặn", cau3, den3, "cong-viec", "so-no", "SỔ NỢ")
+    + '<p class="ghi">Ba câu này là <strong>tóm tắt, không phải bản sao</strong> — mỗi khái niệm chỉ '
+    + 'vẽ đầy đủ ở <strong>một</strong> chỗ, và liên kết bên phải dẫn tới đúng chỗ đó. Câu đầu lấy '
+    + 'chữ từ hồ sơ trạng thái (chỉ người biết đang làm gì); <strong>hai câu sau MÁY ĐẾM</strong>, '
+    + 'không lấy chữ gõ tay — một bản đếm gõ tay là nguồn sự thật thứ hai, và ngày 07/09 nó đã lệch '
+    + 'thật: nó nói bốn việc trong khi máy đếm mười ba. Xem '
+    + '<code>docs/adr/0006-bang-mot-khai-niem-mot-cho.md</code>.</p></div>';
 }
 
 /* Tách thành hàm RIÊNG và XUẤT RA để phép kiểm gọi thẳng được.
@@ -698,26 +773,6 @@ function khoiVongDoi(st) {
 
 /* Sức khoẻ — ba con số đếm và MỘT đèn. Đèn xanh chỉ khi cả ba bằng 0. Không phần trăm, không
    lời máy tự khen: một dòng "đạt 94%" là thứ không ai hành động được. */
-/* PHÉP ĐO HỎNG PHẢI HIỆN RA LÀ HỎNG, KHÔNG ĐƯỢC THÀNH SỐ 0.
- *
- * `so: null` nghĩa là KHÔNG ĐO ĐƯỢC (git không chạy, cổng cấu trúc chết giữa chừng). Bản đầu
- * biến mọi ca đó thành `0` — tức là thành "sạch". Một trang tự khen mình sạch vì nó không đo
- * được gì là thứ nguy hiểm nhất ở đây: người xem trang này KHÔNG mở repo ra kiểm lại. */
-function khoiSucKhoe(sk) {
-  const coHong = sk.some((s) => s.so === null);
-  const tong = sk.reduce((a, b) => a + (b.so ?? 0), 0);
-  const den = coHong ? "do" : (tong === 0 ? "xanh" : (tong <= 3 ? "vang" : "do"));
-  return `<div class="the"><h2>Sức khoẻ</h2>
-    <div class="luoi">
-      ${sk.map((s) => {
-        if (s.so === null) return `<div class="o canh"><b>?</b><span>${esc(s.nhan)} — không đo được</span></div>`;
-        return `<div class="o ${s.so === 0 ? "ok" : "canh"}"><b>${s.so}</b><span>${esc(s.nhan)}</span></div>`;
-      }).join("")}
-      <div class="o"><b><span class="den ${den}"></span></b><span>tổng thể</span></div>
-    </div>
-    <p style="font-size:13.2px;color:var(--mo)">Đèn xanh chỉ khi cả ba đều bằng 0. Dấu <b>?</b> nghĩa là phép đo không chạy được — đó không phải điểm 0, và đèn không xanh. Không có phần trăm ở đây — một con số như "đạt 94%" thì không ai hành động được.</p>
-  </div>`;
-}
 
 
 /* BẮT ĐẦU Ở ĐÂU — ba câu hỏi, ba lệnh. Đặt NGAY dưới NOW/NEXT vì đây là thứ người mở trang
@@ -850,7 +905,7 @@ export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [
 /* "Còn việc nào đang chờ chính tôi?" — quét dấu đặt ngay trên dòng của mục, ở bốn sổ. */
 export function khoiCanDuc(canDuc, tenNguoi) {
   if (!canDuc.length) {
-    return '<div class="the"><h2>Cần ' + esc(tenNguoi) + '</h2>'
+    return '<div class="the" id="can-nguoi-chot"><h2>Cần ' + esc(tenNguoi) + '</h2>'
       + '<p>Không mục nào đang mang dấu chờ. <strong>Đọc đúng chữ:</strong> nghĩa là chưa ai '
       + '<em>đánh dấu</em> việc nào cần ' + esc(tenNguoi) + ' — không phải là không có việc nào. '
       + 'Muốn một mục hiện ở đây thì đặt <code>@Đức:bấm</code> hoặc <code>@Đức:chốt</code> ngay '
@@ -862,7 +917,7 @@ export function khoiCanDuc(canDuc, tenNguoi) {
     + '<span class="lo ' + c.loai + '">' + (c.loai === "bam" ? "BẤM" : "CHỐT") + '</span>'
     + '<span class="c">' + esc(boTenFile(c.cau))
     + '<span class="tu">' + esc(c.tuoi) + ' · nêu trong ' + esc(c.file) + '</span></span></div>').join("");
-  return '<div class="the"><h2>Cần ' + esc(tenNguoi) + ' — ' + canDuc.length + ' việc · '
+  return '<div class="the" id="can-nguoi-chot"><h2>Cần ' + esc(tenNguoi) + ' — ' + canDuc.length + ' việc · '
     + bam + ' bấm · ' + chot + ' chốt</h2>' + dong
     + '<p class="ghi"><strong>BẤM</strong> là việc tay vài phút, gom được thành một buổi. '
     + '<strong>CHỐT</strong> là việc cần nghĩ, mỗi cái một lượt. Số ngày treo <strong>đo bằng '
@@ -901,7 +956,7 @@ export function khoiDangLamGi(khoa, ngay, vet = new Map()) {
   /* MỖI DÒNG MỘT KHOÁ, và mỗi dòng mang nhãn. Nối chúng bằng xuống dòng chứ không nối liền:
    * bộ lọc làm việc theo DÒNG, nên hai khoá nằm chung một dòng thì hoặc lọt cả hai hoặc lọc
    * cả hai — không có cách nào đúng. */
-  return NHAN_KHOA + '<div class="the"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · ' + giu.length + ' luồng</h2>' + NL
+  return NHAN_KHOA + '<div class="the" id="dang-lam-gi"><h2>Đang làm gì — ảnh chụp lúc sinh bảng · ' + giu.length + ' luồng</h2>' + NL
     + than + NL
     + '<p class="ghi"><strong>Khối này không thấy hai thứ.</strong> Một: <em>luồng đang chạy ở '
     + 'repo khác</em> — bảng của repo này chỉ thấy repo của nó. Hai: <em>luồng vừa được giao mà '
@@ -959,19 +1014,6 @@ export function boTenFile(t) {
     .replace(/\s+/g, " ").trim();
 }
 
-/* "Những hướng đang mở của repo đang ở bước nào?" — bản rút gọn, cho tab Tổng quan. */
-export function khoiYTuongGon(ideas) {
-  if (!ideas.length) return "";
-  const dong = ideas.map((y) => '<div class="yt"><span>'
-    + '<a href="#y-' + esc(slug(y.ma)) + '" data-goto="y-tuong">' + esc(y.ma) + ' · ' + esc(boTenFile(y.ten)) + '</a>'
-    + (y.viecKe ? '<span class="ke">' + esc(boTenFile(y.viecKe)) + '</span>' : "")
-    + '</span>' + thanhBac(y.bac) + '</div>').join("");
-  return '<div class="the"><h2>Ý tưởng đang ở bước nào — ' + ideas.length + ' hướng</h2>' + dong
-    + '<p class="ghi">Ba bước là đường đi thật của một ý tưởng. <strong>Nghỉ</strong> không phải '
-    + 'bước thứ tư — ý tưởng đã nghỉ hiện thanh rỗng có gạch ngang, để không ai đọc nhầm là gần '
-    + 'xong. Bấm tên để xem chi tiết ở tab <strong>Ý tưởng</strong>.</p></div>';
-}
-
 /* Tab Ý tưởng — mỗi ý tưởng một thẻ gập.
  *
  * GIỮ NGUYÊN mọi trường lạ (`extra`). Ai viết thêm `- **rủi ro:** …` vào sổ thì dòng đó vẫn hiện
@@ -1001,40 +1043,26 @@ export function khoiCauTruc(vung, fileGoc, banDo) {
     + '<span class="st">' + esc(v.chu || "từng gói tự giữ") + '</span>'
     + '<span class="sl">' + v.soFile + ' file</span></div>').join("");
   const oFile = fileGoc.map((f) => '<span' + (f.may ? ' class="may"' : "") + '>' + esc(f.ten) + '</span>').join("");
-  const sach = (t) => String(t).replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\*\*/g, "");
-  /* CẮT Ở RANH GIỚI CÂU, không cắt giữa chữ. Cắt giữa chữ rồi thêm ba chấm là câu đọc lên có
-   * thể mang nghĩa khác hẳn nghĩa gốc — trên một bảng trạng thái thì đó là nói sai, không phải
-   * là gọn. Không tìm được ranh giới nào thì thà để dài. */
-  const gon = (t, max) => {
-    const x = String(t).trim();
-    if (x.length <= max) return x;
-    const cat = x.slice(0, max);
-    const i = Math.max(cat.lastIndexOf(" — "), cat.lastIndexOf(". "), cat.lastIndexOf(", "), cat.lastIndexOf(" · "));
-    return (i > max * 0.4 ? cat.slice(0, i) : cat.slice(0, cat.lastIndexOf(" "))) + "…";
-  };
-  const hangBanDo = banDo.map((c) => '<div class="cay">'
-    + '<span class="p">' + esc(sach(String(c[0]))) + '</span>'
-    + '<span class="st">' + esc(gon(sach(String(c[1])), 78)) + '</span>'
-    + '<span class="sl"></span></div>').join("");
+  /* BẢN ĐỒ FILE KHÔNG VẼ Ở ĐÂY NỮA — nó có đúng MỘT chỗ, và chỗ đó là bảng đầy đủ ở nhóm
+   * Hệ thống.
+   *
+   * Đo 07/09: cùng một nguồn `banDo` được vẽ **BA LẦN** trên cùng một tab — một danh sách gọn
+   * (2.011px), một bảng đầy đủ (4.676px), và một câu trỏ qua lại giữa hai cái. Ba cách chiếu,
+   * không cách nào bổ sung cho cách nào. Bản gọn còn phải **cắt câu và bỏ liên kết** để vừa
+   * một dòng, tức nó là bản KÉM HƠN của cùng dữ liệu — giữ nó lại chỉ để người đọc phải cuộn
+   * qua trước khi tới bản dùng được.
+   *
+   * Hai hàm `sach()` và `gon()` chỉ tồn tại để cắt câu cho bản gọn, nên chúng chết theo. */
   return '<div class="the"><h2>Thư mục ở tầng ngoài cùng — ' + vung.length + ' vùng</h2>' + hangVung
     + '<p class="ghi">Cột giữa là <strong>ai được ghi vào đó</strong>. Một vùng chỉ một AI được ghi '
     + 'tại một thời điểm; vùng của người khác thì chỉ được đọc.</p></div>'
     + '<div class="the"><h2>File ở gốc repo — ' + fileGoc.length + ' file</h2>'
     + '<div class="tep">' + oFile + '</div>'
     + '<p class="ghi">Ô tô xanh là file <strong>máy sinh</strong> — đừng sửa tay, sửa là mất ở lần '
-    + 'sinh sau. Số còn lại là chữ của người.</p></div>'
-    /* GẬP LẠI, và đây là chỗ tốn nhất của cả tab. Đo 07/09: danh sách 54 lối chiếm 2.011px
-     * trong 3.052px của tab — tức mỗi lần vào tab này để xem MỘT thứ khác, người đọc phải
-     * cuộn qua trọn bộ bản đồ. Nó vẫn là nội dung chính của tab, nên không xoá; nhưng thứ
-     * "mở ra khi cần tra" không được nằm chắn đường thứ "đọc một lần là hiểu". */
-    + '<details class="the gap"><summary>Khi cần gì thì mở file nào — ' + banDo.length + ' lối</summary>'
-    + hangBanDo
-    + '<p class="ghi">Bảng này <strong>đọc lại từ luật gốc</strong>, không phải bản chép — nên nó '
-    + 'không thể nói khác luật. Câu ở cột giữa bị <strong>cắt ở ranh giới câu</strong> cho gọn; '
-    + 'muốn nguyên văn và bấm được thì mở khối <em>Bản đồ file đầy đủ</em> ở dưới.</p></details>';
+    + 'sinh sau. Số còn lại là chữ của người. <strong>Bản đồ file</strong> (' + banDo.length
+    + ' lối) nằm ở khối riêng phía dưới — một chỗ duy nhất.</p></div>';
 }
 
-/* "Repo đang nợ gì, và những con số 0 kia là sạch hay là chưa dò?" */
 export function khoiSucKhoeNo(so, noMo, noMuc) {
   const o = so.map((x) => {
     const lop = x.so === null ? "" : (x.so === 0 ? " sach" : " ban");
@@ -1048,7 +1076,7 @@ export function khoiSucKhoeNo(so, noMo, noMuc) {
     + '<p class="ghi">Một số <strong>0</strong> đứng một mình trông giống hệt nhau ở hai ca ngược '
     + 'nhau: <em>đã dò hết, sạch</em> và <em>chưa dò gì cả</em>. Dòng nhỏ dưới mỗi ô là thứ tách '
     + 'được hai ca đó. Dấu <strong>?</strong> nghĩa là KHÔNG ĐO ĐƯỢC — và nó khác 0.</p></div>'
-    + '<div class="the"><h2>Việc còn nợ — ' + noMo.length + ' mục đang mở</h2>'
+    + '<div class="the" id="so-no"><h2>Việc còn nợ — ' + noMo.length + ' mục đang mở</h2>'
     + '<div class="hs"><span class="n">' + noMo.length + '</span><span class="t">đang mở trong sổ nợ</span></div>'
     + '<div class="hs"><span class="n">' + daDong + '</span><span class="t">đã đóng, giữ lại để tra</span></div>'
     + '<details><summary>Con số này đếm thế nào, và vì sao nó thà đếm thừa hơn đếm thiếu</summary>'
@@ -1394,39 +1422,35 @@ export function trang(dl) {
    * hai ban se lech, va luc do khong ai biet ban nao dung. */
   const oLamMoi = khoiLamMoi(nguonLamMoi({ tenBang: TRANG_FILE, lenh, maMayChu: dl.maMayChu }));
 
+  /* BỐN NHÓM, không phải mười tab.
+   *
+   * Đức chốt 07/09 sau audit UX: bảng đang *fragment* và *tự mâu thuẫn*. Đo được trên bản đã
+   * commit: **bản đồ file vẽ 3 lần**, còn "Cần Đức" · "Sức khoẻ" · "Ý tưởng" · "Giao việc" ·
+   * "Làm mới bảng" mỗi thứ vẽ **2 lần** — và không lần nào là tóm tắt, đều là bản vẽ ĐẦY ĐỦ.
+   *
+   * Mười tab ngang hàng không nói được cái gì quan trọng hơn cái gì. Bốn nhóm thì nói được, vì
+   * chúng chia theo **câu hỏi người mở trang đang có**:
+   *
+   *   Tổng quan → "repo đang thế nào"        (đúng BA CÂU, không gì khác)
+   *   Công việc → "tôi phải làm gì"           (mọi thứ HÀNH ĐỘNG được)
+   *   Hệ thống  → "cái này chạy thế nào"      (đọc một lần là hiểu)
+   *   Lịch sử   → "chuyện gì đã xảy ra"       (KHÔNG hành động được nữa)
+   *
+   * LUẬT MỘT-CHỖ: mỗi khái niệm chỉ vẽ đầy đủ ở **một** nhóm. Chỗ khác được in một câu tóm tắt
+   * kèm liên kết, không được vẽ lại. Ba câu ở Tổng quan là ngoại lệ DUY NHẤT, và chúng là tóm
+   * tắt thật — một dòng, một con số, một liên kết.
+   *
+   * Vì sao ranh "Lịch sử" quan trọng hơn nó trông: thứ nằm trong đó **không được sinh ra việc**.
+   * Bản trước quét `HANDOFF.md` tìm dấu chờ người chốt, nên mỗi lần một phiên KỂ LẠI rằng có
+   * việc chờ thì lần kể đó thành một việc mới, vĩnh viễn — 8 trong 13 dấu là ảo. Xem `SO_CON_SONG`.
+   *
+   * Lý do và cái MẤT: `docs/adr/0006-bang-mot-khai-niem-mot-cho.md`. */
   const tabs = [
-    // Thứ tự = tần suất dùng, không phải thứ tự viết ra. "Cách vận hành" và "Sổ tay" là hai
-    // tab mở hằng ngày; "Làm được gì" chỉ đọc một lần lúc mới vào.
-    // CHÍN TAB, và con số chín là có chủ đích.
-    //
-    // Bản trước có mười tab và vẫn thiếu năm thứ Đức hỏi tới (AI điều phối · Ý tưởng · Vận hành
-    // · Sức khoẻ & nợ · Cấu trúc). Thêm thẳng vào là mười lăm tab — và một bảng mười lăm tab thì
-    // không ai tìm nổi mục mình cần, tức bảng chết theo kiểu khác. Nên bốn tab cũ được GỘP vào
-    // chỗ đúng của chúng thay vì đứng riêng: "Sổ tay" + "Bảo trì" + "Cách vận hành" → **Vận
-    // hành**; "Làm được gì" → **Mô hình** (nó vốn là danh sách tính năng của khối dữ liệu lõi);
-    // "Đã xong" → **Nhật ký**; "Bên trong" → **Cấu trúc**.
-    //
-    // Thứ tự = tần suất dùng, không phải thứ tự viết ra.
     ["tong-quan", "Tổng quan"],
-    ["ai-dieu-phoi", "AI điều phối"],
-    ["y-tuong", "Ý tưởng"],
-    ["mo-hinh", "Mô hình"],
-    ["van-hanh", "Vận hành"],
-    ["suc-khoe", "Sức khoẻ & nợ"],
-    ["cau-truc", "Cấu trúc"],
-    ["migrate", "Migrate"],
-    ["nhat-ky", "Nhật ký"],
-    ["tra-cuu", "Tra cứu"]
-  ].filter(([id]) => {
-    // Tab nào không có nguồn thì BIẾN MẤT ÊM, không hiện ra rỗng. Một tab rỗng dạy người mở nó
-    // rằng bảng này có chỗ không dùng được, và lần sau họ thôi mở cả những tab có dữ liệu.
-    if (id === "y-tuong") return ideas.length > 0;
-    if (id === "tra-cuu") return Boolean(legend);
-    if (id === "mo-hinh") return laRepoNha;
-    if (id === "migrate") return hoSo.length > 0;
-    if (id === "nhat-ky") return nhatKy.length > 0 || daXong.length > 0 || adrs.length > 0;
-    return true;
-  });
+    ["cong-viec", "Công việc"],
+    ["he-thong", "Hệ thống"],
+    ["lich-su", "Lịch sử"]
+  ];
 
   const oSo = so.map((s) => `<div class="o ${s.mau || ""}"><b>${esc(s.so)}</b><span>${s.nhan}</span></div>`).join("");
 
@@ -1466,9 +1490,9 @@ export function trang(dl) {
     <p class="sub">${esc(dl.khauHieu || "Repo này chưa khai một câu tự giới thiệu (repo.tagline).")}</p>
     <details class="vi-sao"><summary title="Trang này là gì">?</summary>
       <p>Bảng trạng thái <strong>máy sinh</strong>, suy hoàn toàn từ lần commit gần nhất — không
-      gõ tay một con số nào. Có cửa kiểm chặn việc dở dang, có luật cho AI đọc, có lịch bảo trì.
-      Ai đang giữ vùng nào thì xem tab <strong>AI điều phối</strong>; F5 có làm mới số hay không
-      thì cũng ở tab đó.</p>
+      gõ tay một con số nào. <strong>Bốn nhóm:</strong> Tổng quan là ba câu · <strong>Công
+      việc</strong> là thứ hành động được · <strong>Hệ thống</strong> là repo này chạy thế nào ·
+      <strong>Lịch sử</strong> là chuyện đã qua. Mỗi khái niệm chỉ vẽ đầy đủ ở một nhóm.</p>
     </details>
     <div class="nhan-hang">
       <span class="chip">v${esc(ban)}</span>
@@ -1481,40 +1505,27 @@ export function trang(dl) {
   </nav>
 
   <section class="tab" id="tab-tong-quan" hidden>
-    ${khoiNowNext(st)}
-    ${khoiCanDuc(canDuc, tenNguoi)}
-    ${khoiYTuongGon(ideas)}
-    ${khoiBatDau(dl)}
-    ${khoiLienQuan(dl.banDo, dl.trangCo)}
-    ${khoiVongDoi(st)}
-    ${khoiSucKhoe(so)}
-    <details class="the">
-      <summary>Ba việc nó làm mà một repo trống không làm được</summary>
-      <div class="cols">
-        <div>
-          <h3>Chặn việc dở dang</h3>
-          <p>Trước khi ai đó được phép nói "xong", một cửa kiểm chạy toàn bộ bài kiểm tra và đối
-          chiếu mọi trang tự sinh với lịch sử thật. Đỏ thì chưa xong.</p>
-        </div>
-        <div>
-          <h3>Không cho hai người giẫm chân</h3>
-          <p>Repo chia vùng, mỗi vùng một chủ tại một thời điểm. Lệnh đẩy từ chối cuốn theo việc
-          của người khác.</p>
-        </div>
-        <div>
-          <h3>Bảng không nói dối</h3>
-          <p>Mọi con số sinh từ lịch sử thật, không gõ tay. Trang cũ quá bảy ngày thì tự treo cờ
-          đỏ ở đầu — bạn đang thấy chỗ đó ở trên cùng.</p>
-        </div>
-      </div>
-    </details>
+    ${khoiBaCau({ st, canDuc, khoa, so, noMo, tenNguoi })}
   </section>
 
-  <section class="tab" id="tab-ai-dieu-phoi" hidden>
-    ${khoiDangLamGi(khoa, ngay, vetKhoa)}
-    ${oLamMoi}
+  <section class="tab" id="tab-cong-viec" hidden>
     ${khoiCanDuc(canDuc, tenNguoi)}
+    ${khoiDangLamGi(khoa, ngay, vetKhoa)}
     ${khoiKhoa(khoa)}
+    ${khoiSucKhoeNo(so, noMo, noMuc)}
+    ${ideas.length ? `<div class="the"><h2>Sổ ý tưởng — phòng chờ của cả repo</h2>
+      <p>Đây <strong>không phải</strong> sổ nợ. Sổ nợ ghi thứ đang <em>hỏng</em>; sổ này ghi
+      <em>hướng đi</em>. Trộn hai thứ là mọi hướng đi trông như một lỗi cần vá gấp.</p></div>
+    ${khoiYTuongDay(ideas)}` : ""}
+    ${hoSo.length ? khoiMigrate(hoSo) : ""}
+  </section>
+
+  <section class="tab" id="tab-he-thong" hidden>
+    ${oLamMoi}
+    ${khoiBatDau(dl)}
+    ${khoiVanHanh(coChe, batBien, khoa.length)}
+    ${khoiVongDoi(st)}
+    ${laRepoNha ? `<details class="the gap"><summary>Mô hình vận hành — ba khối, và luồng chạy giữa chúng</summary>${khoiMoHinh({ lenh, protocols, briefs, dichDen, soPhepKiem })}</details>` : ""}
     ${laRepoNha ? `<div class="the">
       <h2>Giao một việc cho AI khác — ba lệnh</h2>
       <p>Đề bài <strong>không viết tay</strong>. Lệnh dưới đo repo đích trước — nhánh · cây làm
@@ -1523,70 +1534,23 @@ export function trang(dl) {
       <pre class="code">cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; git fetch
 npm run giao-viec -- --viec nang --repo "&lt;REPO ĐÍCH&gt;" --as codex-nang &gt; de-bai.txt
 cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.txt</pre>
-      <p class="ghi">Ba loại việc giao được: <code>nang</code> · <code>migrate</code> ·
-      <code>audit</code>. Phiên nhận việc trả về <strong>năm dòng</strong> — và năm dòng đó vẫn
-      là <strong>lời tự khai</strong>, chưa lệnh nào đo lại. Kiểm chứng độc lập trước khi tin.</p>
-    </div>` : ""}
-  </section>
-
-  ${ideas.length ? `<section class="tab" id="tab-y-tuong" hidden>
-    <div class="the"><h2>Sổ ý tưởng — phòng chờ của cả repo</h2>
-      <p>Đây <strong>không phải</strong> sổ nợ. Sổ nợ ghi thứ đang <em>hỏng</em>; sổ này ghi
-      <em>hướng đi</em>. Trộn hai thứ là mọi hướng đi trông như một lỗi cần vá gấp.</p></div>
-    ${khoiYTuongDay(ideas)}
-  </section>` : ""}
-
-  ${laRepoNha ? `<section class="tab" id="tab-mo-hinh" hidden>
-    ${khoiMoHinh({ lenh, protocols, briefs, dichDen, soPhepKiem })}
-    <div class="the">
-      <h2>Một lượt giao việc, ba lệnh</h2>
-      <p>Đề bài <strong>không viết tay</strong>. Lệnh dưới đây đo repo đích trước — nhánh, cây
-      làm việc, bảng quyền, bản khung đang ghim — rồi mới ghép đề bài quanh những con số đó.
-      Đo không được thì nó <strong>không in gì cả</strong>.</p>
-      <pre class="code">cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; git fetch
-npm run giao-viec -- --viec nang --repo "&lt;REPO ĐÍCH&gt;" --as codex-nang &gt; de-bai.txt
-cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.txt</pre>
       <p><strong>Vì sao phải đo trước:</strong> lượt giao đầu tiên (06/09) dùng một đề bài viết
       trước khi ai đo repo đích. Nó dạy <code>git add -A</code> trong khi repo đó đang có ba file
       sửa dở của phiên khác — tức dạy phiên nhận việc cuốn việc của người khác vào commit của
       mình rồi đẩy đi. Lỗi đó không phải của phiên nhận việc.</p>
-    </div>
-    ${dl.tinhNang ? `<div class="the">${md(dl.tinhNang)}</div>` : ""}
-  </section>` : ""}
-
-  <section class="tab" id="tab-van-hanh" hidden>
-    ${khoiVanHanh(coChe, batBien, khoa.length, oLamMoi)}
-    ${huongDan ? `<details class="the gap" id="huong-dan"><summary>Hướng dẫn cho người mới vào — hai phần: cho người, và cho phiên AI</summary>${md(huongDan)}</details>` : ""}
-    ${mucLuc(workflows.map((w) => ({ id: `wf-${slug(w.file)}`, ten: w.fm.ten || w.tieuDe })))}
-    ${workflows.map((w) => {
-      const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
-      const iMer = than2.findIndex((l) => l.trim().startsWith("```mermaid"));
-      const jMer = iMer >= 0 ? than2.findIndex((l, k) => k > iMer && l.trim().startsWith("```")) : -1;
-      const luuDo = iMer >= 0 ? than2.slice(iMer, jMer + 1).join(NL) : "";
-      const conLai = iMer >= 0 ? [...than2.slice(0, iMer), ...than2.slice(jMer + 1)].join(NL) : than2.join(NL);
-      return `<div class="the" id="wf-${slug(w.file)}">
-        <h2>${esc(w.fm.ten || w.tieuDe)}</h2>
-        <div class="nhan-hang">
-          ${w.fm.ai_chay ? `<span class="chip">ai chạy: ${esc(w.fm.ai_chay)}</span>` : ""}
-          ${w.fm.mat ? `<span class="chip">mất: ${esc(w.fm.mat)}</span>` : ""}
-        </div>
-        ${md(luuDo)}
-        <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
-      </div>`;
-    }).join("")}
-    ${dl.soTay ? `<details class="the gap"><summary>Sổ tay AI Agent — danh sách kiểm cho việc lặp lại</summary>${md(dl.soTay)}</details>` : ""}
-    ${protocols.length ? `<div class="the"><h2>Quy trình đầy đủ — ${protocols.length} bản</h2>
-      ${protocols.map((p2) => `<details><summary>${esc(p2.tieuDe)}</summary>${md(p2.than.split(NL).filter((l) => !l.startsWith("# ")).join(NL))}</details>`).join("")}
+      <p class="ghi">Ba loại việc giao được: <code>nang</code> · <code>migrate</code> ·
+      <code>audit</code> · <code>onboard</code>. Phiên nhận việc trả về <strong>năm dòng</strong>
+      — và năm dòng đó vẫn là <strong>lời tự khai</strong>, chưa lệnh nào đo lại.</p>
     </div>` : ""}
-    ${dl.baoTri ? `<details class="the gap"><summary>Bảo trì định kỳ — ba nhịp giữ repo đúng, một nhịp giữ repo rẻ</summary>${md(dl.baoTri)}</details>` : ""}
-  </section>
-
-  <section class="tab" id="tab-suc-khoe" hidden>
-    ${khoiSucKhoeNo(so, noMo, noMuc)}
-  </section>
-
-  <section class="tab" id="tab-cau-truc" hidden>
     ${khoiCauTruc(vung, fileGoc, banDo)}
+    <details class="the gap" id="ban-do-file">
+      <summary>Bản đồ file — ${banDo.length} lối, khi cần gì thì mở file nào</summary>
+      <p><strong>Chỗ duy nhất</strong> vẽ bản đồ file. Bảng này <strong>đọc lại từ luật
+      gốc</strong>, không phải bản chép — nên nó không thể nói khác luật.</p>
+      <div class="tw"><table><thead><tr><th>Khi bạn sắp…</th><th>Mở cái gì</th></tr></thead><tbody>
+      ${banDo.map((r) => `<tr><td>${md(r[0]).replace(/^<p>|<\/p>$/g, "")}</td><td>${md(r.slice(1).join(" · ")).replace(/^<p>|<\/p>$/g, "")}</td></tr>`).join("")}
+      </tbody></table></div>
+    </details>
     <div class="the">
       <h2>Bốn tầng, và chúng được đối xử khác nhau</h2>
       ${md(["```mermaid", "flowchart LR", '  L["LUẬT<br/>người viết<br/>đổi vài tháng một lần"] --> S["TRẠNG THÁI<br/>người viết<br/>đổi mỗi phiên"]',
@@ -1597,29 +1561,34 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
     </div>
     <details class="the gap">
       <summary>Lệnh chạy được — ${lenh.length} lệnh</summary>
-      <p>Dành cho ai gõ lệnh. Người không gõ lệnh thì xem tab <strong>Mô hình</strong> — cùng
-      một thứ, kể bằng tiếng người.</p>
       <div class="tw"><table><thead><tr><th>Lệnh</th><th>Chạy gì</th></tr></thead><tbody>
       ${lenh.map(([k, v]) => `<tr><td><code>npm run ${esc(k)}</code></td><td><code>${esc(v)}</code></td></tr>`).join("")}
       </tbody></table></div>
     </details>
-    <details class="the gap" id="ban-do-day">
-      <summary>Bản đồ file đầy đủ — ${banDo.length} lối, có liên kết bấm được</summary>
-      <p>Khối trên là bản <strong>liếc</strong>: một dòng một lối, câu cắt ngắn. Khối này là
-      bản <strong>đọc</strong>: nguyên văn, và mỗi file là một liên kết mở được.</p>
-      <div class="tw"><table><thead><tr><th>Khi bạn sắp…</th><th>Mở cái gì</th></tr></thead><tbody>
-      ${banDo.map((r) => `<tr><td>${md(r[0]).replace(/^<p>|<\/p>$/g, "")}</td><td>${md(r.slice(1).join(" · ")).replace(/^<p>|<\/p>$/g, "")}</td></tr>`).join("")}
-      </tbody></table></div>
-    </details>
+    ${workflows.map((w) => {
+      const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
+      const iMer = than2.findIndex((l) => l.trim().startsWith("```mermaid"));
+      const jMer = iMer >= 0 ? than2.findIndex((l, k) => k > iMer && l.trim().startsWith("```")) : -1;
+      const luuDo = iMer >= 0 ? than2.slice(iMer, jMer + 1).join(NL) : "";
+      const conLai = iMer >= 0 ? [...than2.slice(0, iMer), ...than2.slice(jMer + 1)].join(NL) : than2.join(NL);
+      return `<details class="the gap" id="wf-${slug(w.file)}">
+        <summary>${esc(w.fm.ten || w.tieuDe)}${w.fm.mat ? ` <span class="tt">mất ${esc(w.fm.mat)}</span>` : ""}</summary>
+        ${md(luuDo)}
+        <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
+      </details>`;
+    }).join("")}
+    ${huongDan ? `<details class="the gap" id="huong-dan"><summary>Hướng dẫn cho người mới vào — hai phần: cho người, và cho phiên AI</summary>${md(huongDan)}</details>` : ""}
+    ${dl.soTay ? `<details class="the gap"><summary>Sổ tay AI Agent — danh sách kiểm cho việc lặp lại</summary>${md(dl.soTay)}</details>` : ""}
+    ${dl.baoTri ? `<details class="the gap"><summary>Bảo trì định kỳ — ba nhịp giữ repo đúng, một nhịp giữ repo rẻ</summary>${md(dl.baoTri)}</details>` : ""}
+    ${protocols.length ? `<details class="the gap"><summary>Quy trình đầy đủ — ${protocols.length} bản</summary>
+      ${protocols.map((p2) => `<details><summary>${esc(p2.tieuDe)}</summary>${md(p2.than.split(NL).filter((l) => !l.startsWith("# ")).join(NL))}</details>`).join("")}
+    </details>` : ""}
+    ${dl.tinhNang && laRepoNha ? `<details class="the gap"><summary>Bộ khung làm được gì — kể bằng tiếng người</summary>${md(dl.tinhNang)}</details>` : ""}
+    ${legend ? `<details class="the gap"><summary>Tra cứu thuật ngữ</summary>${md(legend)}</details>` : ""}
+    ${khoiLienQuan(dl.banDo, dl.trangCo)}
   </section>
 
-  ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><details class="the" open><summary>Bảng tra cứu thuật ngữ</summary><div>${md(legend)}</div></section>` : ""}
-
-  ${hoSo.length ? `<section class="tab" id="tab-migrate" hidden>
-    ${khoiMigrate(hoSo)}
-  </section>` : ""}
-
-  <section class="tab" id="tab-nhat-ky" hidden>
+  <section class="tab" id="tab-lich-su" hidden>
     ${adrs.length ? `<div class="the"><h2>Quyết định đã chốt — ${adrs.length} bản ghi</h2>
       <p>Mỗi quyết định là một file <strong>bất biến</strong>: đã chốt thì không sửa được, chỉ
       thay bằng bản mới. Bản bị thay vẫn giữ nguyên để tra lại được.</p>
@@ -1705,10 +1674,10 @@ export async function gomDuLieu() {
   const rawY = doc("IDEAS.md");
   const ideas = rawY ? readIdeas(rawY) : [];
 
-  /* Việc chờ người chốt. Quét dấu `@Đức:bấm` / `@Đức:chốt` ngay trên dòng của mục, ở BA sổ.
+  /* Việc chờ người chốt. Quét dấu `@Đức:bấm` / `@Đức:chốt` ngay trên dòng của mục.
    * Bảng KHÔNG giữ danh sách này: đóng mục thì dấu mất theo, không ai phải nhớ đi xoá. */
   const canDuc = [];
-  for (const f of ["BACKLOG.md", "IDEAS.md", "STATUS.md", "HANDOFF.md"]) {
+  for (const f of SO_CON_SONG) {
     const t = doc(f);
     if (t === null) continue;
     for (const d of quetDauDuc(t, f)) {
@@ -1959,22 +1928,12 @@ export async function gomDuLieu() {
  * hỏi đúng câu "tên đang sinh có nằm trong `generated` không" và đỏ kèm tên nguyên nhân. Còn
  * muốn khoá cứng một tên thì khai `generated_names.overview`, không phải sửa mã. */
 export function tenTrang(cauHinhRaw) {
+  /* PHÉP SUY NẰM Ở `repo-structure.mjs`, không chép lại ở đây. Hai bản chép sẽ lệch, và lúc
+   * lệch thì bộ sinh ghi ra một tên mà bộ đếm "code đã đổi" lại coi là file lạ — đúng ca đã
+   * làm cổng *"Sự thật máy sinh còn tươi"* đỏ vĩnh viễn ở một repo đã lắp, 07/09. */
   let j = null;
   try { j = JSON.parse(cauHinhRaw || "{}"); } catch (_) { j = null; }
-  const khai = j?.generated_names?.overview;
-  if (typeof khai === "string" && khai.trim() && !khai.includes("/") && !khai.includes("\\")) {
-    return khai.trim();
-  }
-  const ten = String(j?.repo?.name || "").trim();
-  if (!ten) return "DASHBOARD.html";
-  // Giữ chữ cái và số, gộp mọi thứ khác thành một gạch nối. Dấu tiếng Việt rụng — đúng ý:
-  // tên file có dấu là chỗ hỏng kinh điển khi đem qua máy khác.
-  // `\u0110`/`\u0111` KH\u00d4NG t\u00e1ch \u0111\u01b0\u1ee3c b\u1eb1ng NFD \u2014 n\u00f3 l\u00e0 m\u1ed9t ch\u1eef c\u00e1i ri\u00eang, kh\u00f4ng ph\u1ea3i D c\u00f3 d\u1ea5u. B\u1ecf qua
-  // ch\u1ed7 n\u00e0y th\u00ec "\u0110\u1ea7u t\u01b0" ra "au-tu", m\u1ea5t lu\u00f4n ch\u1eef \u0111\u1ea7u c\u1ee7a t\u00ean repo.
-  const gon = ten.split("\u0110").join("D").split("\u0111").join("d")
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return gon ? `DASHBOARD-${gon}.html` : "DASHBOARD.html";
+  return tenTrangFrom(j);
 }
 
 export const TRANG_FILE = tenTrang(doc(".repo-structure.json"));

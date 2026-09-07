@@ -9,10 +9,10 @@ last_verified_how: "npm test 145/145 xanh · cổng đóng phiên XANH TOÀN B�
 evidence_ref: HANDOFF.md
 owner: claude-bang9tab
 priority_rank: 1
-next_step: "Y-09 trong IDEAS.md — đưa `build-overview.mjs` vào bản trích rồi phát bảng chín tab sang ba repo đã lắp. Chín tab đã dựng xong ở repo nhà 06/09; phần còn lại là bỏ chữ riêng của repo nhà, thêm phép kiểm, rồi mới phát."
+next_step: "Gọt bộ khung theo bài học của repo tiêu thụ: bảy giới hạn Đức chốt 07/09, quan trọng nhất là NGÂN SÁCH DÒNG cho file luật và luật DỪNG khi hết việc sản phẩm. Xem BACKLOG.md nhóm P0."
 version_source: package.json
-current_focus: "Bản 1.3.14 · bảng nay có chín tab và đọc thêm năm nguồn (sổ ý tưởng · dấu chờ người chốt · bảng chủ sở hữu · sổ nợ · luật đa phiên). Đức chốt 06/09: bảng phải đi theo bản trích, không để mỗi repo một kiểu."
-human_action: "CÓ — bốn mục đang mang dấu chờ, xem tab \"AI điều phối\" của bảng: KHUNG-11 và KHUNG-6 và KHUNG-30 cần Đức CHỐT, KHUNG-14 cần Đức BẤM. Bảng quét dấu `@Đức:` ngay trên dòng của mục, nên danh sách này không cần ai nhớ cập nhật."
+current_focus: "Bảng gom 10 tab thành BỐN nhóm, mỗi khái niệm một chỗ canonical — xem ADR-0006. Đây là lượt CẮT: thước đo của lượt là số dòng luật GIẢM, không phải số tính năng tăng."
+human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Trường này CỐ Ý không giữ danh sách và không giữ con số: máy đếm được thì máy đếm, còn một bản gõ tay là nguồn sự thật thứ hai, và ngày 07/09 nó đã lệch thật — nó nói bốn mục trong khi máy đếm mười ba, và hai trong bốn mục nó nêu đã đóng. Xem ADR-0006."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---

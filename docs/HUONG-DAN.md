@@ -10,16 +10,20 @@ Hai người dùng, hai nhu cầu khác nhau. Đọc phần của mình.
 
 ## Đọc trang này thế nào — 60 giây
 
-Trang có tám tab, **xếp theo tần suất dùng**, không theo thứ tự viết ra.
+Trang có **bốn nhóm**, xếp theo *bạn đang cần gì*, không theo thứ tự viết ra.
 
-| Tab | Mở khi nào | Ai đọc |
+| Nhóm | Mở khi nào | Ai đọc |
 |---|---|---|
-| **Tổng quan** | mỗi lần mở trang — repo đang thế nào, cần bạn làm gì, bắt đầu từ lệnh nào | Đức |
-| **Cách vận hành** | sắp làm một việc và muốn biết các bước | AI · Đức |
-| **Sổ tay** | việc lặp lại — làm theo danh sách kiểm, đừng tự nghĩ lại | AI |
-| **Làm được gì** | mới vào, muốn biết bộ khung này để làm gì | Đức |
-| **Bảo trì** | tới hạn quét, hoặc repo im ắng lâu ngày | AI |
-| **Bên trong** · **Tra cứu** · **Nhật ký** | tra một thứ cụ thể | AI |
+| **Tổng quan** | mỗi lần mở trang — **đúng ba câu**: đang làm gì · cần bạn làm gì · chỗ nào đang chặn | Đức |
+| **Công việc** | muốn HÀNH ĐỘNG — việc chờ bạn chốt, ai đang giữ vùng nào, sổ nợ, hướng đang mở | Đức · AI |
+| **Hệ thống** | muốn biết repo này CHẠY thế nào — làm mới bảng, cơ chế đa phiên, cấu trúc, lệnh | AI |
+| **Lịch sử** | tra lại chuyện đã qua — quyết định, sổ phát hành, việc đã xong | AI · Đức |
+
+**Bốn nhóm, không phải mười tab** — và mỗi khái niệm chỉ vẽ đầy đủ ở **một** chỗ; chỗ khác chỉ
+một câu tóm tắt kèm liên kết. Lý do và cái mất: [ADR-0006](adr/0006-bang-mot-khai-niem-mot-cho.md).
+
+**Nhóm Lịch sử không bao giờ sinh ra việc.** Viết `@Đức:bấm` trong sổ bàn giao thì bảng **không
+thấy** — cố ý. Nhật ký là chỗ kể lại; giao việc thì viết vào sổ nợ.
 
 Ba quy ước đọc, biết rồi thì không cần hỏi ai:
 

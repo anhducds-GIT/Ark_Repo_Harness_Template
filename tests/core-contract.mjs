@@ -466,9 +466,33 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     generated: ["views/BOARD.md"],
   });
   assert.deepEqual(opts.behaviourGlobs, ["**/*.py"], "opts phai mang nghe cua repo");
-  assert.deepEqual(opts.generatedFiles, ["views/BOARD.md"], "opts phai mang file may sinh");
+  assert.ok(opts.generatedFiles.includes("views/BOARD.md"), "opts phai mang file may sinh repo TU KHAI");
   assert.equal(isBehaviourFile("tools/render.py", opts), true, "qua opts: .py phai duoc dem");
   assert.equal(isBehaviourFile("views/BOARD.md", opts), false, "qua opts: file may sinh KHONG dem");
+
+  /* VE THEM 07/09 — ARTIFACT SUY RA cung phai duoc mien, khong chi artifact repo tu khai.
+   *
+   * Truoc do ve nay doi `generatedFiles` BANG DUNG danh sach repo khai. Doi bang dung nghe la
+   * "repo khong khai thi khong mien", va tu ban 1.3.18 bo khung sinh THEM mot trang HTML ma
+   * khong repo da lap nao biet ma khai. Do that o `nav_platform_main`: bo dem "code da doi sau
+   * kiem chung" +1 moi luot sinh lai trang, va cong "Su that may sinh con tuoi" DO VINH VIEN —
+   * sinh lai khong thoat duoc, vi chinh viec sinh lai lam no tang.
+   *
+   * Nen doi tu "bang dung" sang "phai chua" (o tren) va them ve nay: ba artifact mac dinh cong
+   * trang suy tu `repo.name` deu phai co trong `generatedFiles`. Chat hon ban cu o mot chieu,
+   * long hon o chieu khong con y nghia nao. */
+  const optsSuy = behaviourOptsFrom({ repo: { name: "Ten Repo Nao Do" }, generated: ["views/BOARD.md"] });
+  for (const ten of ["DASHBOARD.md", "llms.txt", "repo-map.json", "DASHBOARD-Ten-Repo-Nao-Do.html"]) {
+    assert.ok(optsSuy.generatedFiles.includes(ten), `artifact suy ra "${ten}" phai duoc mien`);
+    assert.equal(isBehaviourFile(ten, optsSuy), false, `"${ten}" la artifact may sinh, KHONG duoc dem la code doi`);
+  }
+  // VE DOI CHUNG: ma san pham thi VAN dem. Thieu ve nay thi mot ban va mien HET moi thu cung qua.
+  assert.equal(isBehaviourFile("app/main.js", optsSuy), true, "ma san pham phai VAN duoc dem la code doi");
+  // Va repo khai ten khac cho trang thi phai theo ten do, khong theo ten suy.
+  const optsKhai = behaviourOptsFrom({ repo: { name: "X" }, generated_names: { overview: "BANG.html" } });
+  assert.ok(optsKhai.generatedFiles.includes("BANG.html"), "repo khai ten trang thi phai mien ten DO");
+  assert.equal(isBehaviourFile("DASHBOARD-X.html", optsKhai), true,
+    "repo da khai ten khac thi ten SUY khong con la artifact cua no");
 
   /* GIOI HAN CUA PHEP GHIM NAY, noi thang thay vi de nguoi sau tuong da phu:
      no ghim ham dung opts, KHONG ghim rang `collectModel` co goi ham do khong. Dot bien thu

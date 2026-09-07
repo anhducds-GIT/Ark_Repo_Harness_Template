@@ -25,10 +25,18 @@ const html = trang(dl);
 {
   const nut = [...html.matchAll(/data-tab="([a-z-]+)"/g)].map((m) => m[1]);
   const than = [...html.matchAll(/id="tab-([a-z-]+)"/g)].map((m) => m[1]);
-  assert.ok(nut.length >= 5, `phai co it nhat 5 tab, dang co ${nut.length}`);
+  /* TRUOC 07/09 ve nay doi ">= 5 tab", va no la mot con so THAY THE cho y that: "bang khong
+   * rong". Duc chot BON nhom (ADR-0006), nen con so 5 do nen — nhung go no ra roi khong thay
+   * gi vao thi ve nay chi con kiem cap nut/than, tuc mot bang KHONG CO NUT NAO cung di lot.
+   *
+   * Nen doi con so thanh DANH SACH: bon nhom, dung ten, dung tung cai. Chat hon ">= 5" o ca
+   * hai chieu — no bat ca viec thieu nhom lan viec ai do lang le them nhom thu nam. */
+  const BON_NHOM = ["cong-viec", "he-thong", "lich-su", "tong-quan"];
+  assert.deepEqual([...new Set(nut)].sort(), BON_NHOM,
+    `bang phai co dung bon nhom (ADR-0006), dang co: ${[...new Set(nut)].join(" ")}`);
   assert.deepEqual([...new Set(nut)].sort(), [...new Set(than)].sort(),
     "moi nut tab phai co dung mot phan than — lech la bam vao thi trang trong");
-  ok(`${nut.length} tab, nút nào cũng có thân`);
+  ok(`${nut.length} nhóm đúng tên, nút nào cũng có thân`);
 }
 
 /* ---- 2. Banner "trang có thể đã cũ" phải mang NGÀY SINH THẬT ------------ */
@@ -42,30 +50,38 @@ const html = trang(dl);
   ok("banner tự biết tuổi: mang ngày sinh thật và có phép so 7 ngày");
 }
 
-/* ---- 3. Đèn sức khoẻ chỉ XANH khi cả ba con số bằng 0 ------------------- */
+/* ---- 3. Câu "chỗ đang chặn" chỉ XANH khi cả ba con số bằng 0 ------------ */
 {
   // Đây là chỗ một bảng dễ nói dối nhất: tô xanh cho đẹp. Kiểm bằng chính dữ liệu đang có.
   // `null` = KHÔNG ĐO ĐƯỢC, và nó KHÔNG phải 0. Bản đầu dùng `?? 0` nên một phép đo hỏng bị
   // tính thành sạch, rồi phép kiểm đòi đèn xanh trong khi đèn (đúng) không xanh — phép kiểm
   // quay ra tố cáo chính hành vi đúng.
+  //
+  // ĐỔI CHỖ ĐỌC 07/09, KHÔNG ĐỔI Ý: khối "đèn sức khoẻ" bị gộp vào ba câu của Tổng quan
+  // (ADR-0006), nên phép ghim này thôi đọc `class="den xanh"` và đọc `data-den` của câu thứ ba.
+  // `data-den` là phán quyết MÁY ĐỌC ĐƯỢC, không phải tên lớp CSS — suy từ CSS thì đổi một lớp
+  // cho đẹp là phép ghim mù, và nó mù IM LẶNG.
+  const den = (h) => (/data-cau="cho-dang-chan" data-den="(\w+)"/.exec(h) || [])[1] || null;
   const doDuoc = dl.so.every((b) => typeof b.so === "number");
   const tong = dl.so.reduce((a, b) => a + (b.so ?? 0), 0);
-  const sachThat = doDuoc && tong === 0;
-  const xanh = /class="den xanh"/.test(html);
-  assert.equal(xanh, sachThat, `${doDuoc ? `tong no = ${tong}` : "co phep do khong chay duoc"} thi den ${sachThat ? "phai" : "KHONG duoc"} xanh`);
+  const sachThat = doDuoc && tong === 0 && dl.noMo.length === 0;
+  assert.equal(den(html) === "xanh", sachThat,
+    `${doDuoc ? `tong no = ${tong}` : "co phep do khong chay duoc"} thi cau chan ${sachThat ? "phai" : "KHONG duoc"} xanh`);
   assert.equal(dl.so.length, 3, "dung ba con so, khong hon — them nua la bat nguoi xem doc bang");
 
   // ĐỐI CHỨNG DƯƠNG — đèn PHẢI xanh được. Trước đây một trong ba số bị đóng cứng bằng 1, nên
-  // đèn không bao giờ xanh nổi dù repo sạch hết, trong khi ngay dưới nó trang vẫn viết "Đèn
-  // xanh chỉ khi cả ba bằng 0". Không có ca này thì một hằng số như thế sống mãi mà không ai
-  // biết: phép kiểm cũ chỉ so đèn với tổng, và tổng thì không bao giờ bằng 0.
-  const sach = trang({ ...dl, so: dl.so.map((s) => ({ ...s, so: 0 })) });
-  assert.match(sach, /class="den xanh"/, "ca ba so bang 0 thi den PHAI xanh — khong duoc co hang so chan duong");
+  // đèn không bao giờ xanh nổi dù repo sạch hết. Không có ca này thì một hằng số như thế sống
+  // mãi mà không ai biết: phép kiểm cũ chỉ so đèn với tổng, và tổng không bao giờ bằng 0.
+  const sach = trang({ ...dl, so: dl.so.map((s) => ({ ...s, so: 0 })), noMo: [] });
+  assert.equal(den(sach), "xanh", "ca ba so bang 0 thi cau chan PHAI xanh — khong duoc co hang so chan duong");
 
-  // KHÔNG ĐO ĐƯỢC ≠ SẠCH. `null` phải hiện ra dấu ?, và đèn không được xanh.
+  // KHÔNG ĐO ĐƯỢC ≠ SẠCH, và nó phải NẶNG HƠN một con số dương: một phép đo chết thì mọi con
+  // số cạnh nó đều đáng ngờ, nên nó ra ĐỎ chứ không ra vàng.
   const mu = trang({ ...dl, so: [{ so: 0, nhan: "a" }, { so: null, nhan: "b" }, { so: 0, nhan: "c" }] });
-  assert.ok(!/class="den xanh"/.test(mu), "co phep do khong chay duoc thi den KHONG duoc xanh");
-  assert.match(mu, /<b>\?<\/b>/, "phep do khong chay duoc phai hien dau ?, khong duoc hien so 0");
+  assert.equal(den(mu), "do", "co phep do khong chay duoc thi cau chan phai ĐỎ, khong duoc xanh");
+  assert.match(mu, /KHÔNG ĐO ĐƯỢC/, "phep do khong chay duoc phai NOI RA la khong do duoc, khong hien so 0");
+  assert.match(trang({ ...dl, so: [{ so: 4, nhan: "a" }], noMo: [] }), /data-cau="cho-dang-chan" data-den="vang"/,
+    "co no ma do duoc het thi la VANG — khong duoc lam tron ve xanh hay ve do");
   // CON SỐ PHẢI ĐƯỢC ĐO, KHÔNG ĐƯỢC GÕ TAY. Ba ca trên chỉ kiểm phần VẼ, nên một hằng số nằm ở
   // phần ĐO vẫn sống sót — đã chứng minh bằng một lượt thử phá: đóng cứng lại số 1 mà không
   // phép kiểm nào đỏ. Nên phải gọi thẳng vào phép đo.
@@ -101,15 +117,22 @@ const html = trang(dl);
   const batDau = html.indexOf('id="tab-tong-quan"');
   const ketThuc = html.indexOf("<section", batDau + 10);
   const dau = html.slice(batDau, ketThuc < 0 ? html.length : ketThuc);
+  // MỎ NEO ĐỔI 07/09, Ý KHÔNG ĐỔI. Trước đây neo vào nhãn "đang ở đâu" của khối NOW/NEXT — khối
+  // đó bị gộp vào BA CÂU (ADR-0006), nên phép kiểm đỏ với một câu lỗi không nói gì về nguyên
+  // nhân. Neo mới là `data-cau`: nó là khoá máy đọc, do mã đặt tay, không đổi theo cách viết
+  // nhãn tiếng Việt.
+  const cau = [...dau.matchAll(/data-cau="([a-z-]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(cau, ["dang-lam-gi", "can-nguoi-chot", "cho-dang-chan"],
+    `Tổng quan phải mở bằng ĐÚNG ba câu, đúng thứ tự — đang có: ${cau.join(" ")}`);
   const viTriLenh = dau.indexOf("npm run");
-  const viTriNguoi = dau.indexOf("đang ở đâu");
-  assert.ok(viTriNguoi >= 0, "tab dau phai mo bang trang thai noi tieng nguoi (NOW/NEXT)");
+  const viTriNguoi = dau.indexOf('data-cau="dang-lam-gi"');
+  assert.ok(viTriNguoi >= 0, "tab dau phai mo bang trang thai noi tieng nguoi (ba cau)");
   if (viTriLenh >= 0) {
     assert.ok(viTriNguoi < viTriLenh,
       "trang thai bang tieng nguoi phai dung TRUOC lenh dau tien tren tab mot");
   }
   assert.ok(!/\.mjs/.test(dau), "tab dau khong duoc chua ten file ma nguon");
-  ok("tab đầu nói bằng tiếng người: không lệnh, không tên file mã nguồn");
+  ok("Tổng quan mở bằng đúng 3 câu, đúng thứ tự: không lệnh, không tên file mã nguồn");
 }
 
 /* ---- 5. Có gì thì hiện nấy — thiếu file thì mục biến mất êm ------------- */
@@ -173,7 +196,15 @@ const html = trang(dl);
    * Đức chốt 06/09: *"chỉ maintain tab Migrate"* — trang riêng thôi được nuôi, sổ nay là một TAB.
    * Nên vế đổi chỗ nhìn, KHÔNG đổi điều nó bảo vệ: sổ migrate vẫn phải có đường tới từ trang mẹ.
    * Bỏ hẳn vế này mới là làm yếu lớp bảo vệ. */
-  assert.match(html, /data-tab="migrate"/, "so migrate phai den duoc tu trang me — nay la mot tab");
+  /* ĐỔI CHỖ NHÌN LẦN THỨ BA, và mỗi lần vẫn giữ đúng MỘT điều: sổ migrate phải đến được từ
+   * trang mẹ. 1.3.20: nó là một trang riêng, ghim `href="SO-MIGRATE-<repo>.html"`. 1.3.20+:
+   * Đức chốt "chỉ maintain tab Migrate", nên ghim `data-tab="migrate"`. 07/09: mười tab gộp
+   * thành BỐN nhóm (ADR-0006), nên sổ nay là một KHỐI trong nhóm Công việc.
+   *
+   * Neo vào chính KHỐI, không neo vào hình dạng điều hướng — điều hướng đã đổi ba lần, còn
+   * "sổ phải đến được" thì chưa đổi lần nào. Bỏ hẳn vế này mới là làm yếu lớp bảo vệ. */
+  assert.match(html, /<h2>Sổ migrate — \d+ lượt/, "so migrate phai den duoc tu trang me");
+  assert.match(html, /id="tab-cong-viec"[\s\S]*<h2>Sổ migrate/, "so migrate phai nam trong nhom Cong viec");
   assert.match(html, /Sổ migrate — \d+ lượt/, "tab migrate phai co than bai that, khong phai mot cai tab rong");
 
   // Link chết còn tệ hơn không link: chỉ nhận trang CÓ THẬT trong HEAD.

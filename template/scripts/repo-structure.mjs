@@ -510,6 +510,34 @@ export const TEN_MAY_SINH_MAC_DINH = Object.freeze({
   overview: null
 });
 
+/* TÊN TRANG HTML — SUY MỘT LẦN, hai cổng dùng chung.
+ *
+ * Trước 07/09 phép suy này nằm trong `build-overview.mjs` và **chỉ bộ sinh trang biết nó**.
+ * Hệ quả đo được ở repo `nav_platform_main`: bộ đếm "code đã đổi sau kiểm chứng" thấy
+ * `DASHBOARD-NAV-Platform-V1.html` là một file `.html` bình thường, nên mỗi lượt sinh lại
+ * trang là bộ đếm +1, và cổng *"Sự thật máy sinh còn tươi"* ĐỎ vĩnh viễn — không cách nào
+ * thoát bằng cách sinh lại, vì chính việc sinh lại làm nó tăng.
+ *
+ * Đây ĐÚNG con bệnh đã được ghi ngay trên `MAY_SINH` cho `repo-map.json`, lặp lại lần thứ hai
+ * với một file mới. Lần trước vá bằng cách thêm tên vào một danh sách; lần này vá bằng cách
+ * **bỏ danh sách** — tên suy ra từ cấu hình, nên repo không phải nhớ khai gì. */
+export function tenTrangFrom(parsed) {
+  const khai = parsed?.generated_names?.overview;
+  if (typeof khai === "string" && khai.trim() && !khai.includes("/") && !khai.includes("\\")) {
+    return khai.trim();
+  }
+  const ten = String(parsed?.repo?.name || "").trim();
+  if (!ten) return "DASHBOARD.html";
+  /* Giữ chữ cái và số, gộp mọi thứ khác thành một gạch nối. Dấu tiếng Việt rụng — đúng ý:
+     tên file có dấu là chỗ hỏng kinh điển khi đem qua máy khác.
+     `Đ`/`đ` KHÔNG tách được bằng NFD — nó là một chữ cái riêng, không phải D có dấu.
+     Bỏ qua chỗ này thì "Đầu tư" ra "au-tu", mất luôn chữ đầu của tên repo. */
+  const gon = ten.split("Đ").join("D").split("đ").join("d")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return gon ? `DASHBOARD-${gon}.html` : "DASHBOARD.html";
+}
+
 export function tenMaySinhFrom(parsed) {
   const khai = parsed?.generated_names;
   if (khai === undefined) return TEN_MAY_SINH_MAC_DINH;

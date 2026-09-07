@@ -3,6 +3,132 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.37 — 2026-09-07 — Bảng: 10 tab → BỐN nhóm, Tổng quan còn ba câu, và nhật ký thôi sinh ra việc
+
+Audit UX 07/09 nói bảng **fragment** và **tự mâu thuẫn**. Cả hai đều đo được, và cả hai đều có
+đúng một nguyên nhân: **cùng một khái niệm được vẽ ở nhiều chỗ.**
+
+### Bằng chứng — đếm trên bản ĐÃ COMMIT, không đọc cảm giác
+
+| Khái niệm | Số lần vẽ ĐẦY ĐỦ |
+|---|---|
+| **Bản đồ file** | **3** |
+| Cần Đức · Sức khoẻ · Ý tưởng · Giao việc · Làm mới bảng | **2** mỗi thứ |
+
+Không lần nào là tóm tắt — đều là bản vẽ đầy đủ. Hậu quả không phải là *dài*; hậu quả là **bảng
+nói hai con số khác nhau cho cùng một câu hỏi**.
+
+### Mâu thuẫn "4 vs 13" — hai gốc khác nhau, không phải một lỗi
+
+```
+Tổng quan     →  "CÓ — bốn mục đang mang dấu chờ …"
+AI điều phối  →  "Cần Đức — 13 việc · 9 bấm · 4 chốt"
+```
+
+**⑴ Con 13: `HANDOFF.md` bị quét tìm dấu việc.** Đo từng nguồn: `BACKLOG.md` **5** (thật) ·
+`IDEAS.md` 0 · `STATUS.md` 0 · **`HANDOFF.md` 8 (ảo)**.
+
+`HANDOFF.md` là nhật ký **chỉ thêm dòng**. Nên mỗi lần một phiên *kể lại* rằng có việc chờ Đức thì
+lần kể đó thành **một việc mới, vĩnh viễn** — con số chỉ có một chiều là tăng, và nó tăng theo
+**số phiên**, không theo số việc thật. Ba trong tám dấu ảo còn tệ hơn: một dấu nằm trong câu
+**giải thích chính quy ước dấu**, tức bảng biến **sách hướng dẫn của nó** thành việc phải làm.
+
+**⑵ Con 4: một câu GÕ TAY trong `STATUS.md`.** Nguồn sự thật thứ hai cho một con số máy đếm được
+— và nó đã lệch: câu đó nêu bốn mã, **hai trong bốn đã đóng**. Cùng trường ấy còn ghi *"Bản 1.3.14
+· bảng nay có chín tab"* trong khi repo ở **1.3.36 với 10 tab**, và câu đó chảy tiếp vào
+`DASHBOARD.md` + `repo-map.json` — **một câu cũ gõ tay làm ba artifact máy sinh nói sai cùng lúc.**
+
+### Sửa: hai luật, cưỡng chế bằng máy
+
+**Luật lịch-sử-không-thành-việc.** Nguồn quét dấu chờ khai thành hằng số `SO_CON_SONG` —
+`BACKLOG.md` · `IDEAS.md` · `STATUS.md`. Nhật ký bị loại. **13 → 5.**
+
+**Luật một-chỗ.** Mỗi khái niệm vẽ đầy đủ ở **đúng một** nhóm; chỗ khác chỉ một câu tóm tắt kèm
+liên kết. Đã kiểm: 8/8 khái niệm nay vẽ đúng 1 lần.
+
+**Bỏ bản đếm gõ tay** ở `STATUS.md` → `human_action`. Máy đếm được thì máy đếm.
+
+### IA: 10 tab ngang hàng → BỐN nhóm có thứ bậc
+
+| Nhóm | Trả lời câu gì |
+|---|---|
+| **Tổng quan** | *"repo đang thế nào"* — **đúng BA CÂU**, không gì khác |
+| **Công việc** | *"tôi phải làm gì"* — mọi thứ HÀNH ĐỘNG được |
+| **Hệ thống** | *"cái này chạy thế nào"* — đọc một lần là hiểu |
+| **Lịch sử** | *"chuyện gì đã xảy ra"* — KHÔNG hành động được nữa |
+
+Ranh **Lịch sử** quan trọng hơn nó trông: thứ nằm trong đó **không được sinh ra việc**. Đó chính
+là luật thứ nhất, phát biểu thành cấu trúc.
+
+Số đo, màn 1440×900: Tổng quan **0,4 màn hình** · tổng bốn nhóm **14,9** (trước: 10 tab ~30).
+
+### Xoá là thắng — bốn hàm chết theo
+
+`khoiNowNext` · `khoiSucKhoe` · `khoiYTuongGon` · `mucLuc`, cộng 7 dòng CSS chỉ phục vụ `mucLuc`,
+cộng đoạn JS bắt liên kết mục lục, cộng hai hàm `sach()`/`gon()` chỉ tồn tại để **cắt câu cho bản
+đồ file bản kém**. Bộ sinh: **−49 dòng thực** (195 thêm / 244 xoá).
+
+### Một bug cùng họ, lộ ra lúc đo
+
+`behaviourOptsFrom` đếm *"code đã đổi sau kiểm chứng"* và nó thấy trang HTML máy sinh là một file
+`.html` bình thường. Ở `nav_platform_main`: mỗi lượt sinh lại trang là bộ đếm **+1**, nên cổng
+*"Sự thật máy sinh còn tươi"* **ĐỎ vĩnh viễn** — sinh lại không thoát được, vì chính việc sinh lại
+làm nó tăng.
+
+Đây **đúng con bệnh đã ghi ngay trên `MAY_SINH`** cho `repo-map.json`, lặp lại lần thứ hai với một
+file mới. Lần trước vá bằng cách **thêm một tên** vào danh sách; lần này vá bằng cách **bỏ danh
+sách**: `tenTrangFrom` dời sang `repo-structure.mjs` — suy một lần, hai cổng dùng chung, không repo
+nào phải nhớ khai gì.
+
+### Phép kiểm
+
+`overview-doc-smoke` 12 → **15 vế**. **Tám đột biến đã chạy, cả tám chết — và cả tám chết ở ĐÚNG
+vế nó đo**, mỗi con một phép khác nhau. Lượt trước (1.3.36) đã dạy vì sao phải kiểm chỗ này: bốn
+đột biến "chết" mà chết vì cổng khác nổ trước, chứng minh không gì cả.
+
+`ADR-0006` ghi cả phần **MẤT**: bấm nhiều hơn · dấu chờ trong nhật ký thành vô hình (cố ý, nhưng
+là bẫy im lặng) · con số bốn nhóm chưa được đo bằng tần suất dùng · và luật một-chỗ hiện chỉ đếm
+**tiêu đề** khối, nên đổi tên là lách được.
+
+### Và đây là lượt CẮT — số đo của cả bộ khung, để lượt sau có mốc
+
+| Đo gì | Hôm nay |
+|---|---|
+| commit 7 ngày **chỉ chạm giấy tờ** | **194/280 = 69%** |
+| luật-là-chữ | **1.254 dòng** |
+| chốt máy cưỡng chế được | **26** · 16 file test |
+| tài liệu | **8.672 dòng** — trần khai 2.200, **vượt 3,9×** |
+| sổ nợ đang mở | **15** / 39 |
+
+**48 dòng văn thuyết phục cho mỗi cơ chế thật.** Việc cắt tiếp ghi ở `BACKLOG.md`
+`KHUNG-40`…`KHUNG-43`, kèm hai chỗ **cần Đức chốt** (trần dòng luật, và có đưa trần vào cổng đóng
+phiên hay không).
+
+### MỎ NEO KHỚP 0 CHỖ — và vì sao con số 0 không bao giờ là "không có gì phải sửa"
+
+Phép ghim mới đếm số câu bằng cách tìm chuỗi `<div class="bc">`. Rồi cùng ngày tôi thêm hai
+thuộc tính máy đọc vào đúng thẻ đó, thẻ mở thành `<div class="bc" data-cau="…"`, và **mỏ neo khớp
+0 chỗ**. Phép kiểm báo *"Tổng quan phải đúng BA câu, đang 0"* trong khi trang có đủ ba.
+
+Con số 0 ở đây **không** nghĩa là "trang hỏng". Nó nghĩa là **dụng cụ đo hỏng** — và hai ca đó
+đọc y hệt nhau trên màn hình. Nếu tin con số thì lượt sửa kế tiếp sẽ đi sửa `khoiBaCau` (thứ đang
+đúng) thay vì sửa phép kiểm.
+
+**Luật rút ra: mỏ neo phải neo vào KHOÁ MÁY ĐỌC, không neo vào hình dạng thẻ HTML hay chữ hiển
+thị.** Thêm một thuộc tính, đổi một tên lớp CSS, sửa cách viết một nhãn tiếng Việt — cả ba đều là
+việc bình thường, và cả ba đều làm vỡ một mỏ neo neo sai chỗ. Nay bốn phép ghim của bảng neo vào
+`data-cau` · `data-den` · `data-tab`, do mã đặt tay, không đổi theo cách viết.
+
+### Và giới hạn ⑦ áp lên chính bản này
+
+Bản này **thêm** một dòng luật (`AGENTS.md` khai `ADR-0006`), nên nó phải **bớt** — đúng luật mục 8.
+Đã bớt hai: dòng `npm run overview` trùng với dòng bảng, và hai dòng `.gitignore`/`.gitattributes`
+gộp lại thành một (cùng trả lời *"git đối xử với file thế nào"* — đúng luật một-chỗ vừa áp cho bảng).
+
+**Luật-là-chữ: 1.254 → 1.253 dòng.** Xuống, không lên. Con số nhỏ, và đó là điểm: hiện chưa cơ chế
+nào **bắt** nó xuống — `can-nang` cố ý nằm ngoài cổng đóng phiên, nên trần tài liệu đang vượt 3,9×
+mà **chưa từng chặn được gì**. Đó là `KHUNG-40`, và nó cần Đức chốt.
+
 ## 1.3.36 — 2026-09-07 — Bộ đo phải đi CÙNG thứ nó đo: `features.json` vào tầng máy
 
 Cùng một lỗ, **lần thứ ba**, và lần này lộ ra đúng lúc sắp phát bản vá sang hai repo đã lắp.

@@ -28,7 +28,7 @@ import {
   BAC, docChecklistTinhNang, khoangNgay, nguonLamMoi, noiTuoi, quetDauDuc, readBatBien,
   readCoChe, readIdeas, readKhoa, readNo
 } from "../scripts/overview-doc.mjs";
-import { khoiChecklist, khoiLamMoi, NHAN_KHOA, soSanhTrang, tenTrang } from "../scripts/build-overview.mjs";
+import { khoiBaCau, khoiChecklist, khoiLamMoi, NHAN_KHOA, SO_CON_SONG, soSanhTrang, tenTrang } from "../scripts/build-overview.mjs";
 
 let passed = 0;
 let boQua = 0;
@@ -340,6 +340,125 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   assert.match(hCo, /F5 KHÔNG ĐỔI SỐ/);
   assert.ok((hCo.match(/data-cp="/g) || []).length >= 4, "phải có nút COPY cho từng thứ copy được");
   ok("ô làm mới: hai câu trả lời cùng một chỗ · cổng đọc từ mã · repo không có bảng sống thì im");
+}
+
+/* ---- 13. LICH SU KHONG BAO GIO THANH VIEC -------------------------------
+ *
+ * Do 07/09: bang noi HAI con so khac nhau cho cung mot cau hoi "Duc can lam gi" — tab dau noi
+ * "bon muc", tab AI dieu phoi noi "13 viec". Tim ra nguyen nhan: nguon quet dau cho co
+ * `HANDOFF.md`, ma `HANDOFF.md` la nhat ky CHI THEM DONG. Moi lan mot phien KE LAI rang co viec
+ * cho Duc thi lan ke do thanh mot viec moi, VINH VIEN — 8 trong 13 dau la ao, va mot trong tam
+ * dau ao nam trong chinh cau giai thich quy uoc dau.
+ *
+ * Ve nay ghim ca hai chieu: nhat ky KHONG duoc trong danh sach, va so con song PHAI trong.
+ */
+{
+  // 1. Nhat ky KHONG duoc la nguon sinh viec. Day la ve chinh.
+  assert.ok(!SO_CON_SONG.includes("HANDOFF.md"),
+    "HANDOFF.md la nhat ky CHI THEM — quet no tim dau viec thi moi lan ke lai thanh mot viec moi");
+  for (const f of SO_CON_SONG) {
+    assert.doesNotMatch(f, /HANDOFF|CHANGELOG|archive/i,
+      `"${f}" la so lich su, khong duoc sinh ra viec`);
+  }
+  // 2. Va so CON SONG phai co mat — cat qua tay thi bang thanh mu, cung te.
+  for (const f of ["BACKLOG.md", "IDEAS.md", "STATUS.md"]) {
+    assert.ok(SO_CON_SONG.includes(f), `so con song thieu ${f} — bang se khong thay viec that`);
+  }
+  ok(`lịch sử không thành việc: ${SO_CON_SONG.length} sổ còn sống, nhật ký bị loại`);
+}
+
+/* ---- 14. TONG QUAN dung BA CAU, va hai cau sau MAY DEM ------------------
+ *
+ * Duc chot 07/09: "Homepage chi giu 3 cau". Ba, khong phai bon — va khong phai ba cau CONG mot
+ * bang. Ve nay dem so hang that trong HTML, khong dem loi hua trong chu thich.
+ */
+{
+  const dl = {
+    st: { current_focus: "\"dang lam mot viec\"", human_action: "\"CO — bon muc\"" },
+    canDuc: [{ loai: "bam", cau: "x" }, { loai: "chot", cau: "y" }, { loai: "chot", cau: "z" }],
+    khoa: [{ khoa: "_root", owner: "lane-a" }, { khoa: "_docs", owner: null }],
+    so: [{ so: 0, nhan: "tài liệu quá hạn" }, { so: 3, nhan: "nợ cấu trúc" }, { so: 0, nhan: "việc lớn" }],
+    noMo: [1, 2, 3, 4, 5],
+    tenNguoi: "Đức"
+  };
+  const h = khoiBaCau(dl);
+  /* Dem theo `data-cau`, KHONG theo `<div class="bc">`.
+   *
+   * Ban dau ve nay dem chuoi `<div class="bc">` — va no vo ngay hom do, luc khoi ba cau duoc
+   * them thuoc tinh `data-cau`/`data-den`: the mo khong con dong y het chuoi nua nen dem ra 0,
+   * va phep kiem bao "dang 0 cau" trong khi trang co du ba. Mot phep ghim neo vao HINH DANG
+   * THE HTML thi moi lan them mot thuoc tinh la no vo, va no vo voi mot cau loi noi sai
+   * nguyen nhan. Neo vao khoa may doc thi khong. */
+  const hang = [...h.matchAll(/<div class="bc" data-cau="/g)].length;
+  assert.equal(hang, 3, `Tổng quan phải đúng BA câu, đang ${hang}`);
+  assert.equal([...h.matchAll(/<table/g)].length, 0, "ba câu KHÔNG được kèm bảng");
+  assert.equal([...h.matchAll(/class="luoi"|class="sk"|class="nn"/g)].length, 0,
+    "ba câu KHÔNG được kèm lưới ô đếm — đó là bản vẽ lại của thứ đã có chỗ canonical");
+
+  // Cau 2 phai la SO MAY DEM, khong phai chu go tay trong `human_action`.
+  assert.match(h, /3 việc đang chờ/, "câu 2 phải đếm từ canDuc");
+  assert.doesNotMatch(h, /CO — bon muc/, "câu 2 KHÔNG được lấy chữ gõ tay ở human_action");
+
+  // Cau 3: `null` la KHONG DO DUOC, va no phai NANG hon mot con so duong.
+  const hHong = khoiBaCau({ ...dl, so: [{ so: null, nhan: "nợ cấu trúc" }, { so: 9, nhan: "tài liệu quá hạn" }] });
+  assert.match(hHong, /KHÔNG ĐO ĐƯỢC/, "phép đo chết phải nói ra là chết");
+  assert.match(hHong, /đáng ngờ/, "phép đo chết phải nói mọi số cạnh nó đáng ngờ");
+  assert.match(hHong, /cham do/, "phép đo chết → đèn đỏ");
+
+  // Sach thi noi sach, va khong duoc noi sach khi con no chan.
+  const hSach = khoiBaCau({ ...dl, so: [{ so: 0, nhan: "a" }, { so: 0, nhan: "b" }], noMo: [] });
+  assert.match(hSach, /Không chỗ nào đang chặn/);
+  assert.doesNotMatch(hSach, /cham do/, "sạch thì không được bật đèn đỏ");
+
+  // Moi cau phai co MOT lien ket sang cho canonical — tom tat ma khong dan duoc di thi
+  // nguoi doc phai tu di tim, va luc do bang lai thanh mot cho nua phai doc.
+  assert.equal([...h.matchAll(/data-goto="/g)].length, 3, "mỗi câu phải có đúng một liên kết");
+  ok("Tổng quan: đúng 3 câu · không bảng không lưới · hai câu sau máy đếm · mỗi câu một liên kết");
+}
+
+/* ---- 15. MOT KHAI NIEM MOT CHO -------------------------------------------
+ *
+ * Do 07/09 tren ban da commit: ban do file ve BA lan; "Can Duc" · "Suc khoe" · "Y tuong" ·
+ * "Giao viec" · "Lam moi bang" moi thu ve HAI lan — va khong lan nao la tom tat, deu la ban ve
+ * DAY DU. Hau qua khong phai la dai: hau qua la bang noi hai con so khac nhau.
+ *
+ * LO DA BIET cua ve nay, ghi ADR-0006: no dem TIEU DE khoi. Doi ten tieu de la lach duoc.
+ * Chua co cach nao may chan viec ai do ve lai cung noi dung duoi mot cai ten khac.
+ */
+{
+  const trang = join(ROOT, tenTrang(readFileSync(join(ROOT, ".repo-structure.json"), "utf8")));
+  let html = null;
+  try { html = readFileSync(trang, "utf8"); } catch { html = null; }
+  if (html === null) {
+    boQua += 1;
+    console.log("  --  một khái niệm một chỗ — BỎ QUA: repo này chưa sinh trang lần nào (chạy: npm run overview)");
+  } else {
+  const dem = (re) => [...html.matchAll(re)].length;
+  const canonical = [
+    ["Cần <người chốt>", /<h2>Cần [^<]*— \d+ việc/g],
+    ["Sức khoẻ", /<h2>Sức khoẻ/g],
+    ["Sổ ý tưởng", /<h2>Sổ ý tưởng/g],
+    ["Bản đồ file", /<th>Khi bạn sắp/g],
+    ["Làm mới bảng", /<h2>Làm mới bảng/g],
+    ["Bảng quyết định", /<th>Quyết định<\/th>/g],
+    ["Lệnh chạy được", /Lệnh chạy được — \d+ lệnh/g],
+    ["Giao việc ba lệnh", /npm run giao-viec -- --viec nang/g]
+  ];
+  const lap = canonical.filter(([, re]) => dem(re) > 1).map(([t, re]) => `${t} (${dem(re)} lần)`);
+  assert.deepEqual(lap, [],
+    `mỗi khái niệm chỉ được vẽ ĐẦY ĐỦ một chỗ; chỗ khác chỉ tóm tắt + liên kết. Đang lặp: ${lap.join(" · ")}`);
+
+  // Va dung BON nhom, khong phai muoi tab.
+  const nhom = [...new Set([...html.matchAll(/data-tab="([a-z-]+)"/g)].map((m) => m[1]))];
+  assert.deepEqual(nhom.sort(), ["cong-viec", "he-thong", "lich-su", "tong-quan"],
+    `bảng phải có đúng bốn nhóm, đang có: ${nhom.join(" ")}`);
+
+  // Khong lien ket chet: moi `data-goto` phai tro toi mot nhom CO THAT.
+  const di = [...new Set([...html.matchAll(/data-goto="([a-z-]+)"/g)].map((m) => m[1]))];
+  const chet = di.filter((g) => !nhom.includes(g));
+  assert.deepEqual(chet, [], `liên kết trỏ tới nhóm không tồn tại: ${chet.join(" ")}`);
+  ok(`một khái niệm một chỗ: ${canonical.length} khái niệm đều vẽ đúng 1 lần · 4 nhóm · 0 liên kết chết`);
+  }
 }
 
 console.log(`overview-doc-smoke: ${passed} vế xanh` + (boQua ? ` · ${boQua} vế BỎ QUA (kể tên ở trên)` : ""));

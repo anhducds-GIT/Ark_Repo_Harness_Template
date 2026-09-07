@@ -1243,3 +1243,73 @@ biến đã chạy thật**, không cái nào sống sót. `npm test` exit 0.
 luật 8A *Cloud Sync Hold* của chính repo đó chặn, và Đức đã hoãn `KHUNG-30`; luật chủ nhà thắng
 trên đất của nó · `KHUNG-39` mới: `.gitignore`/`.gitattributes` nằm trong bản trích mà không tầng
 nào phát, đã vá tay cho hai repo · cân nặng vượt ngân sách 3 chỗ (`npm run don` là nhịp riêng).
+
+## 2026-09-07 · claude-bang-gon · bản 1.3.37 — bảng gom BỐN nhóm, và nhật ký thôi sinh ra việc
+
+**Làm gì:** audit UX nói bảng *fragment* và *tự mâu thuẫn*. Đo cả hai, tìm ra gốc, sửa gốc.
+
+**Bằng chứng, đếm trên bản ĐÃ COMMIT — không đọc cảm giác:** bản đồ file vẽ **3 lần**; Cần Đức ·
+Sức khoẻ · Ý tưởng · Giao việc · Làm mới bảng vẽ **2 lần** mỗi thứ. Không lần nào là tóm tắt.
+
+**Mâu thuẫn "4 vs 13" có HAI gốc, không phải một lỗi:**
+
+| Con số | Gốc |
+|---|---|
+| **13** | `HANDOFF.md` bị quét tìm dấu `@Đức:` — **8/13 dấu là ảo** |
+| **4** | một câu **gõ tay** trong `STATUS.md`, đã lệch: 2/4 mã nó nêu đã đóng |
+
+`HANDOFF.md` là nhật ký **chỉ thêm dòng**. Nên mỗi lần một phiên *kể lại* rằng có việc chờ Đức
+thì lần kể đó thành **một việc mới, vĩnh viễn** — con số tăng theo **số phiên**, không theo số
+việc. Một dấu ảo còn nằm trong chính câu **giải thích quy ước dấu**: bảng biến sách hướng dẫn của
+nó thành việc phải làm. **13 → 5** sau khi sửa.
+
+Cùng trường gõ tay đó còn ghi *"Bản 1.3.14 · bảng nay có chín tab"* trong khi repo ở 1.3.36 với
+10 tab — và câu ấy chảy vào `DASHBOARD.md` + `repo-map.json`, tức **một câu cũ làm ba artifact máy
+sinh nói sai cùng lúc**. `docs/HUONG-DAN.md` cũng còn ghi *"tám tab"*.
+
+**IA: 10 tab ngang hàng → BỐN nhóm có thứ bậc** — Tổng quan (đúng ba câu) · Công việc (hành động
+được) · Hệ thống (chạy thế nào) · Lịch sử (không hành động được nữa). Ranh **Lịch sử** là luật
+thứ nhất phát biểu thành cấu trúc: thứ trong đó **không được sinh ra việc**.
+
+**Số đo, màn 1440×900:**
+
+| | Trước | Sau |
+|---|---|---|
+| đầu trang | 270px | **124px** |
+| Tổng quan | 3,4 màn hình (6 khối) | **0,4** (ba câu) |
+| tab Vận hành / Cấu trúc | 16,0 / 10,1 | gộp vào Hệ thống: **5,4** |
+| tổng cả bảng | 10 tab ~30 màn hình | **4 nhóm, 14,9** |
+
+**Xoá là thắng:** `khoiNowNext` · `khoiSucKhoe` · `khoiYTuongGon` · `mucLuc` · hai hàm
+`sach()`/`gon()` (chỉ tồn tại để cắt câu cho bản đồ file **bản kém**) · 7 dòng CSS · đoạn JS mục
+lục. Bộ sinh **−49 dòng thực**.
+
+**Một bug cùng họ, lộ ra lúc đo:** bộ đếm *"code đã đổi sau kiểm chứng"* thấy trang HTML máy sinh
+là file `.html` bình thường, nên ở `nav_platform_main` mỗi lượt sinh lại là **+1** và cổng *"Sự
+thật máy sinh còn tươi"* **ĐỎ vĩnh viễn** — sinh lại không thoát được. Đúng con bệnh đã ghi trên
+`MAY_SINH` cho `repo-map.json`, lặp lần thứ hai. Vá bằng cách **bỏ danh sách**: `tenTrangFrom` dời
+sang `repo-structure.mjs`, suy một lần, hai cổng dùng chung.
+
+**Phép kiểm:** `overview-doc-smoke` 12 → **15 vế**. **Tám đột biến, cả tám chết ở ĐÚNG vế nó đo.**
+
+**Bốn phép ghim CŨ đỏ, và cả bốn đỏ ĐÚNG** — chúng ghim đúng cái IA vừa bị đổi: `>= 5 tab` ·
+`class="den xanh"` · nhãn `"đang ở đâu"` · `data-tab="migrate"`. Mỗi cái đổi **chỗ nhìn**, giữ
+nguyên **điều nó canh**, và ba trong bốn nay neo vào **khoá máy đọc** (`data-cau` · `data-den`)
+thay vì tên lớp CSS hay nhãn tiếng Việt — neo vào chữ hiển thị thì đổi cách viết nhãn là phép ghim
+mù, và nó mù IM LẶNG.
+
+**Đây là lượt CẮT — số đo cả bộ khung, để lượt sau có mốc:** 69% commit 7 ngày chỉ chạm giấy tờ ·
+luật-là-chữ **1.254 dòng** · chốt máy **26** · tài liệu **8.672 dòng** (trần 2.200, vượt 3,9×) ·
+sổ nợ mở **15**/39. **48 dòng văn cho mỗi cơ chế thật.**
+
+**Còn mở — việc cắt tiếp, `BACKLOG.md` `KHUNG-40`…`KHUNG-43`:** bảy giới hạn Đức chốt (hai chỗ
+cần Đức chốt: **trần dòng luật**, và **có đưa trần vào cổng đóng phiên hay không** — hiện
+`can-nang` cố ý nằm ngoài cổng nên **mọi trần chưa từng chặn được gì**) · luật **DỪNG** khi hết
+việc sản phẩm · khoá hết hạn khi có người chờ · một trang ADR cho người chủ đọc.
+
+**Một slip của chính lượt này, ghi lại vì nó đúng cái bẫy prompt cảnh báo:** phép ghim mới đếm câu
+bằng chuỗi `<div class="bc">`, rồi cùng ngày tôi thêm `data-cau` vào đúng thẻ đó → **mỏ neo khớp 0
+chỗ**, và phép kiểm báo *"đang 0 câu"* trong khi trang có đủ ba. Con số 0 ở đây nghĩa là **dụng cụ
+đo hỏng**, không phải "trang hỏng" — hai ca đọc y hệt nhau. Tin con số thì lượt sau đi sửa thứ
+đang đúng. Nay mỏ neo neo vào **khoá máy đọc** (`data-cau` · `data-den` · `data-tab`), không neo
+vào hình dạng thẻ HTML hay chữ hiển thị.

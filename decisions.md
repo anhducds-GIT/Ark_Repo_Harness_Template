@@ -444,3 +444,37 @@ không assert** — và không lộ ra ở lần chạy xanh, vì nhánh đó ch
    phép còn lại chưa được đo lần nào.
 
 Ghi chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.36.
+
+---
+
+## 2026-09-07 — Bảng: một khái niệm một chỗ, và nhật ký KHÔNG bao giờ sinh ra việc
+
+Đức đọc audit UX rồi chốt bảy điều, **nguyên văn năm điều đầu**:
+
+> *"Homepage chỉ giữ 3 câu: Đang làm gì / Cần Đức làm gì / Blocker-risk."* · *"Tìm và loại nguyên
+> nhân 4-vs-13 'Cần Đức'; historical HANDOFF không được trở thành action."* · *"Gom 9 tab thành
+> khoảng 4 nhóm."* · *"Mỗi information concept chỉ có một canonical location; nơi khác chỉ summary
+> + link."* · *"Xóa/đồng bộ hướng dẫn 8-tab cũ và mọi nội dung stale."*
+
+**Hai luật rút ra, và cả hai đã thành chốt máy:**
+
+**⑴ Thứ không hành động được nữa thì không được sinh ra việc.** `HANDOFF.md` là nhật ký chỉ-thêm.
+Quét nó tìm dấu `@Đức:` nghĩa là mỗi lần một phiên *kể lại* rằng có việc chờ thì lần kể đó thành
+một việc mới, **vĩnh viễn** — con số tăng theo **số phiên**, không theo số việc. Đo được: 8 trong
+13 dấu là ảo, và một dấu ảo nằm trong chính câu giải thích quy ước dấu.
+
+**⑵ Một khái niệm một chỗ.** Bản trước vẽ bản đồ file **ba lần** và năm khái niệm khác **hai
+lần** — không lần nào là tóm tắt. Hậu quả không phải dài, mà là **bảng nói hai con số khác nhau
+cho cùng một câu hỏi**, và lúc đó cả hai con số đều vô giá trị.
+
+**Luật kèm theo, áp cho mọi lần sửa bảng sau này: MÁY ĐẾM ĐƯỢC THÌ MÁY ĐẾM.** Con số "4" đến từ
+một câu gõ tay trong `STATUS.md`. Một bản đếm gõ tay là nguồn sự thật thứ hai, và nguồn thứ hai
+thì sẽ lệch — nó đã lệch: hai trong bốn mã nó nêu đã đóng, và cùng trường ấy còn nói *"chín tab"*
+trong khi bảng có mười.
+
+Chi tiết và **phần MẤT**: [docs/adr/0006](docs/adr/0006-bang-mot-khai-niem-mot-cho.md) ·
+[CHANGELOG.md](CHANGELOG.md) bản 1.3.37.
+
+**Hai chỗ Đức còn phải chốt** (đã ghi `BACKLOG.md` `KHUNG-40`): trần số dòng cho file luật là bao
+nhiêu, và có đưa trần đó vào **cổng đóng phiên** hay không. Hiện `can-nang` cố ý nằm ngoài cổng,
+nên mọi trần **chưa từng chặn được gì** — kể cả cái đang vượt 3,9 lần.
