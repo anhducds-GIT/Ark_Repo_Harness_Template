@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T04:36:33.170Z",
-      "task": "sua dinh nghia tang may",
-      "released_at": "2026-09-07T06:44:49.073Z",
+      "claimed_at": "2026-09-07T07:55:13.044Z",
+      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
+      "released_at": "2026-09-07T10:52:20.707Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -15,9 +15,9 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T05:45:53.753Z",
-      "task": "de bai onboard AI repo dich",
-      "released_at": "2026-09-07T06:44:48.955Z",
+      "claimed_at": "2026-09-07T07:55:12.956Z",
+      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
+      "released_at": "2026-09-07T10:52:20.883Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T04:36:32.718Z",
-      "task": "sua dinh nghia tang may",
-      "released_at": "2026-09-07T06:44:48.816Z",
+      "claimed_at": "2026-09-07T07:55:12.889Z",
+      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
+      "released_at": "2026-09-07T10:52:21.052Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T04:36:32.891Z",
-      "task": "sua dinh nghia tang may",
-      "released_at": "2026-09-07T06:44:49.215Z"
+      "claimed_at": "2026-09-07T07:55:13.119Z",
+      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
+      "released_at": "2026-09-07T10:52:21.241Z"
     }
   }
 }
