@@ -23,11 +23,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-loi-hai-vai",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-07T13:01:58.595Z",
       "task": "va ba loi P1 Codex tim duoc o quyen.mjs",
-      "released_at": null,
+      "released_at": "2026-09-07T14:02:23.889Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
