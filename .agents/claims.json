@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-loi-hai-vai",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-07T12:06:48.447Z",
       "task": "package.json: noi suite quyen vao npm test",
-      "released_at": null,
+      "released_at": "2026-09-07T12:38:13.300Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,11 +23,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-loi-hai-vai",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-07T11:24:33.782Z",
       "task": "xay loi cap quyen nguyen tu bang ref git — brief LAT-CAT-HAI-VAI-01",
-      "released_at": null,
+      "released_at": "2026-09-07T12:38:13.182Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
