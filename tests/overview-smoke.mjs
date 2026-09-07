@@ -31,9 +31,14 @@ const html = trang(dl);
    *
    * Nen doi con so thanh DANH SACH: bon nhom, dung ten, dung tung cai. Chat hon ">= 5" o ca
    * hai chieu — no bat ca viec thieu nhom lan viec ai do lang le them nhom thu nam. */
-  const BON_NHOM = ["cong-viec", "he-thong", "lich-su", "tong-quan"];
-  assert.deepEqual([...new Set(nut)].sort(), BON_NHOM,
-    `bang phai co dung bon nhom (ADR-0006), dang co: ${[...new Set(nut)].join(" ")}`);
+  /* ĐỔI TỪ BỐN SANG NĂM NHÓM — 08/09, Đức chốt, ADR-0007 bổ sung ADR-0006.
+   *
+   * Phép kiểm này ĐỎ khi tôi thêm tab Migrate, và nó đỏ ĐÚNG: nó sinh ra để bắt cả việc thiếu
+   * nhóm lẫn việc ai đó lặng lẽ thêm nhóm thứ năm. Nên tôi sửa nó **có chủ ý và kèm một ADR**,
+   * không phải sửa cho hết đỏ. Ai đọc dòng này mà không thấy ADR-0007 thì hãy nghi ngờ nó. */
+  const NAM_NHOM = ["cong-viec", "he-thong", "lich-su", "migrate", "tong-quan"];
+  assert.deepEqual([...new Set(nut)].sort(), NAM_NHOM,
+    `bang phai co dung nam nhom (ADR-0006 + ADR-0007), dang co: ${[...new Set(nut)].join(" ")}`);
   assert.deepEqual([...new Set(nut)].sort(), [...new Set(than)].sort(),
     "moi nut tab phai co dung mot phan than — lech la bam vao thi trang trong");
   ok(`${nut.length} nhóm đúng tên, nút nào cũng có thân`);
@@ -202,9 +207,18 @@ const html = trang(dl);
    * thành BỐN nhóm (ADR-0006), nên sổ nay là một KHỐI trong nhóm Công việc.
    *
    * Neo vào chính KHỐI, không neo vào hình dạng điều hướng — điều hướng đã đổi ba lần, còn
-   * "sổ phải đến được" thì chưa đổi lần nào. Bỏ hẳn vế này mới là làm yếu lớp bảo vệ. */
-  assert.match(html, /<h2>Sổ migrate — \d+ lượt/, "so migrate phai den duoc tu trang me");
-  assert.match(html, /id="tab-cong-viec"[\s\S]*<h2>Sổ migrate/, "so migrate phai nam trong nhom Cong viec");
+   * "sổ phải đến được" thì chưa đổi lần nào. Bỏ hẳn vế này mới là làm yếu lớp bảo vệ.
+   *
+   * ĐỔI CHỖ NHÌN LẦN THỨ TƯ, 08/09, và vẫn giữ đúng MỘT điều đó: Đức chốt tách tab Migrate
+   * (ADR-0007), và tab đó gập được — nên nhãn của khối nay là `<summary>` chứ không phải `<h2>`.
+   * Nhận CẢ HAI hình dạng: một cái là nhãn khối mở, cái kia là nhãn khối gập, và ta không cần
+   * biết nó đang ở dạng nào để trả lời câu *"sổ có đến được không"*. */
+  assert.match(html, /<(?:h2|summary)>Sổ migrate — \d+ lượt/, "so migrate phai den duoc tu trang me");
+  /* Vế này TRƯỚC 08/09 đòi sổ migrate nằm trong nhóm Công việc — đúng ADR-0006 lúc đó. Đức đảo
+   * chốt đó 08/09 (ADR-0007) vì gộp lại làm nội dung migrate rải ba tab. Nên vế này đổi ĐÍCH,
+   * không đổi ý: sổ vẫn phải nằm ở MỘT nhóm xác định, nay là nhóm Migrate. Đích cụ thể được đo
+   * kỹ hơn ở ca "tab Migrate" phía dưới — vế ở đây chỉ giữ chỗ để câu chuyện đọc liền mạch. */
+  assert.match(html, /id="tab-migrate"[\s\S]*<(?:h2|summary)>Sổ migrate/, "so migrate phai nam trong nhom Migrate");
   assert.match(html, /Sổ migrate — \d+ lượt/, "tab migrate phai co than bai that, khong phai mot cai tab rong");
 
   // Link chết còn tệ hơn không link: chỉ nhận trang CÓ THẬT trong HEAD.
@@ -338,6 +352,53 @@ const html = trang(dl);
     "phải có quy tắc cho khối đang mở chiếm cả hàng — không thì bảng bên trong bị bóp còn 1/3");
 
   ok("tab Hệ thống: khối mở thành khối gập, xếp lưới, và bộ chuyển không lặn vào khối đã gập");
+}
+
+/* ---- Tab Migrate: nội dung migrate KHÔNG được nằm rải ba tab ----------------
+ *
+ * Đức nêu 08/09: *"việc compact không làm dễ làm việc hơn mà còn trộn nội dung"*. Đo lúc đó:
+ * sổ migrate ở tab Công việc, quy trình migrate ở tab Hệ thống — hai nửa của một việc, hai chỗ.
+ *
+ * Kiểu hỏng phải canh: ai đó sau này gom lại *"cho gọn bảng"*, và nó **trông vẫn đẹp** — mọi
+ * khối vẫn đủ, chỉ là người làm migrate lại phải mở hai tab. Nên vế dưới không đo *"có tab
+ * migrate không"* (quá dễ đạt) mà đo **hai nửa đó nằm CÙNG một tab**.
+ */
+{
+  const catTab = (h) => {
+    const ids = [...h.matchAll(/id="tab-([a-z-]+)"/g)].map((m) => ({ t: m[1], i: m.index }));
+    const o = {};
+    ids.forEach((x, k) => { o[x.t] = h.slice(x.i, k + 1 < ids.length ? ids[k + 1].i : h.length); });
+    return o;
+  };
+  const T = catTab(html);
+  assert.ok(T.migrate, "phai co tab migrate");
+
+  // HAI NỬA CỦA MỘT VIỆC phải cùng tab: quy trình migrate, và sổ ba lượt migrate.
+  assert.ok(T.migrate.includes("wf-02-dua-repo-cu-len-chuan"),
+    "quy trinh migrate phai o tab Migrate");
+  assert.ok(!T["he-thong"].includes("wf-02-dua-repo-cu-len-chuan"),
+    "quy trinh migrate KHONG duoc con nam o tab He thong — do la nua bi tach ra");
+  assert.ok(/so-migrate|Sổ migrate/.test(T.migrate), "so migrate phai o tab Migrate");
+  assert.ok(!/id="so-migrate"/.test(T["cong-viec"]),
+    "so migrate KHONG duoc con nam o tab Cong viec");
+
+  // CHIA THEO DỮ LIỆU, KHÔNG THEO TÊN FILE. Đổi tên file thì tab phải vẫn đúng.
+  const wMigrate = dl.workflows.filter((w) => String(w.fm.nhom || "").trim() === "migrate");
+  assert.equal(wMigrate.length, 1, "dung mot workflow khai nhom: migrate — neu 0 thi tab Migrate rong");
+  assert.ok(dl.workflows.length > wMigrate.length,
+    "phai con workflow khac o tab He thong, neu khong thi phep kiem duoi vo nghia");
+
+  // Tab Migrate cũng phải gập được và xếp lưới, như tab Hệ thống — cùng một cách đối xử.
+  assert.ok(T.migrate.includes('<div class="xep">'), "tab Migrate phai xep luoi");
+  assert.ok(/ open>/.test(T.migrate), "tab Migrate phai mo san khoi quy trinh — vao tab do la de lam migrate");
+
+  // Và bộ vẽ workflow phải là MỘT bản. Trước 08/09 có hai, một bản chưa bao giờ được gọi.
+  const nguon = fs.readFileSync(path.join(ROOT, "scripts", "build-overview.mjs"), "utf8");
+  assert.equal((nguon.match(/const veWorkflow = /g) || []).length, 1,
+    "chi duoc MOT bo ve workflow — hai ban thi luot sau sua nham vao ban chet");
+  assert.ok(!/const tabWorkflow =/.test(nguon), "ban ve workflow da chet phai bi xoa, khong de lai");
+
+  ok("tab Migrate: hai nửa của một việc về cùng một tab, chia theo dữ liệu chứ không theo tên file");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
