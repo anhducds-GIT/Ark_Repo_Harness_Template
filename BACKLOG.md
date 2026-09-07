@@ -952,3 +952,24 @@ SHA. Giữ ADR (chúng cứu việc thật), nhưng **bổ sung cửa cho ngư�
 
 Nguồn có sẵn: `decisions.md` đã là sổ tra nhanh *"Đức đã chốt gì, ngày nào"*, và bảng **chưa đọc
 file đó lần nào**. Nên đây có thể là một lượt **nối nguồn đã có**, không phải viết cơ chế mới.
+
+### KHUNG-7 · `template/` phát bộ sinh bảng mà KHÔNG phát phép ghim của nó
+
+Phát hiện 08/09 khi thêm khối **hai vai Assistant** vào `build-overview.mjs`. Bản trích phát
+`template/scripts/build-overview.mjs` (bản 1.3.38) nhưng `template/tests/` **không có**
+`overview-smoke.mjs` — nên repo đích nhận tính năng mà **không nhận lớp canh**. Ở nhà, khối đó
+có 10 phép ghim và **6/6 đột biến bị bắt**; ở repo đích nó có **0**.
+
+Vì sao có thể là cố ý, phải kiểm trước khi "vá": `overview-smoke.mjs` gọi `gomDuLieu()` ở tầng
+module, tức nó **đọc `docs/` của repo nhà**. Ở một repo đích còn trống, phép kiểm đó có thể đỏ vì
+lý do không liên quan gì tới bộ sinh — và một phép kiểm đỏ vô cớ ở repo đích thì tệ hơn không có.
+
+Nhưng phần ghim khối hai vai **không** đọc repo: nó gọi `khoiMoHinh()` với đầu vào tự dựng. Nên
+lối rẻ nhất có thể là **tách phần thuần hàm ra một file riêng rồi phát file đó**, chứ không phát
+cả suite.
+
+Vùng: `_template` + `_code`.
+
+**đóng khi:** repo đích chạy được một phép kiểm canh khối hai vai (số suy từ đầu vào, không gõ
+cứng), và một đột biến gõ cứng con số làm nó ĐỎ ở repo đích — đo trên một repo đích thật, không
+suy ra. Hoặc: ghi vào `PLATFORM.md` rằng bộ sinh bảng phát **không kèm** phép ghim, kèm lý do.

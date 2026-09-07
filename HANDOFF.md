@@ -1405,3 +1405,35 @@ minh có bên thứ ba thật. Cần danh tính từ nguồn được xác thự
 
 **Việc kế:** ràng vùng → đường dẫn (lõi hiện nhận bất kỳ tên vùng nào) · dựng bản xem được cho cờ
 `enforce_admins` mà **không tự bật**.
+
+## 2026-09-08 · claude-cua-kiem — bản đồ vùng↔đường dẫn, và khối hai vai trên bảng
+
+**Số đo.** 79 → **97 phép kiểm xanh** · 21/21 → **27/27 đột biến bị bắt** · 13 → **15 ca**.
+Bảng: `overview-smoke` 9 → **10 ghim**, đột biến khối hai vai **6/6 bị bắt**.
+Chạy lại: `node tests/quyen-sau-ca.mjs` · `node tests/overview-smoke.mjs`.
+
+**Chỗ hở số 3 đã bịt.** `--tich-hop` và `--xac-nhan` bắt buộc `--ban-do` + `--con-lai`; lõi quy
+mọi đường dẫn trong khoảng `coSo..sha` về một khoá theo khối `areas` và từ chối nếu có đường dẫn
+thuộc vùng khác. Bản đồ **truyền vào**, lõi vẫn không biết nó chạy ở repo nào. Lý do và ranh giới
+đầy đủ: ADR-0019 ⑵c. **Chạm nhiều vùng thì ai duyệt: KHÔNG AI** — tách hai lượt.
+
+**HAI CHỖ CA CỦA TÔI ĐO SAI THỨ NÓ KHAI**, cả hai do đột biến tìm ra. Nguyên văn ở commit
+`c7a3a9c`; đây là cái phải nhớ:
+
+⑴ Phép kiểm quyền bắt TRƯỚC phép kiểm đường dẫn, nên ca *"khai sai vùng"* chỉ đo được lớp mới khi
+lane **giữ CẢ HAI** vùng. Không thế thì ca đo lại lớp cũ mà vẫn trông như đang đo lớp mới.
+
+⑵ Đột biến *"bật dò-đổi-tên"* **LỌT** lượt đầu. Ca dựng **chiều RA** không phân biệt được — chiều
+nguy hiểm là **CHIỀU VÀO**, hút file TỪ vùng khác VỀ vùng mình: phía NGUỒN là thứ duy nhất tố giác,
+đúng phía dò-đổi-tên xoá. Sửa chiều rồi đo lại: bắt, 96 đạt · 1 sai.
+
+**Thứ tự phép kiểm.** `kiemDuongDan` phải nằm SAU `STALE_BASE`: đặt trên cùng thì một nền khai sai
+làm khoảng đo phình ra và cuốn theo commit lane khác, `STALE_BASE` thành mã không bao giờ chạy.
+
+**Khối hai vai trên bảng** (Đức giao 08/09) — gộp vào tab mô hình vận hành, không tab mới: Vai ①
+giữ Khối 1, Vai ② giữ hai mũi + vòng ngược, ranh giới **Vai ② phát hiện · Vai ① sửa**. Chữ là
+quyết định nên gõ tay, **số suy từ repo** — ghim đúng chỗ đó. Phát ra `template/` ở bản **1.3.38**.
+
+**Còn mở.** `--as` vẫn là tên tự khai · đẩy `main` bỏ qua cửa thì mã VẪN vào · chưa bật cờ GitHub
+nào · `template/` phát bộ sinh mà **chưa phát phép ghim** của nó (đã vào `BACKLOG.md`).
+Khuyến nghị việc kế tiếp: `_run-qua-dem-20260907/TRANG-THAI-HE-THONG.md`.
