@@ -37,18 +37,20 @@
 //   DỰA VÀO TUÂN THỦ:     đẩy `main` mà KHÔNG ghi sự kiện tích hợp. File này không thấy được.
 //                         Muốn chặn cả chỗ đó thì cần MỘT BÊN THỨ BA đọc sổ quyền — và bên thứ
 //                         ba phải không phải bên đang bị kiểm. Chưa làm, cố ý.
-//   CHƯA LÀM, ĐÃ BIẾT:    file này KHÔNG kiểm đường dẫn. Nó nhận bất kỳ tên vùng nào, kể cả khi
-//                         commit kết quả sửa file thuộc vùng khác — phiên Codex khai `wrong-area`
-//                         cho một thay đổi ở `product.txt` và đi qua được. Bịt chỗ này cần bản đồ
-//                         vùng → đường dẫn, mà bản đồ đó nằm ở `.repo-structure.json` của TỪNG
-//                         repo, còn file này thì cố ý không biết repo nào. Nên nó là mục việc kế
-//                         tiếp, không phải một dòng thêm vào đây. Cho tới lúc đó: tên vùng ở đây
-//                         là LỜI KHAI, không phải điều đã kiểm.
+//   CHƯA LÀM, ĐÃ BIẾT:    `--as` là TÊN TỰ KHAI, không phải danh tính. Vế "bên xác nhận không
+//                         được là bên bị kiểm" so hai chuỗi tên, nên cùng một Assistant gọi lại
+//                         bằng một cái tên khác là đi qua được. Muốn thật thì danh tính phải đến
+//                         từ nguồn được xác thực (token workflow chạy trên máy GitHub) — chưa nối.
+//
+// Tên vùng thì ĐÃ KIỂM từ 08/09: `--ban-do` + `--con-lai` buộc mọi đường dẫn trong khoảng
+// `coSo..sha` quy về đúng vùng đã khai (`kiemDuongDan`). Trước đó phiên Codex khai `wrong-area`
+// cho một thay đổi ở `product.txt` và đi qua được.
 //
 // Fail-closed: không tới được remote thì KHÔNG cấp quyền. Một quyền cấp bằng phỏng đoán tệ hơn
 // không có quyền.
 
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 
 const REF = 'refs/ark/quyen';
 const TEP = 'su-kien.jsonl';
@@ -338,6 +340,110 @@ function kiemTheHe(dangGiu, theHe, danh) {
   return MA.TU_CHOI;
 }
 
+/* ── VÙNG ↔ ĐƯỜNG DẪN ─────────────────────────────────────────────────────────────────────────
+ *
+ * Chỗ hở phiên Codex đo được 07/09: lõi nhận BẤT KỲ tên vùng nào. Nó đẩy một kết quả sửa
+ * `product.txt` qua cửa dưới tên vùng `wrong-area`, và cửa nói ĐẠT. Tên vùng khi ấy chỉ là một
+ * lời khai — cùng loại với `--as`, và cùng loại với mọi thứ chưa ai kiểm.
+ *
+ * Bản đồ nằm ở khối `areas` của `.repo-structure.json` thuộc repo tiêu thụ, và được TRUYỀN VÀO
+ * bằng `--ban-do`. Lõi cố ý không biết nó đang chạy trong repo nào: bản đồ vùng là chuyện của
+ * từng repo, còn phép kiểm là chuyện của lõi.
+ *
+ * MỘT KẾT QUẢ, MỘT VÙNG — và đây là câu trả lời cho *"kết quả chạm NHIỀU vùng thì ai duyệt"*:
+ * **không ai.** Tách ra, mỗi vùng một lượt. Lý do, không phải sở thích: một tờ xác nhận ký cho
+ * MỘT vùng, và một lượt thu hồi cũng thu hồi MỘT vùng. Cho một kết quả trải hai vùng đi qua bằng
+ * một tờ xác nhận là để bên kiểm của vùng A ký thay cho vùng B — mà nó không đọc, và không bị
+ * thu hồi cùng. Luật này chặt hơn bảng khoá (bảng cho một lane giữ hai khoá cùng lúc); cố ý,
+ * vì giữ hai khoá là chuyện điều phối, còn ký nhận một kết quả là chuyện thẩm quyền. */
+
+function docBanDo(duong) {
+  if (!duong) {
+    console.error('TỪ CHỐI [MISSING_MAP] — cần --ban-do <đường dẫn .repo-structure.json>.');
+    console.error('Không có bản đồ thì tên vùng chỉ là lời khai, và cửa này đã đi qua một lời');
+    console.error('khai sai ngày 07/09. Cửa không chạy ở chế độ không kiểm.');
+    return { ok: false, ma: MA.DUNG_SAI };
+  }
+  let tho;
+  try {
+    tho = JSON.parse(fs.readFileSync(duong, 'utf8'));
+  } catch (e) {
+    console.error(`TỪ CHỐI [MAP_UNREADABLE] — không đọc được bản đồ vùng ở ${duong}.`);
+    console.error(String(e.message).split('\n')[0]);
+    return { ok: false, ma: MA.DUNG_SAI };
+  }
+  const areas = tho && tho.areas;
+  if (!areas || typeof areas !== 'object') {
+    console.error(`TỪ CHỐI [MAP_UNREADABLE] — ${duong} không có khối "areas".`);
+    return { ok: false, ma: MA.DUNG_SAI };
+  }
+  // Chỉ giữ khoá là đường dẫn (kết thúc bằng "/"); các khoá `_doc*` là văn xuôi cho người đọc.
+  // Sắp theo độ dài GIẢM để khớp tiền tố dài nhất trước — nhờ đó `workers/_shared/` thắng
+  // `workers/`, và luật đó không cần một vế riêng.
+  const muc = Object.entries(areas)
+    .filter(([k, v]) => k.endsWith('/') && v && typeof v === 'object')
+    .sort((a, b) => b[0].length - a[0].length);
+  if (!muc.length) {
+    console.error(`TỪ CHỐI [MAP_UNREADABLE] — khối "areas" ở ${duong} không có mục đường dẫn nào.`);
+    return { ok: false, ma: MA.DUNG_SAI };
+  }
+  return { ok: true, muc };
+}
+
+/* Một đường dẫn quy về khoá quyền nào. `null` = bản đồ không phủ tới. */
+function quyVung(duongDan, muc, conLai) {
+  for (const [tienTo, khai] of muc) {
+    if (!duongDan.startsWith(tienTo)) continue;
+    if (khai.ownership_mode === 'per-package') {
+      const conLaiDuong = duongDan.slice(tienTo.length);
+      const goi = conLaiDuong.split('/')[0];
+      if (!goi) return null;
+      return `${khai.claim_prefix || tienTo}${goi}`;
+    }
+    return khai.steward || null;
+  }
+  return conLai || null;
+}
+
+/* Mọi đường dẫn trong khoảng `coSo..sha` có nằm trong vùng đã khai không.
+ * `--no-renames` cố ý: mặc định git chỉ in tên MỚI của một file bị đổi tên, nên một lượt chuyển
+ * file từ vùng A sang vùng B sẽ chỉ hiện phía B và phía A biến mất khỏi phép kiểm. */
+function kiemDuongDan({ vung, sha, coSo, banDo, conLai }) {
+  const bd = docBanDo(banDo);
+  if (!bd.ok) return bd.ma;
+
+  const d = thu(['diff', '--name-only', '--no-renames', coSo, sha]);
+  if (!d.ok) {
+    console.error('TỪ CHỐI [DIFF_FAILED] — không đọc được khoảng thay đổi giữa nền và kết quả.');
+    console.error(String(d.ra).split('\n').slice(0, 3).join('\n'));
+    return MA.TU_CHOI;
+  }
+  const duongDan = d.ra.split('\n').map((s) => s.trim()).filter(Boolean);
+
+  const laVungKhac = [];
+  const khongPhu = [];
+  for (const p of duongDan) {
+    const khoa = quyVung(p, bd.muc, conLai);
+    if (khoa === null) khongPhu.push(p);
+    else if (khoa !== vung) laVungKhac.push([p, khoa]);
+  }
+
+  if (khongPhu.length) {
+    console.error(`TỪ CHỐI [UNMAPPED_PATH] — ${khongPhu.length} đường dẫn không nằm trong vùng nào của bản đồ:`);
+    for (const p of khongPhu.slice(0, 5)) console.error(`  ${p}`);
+    console.error('Khai nó vào khối "areas", hoặc đưa --con-lai <khoá> cho phần còn lại của repo.');
+    return MA.TU_CHOI;
+  }
+  if (laVungKhac.length) {
+    console.error(`TỪ CHỐI [AREA_MISMATCH] — kết quả khai vùng ${vung} nhưng chạm ${laVungKhac.length} đường dẫn của vùng khác:`);
+    for (const [p, k] of laVungKhac.slice(0, 5)) console.error(`  ${p} → ${k}`);
+    console.error('Một kết quả, một vùng. Tách thành từng lượt riêng, mỗi vùng một tờ xác nhận —');
+    console.error('bên kiểm của vùng này không ký thay cho vùng kia được.');
+    return MA.TU_CHOI;
+  }
+  return null;
+}
+
 function kiemSieuDuLieu({ theHe, sha, coSo }) {
   if (!theHe || !sha || !coSo) {
     console.error('TỪ CHỐI [MISSING_DATA] — cần cả --the-he, --sha và --co-so.');
@@ -370,9 +476,14 @@ function kiemSieuDuLieu({ theHe, sha, coSo }) {
  * Tờ xác nhận vào chính sổ quyền, nên nó thừa hưởng thứ tự và phép so-và-đổi của sổ. Đó là thứ cho
  * cửa tích hợp hỏi được câu *"đây có phải điều cuối cùng xảy ra với vùng này không"* — xem chốt ở
  * `lenhTichHop`. Trong bản thật, bên kiểm là workflow `cong-kiem` chạy trên máy GitHub. */
-function lenhXacNhan({ vung, lane, theHe, sha, coSo, remote }) {
+function lenhXacNhan({ vung, lane, theHe, sha, coSo, remote, banDo, conLai }) {
   const hong = kiemSieuDuLieu({ theHe, sha, coSo });
   if (hong !== null) return hong;
+
+  // Bên kiểm cũng không được ký cho một kết quả nằm ngoài vùng nó đang kiểm. Cùng một hàm với
+  // cửa tích hợp — luật cài hai chỗ là luật bộ đột biến không đo được (đã vấp 07/09).
+  const lechVung = kiemDuongDan({ vung, sha, coSo, banDo, conLai });
+  if (lechVung !== null) return lechVung;
 
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
@@ -420,7 +531,7 @@ function lenhXacNhan({ vung, lane, theHe, sha, coSo, remote }) {
 }
 
 // Cửa tích hợp. Lượt KIỂM và lượt GHI là cùng một lượt đẩy — đó là cả điểm của lệnh này.
-function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
+function lenhTichHop({ vung, lane, theHe, sha, coSo, remote, banDo, conLai }) {
   // Bắt buộc điền là CHƯA ĐỦ — phải kiểm điều đã điền có khớp commit thật.
   // Phiên Codex đẩy được ba thứ qua cửa này ngày 07/09: kết quả cũ bỏ trống `--co-so` ·
   // kết quả cũ khai một nền mà chính nó không chứa · một SHA bịa ra hoàn toàn.
@@ -460,6 +571,19 @@ function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
     console.error('Lấy về, dựng lại, rồi kiểm lại. Mỗi lượt rebase phải kiểm lại.');
     return MA.TU_CHOI;
   }
+
+  /* TÊN VÙNG PHẢI KHỚP ĐƯỜNG DẪN THẬT — và thứ tự ở đây là chuyện đã đo, không phải chuyện gu.
+   *
+   * Bản đầu đặt phép kiểm này lên TRÊN CÙNG, với lý lẽ "sai vùng thì chẳng cần hỏi remote". Lý lẽ
+   * đó sai, và ca ⑤ chỉ ra: phép kiểm đo khoảng `coSo..sha`, nên một NỀN KHAI SAI làm khoảng đó
+   * phình ra và cuốn theo commit của lane khác — cửa từ chối đúng, nhưng nói sai lý do
+   * (`AREA_MISMATCH` thay vì `STALE_BASE`), và `STALE_BASE` thành mã không bao giờ chạy.
+   *
+   * Đặt sau `STALE_BASE` thì khoảng đo mới tin được: vế đó buộc `coSo` phải CHỨA lượt tích hợp
+   * gần nhất của vùng, nên `coSo..sha` chính là "những gì vùng này đổi kể từ lần nhận trước".
+   * Khai một nền SỚM hơn chỉ làm khoảng rộng ra — hướng an toàn, và vẫn bị từ chối. */
+  const lechVung = kiemDuongDan({ vung, sha, coSo, banDo, conLai });
+  if (lechVung !== null) return lechVung;
 
   /* XÁC NHẬN CỦA BÊN THỨ BA PHẢI LÀ SỰ KIỆN LIỀN TRƯỚC — chốt trả lời phiên Codex (#14, #19).
    *
@@ -584,6 +708,8 @@ function docDoiSo(argv) {
     else if (a === '--sha') { o.sha = ke(); i += 1; }
     else if (a === '--co-so') { o.coSo = ke(); i += 1; }
     else if (a === '--remote') { o.remote = ke(); i += 1; }
+    else if (a === '--ban-do') { o.banDo = ke(); i += 1; }
+    else if (a === '--con-lai') { o.conLai = ke(); i += 1; }
   }
   return o;
 }
@@ -595,10 +721,18 @@ function huongDan() {
   node scripts/quyen.mjs --nhan <vùng> --as <lane> --viec "một câu"
   node scripts/quyen.mjs --tra <vùng> --as <lane>
   node scripts/quyen.mjs --thu-hoi <vùng> --as <lane> --duc "<câu chốt của Đức>"
-  node scripts/quyen.mjs --xac-nhan <vùng> --as <bên-kiểm> --the-he <n> --sha <sha> --co-so <sha>
-  node scripts/quyen.mjs --tich-hop <vùng> --as <lane> --the-he <n> --sha <sha> --co-so <sha>
+  node scripts/quyen.mjs --xac-nhan <vùng> --as <bên-kiểm> --the-he <n> --sha <sha> --co-so <sha> \\
+                         --ban-do .repo-structure.json --con-lai _root
+  node scripts/quyen.mjs --tich-hop <vùng> --as <lane> --the-he <n> --sha <sha> --co-so <sha> \\
+                         --ban-do .repo-structure.json --con-lai _root
+  node scripts/quyen.mjs --cho-day <vùng> --as <lane> --sha <sha>
 
 Cửa tích hợp đòi tờ xác nhận của BÊN KHÁC, và đòi nó là điều CUỐI CÙNG xảy ra với vùng đó.
+
+--ban-do là bản đồ vùng → đường dẫn (khối "areas" của .repo-structure.json). Bắt buộc: không
+có nó thì tên vùng chỉ là lời khai. --con-lai là khoá cho các đường dẫn bản đồ không phủ tới
+(thường là _root); không khai thì đường dẫn đó bị TỪ CHỐI, không được cho qua.
+MỘT KẾT QUẢ, MỘT VÙNG — kết quả chạm hai vùng thì tách thành hai lượt, không ai duyệt gộp.
 
 Mã thoát: 0 xong · 2 gọi sai · 3 TỪ CHỐI · 4 không tới được remote · 5 sổ quyền hỏng.
 Ba mã cuối đều là fail-closed: không chắc thì KHÔNG cấp và KHÔNG nhận.`);

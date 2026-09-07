@@ -53,13 +53,40 @@ function gitThu(cwd, args, input) {
   catch (e) { return { ma: e.status ?? 1, ra: `${e.stdout || ''}${e.stderr || ''}` }; }
 }
 
-function chayQuyen(cwd, args) {
+function chayTho(cwd, args) {
   try {
     const ra = execFileSync('node', [QUYEN, ...args], { cwd, encoding: 'utf8', env: MOI_TRUONG });
     return { ma: 0, ra };
   } catch (e) {
     return { ma: e.status ?? 1, ra: `${e.stdout || ''}${e.stderr || ''}` };
   }
+}
+
+/* BẢN ĐỒ VÙNG cho sân thử. Mỗi vùng là một thư mục cùng tên, cộng ba mục để ghim ba luật mà một
+ * bản đồ toàn-thư-mục-phẳng không ghim được: một vùng của bên KHÁC (`tai-lieu/`), chế độ chia chủ
+ * theo gói (`goi/`), và một mục con thắng mục cha nhờ tiền tố dài hơn (`goi/_chung/`). */
+const TEN_VUNG = ['goi-f', 'goi-g', 'goi-h', 'goi-j', 'goi-k', 'goi-m', 'goi-m2', 'goi-n',
+  'goi-aa', 'goi-p', 'goi-q', 'goi-r', 'goi-s', 'goi-t', 'goi-u', 'goi-v', 'goi-w', 'goi-x', 'goi-y', 'goi-z'];
+const BAN_DO = path.join(san, 'ban-do.json');
+{
+  const areas = { _doc: 'ban do vung cho san thu' };
+  for (const v of TEN_VUNG) areas[`${v}/`] = { steward: v, ownership_mode: 'root' };
+  areas['tai-lieu/'] = { steward: 'vung-khac', ownership_mode: 'root' };
+  areas['goi/'] = { steward: null, ownership_mode: 'per-package', claim_prefix: 'goi/' };
+  areas['goi/_chung/'] = { steward: '_root', ownership_mode: 'root' };
+  fs.writeFileSync(BAN_DO, JSON.stringify({ areas }, null, 1));
+}
+
+/* Hai cờ bản đồ được TIÊM ở đây, không rải ra 23 chỗ gọi. Lý do: mọi ca cũ nói về thẩm quyền,
+ * không nói về bản đồ, nên thêm cùng một cặp cờ vào 23 dòng là tạo ra 23 chỗ để gõ sai một chỗ —
+ * và một ca gõ sai cờ sẽ TRƯỢT VÌ LÝ DO KHÁC mà vẫn trông như đang đo điều nó khai.
+ * Ca nào cần THIẾU cờ, hoặc cần một bản đồ khác, thì gọi `chayTho` trực tiếp. */
+function chayQuyen(cwd, args) {
+  const canBanDo = args.includes('--tich-hop') || args.includes('--xac-nhan');
+  const them = [];
+  if (canBanDo && !args.includes('--ban-do')) them.push('--ban-do', BAN_DO);
+  if (canBanDo && !args.includes('--con-lai')) them.push('--con-lai', '_root');
+  return chayTho(cwd, [...args, ...them]);
 }
 
 // Dựng một commit sự kiện bằng tay, đặt cha là ĐÚNG commit ta chỉ định (kể cả commit đã cũ).
@@ -88,6 +115,17 @@ function xacNhan(cwd, remoteDuong, vung, boi, theHe, sha, coSo) {
   gitThu(cwd, ['fetch', '--quiet', 'origin', '+refs/ark/ung-vien/*:refs/ark/ung-vien/*']);
   return chayQuyen(cwd, ['--xac-nhan', vung, '--as', boi, '--the-he', theHe,
     '--sha', sha, '--co-so', coSo, '--remote', remoteDuong]);
+}
+
+/* Ghi một file trong sân thử, tạo cả thư mục cha. Cần vì từ 08/09 mỗi vùng là một THƯ MỤC —
+ * bản đồ vùng quy theo tiền tố đường dẫn, nên một file phẳng ở tầng ngoài cùng quy về `--con-lai`
+ * chứ không về vùng nào. */
+function ghi(...phan) {
+  const noiDung = phan.pop();
+  const duong = path.join(...phan);
+  fs.mkdirSync(path.dirname(duong), { recursive: true });
+  fs.writeFileSync(duong, noiDung);
+  return duong;
 }
 
 function docSoTu(cwd, ref = REF) {
@@ -290,7 +328,7 @@ console.log('\nCa ④ — quyền cũ sau fetch + rebase  ⬅ ca đã bác đư�
   const gA = /THE_HE=(\d+)/.exec(rA.ra)[1];
 
   // A làm việc trên main.
-  fs.writeFileSync(path.join(A, 'goi-w.txt'), 'viec cua A\n');
+  ghi(A, 'goi-w', 'a.txt', 'viec cua A\n');
   git(A, ['add', '-A']);
   git(A, ['commit', '--quiet', '-m', 'A: viec goi W']);
 
@@ -300,7 +338,7 @@ console.log('\nCa ④ — quyền cũ sau fetch + rebase  ⬅ ca đã bác đư�
   const gB = /THE_HE=(\d+)/.exec(rB.ra)[1];
   xong('thế hệ tăng sau khi cấp lại', Number(gB) === Number(gA) + 1, `${gA} → ${gB}`);
 
-  fs.writeFileSync(path.join(B, 'goi-w-b.txt'), 'viec cua B\n');
+  ghi(B, 'goi-w', 'b.txt', 'viec cua B\n');
   git(B, ['add', '-A']);
   git(B, ['commit', '--quiet', '-m', 'B: viec goi W']);
   git(B, ['push', '--quiet', 'origin', 'main']);
@@ -390,7 +428,7 @@ console.log('\nCa ⑥ — đường hợp lệ đi hết được');
   xong('nhận quyền', rNhan.ma === 0);
   const g = /THE_HE=(\d+)/.exec(rNhan.ra)[1];
 
-  fs.writeFileSync(path.join(A, 'goi-u.txt'), 'xong\n');
+  ghi(A, 'goi-u', 'xong.txt', 'xong\n');
   git(A, ['add', '-A']);
   git(A, ['commit', '--quiet', '-m', 'A: xong goi U']);
   git(A, ['push', '--quiet', 'origin', 'main']);
@@ -438,7 +476,7 @@ console.log('\nCa ⑦ — thông tin kết quả phải khớp commit thật');
   // trước — nó chưa bao giờ so nền với chính commit kết quả.
   git(B, ['fetch', '--quiet', 'origin']);
   git(B, ['reset', '--quiet', '--hard', 'origin/main']);
-  fs.writeFileSync(path.join(B, 'nen-moi.txt'), 'B tien len\n');
+  ghi(B, 'goi-n', 'nen-moi.txt', 'B tien len\n');
   git(B, ['add', '-A']);
   git(B, ['commit', '--quiet', '-m', 'B: tien len']);
   git(B, ['push', '--quiet', 'origin', 'main']);
@@ -571,7 +609,11 @@ console.log('\nCa ⑩b — tờ xác nhận không còn là điều cuối cùng
   // Việc khác chen vào CÙNG VÙNG: một tờ xác nhận thứ hai cho một SHA khác.
   git(A, ['fetch', '--quiet', 'origin']);
   const shaKhac = git(A, ['rev-parse', 'HEAD']);
-  xacNhan(B, remote, 'goi-j', 'lane-B', g, shaKhac, SHA_GOC);
+  /* Cả hai tờ khai nền BẰNG CHÍNH kết quả, cố ý: ca này đo THỨ TỰ của tờ xác nhận, không đo bản
+   * đồ vùng. Nếu khai nền là `SHA_GOC` thì khoảng đo trải qua commit của goi-w/goi-u ở các ca
+   * trước, và ca này sẽ trượt vì `AREA_MISMATCH` — tức trượt vì một lý do nó không hề khai. */
+  const rXac2 = xacNhan(B, remote, 'goi-j', 'lane-B', g, shaKhac, shaKhac);
+  xong('tờ xác nhận thứ hai ghi được', rXac2.ma === 0, `mã ${rXac2.ma}`);
 
   const rCu = chayQuyen(A, ['--tich-hop', 'goi-j', '--as', 'lane-A', '--the-he', g,
     '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
@@ -579,7 +621,7 @@ console.log('\nCa ⑩b — tờ xác nhận không còn là điều cuối cùng
     rCu.ma === 3 && /CHECK_MISMATCH/.test(rCu.ra));
 
   const rMoi = chayQuyen(A, ['--tich-hop', 'goi-j', '--as', 'lane-A', '--the-he', g,
-    '--sha', shaKhac, '--co-so', SHA_GOC, '--remote', remote]);
+    '--sha', shaKhac, '--co-so', shaKhac, '--remote', remote]);
   xong('tờ xác nhận MỚI NHẤT thì dùng được', rMoi.ma === 0, `mã ${rMoi.ma}`);
   chayQuyen(A, ['--tra', 'goi-j', '--as', 'lane-A', '--remote', remote]);
 }
@@ -649,7 +691,7 @@ console.log('\nCa ⑪ — thu hồi sau khi đã ghi nhận, rồi thử đưa m
   git(A, ['fetch', '--quiet', 'origin']);
   git(A, ['reset', '--quiet', '--hard', 'origin/main']);
   const nen = git(A, ['rev-parse', 'HEAD']);
-  fs.writeFileSync(path.join(A, 'goi-m2.txt'), 'ket qua cua A\n');
+  ghi(A, 'goi-m2', 'ket-qua.txt', 'ket qua cua A\n');
   git(A, ['add', '-A']);
   git(A, ['commit', '--quiet', '-m', 'A: ket qua goi M2']);
   const C = git(A, ['rev-parse', 'HEAD']);
@@ -703,6 +745,168 @@ console.log('\nCa ⑪ — thu hồi sau khi đã ghi nhận, rồi thử đưa m
   xong('sổ quyền VẪN nói không được phép, dù mã đã nằm trong `main`', rVanTuChoi.ma === 3);
   xong('nên khoảng trống PHÁT HIỆN ĐƯỢC, chỉ chưa NGĂN được',
     mainSau === C && rVanTuChoi.ma === 3);
+}
+
+// ── Ca ⑫ — tên vùng phải khớp đường dẫn thật ───────────────────────────────────────────────────
+//
+// Chỗ hở phiên Codex đo được 07/09: nó khai vùng `wrong-area` cho một thay đổi ở `product.txt`
+// và cửa nói ĐẠT. Ca này đo lớp bịt chỗ đó, và đo cả hai chiều — chặn được cái sai, và KHÔNG
+// chặn cái đúng.
+
+console.log('\nCa ⑫ — tên vùng phải khớp đường dẫn thật  ⬅ chỗ hở Codex khai `wrong-area`');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-aa', '--as', 'lane-A', '--viec', 'A lam goi AA', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  /* A GIỮ CẢ HAI VÙNG, cố ý — và đây là điều khiến ca này đo được thứ nó khai.
+   * Bản đầu để A chỉ giữ `goi-aa` rồi khai `goi-t`, và cả ba mục trượt vì `AUTHORITY_REVOKED`:
+   * phép kiểm "còn là chủ không" bắt trước, nên phép kiểm đường dẫn KHÔNG BAO GIỜ CHẠY và ca chỉ
+   * đo lại lớp cũ. Ca nguy hiểm thật là lane giữ hai vùng và đưa việc của vùng này qua tờ xác
+   * nhận của vùng kia — lúc đó thứ duy nhất chặn được là bản đồ đường dẫn. */
+  const rT = chayQuyen(A, ['--nhan', 'goi-t', '--as', 'lane-A', '--viec', 'A giu ca goi-t', '--remote', remote]);
+  const gT = /THE_HE=(\d+)/.exec(rT.ra)[1];
+
+  git(A, ['fetch', '--quiet', 'origin']);
+  git(A, ['reset', '--quiet', '--hard', 'origin/main']);
+  const nen = git(A, ['rev-parse', 'HEAD']);
+
+  // Kết quả SẠCH: chỉ chạm vùng goi-aa.
+  ghi(A, 'goi-aa', 'x.txt', 'ket qua trong vung\n');
+  git(A, ['add', '-A']);
+  git(A, ['commit', '--quiet', '-m', 'goi-aa: mot file trong vung']);
+  const sachP = git(A, ['rev-parse', 'HEAD']);
+  git(A, ['push', '--quiet', 'origin', `+HEAD:refs/ark/ung-vien/lane-A`]);
+
+  // ⓐ Khai SAI vùng — cùng một kết quả, chỉ đổi tên vùng.
+  const rSai = chayQuyen(A, ['--tich-hop', 'goi-t', '--as', 'lane-A', '--the-he', gT,
+    '--sha', sachP, '--co-so', nen, '--remote', remote]);
+  xong('khai sai vùng thì bị TỪ CHỐI', rSai.ma === 3, `mã ${rSai.ma}`);
+  xong('lý do là AREA_MISMATCH, không phải "không có quyền"',
+    /AREA_MISMATCH/.test(rSai.ra), /\[([A-Z_]+)\]/.exec(rSai.ra)?.[1] || '');
+  xong('câu từ chối chỉ ra ĐƯỜNG DẪN nào và thuộc vùng nào',
+    /goi-aa\/x\.txt → goi-aa/.test(rSai.ra));
+
+  // ⓑ Bên KIỂM cũng không ký được cho kết quả ngoài vùng.
+  const rXacSai = xacNhan(B, remote, 'goi-t', 'lane-B', gT, sachP, nen);
+  xong('bên kiểm cũng bị chặn khi vùng không khớp',
+    rXacSai.ma === 3 && /AREA_MISMATCH/.test(rXacSai.ra), `mã ${rXacSai.ma}`);
+
+  // ⓒ MỘT KẾT QUẢ, HAI VÙNG — không ai duyệt gộp.
+  ghi(A, 'tai-lieu', 'y.md', 'ghi chu\n');
+  git(A, ['add', '-A']);
+  git(A, ['commit', '--quiet', '-m', 'them mot file o vung khac']);
+  const haiVung = git(A, ['rev-parse', 'HEAD']);
+  git(A, ['push', '--quiet', 'origin', `+HEAD:refs/ark/ung-vien/lane-A`]);
+  const rHai = chayQuyen(A, ['--tich-hop', 'goi-aa', '--as', 'lane-A', '--the-he', g,
+    '--sha', haiVung, '--co-so', nen, '--remote', remote]);
+  xong('kết quả trải hai vùng bị TỪ CHỐI dù khai đúng một trong hai',
+    rHai.ma === 3 && /AREA_MISMATCH/.test(rHai.ra), `mã ${rHai.ma}`);
+  xong('và nó chỉ ra vùng kia, không nói chung chung', /tai-lieu\/y\.md → vung-khac/.test(rHai.ra));
+
+  // ⓓ Bản đồ KHÔNG PHỦ tới đường dẫn, và không khai `--con-lai` → từ chối, không cho qua.
+  const rHo = chayTho(A, ['--tich-hop', 'goi-aa', '--as', 'lane-A', '--the-he', g,
+    '--sha', sachP, '--co-so', nen, '--remote', remote, '--ban-do', BAN_DO]);
+  xong('bản đồ phủ đủ thì thiếu --con-lai vẫn đi được', rHo.ma !== 3 || !/UNMAPPED_PATH/.test(rHo.ra));
+
+  const banDoHep = path.join(san, 'ban-do-hep.json');
+  fs.writeFileSync(banDoHep, JSON.stringify({ areas: { 'tai-lieu/': { steward: 'vung-khac', ownership_mode: 'root' } } }));
+  const rKhongPhu = chayTho(A, ['--tich-hop', 'goi-aa', '--as', 'lane-A', '--the-he', g,
+    '--sha', sachP, '--co-so', nen, '--remote', remote, '--ban-do', banDoHep]);
+  xong('đường dẫn bản đồ không phủ tới bị TỪ CHỐI, không được cho qua',
+    rKhongPhu.ma === 3 && /UNMAPPED_PATH/.test(rKhongPhu.ra), `mã ${rKhongPhu.ma}`);
+
+  // ⓔ THIẾU bản đồ — cửa không chạy ở chế độ không kiểm. Đây là vế fail-closed của cả lớp này:
+  // nếu thiếu cờ mà vẫn đi qua thì mọi ca trên chỉ chứng minh "cờ có tác dụng khi được đưa".
+  const rThieuBanDo = chayTho(A, ['--tich-hop', 'goi-aa', '--as', 'lane-A', '--the-he', g,
+    '--sha', sachP, '--co-so', nen, '--remote', remote]);
+  xong('THIẾU --ban-do thì cửa DỪNG, không bỏ qua phép kiểm',
+    rThieuBanDo.ma === 2 && /MISSING_MAP/.test(rThieuBanDo.ra), `mã ${rThieuBanDo.ma}`);
+
+  const banDoHong = path.join(san, 'ban-do-hong.json');
+  fs.writeFileSync(banDoHong, '{ khong phai json');
+  const rHongBanDo = chayTho(A, ['--tich-hop', 'goi-aa', '--as', 'lane-A', '--the-he', g,
+    '--sha', sachP, '--co-so', nen, '--remote', remote, '--ban-do', banDoHong]);
+  xong('bản đồ hỏng cũng DỪNG, không thành bản đồ trống',
+    rHongBanDo.ma === 2 && /MAP_UNREADABLE/.test(rHongBanDo.ra), `mã ${rHongBanDo.ma}`);
+
+  // ⓕ ĐƯỜNG HỢP LỆ — vế duy nhất chứng minh cửa còn mở sau khi thêm lớp này.
+  const rXac = xacNhan(B, remote, 'goi-aa', 'lane-B', g, sachP, nen);
+  xong('bên kiểm ký được cho kết quả TRONG vùng', rXac.ma === 0, `mã ${rXac.ma}`);
+  const rDat = chayQuyen(A, ['--tich-hop', 'goi-aa', '--as', 'lane-A', '--the-he', g,
+    '--sha', sachP, '--co-so', nen, '--remote', remote]);
+  xong('kết quả đúng vùng vẫn đi hết được', rDat.ma === 0, `mã ${rDat.ma}`);
+  chayQuyen(A, ['--tra', 'goi-aa', '--as', 'lane-A', '--remote', remote]);
+}
+
+// ── Ca ⑫b — hai luật quy vùng mà một bản đồ phẳng không ghim được ──────────────────────────────
+
+console.log('\nCa ⑫b — chia chủ theo gói, và tiền tố dài nhất thắng');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi/scouter', '--as', 'lane-A', '--viec', 'A lam scouter', '--remote', remote]);
+  xong('nhận được một vùng kiểu chia-chủ-theo-gói', r.ma === 0, `mã ${r.ma}`);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  git(A, ['fetch', '--quiet', 'origin']);
+  git(A, ['reset', '--quiet', '--hard', 'origin/main']);
+  const nen = git(A, ['rev-parse', 'HEAD']);
+
+  ghi(A, 'goi', 'scouter', 'a.js', '// scouter\n');
+  git(A, ['add', '-A']);
+  git(A, ['commit', '--quiet', '-m', 'goi/scouter: mot file']);
+  const sha = git(A, ['rev-parse', 'HEAD']);
+  git(A, ['push', '--quiet', 'origin', `+HEAD:refs/ark/ung-vien/lane-A`]);
+
+  // `goi/scouter/a.js` phải quy về `goi/scouter`, không về `goi/`.
+  const rK = chayQuyen(A, ['--nhan', 'goi/khac', '--as', 'lane-A', '--viec', 'A giu ca goi/khac', '--remote', remote]);
+  const gK = /THE_HE=(\d+)/.exec(rK.ra)[1];
+  const rKhac = chayQuyen(A, ['--tich-hop', 'goi/khac', '--as', 'lane-A', '--the-he', gK,
+    '--sha', sha, '--co-so', nen, '--remote', remote]);
+  xong('gói khác trong cùng thư mục cha là VÙNG KHÁC',
+    rKhac.ma === 3 && /goi\/scouter\/a\.js → goi\/scouter/.test(rKhac.ra), `mã ${rKhac.ma}`);
+
+  xacNhan(B, remote, 'goi/scouter', 'lane-B', g, sha, nen);
+  const rDat = chayQuyen(A, ['--tich-hop', 'goi/scouter', '--as', 'lane-A', '--the-he', g,
+    '--sha', sha, '--co-so', nen, '--remote', remote]);
+  xong('đúng gói thì đi qua', rDat.ma === 0, `mã ${rDat.ma}`);
+
+  /* TIỀN TỐ DÀI NHẤT THẮNG. `goi/_chung/` khai steward `_root`, còn `goi/` là chia-chủ-theo-gói.
+   * Không có luật này thì `goi/_chung/x.js` quy về `goi/_chung` — một khoá không ai giữ, và mã
+   * dùng chung sẽ đòi một chủ không tồn tại. */
+  ghi(A, 'goi', '_chung', 'x.js', '// dung chung\n');
+  git(A, ['add', '-A']);
+  git(A, ['commit', '--quiet', '-m', 'goi/_chung: mot file']);
+  const shaChung = git(A, ['rev-parse', 'HEAD']);
+  git(A, ['push', '--quiet', 'origin', `+HEAD:refs/ark/ung-vien/lane-A`]);
+  const rChung = chayQuyen(A, ['--tich-hop', 'goi/scouter', '--as', 'lane-A', '--the-he', g,
+    '--sha', shaChung, '--co-so', sha, '--remote', remote]);
+  xong('mục con thắng mục cha: goi/_chung quy về _root, không về goi/_chung',
+    rChung.ma === 3 && /goi\/_chung\/x\.js → _root/.test(rChung.ra), `mã ${rChung.ma}`);
+
+  /* ĐỔI TÊN FILE — CHIỀU VÀO, và chiều là cả điểm của ca này.
+   *
+   * Bản đầu của ca này dựng chiều RA (chuyển file từ vùng mình sang vùng khác) và **đột biến
+   * "bật dò-đổi-tên" LỌT**: 97 đạt · 0 sai. Lý do, đo rồi mới thấy: `--name-only` với dò-đổi-tên
+   * vẫn in tên MỚI, mà ở chiều ra tên mới nằm ở vùng khác — nên ca vẫn đỏ dù lớp bảo vệ đã bị gỡ.
+   * Ca đo đúng thứ nó khai chỉ ở CHIỀU VÀO: chuyển một file TỪ vùng khác VÀO vùng mình. Lúc đó
+   * tên mới nằm trong vùng mình, và phía NGUỒN là thứ duy nhất tố giác — mà dò-đổi-tên xoá đúng
+   * phía đó. Không có `--no-renames` thì một lane hút file của vùng khác về mà cửa không thấy gì. */
+  git(A, ['reset', '--quiet', '--hard', sha]);
+  ghi(A, 'tai-lieu', 'nguon.md', 'file cua vung khac\n');
+  git(A, ['add', '-A']);
+  git(A, ['commit', '--quiet', '-m', 'tai-lieu: mot file cua vung khac']);
+  const shaNguon = git(A, ['rev-parse', 'HEAD']);
+
+  git(A, ['mv', 'tai-lieu/nguon.md', 'goi/scouter/nguon.md']);
+  git(A, ['commit', '--quiet', '-m', 'hut file cua vung khac ve vung minh']);
+  const shaDoiTen = git(A, ['rev-parse', 'HEAD']);
+  git(A, ['push', '--quiet', 'origin', `+HEAD:refs/ark/ung-vien/lane-A`]);
+
+  const rDoiTen = chayQuyen(A, ['--tich-hop', 'goi/scouter', '--as', 'lane-A', '--the-he', g,
+    '--sha', shaDoiTen, '--co-so', shaNguon, '--remote', remote]);
+  xong('hút file TỪ vùng khác về vùng mình bị thấy, không bị dò-đổi-tên che',
+    rDoiTen.ma === 3 && /tai-lieu\/nguon\.md → vung-khac/.test(rDoiTen.ra), `mã ${rDoiTen.ma}`);
+
+  chayQuyen(A, ['--tra', 'goi/scouter', '--as', 'lane-A', '--remote', remote]);
 }
 
 // ── Fail-closed ────────────────────────────────────────────────────────────────────────────────

@@ -1366,3 +1366,42 @@ biết repo nào — nên đó là việc kế tiếp, không phải một dòng
 
 **Đo được lúc dọn cổng:** bảng máy sinh cần **hai lượt** sinh–commit mới hội tụ, vì nó suy từ HEAD
 mà chính lượt commit lại đổi HEAD. Cổng của phiên Codex đỏ `TRANG_CU` đúng vì thế.
+
+## 2026-09-08 · claude-cua-kiem — cửa cho đường đẩy `main`, và ứng viên ra ref riêng
+
+**Số đo.** 52 → **79 phép kiểm xanh** · 14/14 → **21/21 đột biến bị bắt** · 9 → **13 ca**.
+Chạy lại: `node tests/quyen-sau-ca.mjs`.
+
+**Trả lời chuỗi Codex.** Tôi kết luận sớm rằng *"bật `enforce_admins` cộng một bước Actions là bịt
+được khe quyền/main"*. Codex chỉ đúng lý do chưa được: **required status check gắn vào COMMIT** —
+xanh cho `C` thì xanh mãi cho `C`, còn nguồn quyền đổi **độc lập** sau đó.
+
+Chốt **không đòi GitHub chấm lại**, nó đổi **câu hỏi**: cửa không hỏi *"có tờ xác nhận nào không"*
+mà hỏi *"tờ xác nhận có phải điều CUỐI CÙNG xảy ra với vùng này không"*. Sổ có thứ tự và mọi lượt
+ghi qua một phép so-và-đổi, nên lượt thu hồi chen vào **buộc phải** nằm sau tờ xác nhận.
+
+**Ca ⑪ quan sát SHA THẬT của `main`, và đo CẢ HAI đường** — vế thứ hai là chỗ tôi cố ý không che:
+
+| Đường | `main` |
+|---|---|
+| Đi qua cửa `--cho-day` | **không đổi** |
+| **Bỏ qua cửa** | **mã VẪN vào** |
+
+Nên chỗ này **phát hiện được, chưa ngăn được**. Sổ quyền vẫn nói *"không được phép"* dù mã đã nằm
+trong `main` — đó chính là hình dạng của khoảng trống.
+
+**Một phát hiện khi dựng ca ⑪:** bên kiểm **không thấy được ứng viên** nếu nó chỉ nằm trong
+checkout của A (`UNKNOWN_COMMIT`, và cửa đúng). Nên luồng cần một chỗ **công bố ứng viên KHÔNG phải
+`main`** — nay là `refs/ark/ung-vien/<lane>`, có phép kiểm ghim rằng công bố ứng viên **không làm
+`main` nhích một byte**.
+
+**Bộ đột biến dạy lại tôi một lần nữa:** 5 lượt báo *"neo khớp 2 chỗ"* thay vì đo được gì — tức tôi
+cài một luật **hai lần** (giới hạn ② của Đức). Gỡ một bản thì bản kia vẫn chặn, test vẫn xanh, và
+cái xanh đó **không nói gì** về bản bị gỡ. Gộp thành `kiemSieuDuLieu` + `kiemTheHe`.
+
+**Còn hở, ghi vào MÃ chứ không chỉ vào ADR:** `--as` là **tên tự khai** — cùng một Assistant gọi
+lại bằng tên khác là qua được `SELF_ATTESTATION`. Nó cưỡng chế **hình dạng** của luật, không chứng
+minh có bên thứ ba thật. Cần danh tính từ nguồn được xác thực trước khi dùng thật.
+
+**Việc kế:** ràng vùng → đường dẫn (lõi hiện nhận bất kỳ tên vùng nào) · dựng bản xem được cho cờ
+`enforce_admins` mà **không tự bật**.
