@@ -12,7 +12,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { gomDuLieu, khoiLienQuan, khoiMoHinh, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
+import { gapKhoi, gomDuLieu, khoiCauTruc, khoiLienQuan, khoiMoHinh, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -290,6 +290,54 @@ const html = trang(dl);
   assert.ok(trong.includes("Vai ①") && trong.includes("Vai ②"), "repo trống vẫn phải ra đủ hai vai");
 
   ok("hai vai Assistant: chữ là quyết định, số suy từ repo — gõ cứng số là đỏ");
+}
+
+/* ---- Tab Hệ thống: khối gập được, và bộ chuyển KHÔNG lặn vào khối đã gập ----
+ *
+ * Đức nêu 08/09: tab Hệ thống scroll quá dài. Chốt: 9 khối mở cứng thành khối gập, cả tab xếp
+ * vào một lưới tự co. Ba kiểu hỏng phải canh, và cái thứ hai đã xảy ra thật:
+ *
+ *  ⓐ Bộ chuyển KHÔNG chuyển gì (im lặng no-op) → tab vẫn dài, mà không ai thấy gì sai.
+ *  ⓑ Bộ chuyển LẶN VÀO một <details> đã có và chuyển cả khối con → khối "Mô hình vận hành" hiện
+ *    HAI nhãn. Trang không vỡ, nó chỉ nói lặp — nên lỗi này đi qua được mắt.
+ *  ⓒ Bộ chuyển ĂN MẤT nội dung khi đầu vào không khớp hình dạng. Fail-open là có chủ ý: khối
+ *    không khớp phải GIỮ NGUYÊN (vẫn mở, tức đúng hành vi cũ), tuyệt đối không biến mất.
+ */
+{
+  // ⓐ chuyển được đầu ra của hàm sinh THẬT, không phải chuỗi tự bịa
+  const goc = khoiCauTruc([{ ten: "docs/", steward: "_docs" }], [{ ten: "AGENTS.md" }], []);
+  const daGap = gapKhoi(goc);
+  assert.ok(/<div class="the/.test(goc), "hàm sinh thật phải trả về khối mở — nếu không, ca này vô nghĩa");
+  assert.equal((daGap.match(/<div class="the/g) || []).length, 0, "mọi khối mở ở tầng ngoài phải thành khối gập");
+  assert.ok((daGap.match(/<details class="the gap/g) || []).length >= 1, "phải sinh ra details.the.gap");
+  assert.equal((daGap.match(/<details/g) || []).length, (daGap.match(/<\/details>/g) || []).length,
+    "thẻ details phải cân");
+  assert.ok(!/<h2/.test(daGap), "h2 phải thành summary, không được còn cả hai");
+
+  // ⓑ KHÔNG lặn vào <details> đã có. Đây là lỗi đã xảy ra thật, nên ca này là ca chịu tải.
+  const daCoSan = `<details class="the gap"><summary>Nhãn ngoài</summary><div class="the"><h2>Nhãn trong</h2><p>x</p></div></details>`;
+  const sau = gapKhoi(daCoSan);
+  assert.equal(sau, daCoSan, "khối đã gập phải được chép NGUYÊN — không chuyển khối con bên trong");
+  assert.equal((sau.match(/<summary>/g) || []).length, 1, "không được sinh nhãn thứ hai cho cùng một khối");
+
+  // ⓒ fail-open: không có h2, hoặc thẻ không cân → giữ nguyên từng byte, không ăn mất nội dung
+  const khongNhan = `<div class="the"><p>không có h2</p></div>`;
+  assert.equal(gapKhoi(khongNhan), khongNhan, "khối không có nhãn phải giữ nguyên");
+  const khongCan = `<div class="the"><h2>Nhãn</h2><p>thiếu thẻ đóng`;
+  assert.ok(gapKhoi(khongCan).includes("thiếu thẻ đóng"), "thẻ không cân vẫn phải giữ được nội dung");
+  assert.equal(gapKhoi(""), "", "chuỗi rỗng không được nổ");
+
+  // moSan mở đúng khối được gọi tên, và KHÔNG mở khối khác
+  const mo = gapKhoi(goc, { moSan: ["Thư mục ở tầng ngoài cùng"] });
+  assert.equal((mo.match(/ open>/g) || []).length, 1, "moSan phải mở đúng MỘT khối được gọi tên");
+
+  // Và tab Hệ thống của trang thật phải thực sự dùng lưới — không thì CSS ngồi đó vô tác dụng.
+  const tabHT = html.slice(html.indexOf('id="tab-he-thong"'));
+  assert.ok(tabHT.slice(0, 4000).includes('<div class="xep">'), "tab Hệ thống phải bọc trong lưới .xep");
+  assert.ok(html.includes(".xep > details.the[open]{grid-column:1/-1}"),
+    "phải có quy tắc cho khối đang mở chiếm cả hàng — không thì bảng bên trong bị bóp còn 1/3");
+
+  ok("tab Hệ thống: khối mở thành khối gập, xếp lưới, và bộ chuyển không lặn vào khối đã gập");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

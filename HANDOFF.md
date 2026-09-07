@@ -1437,3 +1437,36 @@ quyết định nên gõ tay, **số suy từ repo** — ghim đúng chỗ đó.
 **Còn mở.** `--as` vẫn là tên tự khai · đẩy `main` bỏ qua cửa thì mã VẪN vào · chưa bật cờ GitHub
 nào · `template/` phát bộ sinh mà **chưa phát phép ghim** của nó (đã vào `BACKLOG.md`).
 Khuyến nghị việc kế tiếp: `_run-qua-dem-20260907/TRANG-THAI-HE-THONG.md`.
+
+## 2026-09-08 · claude-cua-kiem — tab Hệ thống: khối gập được, xếp lưới
+
+**Đức nêu.** Tab Hệ thống scroll quá dài, nhiều không gian thừa, muốn co block để tự arrange.
+
+**MỘT LƯỢT ĐO SAI CỦA TÔI — bài học đắt nhất của lượt này.** Tôi đếm **byte markup** từng mục và
+kết luận mục *"Bảo trì định kỳ"* chiếm **50% cả tab**. Sai metric: mục đó **đã nằm trong
+`<details>`** nên nó chiếm **một dòng** scroll. Đi theo con số đó là đi gập những thứ đã gập sẵn
+rồi báo *"đã tối ưu 82%"*.
+
+| | trước | sau |
+|---|---|---|
+| Khối xếp dọc ở tầng ngoài | **21** | 20 (banner làm mới ra ngoài lưới) |
+| Khối mở cứng | **9** | **1** |
+| Xếp lưới | không | **có**, 3 cột → **~7 hàng thay vì 21** |
+
+Nguyên nhân thật **không phải** nội dung chưa gập (95% đã gập) mà là 21 khối xếp một hàng một:
+padding 12–17px hai bên cộng margin 9px mỗi khối ≈ **1.150px** chỉ riêng viền, đệm, khoảng cách.
+
+**Cách làm.** Bộ chuyển `gapKhoi()` đặt ở **chỗ ghép tab**, không sửa hàm sinh nào — bốn hàm liên
+quan dùng chung nhiều tab. Đo lại: ba tab kia **khớp từng byte** trước/sau. Lưới là CSS thuần,
+`<details>` là thẻ gốc trình duyệt — **không thêm thư viện**.
+
+**Một lỗi thật của bộ chuyển, đã sửa:** bản đầu dò ở **bất kỳ đâu** nên lặn vào `<details>` đã có
+và chuyển cả khối con — khối *"Mô hình vận hành"* hiện **HAI nhãn**. Trang **không vỡ, chỉ nói
+lặp**, nên nó đi qua được mắt. Lý lẽ đầy đủ (kể cả vì sao chỗ này **cố ý fail-open**) ở commit của
+lượt này và chú thích ngay trên `gapKhoi`.
+
+**Số đo.** `overview-smoke` 10 → **11 ghim** · đột biến **8/8 bị bắt**. Chạy lại:
+`node tests/overview-smoke.mjs`. Phát ra `template/` bản **1.3.39**.
+
+**Đức chốt hai câu:** không thêm block mục lục riêng (lưới đã là mục lục — thêm nữa là in cùng một
+danh sách hai lần) · giữ khối *"Bắt đầu ở đâu"* mở sẵn để trang còn nói được câu đầu tiên.

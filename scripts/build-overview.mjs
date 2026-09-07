@@ -534,6 +534,32 @@ section.tab{padding-top:9px}
 .the{background:var(--mat);border:1px solid var(--vien);border-radius:11px;
   padding:clamp(12px,1.5vw,17px);margin:9px 0;box-shadow:var(--bong)}
 .the > h2:first-child, .the > h3:first-child{margin-top:0}
+
+/* XẾP LƯỚI CHO TAB DÀI — Đức nêu 08/09: tab Hệ thống scroll quá dài, nhiều không gian thừa.
+ *
+ * Đo trước khi sửa, và lượt đo ĐẦU của tôi sai nên ghi cả hai ra đây: đếm byte markup thì mục
+ * "Bảo trì định kỳ" chiếm 50% cả tab — nhưng mục đó ĐÃ nằm trong <details>, nên nó chỉ chiếm MỘT
+ * DÒNG scroll. Đi theo con số đó là đi gập những thứ đã gập sẵn.
+ *
+ * Số đúng: 9.483 byte đang hiện · 186.605 byte đã gập · 21 khối xếp một hàng một. Mỗi khối .the
+ * tốn padding 12-17px hai bên cộng margin 9px hai đầu, nên 21 khối tốn khoảng 1.150px chỉ riêng
+ * viền, đệm và khoảng cách — trước một chữ nội dung nào. Đó là "không gian thừa".
+ *
+ * Chốt: xếp các khối vào một lưới tự co. Khối GẬP nằm 3 cột; khối MỞ tự giãn hết chiều ngang
+ * (grid-column:1/-1) nên bảng và mã bên trong không bị bóp. Thuần CSS — không một dòng JS, và
+ * thẻ details là thẻ gốc của trình duyệt nên không thêm thư viện nào. */
+.xep{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));
+  gap:9px;align-items:start;margin:9px 0}
+.xep > .the{margin:0}
+/* Khối đang MỞ chiếm cả hàng — nội dung bên trong (bảng, mã, sơ đồ ba khối) cần chiều ngang. */
+.xep > details.the[open]{grid-column:1/-1}
+/* Thanh khi GẬP chỉ cần cao bằng một dòng: bỏ đệm đứng, bỏ cả bóng cho nhẹ mắt. */
+.xep > details.the:not([open]){padding:9px clamp(10px,1.2vw,13px);box-shadow:none}
+.xep > details.the:not([open]) > summary{font-size:14.6px;line-height:1.35;margin:0}
+/* Khối KHÔNG gập được (mở cứng) vẫn chiếm cả hàng — nếu không thì nó bị bóp còn 1/3 chiều ngang
+ * mà chẳng ai gập được nó để lấy lại. */
+.xep > div.the{grid-column:1/-1}
+@media (max-width:700px){ .xep{grid-template-columns:1fr} }
 .luoi{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:1px;
   background:var(--vien);border:1px solid var(--vien);border-radius:9px;overflow:hidden;margin:14px 0}
 .o{background:var(--mat);padding:13px 15px;display:flex;flex-direction:column;gap:3px}
@@ -966,6 +992,79 @@ export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [
  */
 
 /* "Còn việc nào đang chờ chính tôi?" — quét dấu đặt ngay trên dòng của mục, ở bốn sổ. */
+/* ĐỔI MỘT KHỐI MỞ CỨNG THÀNH KHỐI GẬP ĐƯỢC — Đức nêu 08/09 cho tab Hệ thống.
+ *
+ * Vì sao là một bộ chuyển ở chỗ GHÉP TAB, chứ không phải một tham số thêm vào từng hàm sinh:
+ * bốn khối cần gập do `khoiBatDau` · `khoiVanHanh` · `khoiVongDoi` · `khoiCauTruc` sinh ra, và cả
+ * bốn hàm đó **dùng chung cho nhiều tab**. Thêm cờ vào chúng là đổi luôn các tab Đức không hề
+ * phàn nàn, cộng bốn chỗ để lệch nhau. Đổi ở một chỗ ghép thì tab khác không bị chạm một byte.
+ *
+ * FAIL-OPEN CÓ CHỦ Ý, và đây là chỗ duy nhất trong repo tôi chọn fail-open: khối nào không khớp
+ * hình dạng mong đợi (không cân thẻ, hoặc không có h2 để làm nhãn) thì **giữ nguyên**. Hỏng theo
+ * hướng đó là khối vẫn mở — tức đúng hành vi hôm nay. Hỏng theo hướng ngược lại là **nội dung
+ * biến mất khỏi bảng**, và một bảng thiếu mục thì tệ hơn một bảng dài. Phép ghim đo rằng nó thật
+ * sự chuyển được đầu ra của các hàm sinh THẬT, nên "không khớp rồi bỏ qua" không lặng lẽ thành
+ * đường mặc định. */
+export function gapKhoi(html, { moSan = [] } = {}) {
+  const s = String(html);
+  let ra = "";
+  let i = 0;
+
+  /* Thẻ đóng khớp với thẻ mở ở vị trí `tu`, đếm ĐÚNG MỘT tên thẻ. Đếm một tên là đủ và đúng vì
+   * HTML sinh ra ở đây cân thẻ: một <details> lồng trong <div> không sinh thêm thẻ div nào. */
+  const timDong = (tu, ten) => {
+    const tok = new RegExp(`<(/?)${ten}\\b[^>]*>`, "g");
+    tok.lastIndex = tu;
+    let sau = 1;
+    let t;
+    while ((t = tok.exec(s))) {
+      sau += t[1] ? -1 : 1;
+      if (sau === 0) return t.index;
+    }
+    return -1;
+  };
+
+  /* CHỈ CHUYỂN Ở TẦNG NGOÀI CÙNG — và đây là chỗ bản đầu của tôi sai.
+   *
+   * Bản đầu dò `<div class="the">` ở BẤT KỲ đâu trong chuỗi, nên nó lặn vào một <details> đã có
+   * và chuyển cả khối con bên trong. Kết quả đo được: khối "Mô hình vận hành" hiện HAI nhãn —
+   * một của <details> bọc ngoài, một của chính nó vừa bị chuyển. Trang trông vẫn chạy, và đó là
+   * lý do lỗi này đi qua được mắt: nó không vỡ, nó chỉ nói lặp.
+   *
+   * Nên vòng dưới đi theo TỪNG khối ở tầng ngoài: gặp <div class="the"> thì chuyển, gặp bất kỳ
+   * thẻ nào khác (kể cả <details> đã gập sẵn) thì CHÉP NGUYÊN và nhảy qua trọn khối đó. */
+  const TOK = /<(div|details)\b([^>]*)>/g;
+  while (i < s.length) {
+    TOK.lastIndex = i;
+    const m = TOK.exec(s);
+    if (!m) { ra += s.slice(i); break; }
+
+    ra += s.slice(i, m.index);
+    const ten = m[1];
+    const thanTu = m.index + m[0].length;
+    const dong = timDong(thanTu, ten);
+    if (dong < 0) { ra += s.slice(m.index); break; }          // thẻ không cân → giữ nguyên
+    const ketThuc = dong + `</${ten}>`.length;
+
+    const laThe = ten === "div" && /^ class="the/.test(m[2]);
+    const than = s.slice(thanTu, dong);
+    const h2 = laThe ? /<h2[^>]*>([\s\S]*?)<\/h2>/.exec(than) : null;
+
+    if (!h2) {
+      ra += s.slice(m.index, ketThuc);                        // khối khác, hoặc không có nhãn
+    } else {
+      const lop = /^ class="the([^"]*)"/.exec(m[2]);
+      const conLai = than.slice(0, h2.index) + than.slice(h2.index + h2[0].length);
+      const mo = moSan.some((k) => h2[1].includes(k)) ? " open" : "";
+      const dư = m[2].replace(/^ class="the[^"]*"/, "");
+      ra += `<details class="the gap${lop ? lop[1] : ""}"${dư}${mo}>`
+        + `<summary>${h2[1]}</summary>${conLai}</details>`;
+    }
+    i = ketThuc;
+  }
+  return ra;
+}
+
 export function khoiCanDuc(canDuc, tenNguoi) {
   if (!canDuc.length) {
     return '<div class="the" id="can-nguoi-chot"><h2>Cần ' + esc(tenNguoi) + '</h2>'
@@ -1585,6 +1684,7 @@ export function trang(dl) {
 
   <section class="tab" id="tab-he-thong" hidden>
     ${oLamMoi}
+    <div class="xep">${gapKhoi(`
     ${khoiBatDau(dl)}
     ${khoiVanHanh(coChe, batBien, khoa.length)}
     ${khoiVongDoi(st)}
@@ -1649,6 +1749,7 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
     ${dl.tinhNang && laRepoNha ? `<details class="the gap"><summary>Bộ khung làm được gì — kể bằng tiếng người</summary>${md(dl.tinhNang)}</details>` : ""}
     ${legend ? `<details class="the gap"><summary>Tra cứu thuật ngữ</summary>${md(legend)}</details>` : ""}
     ${khoiLienQuan(dl.banDo, dl.trangCo)}
+    `, { moSan: ["Bắt đầu ở đâu"] })}</div>
   </section>
 
   <section class="tab" id="tab-lich-su" hidden>
