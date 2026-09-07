@@ -17,6 +17,12 @@
 //   ⑵ LƯỢT TÍCH HỢP CŨNG LÀ MỘT SỰ KIỆN trên chính ref đó. Nên lượt kiểm quyền và lượt ghi kết
 //      quả là MỘT lượt đẩy — không có khe giữa hai bước để một lượt thu hồi chen vào.
 //
+//      ĐỌC HẸP CÂU TRÊN. Nó đóng khe **trong phạm vi sổ quyền**, không đóng khe giữa sổ và
+//      `main`. Phiên Codex chạy đúng chuỗi này ngày 07/09 và cả ba lượt đều thành công:
+//      A được ghi nhận kết quả → B thu hồi quyền A → A đẩy mã vào `main`. Bản đầu của tôi viết
+//      "đóng lỗ TOCTOU" không kèm giới hạn, và câu đó rộng hơn bằng chứng.
+//      **Được ghi nhận KHÁC đã tích hợp.** Ghi nhận là chữ trong sổ; `main` là mã chạy thật.
+//
 //   ⑶ Đẩy TRẦN, không `--force`. Phép phân xử do git làm, không do mã ở đây làm — nhưng nó là
 //      HAI lớp khác nhau, và đo 07/09 mới tách được:
 //        · Trong MỘT kết nối đẩy: git gửi kèm giá-trị-cũ lấy từ lượt quảng bá ref, nên remote
@@ -31,6 +37,13 @@
 //   DỰA VÀO TUÂN THỦ:     đẩy `main` mà KHÔNG ghi sự kiện tích hợp. File này không thấy được.
 //                         Muốn chặn cả chỗ đó thì cần MỘT BÊN THỨ BA đọc sổ quyền — và bên thứ
 //                         ba phải không phải bên đang bị kiểm. Chưa làm, cố ý.
+//   CHƯA LÀM, ĐÃ BIẾT:    file này KHÔNG kiểm đường dẫn. Nó nhận bất kỳ tên vùng nào, kể cả khi
+//                         commit kết quả sửa file thuộc vùng khác — phiên Codex khai `wrong-area`
+//                         cho một thay đổi ở `product.txt` và đi qua được. Bịt chỗ này cần bản đồ
+//                         vùng → đường dẫn, mà bản đồ đó nằm ở `.repo-structure.json` của TỪNG
+//                         repo, còn file này thì cố ý không biết repo nào. Nên nó là mục việc kế
+//                         tiếp, không phải một dòng thêm vào đây. Cho tới lúc đó: tên vùng ở đây
+//                         là LỜI KHAI, không phải điều đã kiểm.
 //
 // Fail-closed: không tới được remote thì KHÔNG cấp quyền. Một quyền cấp bằng phỏng đoán tệ hơn
 // không có quyền.
@@ -40,7 +53,7 @@ import { execFileSync } from 'node:child_process';
 const REF = 'refs/ark/quyen';
 const TEP = 'su-kien.jsonl';
 
-const MA = { OK: 0, DUNG_SAI: 2, TU_CHOI: 3, MAT_REMOTE: 4 };
+const MA = { OK: 0, DUNG_SAI: 2, TU_CHOI: 3, MAT_REMOTE: 4, SO_HONG: 5 };
 
 const MOI_TRUONG = {
   ...process.env,
@@ -83,11 +96,56 @@ function dongBo(remote) {
   return { ok: true, co_ref: true };
 }
 
+// SỔ HỎNG KHÁC SỔ TRỐNG — và gộp hai chuyện đó lại là fail-open.
+//
+// Bản đầu viết `if (!r.ok) return []`, nên một ref quyền tồn tại mà thiếu file sổ bị hiểu thành
+// "chưa ai giữ gì": phiên Codex dựng đúng ca đó ngày 07/09 và công cụ vừa in lỗi đọc file vừa
+// CẤP QUYỀN ở thế hệ 1. Trạng thái không đọc được phải làm hệ thống DỪNG và giữ nguyên bản cuối
+// còn đọc được — chỉ quyền THẬT SỰ chưa khởi tạo mới được bắt đầu từ trống.
 function docSo(coRef) {
-  if (!coRef) return [];
+  if (!coRef) return { ok: true, so: [] };
+
   const r = thu(['show', `${REF}:${TEP}`]);
-  if (!r.ok) return [];
-  return r.ra.split('\n').filter(Boolean).map((d) => JSON.parse(d));
+  if (!r.ok) {
+    return {
+      ok: false,
+      ma: MA.SO_HONG,
+      ly_do: 'LEDGER_UNREADABLE',
+      chi_tiet: `Ref ${REF} có tồn tại nhưng không đọc được ${TEP}. Đây KHÔNG phải sổ trống.\n${r.ra}`,
+    };
+  }
+
+  const so = [];
+  const dong = r.ra.split('\n').filter(Boolean);
+  for (let i = 0; i < dong.length; i += 1) {
+    let sk;
+    try {
+      sk = JSON.parse(dong[i]);
+    } catch {
+      return {
+        ok: false,
+        ma: MA.SO_HONG,
+        ly_do: 'LEDGER_UNREADABLE',
+        chi_tiet: `Dòng ${i + 1} của ${TEP} không phải JSON đọc được.`,
+      };
+    }
+    if (!sk || typeof sk.viec !== 'string' || typeof sk.vung !== 'string') {
+      return {
+        ok: false,
+        ma: MA.SO_HONG,
+        ly_do: 'LEDGER_UNREADABLE',
+        chi_tiet: `Dòng ${i + 1} của ${TEP} thiếu trường bắt buộc (viec · vung).`,
+      };
+    }
+    so.push(sk);
+  }
+  return { ok: true, so };
+}
+
+// Commit có thật hay không. Không có vế này thì cửa nhận cả một SHA bịa ra —
+// phiên Codex đẩy `deadbeef…` qua được ngày 07/09.
+function laCommit(s) {
+  return /^[0-9a-f]{7,40}$/i.test(s) && thu(['cat-file', '-e', `${s}^{commit}`]).ok;
 }
 
 // Trạng thái = phát lại sổ. Sổ là sự thật; trạng thái là bản tính ra, không lưu ở đâu cả.
@@ -152,7 +210,9 @@ function moc() {
 function lenhXem(remote) {
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
-  const so = docSo(db.co_ref);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+  const so = ds.so;
   const { chu, theHe } = trangThai(so);
 
   if (chu.size === 0) console.log('(không vùng nào có chủ)');
@@ -168,7 +228,9 @@ function lenhNhan({ vung, lane, moTa, remote }) {
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
 
-  const so = docSo(db.co_ref);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+  const so = ds.so;
   const { chu, theHe } = trangThai(so);
 
   const dangGiu = chu.get(vung);
@@ -200,7 +262,9 @@ function lenhTra({ vung, lane, remote }) {
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
 
-  const so = docSo(db.co_ref);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+  const so = ds.so;
   const { chu } = trangThai(so);
   const dangGiu = chu.get(vung);
 
@@ -234,7 +298,9 @@ function lenhThuHoi({ vung, lane, duc, remote }) {
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
 
-  const so = docSo(db.co_ref);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+  const so = ds.so;
   const { chu } = trangThai(so);
   const dangGiu = chu.get(vung);
   if (!dangGiu) {
@@ -257,15 +323,35 @@ function lenhThuHoi({ vung, lane, duc, remote }) {
 
 // Cửa tích hợp. Lượt KIỂM và lượt GHI là cùng một lượt đẩy — đó là cả điểm của lệnh này.
 function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
-  if (!theHe || !sha) {
-    console.error('TỪ CHỐI [MISSING_DATA] — cần cả --the-he và --sha. Thiếu dữ liệu thì không báo hợp lệ.');
+  // Bắt buộc điền là CHƯA ĐỦ — phải kiểm điều đã điền có khớp commit thật.
+  // Phiên Codex đẩy được ba thứ qua cửa này ngày 07/09: kết quả cũ bỏ trống `--co-so` ·
+  // kết quả cũ khai một nền mà chính nó không chứa · một SHA bịa ra hoàn toàn.
+  if (!theHe || !sha || !coSo) {
+    console.error('TỪ CHỐI [MISSING_DATA] — cần cả --the-he, --sha và --co-so.');
+    console.error('`--co-so` là SHA mà kết quả được dựng trên. Không có nó thì không kiểm được');
+    console.error('kết quả có tính tới trạng thái tích hợp mới nhất hay không.');
+    return MA.TU_CHOI;
+  }
+  for (const [ten, gt] of [['--sha', sha], ['--co-so', coSo]]) {
+    if (!laCommit(gt)) {
+      console.error(`TỪ CHỐI [UNKNOWN_COMMIT] — ${ten}=${gt} không phải một commit có thật ở đây.`);
+      console.error('Cửa không nhận một SHA nó không kiểm được. Fetch về rồi khai lại.');
+      return MA.TU_CHOI;
+    }
+  }
+  if (!laToTien(coSo, sha)) {
+    console.error(`TỪ CHỐI [BASE_NOT_IN_RESULT] — nền khai là ${coSo.slice(0, 8)} nhưng commit kết quả`);
+    console.error(`${sha.slice(0, 8)} KHÔNG chứa nó. Nền khai phải là tổ tiên của chính kết quả.`);
+    console.error('Không có vế này thì khai nền nào cũng đi qua được lượt so "đích đã đổi".');
     return MA.TU_CHOI;
   }
 
   const db = dongBo(remote);
   if (!db.ok) return bao(db);
 
-  const so = docSo(db.co_ref);
+  const ds = docSo(db.co_ref);
+  if (!ds.ok) return bao(ds);
+  const so = ds.so;
   const { chu, tichHopCuoi } = trangThai(so);
   const dangGiu = chu.get(vung);
 
@@ -289,14 +375,14 @@ function lenhTichHop({ vung, lane, theHe, sha, coSo, remote }) {
   // Đích đã đổi? So với lượt TÍCH HỢP gần nhất của cùng vùng — không so với cây làm việc của ai.
   // Cố ý: một checkout khác đang làm dở KHÔNG phải cơ sở để chặn ai (ADR-0019 ⑶).
   const truoc = tichHopCuoi.get(vung);
-  if (truoc && coSo && !laToTien(truoc.sha, coSo)) {
+  if (truoc && !laToTien(truoc.sha, coSo)) {
     console.error(`TỪ CHỐI [STALE_BASE] — ${vung} đã tích hợp tới ${truoc.sha.slice(0, 8)} lúc ${truoc.luc},`);
     console.error(`mà kết quả này dựng trên ${coSo.slice(0, 8)} — không chứa lượt đó.`);
     console.error('Lấy về, dựng lại, rồi kiểm lại. Mỗi lượt rebase phải kiểm lại.');
     return MA.TU_CHOI;
   }
 
-  const sk = { viec: 'tich-hop', vung, lane, the_he: Number(theHe), sha, co_so: coSo || null, luc: moc() };
+  const sk = { viec: 'tich-hop', vung, lane, the_he: Number(theHe), sha, co_so: coSo, luc: moc() };
   const d = daySuKien(so, sk, `quyen: ${lane} tich hop ${vung} @ ${sha.slice(0, 8)}`, remote, db.co_ref);
   if (!d.ok) {
     // Thu hồi chen vào ĐÚNG giữa lượt kiểm và lượt ghi. Git từ chối, nên không lọt.
@@ -344,9 +430,10 @@ function huongDan() {
   node scripts/quyen.mjs --nhan <vùng> --as <lane> --viec "một câu"
   node scripts/quyen.mjs --tra <vùng> --as <lane>
   node scripts/quyen.mjs --thu-hoi <vùng> --as <lane> --duc "<câu chốt của Đức>"
-  node scripts/quyen.mjs --tich-hop <vùng> --as <lane> --the-he <n> --sha <sha> [--co-so <sha>]
+  node scripts/quyen.mjs --tich-hop <vùng> --as <lane> --the-he <n> --sha <sha> --co-so <sha>
 
-Mã thoát: 0 xong · 2 gọi sai · 3 TỪ CHỐI · 4 không tới được remote (fail-closed).`);
+Mã thoát: 0 xong · 2 gọi sai · 3 TỪ CHỐI · 4 không tới được remote · 5 sổ quyền hỏng.
+Ba mã cuối đều là fail-closed: không chắc thì KHÔNG cấp và KHÔNG nhận.`);
 }
 
 const o = docDoiSo(process.argv.slice(2));

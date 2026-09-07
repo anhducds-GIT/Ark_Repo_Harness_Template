@@ -136,7 +136,7 @@ console.log('\nCa ② — phiên mất quyền quay lại ghi kết quả');
   const rKhongDuc = chayQuyen(B, ['--thu-hoi', 'goi-x', '--as', 'lane-B', '--remote', remote]);
   xong('thu hồi KHÔNG có câu chốt thì bị từ chối', rKhongDuc.ma === 3 && /NO_DUC_DECISION/.test(rKhongDuc.ra));
 
-  const rTich = chayQuyen(A, ['--tich-hop', 'goi-y', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--remote', remote]);
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-y', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   xong('kết quả của A bị từ chối', rTich.ma === 3 && /AUTHORITY_REVOKED/.test(rTich.ra));
   xong('lý do đọc được: nói lúc nào và bằng lượt gì', /Mất lúc .* bằng lượt/.test(rTich.ra));
   xong('câu chốt của Đức nằm TRONG sổ, in ra được', /chuyen goi Y sang B/.test(rTich.ra));
@@ -198,7 +198,7 @@ console.log('\nCa ③b — thu hồi chen vào khe fetch/push của chính lện
   ].join('\n'));
   fs.chmodSync(hook, 0o755);
 
-  const rTich = chayQuyen(A, ['--tich-hop', 'goi-r', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--remote', remote]);
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-r', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   fs.rmSync(hook);
 
   xong('hook thật sự đã chen', fs.existsSync(co));
@@ -244,7 +244,7 @@ console.log('\nCa ③c — remote tiến lên sau lượt fetch, trước lượ
   fs.chmodSync(hook, 0o755);
   fs.writeFileSync(nap, '');
 
-  const rTich = chayQuyen(A, ['--tich-hop', 'goi-q', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--remote', remote]);
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-q', '--as', 'lane-A', '--the-he', g, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   fs.rmSync(hook);
   fs.rmSync(nap);
 
@@ -294,11 +294,11 @@ console.log('\nCa ④ — quyền cũ sau fetch + rebase  ⬅ ca đã bác đư�
 
   // Nhưng cửa quyền vẫn từ chối: sổ quyền nằm trên ref RIÊNG, rebase main không chạm được.
   const shaSauRebase = git(A, ['rev-parse', 'HEAD']);
-  const rTich = chayQuyen(A, ['--tich-hop', 'goi-w', '--as', 'lane-A', '--the-he', gA, '--sha', shaSauRebase, '--remote', remote]);
+  const rTich = chayQuyen(A, ['--tich-hop', 'goi-w', '--as', 'lane-A', '--the-he', gA, '--sha', shaSauRebase, '--co-so', shaSauRebase, '--remote', remote]);
   xong('cửa quyền VẪN từ chối kết quả của A sau rebase', rTich.ma === 3, /AUTHORITY_REVOKED|STALE/.exec(rTich.ra)?.[0] || '');
 
   // Và A không lách được bằng cách khai thế hệ mới: nó không phải chủ.
-  const rGian = chayQuyen(A, ['--tich-hop', 'goi-w', '--as', 'lane-A', '--the-he', gB, '--sha', shaSauRebase, '--remote', remote]);
+  const rGian = chayQuyen(A, ['--tich-hop', 'goi-w', '--as', 'lane-A', '--the-he', gB, '--sha', shaSauRebase, '--co-so', shaSauRebase, '--remote', remote]);
   xong('khai thế hệ của người khác cũng bị từ chối', rGian.ma === 3 && /AUTHORITY_REVOKED/.test(rGian.ra));
 
   // Chốt cấu trúc: ref quyền KHÔNG nằm trong lịch sử main.
@@ -320,10 +320,10 @@ console.log('\nCa ④b — cùng lane nhưng kết quả mang thế hệ cũ');
   const g2 = /THE_HE=(\d+)/.exec(r2.ra)[1];
   xong('nhận lại thì thế hệ tăng', Number(g2) === Number(g1) + 1, `${g1} → ${g2}`);
 
-  const rCu = chayQuyen(B, ['--tich-hop', 'goi-s', '--as', 'lane-B', '--the-he', g1, '--sha', SHA_GOC, '--remote', remote]);
+  const rCu = chayQuyen(B, ['--tich-hop', 'goi-s', '--as', 'lane-B', '--the-he', g1, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   xong('kết quả mang thế hệ cũ bị từ chối dù vẫn đúng chủ', rCu.ma === 3 && /STALE_GENERATION/.test(rCu.ra));
 
-  const rMoi = chayQuyen(B, ['--tich-hop', 'goi-s', '--as', 'lane-B', '--the-he', g2, '--sha', SHA_GOC, '--remote', remote]);
+  const rMoi = chayQuyen(B, ['--tich-hop', 'goi-s', '--as', 'lane-B', '--the-he', g2, '--sha', SHA_GOC, '--co-so', SHA_GOC, '--remote', remote]);
   xong('thế hệ đúng thì vào được', rMoi.ma === 0);
   chayQuyen(B, ['--tra', 'goi-s', '--as', 'lane-B', '--remote', remote]);
 }
@@ -383,6 +383,115 @@ console.log('\nCa ⑥ — đường hợp lệ đi hết được');
 
   const rLai = chayQuyen(B, ['--nhan', 'goi-u', '--as', 'lane-B', '--viec', 'B tiep goi U', '--remote', remote]);
   xong('vùng đã trả thì bên kia nhận được ngay', rLai.ma === 0);
+}
+
+// ── Ca ⑦ — thông tin kết quả phải KHỚP commit thật ─────────────────────────────────────────────
+
+// Ba ca này do phiên Codex tìm được (audit r01, 07/09). Trước khi vá, cả ba đều ĐƯỢC NHẬN:
+// cửa chỉ kiểm "có điền không", không kiểm "điền có đúng không". Bắt buộc điền là chưa đủ.
+console.log('\nCa ⑦ — thông tin kết quả phải khớp commit thật');
+{
+  const r = chayQuyen(A, ['--nhan', 'goi-n', '--as', 'lane-A', '--viec', 'A lam goi N', '--remote', remote]);
+  const g = /THE_HE=(\d+)/.exec(r.ra)[1];
+
+  git(A, ['fetch', '--quiet', 'origin']);
+  git(A, ['rebase', '--quiet', 'origin/main']);
+  const dinh = git(A, ['rev-parse', 'HEAD']);
+
+  const KHONG_CO = 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef';
+  const rMa = chayQuyen(A, ['--tich-hop', 'goi-n', '--as', 'lane-A', '--the-he', g,
+    '--sha', KHONG_CO, '--co-so', dinh, '--remote', remote]);
+  xong('SHA không tồn tại bị từ chối', rMa.ma === 3 && /UNKNOWN_COMMIT/.test(rMa.ra));
+
+  const rThieu = chayQuyen(A, ['--tich-hop', 'goi-n', '--as', 'lane-A', '--the-he', g,
+    '--sha', dinh, '--remote', remote]);
+  xong('thiếu --co-so bị từ chối', rThieu.ma === 3 && /MISSING_DATA/.test(rThieu.ra));
+
+  // Khai một nền mà commit kết quả KHÔNG chứa. Trước khi vá, cửa chỉ so nền với lượt tích hợp
+  // trước — nó chưa bao giờ so nền với chính commit kết quả.
+  git(B, ['fetch', '--quiet', 'origin']);
+  git(B, ['reset', '--quiet', '--hard', 'origin/main']);
+  fs.writeFileSync(path.join(B, 'nen-moi.txt'), 'B tien len\n');
+  git(B, ['add', '-A']);
+  git(B, ['commit', '--quiet', '-m', 'B: tien len']);
+  git(B, ['push', '--quiet', 'origin', 'main']);
+  const dinhMoi = git(B, ['rev-parse', 'HEAD']);
+  // A phải fetch về, không thì cửa dừng ở UNKNOWN_COMMIT và ta không kiểm được
+  // đúng chốt cần kiểm. Hai chốt khác nhau, đừng để chốt này che chốt kia.
+  git(A, ['fetch', '--quiet', 'origin']);
+
+  const rLech = chayQuyen(A, ['--tich-hop', 'goi-n', '--as', 'lane-A', '--the-he', g,
+    '--sha', dinh, '--co-so', dinhMoi, '--remote', remote]);
+  xong('nền khai KHÔNG nằm trong commit kết quả thì bị từ chối',
+    rLech.ma === 3 && /BASE_NOT_IN_RESULT/.test(rLech.ra));
+
+  const rDung = chayQuyen(A, ['--tich-hop', 'goi-n', '--as', 'lane-A', '--the-he', g,
+    '--sha', dinh, '--co-so', dinh, '--remote', remote]);
+  xong('thông tin khớp thật thì vào được', rDung.ma === 0);
+  chayQuyen(A, ['--tra', 'goi-n', '--as', 'lane-A', '--remote', remote]);
+}
+
+// ── Ca ⑧ — sổ HỎNG khác sổ TRỐNG ───────────────────────────────────────────────────────────────
+
+// Phiên Codex dựng ca này: ref quyền tồn tại nhưng thiếu file sổ. Trước khi vá, công cụ vừa in
+// lỗi đọc file vừa CẤP QUYỀN ở thế hệ 1 — tức nó coi "không đọc được" là "chưa ai giữ gì".
+// Trạng thái không đọc được phải làm hệ thống DỪNG. Vắng ref và sổ hỏng là hai chuyện khác nhau.
+console.log('\nCa ⑧ — sổ quyền hỏng phải làm hệ thống dừng, không thành sổ trống');
+{
+  chayQuyen(A, ['--nhan', 'goi-m', '--as', 'lane-A', '--viec', 'A lam goi M', '--remote', remote]);
+  git(A, ['fetch', '--quiet', remote, `+${REF}:${REF}`]);
+  const laLanh = git(A, ['rev-parse', REF]);
+
+  const treTrong = git(A, ['mktree'], '');
+  const cmHong = git(A, ['commit-tree', treTrong, '-p', laLanh, '-m', 'so hong: thieu file']);
+  git(A, ['push', '--quiet', remote, `${cmHong}:${REF}`]);
+
+  const rHong = chayQuyen(B, ['--nhan', 'goi-m', '--as', 'lane-B', '--viec', 'B thu', '--remote', remote]);
+  xong('sổ hỏng thì KHÔNG cấp quyền', rHong.ma !== 0, `mã ${rHong.ma}`);
+  xong('nói rõ là sổ hỏng, không nói là trống', /LEDGER_UNREADABLE/.test(rHong.ra));
+
+  const rXem = chayQuyen(B, ['--xem', '--remote', remote]);
+  xong('lệnh xem cũng dừng thay vì báo trống', rXem.ma !== 0 && /LEDGER_UNREADABLE/.test(rXem.ra));
+
+  // Phục hồi để các ca sau còn chạy được: đưa ref về lá lành cuối cùng.
+  git(A, ['push', '--quiet', '--force', remote, `${laLanh}:${REF}`]);
+  const rSau = chayQuyen(B, ['--xem', '--remote', remote]);
+  xong('đưa về lá lành thì đọc lại được', rSau.ma === 0 && /goi-m/.test(rSau.ra));
+  chayQuyen(A, ['--tra', 'goi-m', '--as', 'lane-A', '--remote', remote]);
+}
+
+// ── Ca ⑨ — xin quyền CẠNH TRANH THẬT, không phải gọi lần lượt ───────────────────────────────────
+
+// Phiên Codex chỉ đúng: ca ① gọi A rồi mới gọi B, nên nhãn "đồng thời" của nó không đúng sự thật.
+// Ở đây hai lượt NHẬN thật sự chen nhau: hook `reference-transaction` cho B nhận quyền đúng lúc
+// lượt `fetch` của A vừa xong, tức A đang cầm bản sổ nói rằng vùng còn trống.
+console.log('\nCa ⑨ — hai lượt nhận quyền cạnh tranh thật');
+{
+  const nap = path.join(san, 'nap-dua').replace(/\\/g, '/');
+  const daNo = path.join(san, 'da-no-dua').replace(/\\/g, '/');
+  const hook = path.join(A, '.git', 'hooks', 'reference-transaction');
+  fs.writeFileSync(hook, [
+    '#!/bin/sh',
+    '[ "$1" = "committed" ] || exit 0',
+    `[ -f "${nap}" ] || exit 0`,
+    `[ -f "${daNo}" ] && exit 0`,
+    `: > "${daNo}"`,
+    `cd "${B}" && node "${QUYEN.replace(/\\/g, '/')}" --nhan goi-p --as lane-B --viec "B chen" --remote "${remote}" >/dev/null 2>&1`,
+    'exit 0',
+  ].join('\n'));
+  fs.chmodSync(hook, 0o755);
+  fs.writeFileSync(nap, '');
+
+  const rA = chayQuyen(A, ['--nhan', 'goi-p', '--as', 'lane-A', '--viec', 'A chen', '--remote', remote]);
+  fs.rmSync(hook);
+  fs.rmSync(nap);
+
+  xong('B thật sự đã chen vào giữa', fs.existsSync(daNo));
+  xong('A KHÔNG nhận được báo thành công', rA.ma !== 0, `mã ${rA.ma}`);
+
+  const rXem = chayQuyen(B, ['--xem', '--remote', remote]);
+  const chuP = /GIỮ  goi-p  →  (\S+)/.exec(rXem.ra);
+  xong('đúng MỘT bên giữ goi-p, và đó là bên vào trước', chuP?.[1] === 'lane-B', chuP?.[1] || 'không ai giữ');
 }
 
 // ── Fail-closed ────────────────────────────────────────────────────────────────────────────────
