@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T18:06:39.621Z",
-      "task": "dung bang song ba cua + chuoi dem",
-      "released_at": "2026-09-06T18:59:55.226Z",
+      "claimed_at": "2026-09-07T01:06:45.660Z",
+      "task": "KHUNG-38 vá lời khuyên sai",
+      "released_at": "2026-09-07T01:13:58.886Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -15,9 +15,9 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T18:06:39.867Z",
-      "task": "dung bang song ba cua + chuoi dem",
-      "released_at": "2026-09-06T18:59:55.102Z",
+      "claimed_at": "2026-09-07T01:06:45.540Z",
+      "task": "KHUNG-38 vá lời khuyên sai",
+      "released_at": "2026-09-07T01:13:58.740Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T18:47:08.183Z",
-      "task": "bang song + KHUNG-33",
-      "released_at": "2026-09-06T18:59:54.983Z",
+      "claimed_at": "2026-09-07T01:06:45.448Z",
+      "task": "KHUNG-38 vá lời khuyên sai",
+      "released_at": "2026-09-07T01:13:58.609Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-06T18:47:08.249Z",
-      "task": "phat bang song di theo ban trich",
-      "released_at": "2026-09-06T18:59:55.363Z"
+      "claimed_at": "2026-09-07T01:06:45.768Z",
+      "task": "KHUNG-38 vá lời khuyên sai",
+      "released_at": "2026-09-07T01:13:59.030Z"
     }
   }
 }
