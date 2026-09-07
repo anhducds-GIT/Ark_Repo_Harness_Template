@@ -25,6 +25,7 @@ import { fileURLToPath } from "node:url";
 
 import { ageHours, ageLabel, dangNhac, DAU_VET, decide, EXIT, GIO_NHAC, mocCoGio, noiDauVet, xetDauVet } from "../scripts/claim.mjs";
 import { khoiDangLamGi } from "../scripts/build-overview.mjs";
+import { loiKhuyenKhiChan } from "../scripts/repo-structure.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -280,6 +281,43 @@ const SAU = "2026-09-06T11:00:00Z";
     "KHONG DO DUOC thi khong chan: tra khoa la thao tac go bi, khac han nhanh --take o tren");
   assert.equal(goi({ chuaDay: [] }).code, EXIT.OK, "day het roi thi tra binh thuong");
   ok("10 · trả khoá khi còn commit chưa đẩy: chặn, có cửa thoát ghi lý do, và không đo được thì không chặn");
+}
+
+/* ---- 11. LANE ĐÃ ĐI RỒI THÌ ĐỪNG BẢO NGƯỜI TA CHỜ NÓ --------------------
+ *
+ * Vế này đến từ một giả thuyết SAI của chính phiên viết nó, và đó là phần đáng giữ lại.
+ *
+ * Giả thuyết: sau một lượt `--release --du-biet`, cổng ĐÓNG PHIÊN của lane kế sẽ đỏ với câu
+ * "vùng bị sửa nhưng chưa ai đứng tên". Đo 07/09 trong một kho dựng riêng: **sai** — phép kiểm
+ * "Phạm vi trách nhiệm" XANH, vì nó đọc file sửa dở trên đĩa chứ không đọc commit chưa đẩy.
+ *
+ * Chỗ hỏng THẬT nằm ở cổng XUẤT BẢN, và nặng hơn: `safe-push` từ chối lane kế vì nó cuốn theo
+ * commit của lane đã đi, và câu nó in ra là *"chờ phiên đó tự push"* — bảo người ta chờ một việc
+ * KHÔNG BAO GIỜ xảy ra. Lane đó trả khoá rồi. Chỉ người chốt gỡ được, mà không ai đi hỏi vì câu
+ * kia bảo là chỉ cần đợi.
+ *
+ * Nên vế này KHÔNG ghim "cổng phải đỏ". Nó ghim: **câu khuyên phải đúng với thực tế**.
+ *
+ * Đột biến đã chạy: cho hàm luôn trả nhánh "chờ phiên đó tự push" → vế này ĐỎ · bỏ tên khoá khỏi
+ * dòng khai → vế này ĐỎ. */
+{
+  const khong = loiKhuyenKhiChan({ _docs: { owner: "ai-do" } }).join(NL);
+  assert.match(khong, /chờ phiên đó tự push/,
+    "khong ai bo lai gi thi loi khuyen cu van dung: lane kia con song, cho no la hop ly");
+
+  const co = loiKhuyenKhiChan({ _docs: { tra_khi_chua_day: "1 commit · cổng đỏ, giao lane khác" } }).join(NL);
+  assert.doesNotMatch(co, /chờ phiên đó tự push/,
+    "lane da tra khoa va DI ROI — bao nguoi ta cho no la mot cau khuyen SAI, va cau khuyen sai te hon khong co cau nao");
+  assert.match(co, /_docs/, "phai noi RO khoa nao — khong thi nguoi doc khong biet di tim cai gi");
+  assert.match(co, /cổng đỏ, giao lane khác/, "phai in lai LY DO lane kia khai, de nguoi chot quyet duoc ma khong phai hoi lai");
+  assert.match(co, /--carry/, "phai chi ra loi ra that: hoi nguoi chot roi --carry");
+
+  /* VÀ KHÔNG ĐƯỢC TỰ CHO QUA. Đây là chỗ dễ trượt nhất: biết lane kia đi rồi thì rất muốn cho
+   * đẩy luôn cho tiện. `--carry` vẫn phải hỏi người chốt (AGENTS.md mục 2 hàng 2) — lượt này chỉ
+   * đổi một câu SAI thành một câu ĐÚNG, không hạ một lớp bảo vệ nào. */
+  assert.doesNotMatch(co, /tự động|bỏ qua|không cần hỏi/,
+    "sua mot cau khuyen KHONG duoc bien thanh tu cap phep — --carry van phai hoi nguoi chot");
+  ok("11 · lane đã trả khoá rồi đi: lời khuyên nói đúng sự thật, và vẫn KHÔNG tự cho qua");
 }
 
 console.log(`khoa-dau-vet: ${passed} vế xanh`);

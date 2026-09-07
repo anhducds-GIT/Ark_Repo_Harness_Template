@@ -629,3 +629,27 @@ export function readStructureFromDisk(root) {
   }
   return parsed;
 }
+
+/* ---- LỜI KHUYÊN KHI CỔNG XUẤT BẢN CHẶN -----------------------------------
+ *
+ * Ở ĐÂY chứ không ở `safe-push.mjs`, và lý do là kiểm được: `safe-push.mjs` chạy phần chính ngay
+ * lúc nạp module và THOÁT khi thiếu `--as`, nên không phép ghim nào `import` nổi nó. Một nhánh
+ * quyết định không nạp được là một nhánh không ai đột biến kiểm được — và nhánh này in ra câu mà
+ * người bị chặn sẽ làm theo.
+ */
+/** Lời khuyên in ra khi cổng xuất bản chặn. THUẦN, nên đột biến kiểm được.
+ *
+ *  Một câu khuyên SAI tệ hơn không có câu nào: nó làm người đọc tin là mình chỉ cần đợi, nên
+ *  không ai đi hỏi người chốt, nên repo kẹt im lặng. */
+export function loiKhuyenKhiChan(claims) {
+  const daBoLai = Object.entries(claims || {})
+    .filter(([, c]) => c && c.tra_khi_chua_day)
+    .map(([khoa, c]) => `  ${khoa}: khai bỏ lại "${String(c.tra_khi_chua_day)}"`);
+  if (!daBoLai.length) return ["Cách xử lý: chờ phiên đó tự push, HOẶC hỏi Đức rồi chạy lại kèm --carry."];
+  return [
+    "",
+    "⚠ CÓ LANE ĐÃ TRẢ KHOÁ RỒI ĐI, VÀ ĐỂ LẠI COMMIT CHƯA ĐẨY — đừng chờ nó:",
+    ...daBoLai,
+    "Commit đó sẽ KHÔNG tự lên. Đây đúng là ca phải hỏi Đức rồi chạy lại kèm --carry."
+  ];
+}

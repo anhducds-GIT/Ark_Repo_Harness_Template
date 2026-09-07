@@ -18,7 +18,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
+import { appendOnlyAtEof, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -245,7 +245,21 @@ if (blocked.length && !carry) {
     console.error(`  ${row.sha.slice(0, 7)} → ${row.foreign.map((f) => `${f.area} (của "${f.owner}")`).join(", ")}`);
   }
   console.error(`\nĐẩy lên là commit của họ cũng lên theo, và Đức chưa duyệt phần đó.`);
-  console.error(`Cách xử lý: chờ phiên đó tự push, HOẶC hỏi Đức rồi chạy lại kèm --carry.\n`);
+  /* LANE ĐÃ ĐI RỒI THÌ ĐỪNG BẢO NGƯỜI TA CHỜ NÓ.
+   *
+   * `claim.mjs --release --du-biet` cho một lane trả khoá KÈM commit chưa đẩy — cần thiết, không
+   * thì lane bị cổng xuất bản chặn sẽ kẹt khoá vĩnh viễn. Nhưng lane đó đi rồi, và commit của nó
+   * ở lại chặn MỌI lane sau.
+   *
+   * Đo 07/09 trong một kho dựng riêng: sau một lượt `--du-biet`, lane kế KHÔNG đẩy được, và câu
+   * duy nhất chỗ này in ra là "chờ phiên đó tự push" — bảo người ta chờ một việc sẽ KHÔNG BAO GIỜ
+   * xảy ra. Lời khuyên sai còn tệ hơn không có lời khuyên: người đọc tin là mình chỉ cần đợi, nên
+   * không ai đi hỏi Đức, nên repo kẹt im lặng.
+   *
+   * KHÔNG tự cho qua. `--carry` vẫn phải hỏi Đức (AGENTS.md mục 2 hàng 2) — chỗ này chỉ đổi một
+   * câu SAI thành một câu ĐÚNG, không hạ một lớp bảo vệ nào. */
+  for (const dong of loiKhuyenKhiChan(claims)) console.error(dong);
+  console.error("");
   process.exit(1);
 }
 if (blocked.length && carry) {

@@ -673,21 +673,36 @@ không chặn được gì. Vùng: `_code`.
 8 hỏi *"đã xảy ra thật chưa"* — và ở đây câu trả lời đo được là chưa. Chép chúng sang là nhập năm
 cơ chế mà không nhập lý do tồn tại của chúng, rồi phiên sau đọc không hiểu vì sao có và gỡ đi.
 
-### KHUNG-38 · `--du-biet` trả khoá xong để lại vùng KHÔNG AI ĐỨNG TÊN mà vẫn có commit chưa đẩy
+### ~~KHUNG-38~~ · ĐÓNG 07/09 · `--du-biet` để lại commit mồ côi — **giả thuyết ban đầu SAI, chỗ hỏng thật nằm chỗ khác**
 
-Rơi ra từ `KHUNG-34` bẫy số 6, và từ chính `KHUNG-33` vừa làm.
+**Điều mục này viết ra hôm trước là sai, và đó là phần đáng đọc nhất.**
 
-Cửa thoát `--du-biet` cho trả khoá khi còn commit chưa đẩy — cần thiết, không thì lane bị chặn đẩy
-kẹt khoá vĩnh viễn. Nhưng sau đó vùng đó `owner: null` trong khi vẫn còn commit chưa công bố, nên
-cổng của phiên SAU đỏ với câu *"vùng bị sửa nhưng chưa ai đứng tên"* — và phiên sau **không hiểu vì
-sao**, vì nó không phải người để lại.
+Giả thuyết: sau `--release --du-biet`, cổng ĐÓNG PHIÊN của lane kế đỏ với *"vùng bị sửa nhưng chưa
+ai đứng tên"*. Đo 07/09 trong một kho dựng riêng — lane A nhận `_docs`, commit, không đẩy, trả khoá
+kèm `--du-biet`, rồi lane B chạy cổng:
 
-Bảng quyền ĐÃ ghi `tra_khi_chua_day` (số commit + lý do). Việc là cho cổng đọc trường đó và hạ từ
-ĐỎ xuống VÀNG **kèm nói ra ai để lại và vì sao** — chứ không phải bỏ phép kiểm.
+| Phép kiểm | Đo được |
+|---|---|
+| Phạm vi trách nhiệm | **XANH** — nó đọc file sửa dở trên ĐĨA, không đọc commit chưa đẩy |
+| hai chỗ đỏ khác | **nhiễu của kho thử** — đối chứng (lane A đẩy đàng hoàng rồi trả) ra **y hệt** |
 
-**Chưa làm vì chưa đo.** Phải dựng ca thật trước: trả khoá bằng `--du-biet` rồi chạy cổng ở một
-phiên khác, xem nó đỏ ở đúng phép kiểm nào và câu chữ ra sao. Hạ mức trước khi biết nó đỏ ở đâu là
-làm yếu một lớp bảo vệ theo phỏng đoán — luật vàng 3 cấm. Vùng: `_code`.
+Không có đối chứng thì hai chỗ đỏ kia đã bị đọc thành bằng chứng cho giả thuyết. Chúng xuất hiện
+dù có `--du-biet` hay không.
+
+**Chỗ hỏng THẬT nằm ở cổng XUẤT BẢN, và nặng hơn giả thuyết:** `safe-push` từ chối lane kế vì nó
+cuốn theo commit của lane đã đi, và câu nó in ra là *"chờ phiên đó tự push"* — **bảo người ta chờ
+một việc không bao giờ xảy ra**, vì lane đó trả khoá rồi. Không ai đi hỏi Đức, vì câu kia bảo chỉ
+cần đợi. Repo kẹt im lặng, và kẹt với **mọi** lane sau, không chỉ lane kế.
+
+**Vá:** đổi một câu SAI thành một câu ĐÚNG, ở cả hai đầu — `claim.mjs` nói ra cái giá **ngay lúc
+trả khoá**, `safe-push` đọc `tra_khi_chua_day` và nói thẳng *"lane đó đã đi, đừng chờ"* kèm lý do
+lane kia khai. **KHÔNG tự cho qua**: `--carry` vẫn phải hỏi Đức (mục 2 hàng 2). Ghim ở
+`tests/khoa-dau-vet.mjs` vế 11, hai đột biến đã chạy — trong đó một vế ghim thẳng rằng lượt sửa
+câu chữ này **không được biến thành tự cấp phép**.
+
+**Bài học chung, và nó lặp lại lần thứ ba trong hai ngày:** *một giả thuyết chưa đo không đáng tin
+hơn vì nó nghe hợp lý.* Nếu tôi vá theo giả thuyết ban đầu thì đã hạ mức một phép kiểm đang XANH,
+và để nguyên chỗ hỏng thật.
 
 ### KHUNG-34-cu · (giữ tiêu đề cũ để tra ngược) Tám cái bẫy đo được 06/09
 

@@ -173,6 +173,9 @@ export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty, ch
         ].join(NL2)
       };
     }
+    /* NÓI RA CÁI GIÁ, ngay lúc trả. Đo 07/09: sau một lượt `--du-biet`, lane KẾ TIẾP không đẩy
+     * được — `safe-push` từ chối vì nó cuốn theo commit của lane đã đi. Gỡ được, nhưng chỉ Đức
+     * gỡ được (`--carry`). Cửa thoát này vẫn đúng là cần; im lặng về cái giá của nó thì không. */
     const khai = duBiet && Array.isArray(chuaDay) && chuaDay.length
       ? { tra_khi_chua_day: `${chuaDay.length} commit · ${typeof duBiet === "string" ? duBiet : "không nêu lý do"}` }
       : {};
@@ -504,6 +507,11 @@ async function main() {
 
   const verb = action === "take" ? (verdict.giành ? `đã GIÀNH từ "${verdict.giành}"` : verdict.already ? "vẫn đang giữ" : "đã nhận") : "đã trả";
   console.log(`${verb}: ${key}${action === "take" ? ` → ${as}` : ""}`);
+  if (verdict.next?.tra_khi_chua_day) {
+    console.log(`⚠ Bạn vừa để lại ${verdict.next.tra_khi_chua_day.split(" · ")[0]} chưa đẩy ở vùng này, và đã trả khoá.`);
+    console.log("  Lane TIẾP THEO sẽ KHÔNG đẩy được: safe-push từ chối vì nó cuốn theo commit của bạn.");
+    console.log("  Chỉ Đức gỡ được (duyệt `--carry`). Nên báo Đức ngay, đừng để phiên sau tự đâm vào.");
+  }
   process.exit(EXIT.OK);
 }
 

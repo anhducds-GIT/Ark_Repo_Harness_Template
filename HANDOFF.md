@@ -1070,3 +1070,37 @@ không ai thêm lại vì cùng linh cảm. Luật mục 8 áp cho chính mình 
 `KHUNG-38` (mới — `--du-biet` để lại vùng vô chủ, phải ĐO trước khi hạ mức cổng) · `KHUNG-30`
 (Đức hoãn) · `KHUNG-37` (`@Đức:bấm`) · `KHUNG-31` · `Y-10` nay đã có bản chạy được, còn phần
 "nghiệm thu trên máy Đức" chưa ai làm.
+
+---
+
+## 2026-09-07 · claude-k4-bangsong · bản 1.3.27 — KHUNG-38: giả thuyết của tôi sai, chỗ hỏng nằm chỗ khác
+
+**Mục KHUNG-38 tôi tự viết hôm trước là sai**, và việc đầu tiên của lượt này là chứng minh điều đó.
+
+Giả thuyết: sau `--release --du-biet`, cổng ĐÓNG PHIÊN của lane kế đỏ với *"vùng bị sửa nhưng chưa
+ai đứng tên"*. Dựng kho riêng, cho lane A nhận `_docs` → commit → không đẩy → trả kèm `--du-biet`,
+rồi lane B chạy cổng. Kết quả: **"Phạm vi trách nhiệm" XANH.** Nó đọc file sửa dở trên ĐĨA, không
+đọc commit chưa đẩy.
+
+**Đối chứng là thứ cứu lượt đo này.** Cổng có hai chỗ đỏ khác, và tôi suýt đọc chúng thành bằng
+chứng. Chạy lại đúng kịch bản đó nhưng cho lane A đẩy đàng hoàng rồi mới trả khoá — **ra y hệt**.
+Hai chỗ đỏ là nhiễu của kho thử, xuất hiện dù có `--du-biet` hay không.
+
+**Chỗ hỏng thật ở cổng XUẤT BẢN, và nặng hơn giả thuyết.** `safe-push` chặn lane kế vì nó cuốn theo
+commit của lane đã đi, rồi khuyên *"chờ phiên đó tự push"*. Lane đó **trả khoá rồi** — nó sẽ không
+bao giờ push. Và vì câu khuyên bảo là chỉ cần đợi, **không ai đi hỏi Đức**. Repo kẹt im lặng, với
+MỌI lane sau chứ không chỉ lane kế.
+
+Vá ở hai đầu, và cả hai chỉ đổi câu SAI thành câu ĐÚNG — không hạ một lớp bảo vệ nào. `--carry`
+vẫn phải hỏi Đức, và có một vế ghim đúng điều đó, vì đây là chỗ dễ trượt thành tự-cấp-phép nhất.
+
+**Một chỗ phải dời file:** hàm quyết định sang `repo-structure.mjs`, vì `safe-push.mjs` chạy phần
+chính ngay lúc nạp và thoát khi thiếu `--as` — **không phép ghim nào import nổi nó**. Một nhánh
+không nạp được là một nhánh không ai đột biến kiểm được, mà nhánh này in ra câu người bị chặn sẽ
+làm theo.
+
+**Lần thứ ba trong hai ngày:** một giả thuyết chưa đo không đáng tin hơn vì nó nghe hợp lý. Vá theo
+giả thuyết ban đầu thì tôi đã hạ mức một phép kiểm đang XANH và để nguyên chỗ hỏng thật.
+
+**Còn mở:** `KHUNG-30` (Đức hoãn) · `KHUNG-37` (`@Đức:bấm`) · `KHUNG-31` · `Y-09` phát bảng sang ba
+repo đã lắp · `Y-10` nghiệm thu ba cửa trên máy Đức.

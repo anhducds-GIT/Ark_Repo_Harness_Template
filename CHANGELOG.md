@@ -3,6 +3,27 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.27 — 2026-09-07 — Lane đã đi rồi thì đừng bảo người ta chờ nó
+
+`KHUNG-38`, và **giả thuyết ban đầu của chính mục đó là sai** — phần đáng đọc nhất của bản này.
+
+Giả thuyết: `--release --du-biet` làm cổng ĐÓNG PHIÊN của lane kế đỏ. Đo trong một kho dựng riêng:
+**"Phạm vi trách nhiệm" XANH** — nó đọc file sửa dở trên đĩa, không đọc commit chưa đẩy. Hai chỗ
+đỏ còn lại là **nhiễu của kho thử**: đối chứng (lane đẩy đàng hoàng rồi mới trả) ra y hệt. Không
+dựng đối chứng thì hai chỗ đó đã bị đọc thành bằng chứng.
+
+**Chỗ hỏng thật ở cổng XUẤT BẢN, và nặng hơn:** `safe-push` chặn lane kế vì nó cuốn theo commit
+của lane đã đi, rồi khuyên *"chờ phiên đó tự push"* — chờ một việc không bao giờ xảy ra. Không ai
+đi hỏi Đức, vì câu đó bảo chỉ cần đợi. Repo kẹt **im lặng**, với mọi lane sau.
+
+Vá ở cả hai đầu: `claim.mjs` nói ra cái giá ngay lúc trả khoá · `safe-push` đọc `tra_khi_chua_day`
+và nói thẳng *"lane đó đã đi, đừng chờ"* kèm lý do lane kia khai. **`--carry` vẫn phải hỏi Đức** —
+và có một vế ghim đúng điều đó, vì sửa câu chữ là chỗ dễ trượt thành tự cấp phép nhất.
+
+Hàm quyết định chuyển sang `repo-structure.mjs` vì `safe-push.mjs` chạy phần chính ngay lúc nạp và
+thoát khi thiếu `--as`, nên **không phép ghim nào import nổi nó** — một nhánh không nạp được là
+một nhánh không ai đột biến kiểm được, mà nhánh này in ra câu người bị chặn sẽ làm theo.
+
 ## 1.3.26 — 2026-09-07 — Chuỗi đêm: bảng SỐNG · trả khoá an toàn · tám cái bẫy đã phân loại
 
 Đức: *"tôi có thể F5 trên dashboard html là latest status sẽ được hiển thị lên các luồng làm
