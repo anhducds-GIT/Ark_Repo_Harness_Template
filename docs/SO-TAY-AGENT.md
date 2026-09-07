@@ -26,6 +26,7 @@ ttl_days: 365
 | **Giao hẳn một việc cho AI khác làm** (nâng · migrate · audit) | [5b](#5b) | 2 phút |
 | Chạy bảo trì định kỳ | [6](#6) | 20 phút |
 | Dựng repo mới / đưa repo cũ lên chuẩn | [7](#7) | xem workflow |
+| **Phát bản vá bộ khung sang một repo đã lắp — và kiểm nó thật sự chạy ở đó** | [8](#8) | 15 phút một repo |
 
 ---
 
@@ -125,6 +126,117 @@ Không tóm tắt ở đây — làm theo đúng workflow, vì thứ tự trong 
 
 - [Dựng repo mới](workflows/01-dung-repo-moi.md)
 - [Đưa repo cũ lên chuẩn](workflows/02-dua-repo-cu-len-chuan.md)
+
+## 8. Phát bản vá sang một repo đã lắp, và KIỂM nó chạy ở đó {#8}
+
+**Vì sao mục này tồn tại.** Đo 07/09: ba lượt migrate đã xong, và cả ba đều để lại repo đích
+với **công cụ có mặt mà tên gọi không có** — `scripts/session-check.mjs` nằm đó, `npm run gate`
+thì không. Bộ đo tính năng đếm ra `[~] MỘT PHẦN`, và **`[~]` nguy hiểm hơn `[ ]` THIẾU**: mục
+một phần trông như đang chạy, nên không ai đi tìm.
+
+Nên "phát xong" **không phải** là `--apply` thoát 0. Nó là: **repo đích tự chạy được, và bảng
+của nó nói đúng về nó.**
+
+### Bước 1 — xem trước, ĐỌC HẾT bản kế hoạch
+
+```bash
+node scripts/upgrade.mjs --plan "<đường-dẫn-repo-đích>"
+```
+
+Bốn tầng, **bốn luật khác nhau** — đừng đọc gộp:
+
+| Tầng | `--apply` làm gì |
+|---|---|
+| **MÁY** (`.mjs` · `.cmd`) | ghi đè — trừ khi file đã bị **SỬA TAY**, lúc đó nó TỪ CHỐI |
+| **TÀI LIỆU** (`docs/`) | THIẾU thì mang sang · **KHÁC thì chỉ kể tên**, không bao giờ ghi đè |
+| **TÊN LỆNH** (`package.json` → `scripts`) | THIẾU thì thêm · **KHÁC thì chỉ kể tên** |
+| **PHỤ LỤC NGHỀ** (`status: optional`) | kể tên, **không bao giờ tự mang** — sai nghề còn tệ hơn thiếu |
+
+Thấy dòng `SỬA TAY` hay `CHƯA GHIM` thì **dừng lại đọc `git diff` ở repo đích trước**. Đó là
+lý do lệnh này tồn tại: nó không phải để chép file, nó là để **không xoá bản vá tại chỗ của
+người khác**.
+
+### Bước 2 — ghi
+
+```bash
+node scripts/upgrade.mjs --apply "<đường-dẫn-repo-đích>"
+```
+
+### Bước 3 — ĐO, đừng tin lệnh vừa thoát 0
+
+```bash
+node scripts/features.mjs "<đường-dẫn-repo-đích>"
+```
+
+**Xử `[~]` trước `[ ]`.** Còn `[~]` nào sau khi `--apply` thoát 0 thì đó là **lỗi của bộ khung**,
+không phải của repo đích — ghi vào sổ nợ ở đây, đừng vá tay ở đó.
+
+### Bước 4 — chạy ở CHÍNH repo đó, năm lệnh
+
+Chạy **ở thư mục repo đích**, không chạy ở đây:
+
+```bash
+npm test
+npm run bootstrap
+npm run dashboard && npm run overview
+npm run state-check
+npm run gate -- --as <tên-phiên>
+```
+
+Đọc kết quả theo đúng nghĩa của từng lệnh — **chúng trả lời bốn câu khác nhau**, và gộp chúng
+là mất đúng cái mình cần biết:
+
+| Lệnh | Trả lời câu gì | Đỏ thì sao |
+|---|---|---|
+| `npm test` | *hành vi có còn đúng không* | dừng hẳn — bản vá làm hỏng một hợp đồng |
+| `npm run bootstrap` | *repo còn nợ gì về cấu trúc* | file mới chưa khai vào Bản đồ file — khai rồi chạy lại |
+| `dashboard` + `overview` | *bảng sinh được không* | thiếu file bộ sinh, hoặc `.repo-structure.json` hỏng |
+| `state-check` | *điều mình sắp báo có đúng không* | `MISMATCH` là thật · `UNKNOWN` là **không biết**, đừng đọc thành OK |
+| `gate -- --as …` | *việc này push được chưa* | mỗi dòng đỏ tự nói cách sửa |
+
+### Bước 5 — MỞ BẢNG RA XEM, ba chỗ
+
+Bảng sinh được **không** có nghĩa là bảng nói đúng. Mở `DASHBOARD-<tên-repo>.html` và soi:
+
+1. **Đầu trang** — tên repo và câu tự giới thiệu phải là của repo ĐÓ. Thấy nó tự gọi mình là
+   "bộ khung" thì repo chưa khai `repo.tagline` trong `.repo-structure.json`.
+2. **Tab AI điều phối → ô "Làm mới bảng"** — hai ô cạnh nhau: `F5 LÀ THẤY` (bảng sống) và
+   `F5 KHÔNG ĐỔI SỐ` (bảng đã commit). Repo không có `bang-song/` thì chỉ có ô thứ hai, kèm
+   một câu nói thẳng là chưa có bảng sống. Thiếu cả khối này = bộ sinh chưa tới.
+3. **Số trên bảng phải khớp thứ vừa đẩy.** Không khớp là **có một nguồn sự thật thứ hai** ở đâu
+   đó — lỗi nặng hơn mọi thứ khác trong danh sách này.
+
+### Bước 6 — ghi checklist vào hồ sơ migrate
+
+```bash
+node scripts/features.mjs --migrate "<đường-dẫn-repo-đích>"
+```
+
+Dán khối đó vào hồ sơ lượt ấy trong [migrations/](migrations/). Khối mang **ngày đo** và **bản
+danh mục**, và tab **Migrate** của bảng đọc lại chính khối đó — nên bảng không thể nói khác hồ sơ.
+
+Hồ sơ là vùng **chỉ thêm**: đo lại thì dán thêm khối mới xuống dưới, **đừng sửa khối cũ**. Bảng
+lấy khối **cuối**.
+
+### Bước 7 — repo đích chưa có người cầm thì phát tiếp đề bài onboard
+
+```bash
+npm run giao-viec -- --viec onboard --repo "<đường-dẫn-repo-đích>" --as <tên-phiên>
+```
+
+Đây là bước hay bị bỏ nhất, và là bước duy nhất quyết định lượt phát có nghĩa gì: **migrate đưa
+công cụ tới, nó không đưa người cầm tới.** Đo được: 3 lượt migrate xong, **0 lượt** có phiên AI
+ở repo đích chạy trọn một vòng làm việc.
+
+### Ba điều KHÔNG làm ở mục này
+
+1. **Không `--force`** để đi qua `SỬA TAY` khi chưa đọc `git diff` ở repo đích. Cờ đó nghĩa là
+   *"tôi đã đọc và chấp nhận mất"*, không phải *"cho tôi qua"*.
+2. **Không vá tay ở repo đích** để bộ đo xanh lên. Bộ khung thiếu thì sửa ở bộ khung rồi phát
+   lại — vá tay là chính tay mình dựng ra cái `SỬA TAY` mà lượt sau sẽ bị chặn.
+3. **Không sửa `package.json` của repo đích ngoài phần tên lệnh còn thiếu.** Một khoá đã có giá
+   trị khác là repo đó đã tự quyết; ghi đè là hỏng **im lặng** — `npm test` vẫn xanh, chỉ là nó
+   không còn chạy đúng những thứ nó từng chạy.
 
 ---
 

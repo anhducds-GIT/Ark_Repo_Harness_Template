@@ -315,3 +315,108 @@ export function readHoSo(nguon) {
   // Mới nhất lên đầu: người mở sổ gần như luôn hỏi "lần gần nhất thế nào".
   return ra.sort((a, b) => String(b.fm.ngay ?? "").localeCompare(String(a.fm.ngay ?? "")));
 }
+
+/* ---- 8. Checklist tính năng trong một hồ sơ migrate -------------------------
+ *
+ * Đức chốt 07/09: *"ở repo đích, đặc biệt là mục dashboard mới… cần ghi rõ checklist các
+ * feature list sẽ được migrate cũng như là ngày phiên bản."*
+ *
+ * Khối chữ do `features.mjs --migrate` sinh và người dán vào hồ sơ. Bộ đọc này chiếu nó lên
+ * bảng — nên bảng **không khai lần thứ hai**: hồ sơ nói gì thì bảng nói đúng thế.
+ *
+ * KHÔNG CÓ KHỐI THÌ TRẢ `null`, và bảng phải nói thẳng là **chưa đo**. Suy bừa ra "chưa có
+ * tính năng nào" là bịa một con số nợ; suy bừa ra "đủ" thì tệ hơn. Ba hồ sơ đầu được ghi
+ * TRƯỚC khi danh mục tính năng tồn tại, nên `null` là trạng thái hợp lệ, không phải lỗi.
+ *
+ * ĐỌC NGÀY VÀ BẢN TỪ CHÍNH DÒNG TIÊU ĐỀ, không lấy ngày sinh bảng: một checklist đo hôm qua
+ * mà bảng dán ngày hôm nay lên là bảng nói dối về tuổi của số đo. Thiếu thì để `null`.
+ */
+const DAU_CHECKLIST = /^##\s+Checklist tính năng[^\n]*$/;
+const KHOI_F = /^\*\*(F\d+)\s*·\s*(.+?)\*\*\s*—\s*(\d+)\/(\d+)\s*$/;
+const MUC_F = /^-\s+\[([x~\-\s])\]\s+`([A-Z]\d+(?:\.\d+)?)`\s+(.+?)\s*$/;
+const TRANG_F = { x: "xong", "~": "mot-phan", " ": "thieu", "-": "ngoai" };
+
+export function docChecklistTinhNang(than) {
+  const dong = donGian(than).split(NL);
+  /* KHỐI CUỐI, không phải khối đầu. Hồ sơ migrate là vùng CHỈ THÊM: đo lại thì dán thêm một
+   * khối mới xuống dưới, khối cũ giữ nguyên để tra. Lấy khối đầu là bảng luôn chiếu lần đo
+   * XA NHẤT — tức càng đo lại nhiều lần thì bảng càng nói về quá khứ sâu hơn. */
+  let i = -1;
+  for (let k = 0; k < dong.length; k++) if (DAU_CHECKLIST.test(dong[k].trim())) i = k;
+  if (i < 0) return null;
+  const dau = dong[i];
+  const ban = /danh mục bản\s+(\S+)/.exec(dau);
+  const ngay = /đo ngày\s+([0-9-]+)/.exec(dau);
+  const khoi = [];
+  const dem = { xong: 0, "mot-phan": 0, thieu: 0, ngoai: 0 };
+  for (let k = i + 1; k < dong.length; k++) {
+    const l = dong[k];
+    if (/^##\s+/.test(l)) break;
+    const mk = KHOI_F.exec(l.trim());
+    if (mk) { khoi.push({ ma: mk[1], ten: mk[2].trim(), xong: Number(mk[3]), tong: Number(mk[4]), muc: [] }); continue; }
+    const mm = MUC_F.exec(l);
+    if (!mm || !khoi.length) continue;
+    const trang = TRANG_F[mm[1]] || "thieu";
+    dem[trang]++;
+    /* Cắt phần `*(từ bản …)*` và phần `— thiếu: …` ra khỏi tên, giữ lại cả hai làm trường
+     * riêng: dán nguyên vào một ô bảng thì dòng dài gấp ba và cái tên biến mất giữa chữ. */
+    let ten = mm[3];
+    const tuBan = /\*\(từ bản\s+([^)]+)\)\*/.exec(ten);
+    const thieu = /—\s*thiếu:\s*(.+)$/.exec(ten);
+    ten = ten.replace(/\*\(từ bản[^)]*\)\*/, "").replace(/—\s*thiếu:.*$/, "").trim();
+    khoi[khoi.length - 1].muc.push({
+      trang, ma: mm[2], ten,
+      tuBan: tuBan ? tuBan[1].trim() : null,
+      thieu: thieu ? thieu[1].replace(/`/g, "").trim() : null
+    });
+  }
+  if (!khoi.length) return null;
+  return {
+    ban: ban ? ban[1] : null,
+    ngay: ngay ? ngay[1] : null,
+    khoi,
+    dem,
+    xong: khoi.reduce((a, b) => a + b.xong, 0),
+    tong: khoi.reduce((a, b) => a + b.tong, 0)
+  };
+}
+
+/* ---- 9. Làm mới: F5 có đổi số hay không -------------------------------------
+ *
+ * Đức nêu 07/09: *"nếu hiện tại F5 là check status mới nhất được rồi thì phải giải thích"*.
+ *
+ * Câu trả lời KHÁC NHAU cho hai file, và đó chính là chỗ dễ hiểu sai nhất của cả bảng:
+ * bản đã commit suy từ HEAD nên F5 **không** đổi số; bản SỐNG đọc bảng quyền từ đĩa nên F5
+ * **có**. Nói gộp "F5 đi" là dạy sai một trong hai.
+ *
+ * ĐO, KHÔNG ĐOÁN: có bảng sống hay không thì xem repo có khai lệnh chạy nó; cổng thì đọc từ
+ * chính mã nguồn máy chủ. Đọc không ra cổng thì nói "cổng máy chủ in ra lúc chạy" — đóng cứng
+ * một con số là dẫn người xem tới bảng CỦA REPO KHÁC khi cổng bị chiếm và máy chủ nhảy cổng.
+ */
+export function nguonLamMoi({ tenBang, lenh = [], maMayChu = null } = {}) {
+  const co = (k) => lenh.some((x) => Array.isArray(x) && x[0] === k);
+  const cong = (() => {
+    const m = /CONG_MAC_DINH\s*=\s*(\d{2,5})/.exec(String(maMayChu || ""));
+    return m ? Number(m[1]) : null;
+  })();
+  const anhChup = {
+    file: tenBang || null,
+    f5: false,
+    lenh: co("overview") ? "npm run overview" : "node scripts/build-overview.mjs"
+  };
+  if (!co("bang-song:may-chu")) return { anhChup, song: null };
+  return {
+    anhChup,
+    song: {
+      file: "bang-song/BANG.html",
+      f5: true,
+      cong,
+      url: cong ? `http://127.0.0.1:${cong}/` : null,
+      cua: [
+        { nhan: "Nhấp đúp — không cần dòng lệnh", gia: "bang-song\\Xem-bang.cmd" },
+        { nhan: "Máy chủ tại chỗ, F5 là thấy", gia: "npm run bang-song:may-chu" },
+        { nhan: "Tự chạy lúc bật máy", gia: "bang-song\\Bat-tu-chay.cmd" }
+      ]
+    }
+  };
+}

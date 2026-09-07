@@ -39,8 +39,8 @@ import { esc, md, tachFrontmatter } from "./md-mini.mjs";
  * đã dời sang `overview-doc.mjs`; chiều phụ thuộc nay chảy từ thứ ở lại sang thứ đi theo. */
 import { ageHours, ageLabel, DAU_VET, dangNhac, doDauVet, GIO_NHAC as GIO_NHAC_BANG, mocCoGio, noiDauVet } from "./claim.mjs";
 import {
-  BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readHoSo, readIdeas, readKhoa,
-  readNo, THU_MUC_MIGRATE, VIEC
+  BAC, docChecklistTinhNang, khoangNgay, nguonLamMoi, noiTuoi, quetDauDuc, readBatBien, readCoChe,
+  readHoSo, readIdeas, readKhoa, readNo, THU_MUC_MIGRATE, VIEC
 } from "./overview-doc.mjs";
 
 const NL = String.fromCharCode(10);
@@ -337,6 +337,49 @@ details.gap[open]>summary{margin-bottom:12px;color:var(--chu)}
 .tabs2 button small{font-weight:400;color:var(--mo);font-size:11.4px}
 .tab2[hidden]{display:none}
 
+/* CHECKLIST TÍNH NĂNG của một lượt migrate. Bốn trạng thái, và MỘT PHẦN phải nhìn ra
+   NGAY là khác THIẾU — mục một phần trông như đang chạy nhưng hỏng ở chỗ không ai nhìn. */
+.ckt{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:1px;
+  background:var(--vien);border:1px solid var(--vien);border-radius:9px;overflow:hidden;margin:8px 0}
+.ckt .o{background:var(--mat);padding:9px 11px;gap:1px}
+.ckt .o b{font-family:var(--disp);font-size:21px;font-weight:800;line-height:1.05;
+  font-variant-numeric:tabular-nums;color:var(--chu)}
+.ckt .o.xong b{color:var(--xanh)} .ckt .o.mot-phan b{color:var(--vang)}
+.ckt .o.thieu b{color:var(--do)} .ckt .o.ngoai b{color:var(--chu2);opacity:.6}
+.ckt .o span{font-size:11.6px;color:var(--mo);line-height:1.3}
+.ckb{display:grid;grid-template-columns:76px 1fr auto;gap:9px;align-items:center;
+  padding:5px 0;border-top:1px solid var(--vien);font-size:13.4px}
+.ckb:first-of-type{border-top:0}
+.ckb .ma{font-family:var(--mono);font-size:12px;color:var(--mo)}
+.ckb .dm{font-family:var(--mono);font-size:12.4px;white-space:nowrap}
+.ckb .dm.het{color:var(--xanh)} .ckb .dm.thieu{color:var(--vang)}
+.ckm{display:grid;grid-template-columns:18px 62px 1fr;gap:8px;align-items:baseline;
+  padding:4px 0;border-top:1px solid var(--vien);font-size:13.2px}
+.ckm:first-of-type{border-top:0}
+.ckm .d{text-align:center;font-weight:700}
+.ckm.mot-phan .d{color:var(--vang)} .ckm.thieu .d{color:var(--do)} .ckm.xong .d{color:var(--xanh)}
+.ckm .ma{font-family:var(--mono);font-size:11.8px;color:var(--mo)}
+.ckm .tv{display:block;font-family:var(--mono);font-size:11.6px;color:var(--vang);margin-top:1px}
+
+/* Ô LÀM MỚI — hai file, hai câu trả lời cho cùng một cú F5. Chúng phải nằm cạnh nhau,
+   vì cái sai duy nhất ở đây là tưởng chúng giống nhau. */
+.lm{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:9px;margin:8px 0 0}
+.lm .h{border:1px solid var(--vien);border-radius:9px;padding:11px 13px;background:var(--nen)}
+.lm .h.co{border-color:var(--xanh)} .lm .h.khong{border-color:var(--vien2)}
+.lm .t{font-family:var(--mono);font-size:12.6px;color:var(--chu);word-break:break-all}
+.lm .f5{font-family:var(--mono);font-size:10px;letter-spacing:.08em;font-weight:600;
+  padding:2px 7px;border-radius:20px;margin-bottom:6px;display:inline-block}
+.lm .h.co .f5{background:var(--xanh-nen);color:var(--xanh)}
+.lm .h.khong .f5{background:var(--mat2);color:var(--chu2)}
+.lm .g{font-size:12.6px;color:var(--chu2);line-height:1.45;margin:6px 0 0}
+.cpd{display:flex;align-items:center;gap:6px;margin-top:5px}
+.cpd code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;font-size:12px;padding:4px 7px}
+button.cp{font:inherit;font-family:var(--mono);font-size:10px;letter-spacing:.07em;font-weight:600;
+  cursor:pointer;padding:4px 8px;border:1px solid var(--vien);border-radius:6px;
+  background:var(--mat);color:var(--chu2);white-space:nowrap}
+button.cp:hover{border-color:var(--nhan);color:var(--nhan)}
+button.cp[data-xong="1"]{border-color:var(--xanh);color:var(--xanh)}
+
 /* Bảng đối chiếu mọi lượt migrate — cái nhìn đầu tiên, trước khi mở từng hồ sơ. */
 .mgt{width:100%;border-collapse:collapse;font-size:13.6px}
 .mgt th,.mgt td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--vien)}
@@ -382,17 +425,20 @@ details.the summary{font-family:var(--disp);font-size:clamp(18px,2.2vw,22px);fon
   --bong:0 1px 2px rgba(0,0,0,.5), 0 10px 28px -18px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
+/* KHUNG RỘNG HƠN, LỀ MỎNG HƠN. Đo 07/09 trên màn 1440: khung 1080 bỏ không 360px chiều
+   ngang, trong khi tab Vận hành cao 16 màn hình. Chỗ trống ngang mà cuộn dọc mỏi tay là
+   lỗi bày trang: nới ngang là bớt dọc, không phải nhồi thêm chữ. */
 body{background:var(--nen);color:var(--chu);font-family:var(--sans);font-size:15px;
-  line-height:1.62;margin:0;padding:clamp(18px,3vw,40px) clamp(14px,3vw,32px) 80px}
-.wrap{max-width:1080px;margin:0 auto}
+  line-height:1.55;margin:0;padding:clamp(10px,1.4vw,16px) clamp(12px,2.4vw,26px) 56px}
+.wrap{max-width:1280px;margin:0 auto}
 h1,h2,h3,h4,h5{font-family:var(--disp);margin:0;letter-spacing:-.018em;text-wrap:balance;color:var(--chu)}
 h1{font-size:clamp(27px,4.4vw,42px);font-weight:800;line-height:1.05}
-h2{font-size:clamp(18px,2.2vw,22px);font-weight:700;margin-top:26px}
+h2{font-size:clamp(17px,2vw,20px);font-weight:700;margin-top:18px}
 h3{font-size:16px;font-weight:700;margin-top:20px}
 h4,h5{font-size:14px;font-weight:600;margin-top:16px;color:var(--chu2)}
-p{margin:9px 0;max-width:70ch}
-ul,ol{margin:9px 0;padding-left:22px}
-li{margin:3px 0;max-width:70ch}
+p{margin:7px 0;max-width:82ch}
+ul,ol{margin:7px 0;padding-left:21px}
+li{margin:2px 0;max-width:82ch}
 a{color:var(--nhan)}
 code{font-family:var(--mono);font-size:.87em;background:var(--mat2);padding:.1em .34em;border-radius:3px;color:var(--chu2)}
 .ref{font-family:var(--mono);font-size:.87em;color:var(--nhan)}
@@ -411,8 +457,22 @@ th{font-family:var(--mono);font-size:10.4px;letter-spacing:.09em;text-transform:
   color:var(--mo);background:var(--mat2);white-space:nowrap;font-weight:600}
 tr:last-child td{border-bottom:none}
 
-header{border-bottom:2px solid var(--chu);padding-bottom:18px;margin-bottom:6px;
-  display:flex;flex-direction:column;gap:10px}
+/* ĐẦU TRANG MỘT HÀNG. Đo 07/09: đầu trang 179px + lề thân 40px + thanh tab 51px = 270px
+   trước khi có chữ nào — 30% một màn 900px, và trên laptop có thanh trình duyệt thì đúng là
+   nửa màn. Tên repo và một câu là đủ; câu dài gập vào dấu ? bên cạnh. */
+header{border-bottom:1px solid var(--vien);padding-bottom:9px;margin-bottom:0;
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+header h1{font-size:clamp(19px,2.4vw,25px);line-height:1.15}
+header .sub{font-size:13.4px;color:var(--mo);max-width:62ch;margin:0}
+header .nhan-hang{margin-left:auto}
+details.vi-sao{background:none;border:0;box-shadow:none;margin:0;padding:0;flex:0 0 auto}
+details.vi-sao>summary{padding:0;font-family:var(--mono);font-size:11px;color:var(--mo);
+  border:1px solid var(--vien);border-radius:20px;width:19px;height:19px;
+  display:flex;align-items:center;justify-content:center;list-style:none}
+details.vi-sao>summary::marker,details.vi-sao>summary::-webkit-details-marker{display:none}
+details.vi-sao[open]{flex:1 1 100%}
+details.vi-sao[open]>summary{margin-bottom:5px}
+details.vi-sao p{font-size:13.4px;color:var(--chu2);margin:0}
 .nhan-hang{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mo)}
 .chip{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;
@@ -420,8 +480,8 @@ header{border-bottom:2px solid var(--chu);padding-bottom:18px;margin-bottom:6px;
 .chip.ok{background:var(--xanh-nen);color:var(--xanh)}
 .chip.canh{background:var(--vang-nen);color:var(--vang)}
 
-nav.tabs{display:flex;flex-wrap:wrap;gap:5px;margin:20px 0 4px;position:sticky;top:0;z-index:5;
-  background:var(--nen);padding:8px 0;border-bottom:1px solid var(--vien)}
+nav.tabs{display:flex;flex-wrap:wrap;gap:4px;margin:0;position:sticky;top:0;z-index:5;
+  background:var(--nen);padding:7px 0;border-bottom:1px solid var(--vien)}
 nav.tabs button{font-family:var(--sans);font-size:13.4px;font-weight:600;cursor:pointer;
   border:1px solid transparent;background:none;color:var(--mo);padding:7px 13px;border-radius:8px}
 nav.tabs button:hover{color:var(--chu);background:var(--mat2)}
@@ -429,9 +489,9 @@ nav.tabs button[aria-selected="true"]{background:var(--mat);color:var(--chu);
   border-color:var(--vien);box-shadow:var(--bong)}
 nav.tabs button:focus-visible{outline:2px solid var(--nhan);outline-offset:2px}
 
-section.tab{padding-top:14px}
+section.tab{padding-top:9px}
 .the{background:var(--mat);border:1px solid var(--vien);border-radius:11px;
-  padding:clamp(15px,2.2vw,22px);margin:14px 0;box-shadow:var(--bong)}
+  padding:clamp(12px,1.5vw,17px);margin:9px 0;box-shadow:var(--bong)}
 .the > h2:first-child, .the > h3:first-child{margin-top:0}
 .luoi{display:grid;grid-template-columns:repeat(auto-fit,minmax(146px,1fr));gap:1px;
   background:var(--vien);border:1px solid var(--vien);border-radius:9px;overflow:hidden;margin:14px 0}
@@ -449,11 +509,11 @@ section.tab{padding-top:14px}
 .muc-luc a{color:var(--chu2);text-decoration:none;border-bottom:1px solid var(--vien2)}
 .muc-luc a:hover{color:var(--nhan);border-color:var(--nhan)}
 
-details{background:var(--mat);border:1px solid var(--vien);border-radius:10px;margin:10px 0;
-  padding:0 16px;box-shadow:var(--bong)}
-details[open]{padding-bottom:12px}
-summary{cursor:pointer;padding:13px 0;font-weight:600;font-family:var(--disp);font-size:15px;
-  display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+details{background:var(--mat);border:1px solid var(--vien);border-radius:10px;margin:7px 0;
+  padding:0 14px;box-shadow:var(--bong)}
+details[open]{padding-bottom:10px}
+summary{cursor:pointer;padding:9px 0;font-weight:600;font-family:var(--disp);font-size:14.6px;
+  display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
 summary:hover{color:var(--nhan)}
 summary::marker{color:var(--mo)}
 summary .ngay{font-family:var(--mono);font-size:11.5px;color:var(--mo);font-weight:400}
@@ -482,6 +542,15 @@ const JS = `
     }
   } catch (e) {}
 
+  function lui(gia, xong){
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = gia; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta); xong();
+    } catch (e) {}
+  }
+
   var nut = [].slice.call(document.querySelectorAll('nav.tabs button'));
   var mucs = [].slice.call(document.querySelectorAll('section.tab'));
   function chon(id, luu){
@@ -505,6 +574,25 @@ const JS = `
   document.addEventListener('click', function(e){
     var b = e.target.closest && e.target.closest('.tabs2 button');
     if (b) { chon2(b.dataset.tab2); return; }
+
+    // COPY. Trang mo bang file:// van la secure context tren Chrome nen clipboard API chay,
+    // nhung KHONG dua ca tinh nang vao mot API co the vang: co duong lui bang textarea an.
+    // Nut phai NOI RA la da copy — bam mot nut khong phan hoi gi thi nguoi ta bam lai ba lan
+    // roi ket luan nut hong.
+    var cp = e.target.closest && e.target.closest('button.cp');
+    if (cp) {
+      var gia = cp.dataset.cp || '';
+      var xong = function(){
+        var cu = cp.textContent; cp.textContent = 'ĐÃ COPY'; cp.dataset.xong = '1';
+        setTimeout(function(){ cp.textContent = cu; cp.dataset.xong = ''; }, 1400);
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(gia).then(xong, function(){ lui(gia, xong); });
+        } else { lui(gia, xong); }
+      } catch (err) { lui(gia, xong); }
+      return;
+    }
 
     // Bảng đối chiếu nhảy thẳng vào tab con của một lượt.
     var g2 = e.target.closest && e.target.closest('[data-goto2]');
@@ -967,20 +1055,15 @@ export function khoiSucKhoeNo(so, noMo, noMuc) {
 }
 
 /* "Bảng này chạy thế nào, và nhiều AI cùng làm thì cái gì giữ cho không giẫm chân?" */
-export function khoiVanHanh(coChe, batBien, soKhoa) {
+export function khoiVanHanh(coChe, batBien, soKhoa, oLamMoi = "") {
   const cc = coChe.map((c) => '<li><strong>' + esc(c.ten) + '</strong> — '
     + esc(String(c.cau).replace(/\*/g, "")) + '</li>').join("");
   const bb = batBien.map((b) => '<li><strong>' + esc(b.so) + '</strong> ' + esc(b.cau) + '</li>').join("");
-  return '<div class="the"><h2>Làm mới bảng này</h2>'
-    + '<p>Bảng là <strong>ảnh chụp, không tự cập nhật</strong>. Dải đỏ ở đầu trang tự bật khi bạn '
-    + 'mở nó vào một ngày khác ngày sinh — nó tính lúc <em>xem</em>, không lúc sinh, nên không cần '
-    + 'sinh lại mới biết là cũ.</p>'
-    + '<pre class="code">npm run overview</pre>'
-    + '<p class="ghi">Bảng <strong>được commit vào repo</strong>, có chủ đích: nhờ vậy bất kỳ AI nào '
-    + 'cũng sinh lại rồi commit được, không phải nhờ riêng một AI đăng hộ. Cổng đóng phiên so bảng '
-    + 'đã commit với trạng thái repo mỗi phiên, nên bảng <strong>không thể âm thầm cũ</strong>. Nội '
-    + 'dung suy hoàn toàn từ lần commit gần nhất, không nhìn đồng hồ — nhìn đồng hồ thì sang ngày là '
-    + 'mọi phiên bị chặn đẩy dù không dữ liệu nào đổi.</p></div>'
+  /* O LAM MOI TRUYEN VAO, khong viet ban thu hai o day. Ban truoc co mot the "Lam moi bang
+   * nay" go tay ngay cho nay, va no chi ke ve ban da commit — nen nguoi doc no ket luan F5
+   * khong bao gio thay so moi, ke ca khi repo dang co bang SONG. Mot cau tra loi dung mot
+   * nua la cau tra loi sai. */
+  return oLamMoi
     + (coChe.length
       ? '<div class="the"><h2>' + coChe.length + ' cơ chế giữ cho không giẫm chân</h2>'
         + '<p>Hiện có <strong>' + soKhoa + ' vùng</strong>, nên tối đa <strong>' + soKhoa
@@ -1070,6 +1153,107 @@ export function viecKe(fm) {
   return null;
 }
 
+/* ---- O LAM MOI: F5 co doi so hay khong -------------------------------------
+ *
+ * Duc neu 07/09: *"can them 1 o nho de copy link cua file dung de refresh, chay host local...
+ * neu hien tai F5 la check status moi nhat duoc roi thi phai giai thich"*.
+ *
+ * Cau tra loi KHAC NHAU cho hai file, va day la cho de hieu sai nhat cua ca bang:
+ * ban da commit suy tu HEAD nen **F5 khong doi so**; ban SONG doc bang quyen tu dia nen
+ * **F5 co doi**. Noi gop "F5 di" la day sai mot trong hai.
+ *
+ * Khoi dat o tab AI dieu phoi vi do la tab tra loi *"dang co gi - lam gi tiep"* - nguoi hoi
+ * "F5 thay chua" dang dung dung o do. Tab Van hanh dung LAI cung khoi nay, khong viet ban
+ * thu hai: hai ban la hai ban se lech.
+ */
+export function khoiLamMoi(ng) {
+  const nut = (gia) => '<div class="cpd"><code>' + esc(gia) + '</code>'
+    + '<button class="cp" type="button" data-cp="' + esc(gia) + '">COPY</button></div>';
+  const ac = ng.anhChup;
+  const oAnh = '<div class="h khong"><span class="f5">F5 KHÔNG ĐỔI SỐ</span>'
+    + '<div class="t">' + esc(ac.file || "bảng đã commit") + '</div>'
+    + '<p class="g">Bản <strong>đã commit</strong>. Nội dung suy hoàn toàn từ lần commit gần nhất, '
+    + 'nên bấm F5 mười lần vẫn ra đúng con số cũ — muốn số mới thì phải sinh lại rồi commit. '
+    + 'Cố ý làm vậy: bộ sinh nhìn đồng hồ thì sang ngày là mọi phiên bị chặn đẩy dù không dữ '
+    + 'liệu nào đổi.</p>' + nut(ac.lenh) + '</div>';
+  if (!ng.song) {
+    return '<div class="the"><h2>Làm mới bảng — F5 có thấy số mới không?</h2>'
+      + '<div class="lm">' + oAnh + '</div>'
+      + '<p class="ghi">Repo này <strong>chưa có bảng SỐNG</strong> (không khai lệnh chạy nó), nên '
+      + 'câu trả lời chỉ có một: F5 không đổi số, phải sinh lại. Bảng sống là tính năng '
+      + '<code>F1.3</code> của bộ khung — muốn có thì nâng bộ khung, đừng chép tay.</p></div>';
+  }
+  const s2 = ng.song;
+  const oSong = '<div class="h co"><span class="f5">F5 LÀ THẤY</span>'
+    + '<div class="t">' + esc(s2.file) + (s2.url ? " &nbsp;·&nbsp; " + esc(s2.url) : "") + '</div>'
+    + '<p class="g">Bản <strong>SỐNG</strong>, nằm ngoài git. Nó đọc bảng quyền từ <strong>đĩa</strong> '
+    + 'nên đổi byte mỗi lượt có ai nhận hay trả khoá — F5 là thấy ngay, không cần nhờ AI sinh lại.</p>'
+    + s2.cua.map((c) => '<p class="g" style="margin-top:7px"><strong>' + esc(c.nhan) + '</strong></p>' + nut(c.gia)).join("")
+    + (s2.url ? nut(s2.url) : "")
+    + '</div>';
+  return '<div class="the"><h2>Làm mới bảng — F5 có thấy số mới không?</h2>'
+    + '<div class="lm">' + oSong + oAnh + '</div>'
+    + '<p class="ghi"><strong>Hai file, hai việc — đừng gộp.</strong> Cái sai duy nhất ở đây là tưởng '
+    + 'chúng giống nhau: một cái là ảnh chụp có commit, cổng đóng phiên kiểm được; một cái là số thời '
+    + 'gian thực, không commit.'
+    + (s2.cong
+      ? ' Cổng mặc định <code>' + s2.cong + '</code>, nhưng máy chủ <strong>nhảy cổng</strong> nếu cổng '
+        + 'đó đã bị một repo khác chiếm — lấy cổng thật ở dòng máy chủ in ra, đừng tin con số ở đây.'
+      : ' Cổng thì đọc ở dòng máy chủ in ra lúc chạy.')
+    + '</p></div>';
+}
+
+/* ---- Checklist tinh nang cua mot luot migrate ------------------------------
+ *
+ * Chieu lai khoi ma `features.mjs --migrate` sinh va nguoi dan vao ho so. Bang **khong khai
+ * lan thu hai** - ho so noi gi thi bang noi dung the, kem NGAY DO va BAN DANH MUC cua chinh
+ * luot do ay. Thieu hai con so do thi sau thang sau khong ai biet checklist nay con dung khong.
+ *
+ * MUC CHUA XONG HIEN TRUOC, muc da xong gap lai. Nguoi mo so hoi *"con thieu gi"*, khong hoi
+ * *"da co gi"* - va 24 dong xanh dung tren 10 dong vang la cach chon 10 dong vang.
+ */
+export function khoiChecklist(ck) {
+  if (!ck) {
+    return '<details class="the gap"><summary>Checklist tính năng — <strong>chưa đo</strong></summary>'
+      + '<p>Hồ sơ này không mang khối checklist. <strong>Chưa đo khác với thiếu tính năng</strong> — '
+      + 'ba hồ sơ đầu được ghi trước khi danh mục tính năng tồn tại, nên chỗ trống này nói về hồ sơ, '
+      + 'không nói về repo.</p>'
+      + '<p>Đo rồi dán vào hồ sơ:</p>'
+      + '<pre class="code">node scripts/features.mjs --migrate &lt;đường-dẫn-repo&gt;</pre>'
+      + '<p class="ghi">Hồ sơ migrate là vùng <strong>chỉ thêm</strong>: thêm khối mới, đừng sửa khối cũ.</p></details>';
+  }
+  const D = { xong: "✓", "mot-phan": "~", thieu: "✗", ngoai: "–" };
+  const NHAN = { xong: "đủ", "mot-phan": "một phần", thieu: "thiếu", ngoai: "chỉ repo phát hành" };
+  const o = ["xong", "mot-phan", "thieu", "ngoai"].map((t) => '<div class="o ' + t + '"><b>'
+    + ck.dem[t] + '</b><span>' + esc(NHAN[t]) + '</span></div>').join("");
+  const hangKhoi = ck.khoi.map((k) => '<div class="ckb"><span class="ma">' + esc(k.ma) + '</span>'
+    + '<span>' + esc(k.ten) + '</span>'
+    + '<span class="dm ' + (k.tong === 0 ? "" : k.xong === k.tong ? "het" : "thieu") + '">'
+    + (k.tong === 0 ? "ngoài phạm vi" : k.xong + "/" + k.tong) + '</span></div>').join("");
+  const dongMuc = (m) => '<div class="ckm ' + m.trang + '"><span class="d">' + D[m.trang] + '</span>'
+    + '<span class="ma">' + esc(m.ma) + '</span><span>' + esc(m.ten)
+    + (m.tuBan ? ' <span class="ma">từ bản ' + esc(m.tuBan) + '</span>' : "")
+    + (m.thieu ? '<span class="tv">thiếu: ' + esc(m.thieu) + '</span>' : "") + '</span></div>';
+  const tatCa = ck.khoi.flatMap((k) => k.muc);
+  const chuaXong = tatCa.filter((m) => m.trang === "mot-phan" || m.trang === "thieu");
+  return '<div class="the"><h2>Checklist tính năng — ' + ck.xong + '/' + ck.tong + ' trong phạm vi</h2>'
+    + '<p class="ghi">Danh mục bản <code>' + esc(ck.ban || "chưa khai") + '</code> · đo ngày <strong>'
+    + esc(ck.ngay || "chưa khai") + '</strong>. Số này <strong>đo, không tự khai</strong> — nguồn là '
+    + 'khối do <code>features.mjs --migrate</code> sinh, dán vào hồ sơ lượt ấy.</p>'
+    + '<div class="ckt">' + o + '</div>'
+    + (chuaXong.length
+      ? '<h3>Còn ' + chuaXong.length + ' mục chưa xong — xử <code>~</code> trước <code>✗</code></h3>'
+        + chuaXong.map(dongMuc).join("")
+        + '<p class="ghi"><strong><code>~</code> MỘT PHẦN nguy hiểm hơn <code>✗</code> THIẾU.</strong> '
+        + 'Mục một phần trông như đang chạy nhưng hỏng ở chỗ không ai nhìn — ca thật đo được: có '
+        + '<code>session-check.mjs</code> mà thiếu <code>npm run gate</code>, nên cổng có mặt mà không '
+        + 'ai gọi được bằng tên chuẩn.</p>'
+      : '<h3>Không mục nào chưa xong</h3><p>Mọi tính năng trong phạm vi repo này đều đủ ở lần đo trên.</p>')
+    + '<details class="gap" style="background:none;border:0;box-shadow:none;padding:0;margin:9px 0 0">'
+    + '<summary>Cả ' + ck.khoi.length + ' khối tính năng, và ' + tatCa.length + ' mục</summary>'
+    + hangKhoi + '<h4>Từng mục</h4>' + tatCa.map(dongMuc).join("") + '</details></div>';
+}
+
 export function khoiMigrate(hoSo) {
   if (!hoSo.length) {
     return '<div class="the"><h2>Sổ migrate</h2><p>Chưa lượt migrate nào được ghi hồ sơ. '
@@ -1079,6 +1263,10 @@ export function khoiMigrate(hoSo) {
   }
   const den = { "xanh": "xanh", "đỏ": "do", "chưa chạy": "vang" };
   const v = (h, k) => (h.fm[k] === undefined || h.fm[k] === "" ? null : String(h.fm[k]));
+  /* CHECKLIST doc tu THAN ho so, khong tu frontmatter: khoi do `features.mjs --migrate` sinh
+   * ra la markdown, va nguoi dan nguyen khoi vao. Doc lai chinh khoi ay la bang khong the noi
+   * khac ho so — bat ai go tay mot con so vao frontmatter thi som muon hai cho se lech. */
+  const ckOf = new Map(hoSo.map((h) => [h.file, docChecklistTinhNang(h.body)]));
   const id = (h) => "mg-" + slug(v(h, "repo") || h.file);
   const O = { xong: "✓", chua: "✗", dang: "◐", trong: "·" };
 
@@ -1090,9 +1278,15 @@ export function khoiMigrate(hoSo) {
         + O[x.den] + (x.nguon === "suy" ? '<sup>?</sup>' : "") + '</td>';
     }).join("");
     const cong = v(h, "cong_dong_phien") || "chưa khai";
+    const ck = ckOf.get(h.file);
+    const oTN = ck
+      ? '<td class="so mc mc-' + (ck.xong === ck.tong ? "xong" : "dang") + '" title="'
+        + esc('danh mục bản ' + (ck.ban || "?") + " · đo ngày " + (ck.ngay || "?")) + '">'
+        + ck.xong + '/' + ck.tong + '</td>'
+      : '<td class="so mc mc-trong" title="hồ sơ chưa mang khối checklist — chưa ĐO, không phải THIẾU">chưa đo</td>';
     return '<tr><td><a href="#' + esc(id(h)) + '" data-goto2="' + esc(id(h)) + '">'
       + esc(v(h, "repo") || h.file) + '</a><small>' + esc(v(h, "ngay") || "—") + '</small></td>'
-      + o
+      + o + oTN
       + '<td class="so"><span class="cham ' + (den[cong.trim()] || (/xanh/i.test(cong) ? "xanh" : "vang")) + '"></span>' + esc(cong) + '</td>'
       + '<td class="so">' + esc(v(h, "ban_khung") || "—") + '</td>'
       + '<td>' + esc(v(h, "trang_thai") || "chưa khai") + '</td></tr>';
@@ -1140,6 +1334,7 @@ export function khoiMigrate(hoSo) {
     + '<div class="hs-do">chi phí trước: ' + esc(v(h, "chi_phi_truoc") || "chưa khai")
     + ' &nbsp;·&nbsp; sau: ' + esc(v(h, "chi_phi_sau") || "chưa khai") + '</div>'
     + '</div>'
+    + khoiChecklist(ckOf.get(h.file))
     /* CHỮ GẬP LẠI, và mặc định ĐÓNG. Toàn văn hồ sơ là thứ đáng giữ — chỗ vấp thật nằm trong đó —
      * nhưng nó là thứ đọc KHI CẦN, không phải thứ đập vào mắt mỗi lần mở sổ. */
     + '<details class="the gap"><summary>Toàn văn hồ sơ — chỗ vấp, cách chữa, số đo từng bước</summary>'
@@ -1148,6 +1343,7 @@ export function khoiMigrate(hoSo) {
   return '<div class="the"><h2>Sổ migrate — ' + hoSo.length + ' lượt · ba mốc mỗi lượt</h2>'
     + '<div class="tw"><table class="mgt"><thead><tr><th>Repo</th>'
     + MOC_MIGRATE.map((m) => '<th class="so" title="' + esc(m.y) + '">' + esc(m.nhan) + '</th>').join("")
+    + '<th class="so" title="tính năng đủ / tổng số trong phạm vi repo đó, theo lần ĐO ghi trong hồ sơ">Tính năng</th>'
     + '<th class="so">Cổng</th><th class="so">Bản khung</th><th>Kết quả</th></tr></thead><tbody>'
     + hangMoc + '</tbody></table></div>'
     + '<p class="ghi"><strong>✓ xong · ◐ đang · ✗ chưa · · chưa khai.</strong> Dấu <sup>?</sup> nghĩa là '
@@ -1155,6 +1351,10 @@ export function khoiMigrate(hoSo) {
     + '(từ <code>muc_sau</code>). Ô trống <strong>không</strong> có nghĩa là chưa làm: ba hồ sơ đang có '
     + 'được ghi trước khi bảng này tồn tại nên chúng không khai hai mốc sau. Hồ sơ từ nay khai thêm '
     + '<code>viec_audit</code> · <code>viec_assistant</code> · <code>viec_ke</code> thì ô tự đầy.</p>'
+    + '<p class="ghi">Cột <strong>Tính năng</strong> đọc từ khối checklist do '
+    + '<code>features.mjs --migrate</code> sinh, dán trong hồ sơ lượt ấy — kèm <strong>ngày đo</strong> '
+    + 'và <strong>bản danh mục</strong> (đưa chuột lên ô để xem). <em>chưa đo</em> nói về HỒ SƠ, không '
+    + 'nói về repo: ba hồ sơ đầu được ghi trước khi danh mục tính năng tồn tại.</p>'
     + '<p class="ghi">Hồ sơ <strong>chỉ thêm, không sửa cái cũ</strong>. Cột <em>lỗi tìm ra</em> ở tab con '
     + 'đếm lỗi <strong>của chính bộ khung</strong> mà lượt ấy lôi ra, không phải lỗi của repo đích: '
     + 'đó là chỗ bộ khung lớn lên.</p></div>'
@@ -1184,6 +1384,9 @@ export function trang(dl) {
     briefs = [], dichDen = [], soPhepKiem = null,
     ideas = [], canDuc = [], khoa = [], vetKhoa = new Map(), noMo = [], noMuc = [], coChe = [], batBien = [], vung = [], fileGoc = [], hoSo = [], laRepoNha = false } = dl;
   const tenNguoi = dl.tenNguoiChot || "người chốt";
+  /* MOT khoi, HAI cho dat (tab AI dieu phoi + tab Van hanh). Tinh mot lan roi dung lai:
+   * hai ban se lech, va luc do khong ai biet ban nao dung. */
+  const oLamMoi = khoiLamMoi(nguonLamMoi({ tenBang: TRANG_FILE, lenh, maMayChu: dl.maMayChu }));
 
   const tabs = [
     // Thứ tự = tần suất dùng, không phải thứ tự viết ra. "Cách vận hành" và "Sổ tay" là hai
@@ -1253,15 +1456,18 @@ export function trang(dl) {
 <div class="wrap">
   <div class="cu" data-sinh="${esc(ngay)}"></div>
   <header>
+    <h1>${esc(ten)}</h1>
+    <p class="sub">${esc(dl.khauHieu || "Repo này chưa khai một câu tự giới thiệu (repo.tagline).")}</p>
+    <details class="vi-sao"><summary title="Trang này là gì">?</summary>
+      <p>Bảng trạng thái <strong>máy sinh</strong>, suy hoàn toàn từ lần commit gần nhất — không
+      gõ tay một con số nào. Có cửa kiểm chặn việc dở dang, có luật cho AI đọc, có lịch bảo trì.
+      Ai đang giữ vùng nào thì xem tab <strong>AI điều phối</strong>; F5 có làm mới số hay không
+      thì cũng ở tab đó.</p>
+    </details>
     <div class="nhan-hang">
       <span class="chip">v${esc(ban)}</span>
-      <span>sinh ngày ${esc(ngay)}</span>
+      <span>sinh ${esc(ngay)}</span>
     </div>
-    <h1>${esc(ten)}</h1>
-    <p style="color:var(--chu2);font-size:16.5px">
-      Bộ khung để một repo tự trông coi lấy mình: có cửa kiểm chặn việc dở dang, có luật cho AI
-      đọc, và có lịch bảo trì. Sau khi dựng xong, <strong>AI là người ở lại trông nhà</strong>.
-    </p>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -1300,6 +1506,7 @@ export function trang(dl) {
 
   <section class="tab" id="tab-ai-dieu-phoi" hidden>
     ${khoiDangLamGi(khoa, ngay, vetKhoa)}
+    ${oLamMoi}
     ${khoiCanDuc(canDuc, tenNguoi)}
     ${khoiKhoa(khoa)}
     ${laRepoNha ? `<div class="the">
@@ -1342,8 +1549,8 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
   </section>` : ""}
 
   <section class="tab" id="tab-van-hanh" hidden>
-    ${khoiVanHanh(coChe, batBien, khoa.length)}
-    ${huongDan ? `<div class="the" id="huong-dan">${md(huongDan)}</div>` : ""}
+    ${khoiVanHanh(coChe, batBien, khoa.length, oLamMoi)}
+    ${huongDan ? `<details class="the gap" id="huong-dan"><summary>Hướng dẫn cho người mới vào — hai phần: cho người, và cho phiên AI</summary>${md(huongDan)}</details>` : ""}
     ${mucLuc(workflows.map((w) => ({ id: `wf-${slug(w.file)}`, ten: w.fm.ten || w.tieuDe })))}
     ${workflows.map((w) => {
       const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
@@ -1361,11 +1568,11 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
         <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
       </div>`;
     }).join("")}
-    ${dl.soTay ? `<div class="the">${md(dl.soTay)}</div>` : ""}
-    ${protocols.length ? `<div class="the"><h2>Quy trình đầy đủ</h2>
+    ${dl.soTay ? `<details class="the gap"><summary>Sổ tay AI Agent — danh sách kiểm cho việc lặp lại</summary>${md(dl.soTay)}</details>` : ""}
+    ${protocols.length ? `<div class="the"><h2>Quy trình đầy đủ — ${protocols.length} bản</h2>
       ${protocols.map((p2) => `<details><summary>${esc(p2.tieuDe)}</summary>${md(p2.than.split(NL).filter((l) => !l.startsWith("# ")).join(NL))}</details>`).join("")}
     </div>` : ""}
-    ${dl.baoTri ? `<div class="the">${md(dl.baoTri)}</div>` : ""}
+    ${dl.baoTri ? `<details class="the gap"><summary>Bảo trì định kỳ — ba nhịp giữ repo đúng, một nhịp giữ repo rẻ</summary>${md(dl.baoTri)}</details>` : ""}
   </section>
 
   <section class="tab" id="tab-suc-khoe" hidden>
@@ -1382,19 +1589,22 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
       <p>Sửa nhầm tầng là kiểu hỏng im lặng: sửa tay một trang máy sinh thì mất trắng ở lần sinh
       sau, và không ai hiểu vì sao chữ mình vừa viết biến mất.</p>
     </div>
-    <div class="the">
-      <h2>Lệnh chạy được</h2>
+    <details class="the gap">
+      <summary>Lệnh chạy được — ${lenh.length} lệnh</summary>
       <p>Dành cho ai gõ lệnh. Người không gõ lệnh thì xem tab <strong>Mô hình</strong> — cùng
       một thứ, kể bằng tiếng người.</p>
       <div class="tw"><table><thead><tr><th>Lệnh</th><th>Chạy gì</th></tr></thead><tbody>
       ${lenh.map(([k, v]) => `<tr><td><code>npm run ${esc(k)}</code></td><td><code>${esc(v)}</code></td></tr>`).join("")}
       </tbody></table></div>
-    </div>
-    <div class="the"><h2>Khi bạn sắp… thì mở file nào</h2>
+    </details>
+    <details class="the gap" id="ban-do-day">
+      <summary>Bản đồ file đầy đủ — ${banDo.length} lối, có liên kết bấm được</summary>
+      <p>Khối trên là bản <strong>liếc</strong>: một dòng một lối, câu cắt ngắn. Khối này là
+      bản <strong>đọc</strong>: nguyên văn, và mỗi file là một liên kết mở được.</p>
       <div class="tw"><table><thead><tr><th>Khi bạn sắp…</th><th>Mở cái gì</th></tr></thead><tbody>
       ${banDo.map((r) => `<tr><td>${md(r[0]).replace(/^<p>|<\/p>$/g, "")}</td><td>${md(r.slice(1).join(" · ")).replace(/^<p>|<\/p>$/g, "")}</td></tr>`).join("")}
       </tbody></table></div>
-    </div>
+    </details>
   </section>
 
   ${legend ? `<section class="tab" id="tab-tra-cuu" hidden><details class="the" open><summary>Bảng tra cứu thuật ngữ</summary><div>${md(legend)}</div></section>` : ""}
@@ -1455,6 +1665,7 @@ export async function gomDuLieu() {
   // chính repo đó đang chết. Trang là thứ Đức nhìn; nó không được đẹp hơn sự thật.
   let tenNguoi = null;
   let tenNguoiChot = null;
+  let khauHieu = null;
   const cauHinhRaw = doc(".repo-structure.json");
   if (cauHinhRaw !== null) {
     let j;
@@ -1464,6 +1675,7 @@ export async function gomDuLieu() {
       throw new Error(`.repo-structure.json hỏng cú pháp (${String(e.message).split(NL)[0]}) — KHÔNG sinh trang. Một trang dựng từ cấu hình hỏng sẽ trông bình thường trong khi repo đang hỏng.`);
     }
     tenNguoi = j?.repo?.name || null;
+    khauHieu = typeof j?.repo?.tagline === "string" && j.repo.tagline.trim() ? j.repo.tagline.trim() : null;
     /* TÊN NGƯỜI CHỐT lấy từ cấu hình, không đóng cứng "Đức" vào bộ sinh: bộ khung này chạy ở
      * repo của người khác, và một bảng gọi sai tên chủ dự án là bảng nói về một repo khác. */
     tenNguoiChot = j?.repo?.owner || null;
@@ -1677,6 +1889,7 @@ export async function gomDuLieu() {
   return {
     ten: tenNguoi || pkg.name || "Repo",
     tenNguoiChot,
+    khauHieu,
     ban: pkg.version || "0.0.0",
     // NGÀY CỦA HEAD, KHÔNG PHẢI NGÀY TRÊN ĐỒNG HỒ. Trước khi trang được commit, đây là
     // `new Date()` — và cái đó vô hại đúng tới lúc trang vào repo. Từ lúc vào, đồng hồ sang
@@ -1712,6 +1925,7 @@ export async function gomDuLieu() {
     // "chưa dò gì cả". Trước 06/09 bảng chỉ in con số, nên nó không phân biệt được hai ca đó —
     // và ca thứ hai là ca nguy hiểm, vì nó hiện ra màu xanh.
     vetKhoa,
+    maMayChu: doc("bang-song/may-chu.mjs"),
     so: [
       { so: taiLieuQuaHan.length, nhan: "tài liệu quá hạn", mau: `đã tính tuổi ${soTaiLieu} tài liệu theo hạn rà mỗi file tự khai` },
       { so: noCauTruc, nhan: "nợ cấu trúc (đỏ + vàng)", mau: noCauTruc === null ? "KHÔNG đọc được cổng cấu trúc — chưa dò được" : `đã chạy trọn ${soPhepCauTruc} phép kiểm cấu trúc` },

@@ -6,6 +6,17 @@
  * giống nhau.
  *
  * Nên mỗi vế dưới đây dựng đúng một ca hỏng thật rồi đòi bộ đọc bắt được nó.
+ *
+ * BẢY ĐỘT BIẾN ĐÃ CHẠY THẬT cho hai vế cuối (07/09) — **cả bảy đều bị bắt**, không cái nào
+ * sống sót lượt đầu. Ghi lại để lần sau ai nới hai vế đó thì biết chúng đang canh gì:
+ *
+ *  1. gộp `[~]` MỘT PHẦN vào `[x]` XONG            → vế 11 đỏ
+ *  2. không có khối thì trả `0/0` thay vì `null`   → vế 11 đỏ
+ *  3. lấy khối ĐẦU thay vì khối CUỐI               → vế 11 đỏ
+ *  4. đọc không ra cổng thì đóng cứng `4747`       → vế 12 đỏ
+ *  5. luôn vẽ cửa bảng sống, kể cả repo không có   → vế 12 đỏ
+ *  6. chỉ in vế "F5 LÀ THẤY", bỏ vế ảnh chụp       → vế 12 đỏ
+ *  7. bỏ mất NGÀY ĐO khỏi khối checklist           → vế 11 đỏ
  */
 
 import assert from "node:assert/strict";
@@ -14,9 +25,10 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  BAC, khoangNgay, noiTuoi, quetDauDuc, readBatBien, readCoChe, readIdeas, readKhoa, readNo
+  BAC, docChecklistTinhNang, khoangNgay, nguonLamMoi, noiTuoi, quetDauDuc, readBatBien,
+  readCoChe, readIdeas, readKhoa, readNo
 } from "../scripts/overview-doc.mjs";
-import { NHAN_KHOA, soSanhTrang, tenTrang } from "../scripts/build-overview.mjs";
+import { khoiChecklist, khoiLamMoi, NHAN_KHOA, soSanhTrang, tenTrang } from "../scripts/build-overview.mjs";
 
 let passed = 0;
 let boQua = 0;
@@ -242,6 +254,92 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   assert.match(html, /data-goto2\]/, "trang thiếu đoạn JS bắt liên kết nhảy tab con");
   ok(`liên kết nhảy tab: ${goto.length} liên kết + ${tab2Co.size} tab con đều trỏ tới thứ có thật`);
   }
+}
+
+/* ---- 11. Checklist tinh nang: CHUA DO khac THIEU ------------------------- */
+{
+  const khoi = [
+    "## Checklist tính năng đã migrate — danh mục bản 1.3.31 · đo ngày 2026-09-07",
+    "",
+    "**F1 · Bảng trạng thái** — 2/3",
+    "",
+    "- [x] `F1.1` Bảng chính HTML *(từ bản 1.3.18)*",
+    "- [~] `F1.2` Ba artifact máy đọc *(từ bản 1.0.0)* — thiếu: `npm run dashboard`",
+    "- [x] `F1.4` Tab Migrate *(từ bản 1.3.20)*",
+    "",
+    "**F7 · Phát hành** — 0/0",
+    "",
+    "- [-] `F7.1` Bản trích tự sinh *(từ bản 1.0.0)*",
+    "",
+    "**Tổng: 2 xong · 1 một phần · 0 thiếu.**"
+  ].join(NL);
+
+  const r = docChecklistTinhNang(khoi);
+  assert.equal(r.ban, "1.3.31");
+  assert.equal(r.ngay, "2026-09-07");
+  assert.equal(r.khoi.length, 2);
+  assert.equal(r.xong + "/" + r.tong, "2/3");
+  assert.deepEqual(r.dem, { xong: 2, "mot-phan": 1, thieu: 0, ngoai: 1 });
+
+  // MOT PHAN KHAC THIEU, va khac DU. Ba trang thai phai la ba, khong duoc lam tron ve hai:
+  // mot muc `[~]` bi doc thanh `[x]` la bang bao xong mot thu dang hong o cho khong ai nhin.
+  const mp = r.khoi[0].muc.find((m) => m.ma === "F1.2");
+  assert.equal(mp.trang, "mot-phan");
+  assert.equal(mp.thieu, "npm run dashboard");
+  assert.equal(mp.tuBan, "1.0.0");
+  assert.ok(!/từ bản/.test(mp.ten) && !/thiếu/.test(mp.ten), "tên mục còn dính phần phụ");
+
+  // KHONG CO KHOI => null, va bang phai noi CHUA DO. `null` bi lam tron thanh 0/0 la bang
+  // bao mot repo khong co tinh nang nao — trong khi that ra ho so chua tung do.
+  assert.equal(docChecklistTinhNang("## Trạng thái" + NL + "Xong hết."), null);
+  const hChua = khoiChecklist(null);
+  assert.match(hChua, /chưa đo/, "khối rỗng phải nói CHƯA ĐO");
+  assert.doesNotMatch(hChua, /0\/0|thiếu tính năng nào<\/h/, "khối rỗng không được hoá con số");
+
+  // KHOI CUOI thang, khong phai khoi dau: ho so migrate la vung CHI THEM.
+  const hai = khoi + NL + NL + khoi
+    .replace("bản 1.3.31", "bản 1.4.0").replace("2026-09-07", "2026-10-01");
+  assert.equal(docChecklistTinhNang(hai).ban, "1.4.0", "phải lấy lần đo MỚI NHẤT");
+  assert.equal(docChecklistTinhNang(hai).ngay, "2026-10-01");
+
+  // Bang phai IN RA ngay do va ban danh muc — Duc doi dung hai con so nay 07/09.
+  const h = khoiChecklist(r);
+  assert.match(h, /1\.3\.31/);
+  assert.match(h, /2026-09-07/);
+  assert.match(h, /F1\.2/, "mục một phần phải hiện ra, không bị gập");
+  ok("checklist tính năng: ba trạng thái tách nhau · chưa đo khác thiếu · lấy khối cuối · in ngày+bản");
+}
+
+/* ---- 12. O lam moi: F5 CO va F5 KHONG khong duoc noi gop ----------------- */
+{
+  const lenhDay = [["overview", "node scripts/build-overview.mjs"], ["bang-song:may-chu", "node bang-song/may-chu.mjs"]];
+  const co = nguonLamMoi({ tenBang: "DASHBOARD-X.html", lenh: lenhDay, maMayChu: "export const CONG_MAC_DINH = 4747;" });
+  assert.equal(co.anhChup.f5, false, "bản đã commit thì F5 KHÔNG đổi số");
+  assert.equal(co.song.f5, true, "bản sống thì F5 LÀ THẤY");
+  assert.equal(co.song.cong, 4747);
+  assert.equal(co.song.url, "http://127.0.0.1:4747/");
+
+  // Repo KHONG co bang song thi khong duoc ve mot cua khong ton tai: bang day nguoi ta go
+  // mot lenh chay khong duoc la bang tu ha do tin cay cua chinh no.
+  const khong = nguonLamMoi({ tenBang: "B.html", lenh: [["overview", "x"]], maMayChu: null });
+  assert.equal(khong.song, null);
+  const hK = khoiLamMoi(khong);
+  assert.match(hK, /chưa có bảng SỐNG/);
+  assert.doesNotMatch(hK, /bang-song\\\\|127\.0\.0\.1/, "repo không có bảng sống không được in cửa của nó");
+
+  // CONG DOC TU MA NGUON, khong dong cung. Cong doc khong ra thi noi thang la doc luc chay —
+  // dong cung mot con so la dan nguoi xem toi bang CUA REPO KHAC khi may chu nhay cong.
+  const mu = nguonLamMoi({ tenBang: "B.html", lenh: lenhDay, maMayChu: "// khong khai cong o day" });
+  assert.equal(mu.song.cong, null);
+  assert.equal(mu.song.url, null);
+  assert.match(khoiLamMoi(mu), /in ra lúc chạy/);
+
+  // Ca hai cau tra loi phai co mat CUNG MOT CHO. Chi in mot ve la day sai mot nua.
+  const hCo = khoiLamMoi(co);
+  assert.match(hCo, /F5 LÀ THẤY/);
+  assert.match(hCo, /F5 KHÔNG ĐỔI SỐ/);
+  assert.ok((hCo.match(/data-cp="/g) || []).length >= 4, "phải có nút COPY cho từng thứ copy được");
+  ok("ô làm mới: hai câu trả lời cùng một chỗ · cổng đọc từ mã · repo không có bảng sống thì im");
 }
 
 console.log(`overview-doc-smoke: ${passed} vế xanh` + (boQua ? ` · ${boQua} vế BỎ QUA (kể tên ở trên)` : ""));

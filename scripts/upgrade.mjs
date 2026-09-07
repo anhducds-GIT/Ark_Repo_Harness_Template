@@ -167,6 +167,58 @@ export function soGhimMoi(chuan, cu, giuLai = {}) {
   };
 }
 
+/* ---- TANG THU BA: TEN LENH -------------------------------------------------
+ *
+ * VI SAO CO TANG NAY. Do 07/09 tai `ALL_SKILL_MANAGEMENT`: **ba muc `[~]` MOT PHAN** — co
+ * `scripts/session-check.mjs`, co `scripts/safe-push.mjs`, co `scripts/build-dashboard.mjs`,
+ * nhung KHONG co `npm run gate`, `npm run push`, `npm run dashboard`. Lenh nay chep file va
+ * **chua bao gio cham `package.json` cua repo dich**, nen ba luot migrate deu dua CONG toi ma
+ * khong dua TEN GOI toi. Cong co mat ma khong ai goi duoc bang ten chuan thi tren thuc te no
+ * khong ton tai — va do la ca nguy hiem hon thieu han, vi bang do dem ra "co file".
+ *
+ * LUAT O DAY GIONG HET TANG TAI LIEU, co y: **THIEU thi mang sang · KHAC thi CHI KE TEN.**
+ * Mot khoa lenh da co gia tri khac la repo dich da tu quyet — de `test` chay bo phep kiem
+ * rieng cua no chang han. Ghi de la xoa quyet dinh cua nguoi ta, va hong IM LANG: `npm test`
+ * van xanh, chi la no khong con chay dung nhung thu no tung chay.
+ */
+export function soSanhLenh(rawDich, rawChuan) {
+  const doc = (raw) => {
+    if (raw === null || raw === undefined) return null;
+    /* MOT KHOI, KHONG PHAI MOT MANG. `JSON.parse("[]")` cho ra thu co `typeof === "object"`,
+     * nen phep kiem "la object" cho mot mang di lot — va luc do `j.scripts` la `undefined`,
+     * roi ham tra `{}`, tuc noi "khong thieu lenh nao" ve mot file KHONG phai package.json.
+     * Phep kiem cua chinh ve nay bat duoc, 07/09. */
+    const laKhoi = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
+    try {
+      const j = JSON.parse(String(raw));
+      if (!laKhoi(j)) return null;
+      if (j.scripts === undefined) return {};
+      return laKhoi(j.scripts) ? j.scripts : null;
+    } catch { return null; }
+  };
+  const chuan = doc(rawChuan);
+  const dich = doc(rawDich);
+  /* DOC KHONG RA THI KHONG BIET, khong phai "khong thieu gi". `null` di het duong len tan cho
+   * in ra, va `--apply` khong ghi gi ca: sua mot `package.json` ma minh khong parse noi la
+   * cach nhanh nhat de lam hong repo cua nguoi khac. */
+  if (chuan === null || dich === null) return null;
+  const thieu = [];
+  const khac = [];
+  for (const [k, v] of Object.entries(chuan)) {
+    if (!(k in dich)) thieu.push([k, v]);
+    else if (String(dich[k]) !== String(v)) khac.push([k, String(dich[k]), String(v)]);
+  }
+  return { thieu, khac };
+}
+
+/** Ghep lenh THIEU vao `package.json` cua repo dich, GIU NGUYEN moi thu khac. */
+export function ghepLenh(rawDich, thieu) {
+  const j = JSON.parse(String(rawDich));
+  j.scripts = j.scripts && typeof j.scripts === "object" ? j.scripts : {};
+  for (const [k, v] of thieu) if (!(k in j.scripts)) j.scripts[k] = v;
+  return JSON.stringify(j, null, 2) + NL;
+}
+
 /* ---- chạy ------------------------------------------------------------------ */
 
 const THIS = fileURLToPath(import.meta.url);
@@ -272,6 +324,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     console.log("    Tăng phiên bản ở repo nhà trước, rồi nâng cấp — đừng để một số trỏ tới hai nội dung.");
   }
   console.log("");
+  /* TEN LENH — tang thu ba, doc cung mot luc voi hai tang kia. */
+  const docTep = (rel) => { try { return fs.readFileSync(path.join(repo, ...rel.split("/")), "utf8"); } catch { return null; } };
+  const lenhSo = soSanhLenh(docTep("package.json"), chuan.get("package.json"));
+
   const tl = soSanhTaiLieu(repo, chuan);
   const tlThieu = tl.filter((d) => d.trangThai === "THIẾU");
   const tlKhac = tl.filter((d) => d.trangThai === "KHÁC");
@@ -294,6 +350,28 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   const tuyChon = fileTuyChon(chuan).filter((rel) => {
     try { fs.readFileSync(path.join(repo, ...rel.split("/"))); return false; } catch { return true; }
   });
+
+  /* TEN LENH in RIENG mot khoi. Tron vao bang tren la nguoi doc tuong day cung la file. */
+  if (lenhSo === null) {
+    console.log("");
+    console.log("  TÊN LỆNH: KHÔNG ĐỌC ĐƯỢC `package.json` (thiếu, hoặc hỏng cú pháp).");
+    console.log("           → `--apply` sẽ KHÔNG chạm tới nó. Sửa ở repo đích rồi chạy lại.");
+  } else if (lenhSo.thieu.length || lenhSo.khac.length) {
+    console.log("");
+    console.log("  TÊN LỆNH (`package.json` → `scripts`):");
+    if (lenhSo.thieu.length) {
+      console.log(`    THIẾU  ${String(lenhSo.thieu.length).padStart(2)} lệnh: ${lenhSo.thieu.map((x) => "npm run " + x[0]).join(", ")}`);
+      console.log("           → SẼ THÊM. File có mà tên gọi không có thì cổng có mặt mà không ai");
+      console.log("             gọi được bằng tên chuẩn — đo thật 07/09: ba lượt migrate đưa công cụ");
+      console.log("             tới mà không đưa tên gọi tới, và bảng đếm ra `[~] MỘT PHẦN`.");
+    }
+    if (lenhSo.khac.length) {
+      console.log(`    KHÁC   ${String(lenhSo.khac.length).padStart(2)} lệnh: ${lenhSo.khac.map((x) => x[0]).join(", ")}`);
+      console.log("           → CHỈ kể tên, KHÔNG bao giờ ghi đè — như tầng tài liệu. Repo đích đã tự");
+      console.log("             quyết giá trị đó (`test` chạy bộ phép kiểm riêng chẳng hạn); ghi đè là");
+      console.log("             xoá quyết định của người ta, và hỏng IM LẶNG vì `npm test` vẫn xanh.");
+    }
+  }
 
   if (tlThieu.length || tlKhac.length || tuyChon.length) {
     console.log("");
@@ -329,8 +407,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     if (lechNoiDung) cau = "`--apply` sẽ TỪ CHỐI: số phiên bản ở repo nhà không trỏ đúng nội dung. Tăng phiên bản ở nhà trước.";
     else if (dem("SỬA TAY").length) cau = "`--apply` sẽ TỪ CHỐI vì có file bị sửa tay. Đọc `git diff` ở repo đích, rồi quyết — cố ý bỏ thì thêm `--force`.";
     else if (dem("CHƯA GHIM").length) cau = "`--apply` sẽ TỪ CHỐI: file đã khác mà repo chưa có sổ ghim, không đủ căn cứ. Đọc `git diff` ở đích, chắc chắn thì thêm `--force`.";
-    else if (canLam || tlThieu.length) cau = `Chạy lại với --apply để ghi ${canLam} file máy`
-      + (tlThieu.length ? ` và mang thêm ${tlThieu.length} file tài liệu repo đích chưa có.` : ".");
+    else if (canLam || tlThieu.length || lenhSo?.thieu.length) cau = `Chạy lại với --apply để ghi ${canLam} file máy`
+      + (tlThieu.length ? `, mang thêm ${tlThieu.length} file tài liệu repo đích chưa có` : "")
+      + (lenhSo?.thieu.length ? `, và thêm ${lenhSo.thieu.length} tên lệnh vào package.json` : "")
+      + ".";
     else if (canChot) cau = `Nội dung đã khớp, không phải ghi file nào — nhưng sổ ghim ở đích còn ghi ${soGhim.version}. Chạy --apply để đóng lại dấu ${TEMPLATE_VERSION}.`;
     else cau = "Không có gì để nâng cấp.";
     console.log(`${NL}${cau}${NL}`);
@@ -388,6 +468,22 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   }
   /* Tài liệu THIẾU thì mang sang — không có gì để mất. Tài liệu KHÁC thì tuyệt đối không đụng:
      đã kể tên ở trên, người quyết. Đây là toàn bộ khác biệt giữa tầng tài liệu và tầng máy. */
+  /* THEM TEN LENH THIEU. Doc lai file NGAY LUC GHI, khong dung ban da doc luc lap ke hoach:
+   * giua hai thoi diem do co the co phien khac sua `package.json`, va ghi lai ban cu la xoa
+   * viec cua ho. Doc lai roi ghep — chi them khoa chua co. */
+  let daThemLenh = 0;
+  if (lenhSo && lenhSo.thieu.length) {
+    const duong = path.join(repo, "package.json");
+    const rawNay = docTep("package.json");
+    const soNay = soSanhLenh(rawNay, chuan.get("package.json"));
+    if (soNay && soNay.thieu.length) {
+      const tam = `${duong}.tam-${process.pid}`;
+      fs.writeFileSync(tam, ghepLenh(rawNay, soNay.thieu), "utf8");
+      fs.renameSync(tam, duong);
+      daThemLenh = soNay.thieu.length;
+    }
+  }
+
   let daGhiTaiLieu = 0;
   for (const d of tlThieu) {
     const dest = path.join(repo, ...d.rel.split("/"));
@@ -409,6 +505,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
 
   console.log(`${NL}Đã ghi ${daGhi} file máy và cập nhật ${SO_GHIM} → ${TEMPLATE_VERSION}.`);
   if (daGhiTaiLieu) console.log(`Đã mang thêm ${daGhiTaiLieu} file tài liệu repo đích chưa có — nhớ khai vào Bản đồ file, cổng đóng phiên bắt.`);
+  if (daThemLenh) console.log(`Đã thêm ${daThemLenh} tên lệnh vào package.json — giờ \`npm run\` gọi được chúng bằng tên chuẩn.`);
+  if (lenhSo === null) console.log("KHÔNG chạm tới package.json: đọc không ra. Sửa ở repo đích rồi chạy lại.");
+  else if (lenhSo.khac.length) console.log(`${lenhSo.khac.length} tên lệnh có giá trị khác bản trích — KHÔNG đụng tới, xem ở trên.`);
   if (tlKhac.length) console.log(`${tlKhac.length} file tài liệu khác bản trích — KHÔNG đụng tới, xem danh sách ở trên.`);
   if (Object.keys(giuLai).length) {
     console.log(`${Object.keys(giuLai).length} file ĐÃ BỎ vẫn còn ở repo — ghi vào khối \`retired\` của sổ ghim, chưa xoá.`);

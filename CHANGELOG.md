@@ -3,6 +3,104 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.35 — 2026-09-07 — Bảng GỌN LẠI (đo được), checklist tính năng vào tab Migrate, và tên lệnh cũng được phát
+
+Đức, sau khi mở bảng: *"content của tab cấu trúc quá lộn xộn & dàn trải, bị scroll nhiều"* ·
+*"artifact theme & layout bị thừa quá nhiều khoảng trống… ví dụ như trang ý tưởng. Scroll mỏi tay"* ·
+*"phần title… chiếm nửa màn hình vô nghĩa"* · và *"cần thêm 1 ô nhỏ để copy link của file dùng để
+refresh, chạy host local… nếu hiện tại F5 là check status mới nhất được rồi thì phải giải thích."*
+
+### ĐO TRƯỚC KHI SỬA — và số đo chỉ ra chỗ khác hẳn chỗ đang nghi
+
+Mở bảng trên màn 1440×900, đo chiều cao từng tab bằng chính trình duyệt:
+
+| | Trước | Sau |
+|---|---|---|
+| Đầu trang (header + lề thân + thanh tab) | **270px** | **105px** |
+| Tab Vận hành | **16,0 màn hình** | **3,7** |
+| Tab Cấu trúc | **10,1 màn hình** | **3,5** |
+| Tab Ý tưởng | 1,9 | 1,4 |
+| Khung nội dung | 1080px trên màn 1440 | **1280px** |
+
+Hai nguyên nhân, cả hai đều **không** phải "CSS thưa":
+
+1. **Tab Vận hành**: ba tài liệu đổ thẳng ra màn hình, không gập — `HUONG-DAN` 3.026px ·
+   `SO-TAY-AGENT` 3.392px · `BAO-TRI-DINH-KY` 4.805px. **11.223px trong 14.442px** là ba khối chữ
+   mà người mở tab đó không hỏi tới. Nay gập vào toggle, mặc định đóng.
+2. **Tab Cấu trúc**: **bản đồ file in HAI LẦN trên cùng một tab** — 2.217px ở dạng hàng gọn, rồi
+   4.676px ở dạng bảng đầy. Cùng một nguồn, hai cách chiếu, không bổ sung gì cho nhau. Bản gọn
+   giữ nguyên vị trí; bản đầy (có liên kết bấm được) gập lại.
+
+Chỗ trống ngang mà cuộn dọc mỏi tay là **lỗi bày trang**: nới khung ngang là bớt dọc, không phải
+nhồi thêm chữ.
+
+### Ô "Làm mới bảng" — hai file, HAI câu trả lời cho cùng một cú F5
+
+Đặt ở tab **AI điều phối** (và tab Vận hành dùng lại đúng khối đó, không viết bản thứ hai):
+
+- `bang-song/BANG.html` → **F5 LÀ THẤY.** Nó đọc bảng quyền từ **đĩa**, nên đổi byte mỗi lượt có ai
+  nhận hay trả khoá.
+- `DASHBOARD-<tên>.html` → **F5 KHÔNG ĐỔI SỐ.** Suy hoàn toàn từ lần commit gần nhất, cố ý: bộ sinh
+  nhìn đồng hồ thì sang ngày là mọi phiên bị chặn đẩy dù không dữ liệu nào đổi.
+
+**Cái sai duy nhất ở đây là tưởng chúng giống nhau**, nên hai ô phải nằm cạnh nhau. Nói gộp "F5 đi"
+là dạy sai một trong hai. Mỗi thứ copy được có một nút COPY; cổng máy chủ **đọc từ mã nguồn**, và
+đọc không ra thì nói thẳng là lấy ở dòng máy chủ in ra — đóng cứng một con số là dẫn người xem tới
+bảng CỦA REPO KHÁC khi cổng bị chiếm và máy chủ nhảy cổng.
+
+Repo **không có** bảng sống thì khối chỉ in một ô, kèm một câu nói thẳng là chưa có — vẽ một cửa
+không tồn tại là bảng tự hạ độ tin cậy của chính nó.
+
+### Checklist tính năng lên tab Migrate — kèm NGÀY ĐO và BẢN DANH MỤC
+
+Đức chốt 07/09: *"ở repo đích, đặc biệt là mục dashboard mới… cần ghi rõ checklist các feature list
+sẽ được migrate cũng như là ngày phiên bản."*
+
+Bảng mốc có thêm cột **Tính năng**; mỗi tab con có thẻ checklist đầy đủ. Nguồn là khối do
+`features.mjs --migrate` sinh và dán vào hồ sơ migrate — **bảng không khai lần thứ hai**, nên nó
+không thể nói khác hồ sơ. Ba hồ sơ đang có đã được **đo lại và thêm khối** (chỉ thêm, không sửa
+một dòng nào của phần cũ): `17/34` · `19/34` · `24/34`.
+
+**Mục chưa xong hiện trước, mục đã xong gập lại.** Người mở sổ hỏi *"còn thiếu gì"* — 24 dòng xanh
+đứng trên 10 dòng vàng là cách chôn 10 dòng vàng.
+
+Bộ đọc lấy **khối cuối**, không phải khối đầu: hồ sơ là vùng chỉ thêm, nên đo lại thì dán thêm
+khối mới. Lấy khối đầu là càng đo lại nhiều lần thì bảng càng nói về quá khứ sâu hơn.
+
+### `upgrade.mjs` phát thêm TẦNG THỨ BA: tên lệnh
+
+Đây là **gốc** của lớp `MỘT PHẦN` mà bản 1.3.34 vừa đo ra. Lệnh nâng cấp chép file và **chưa bao
+giờ chạm `package.json` của repo đích**, nên ba lượt migrate đều đưa **công cụ** tới mà không đưa
+**tên gọi** tới: `scripts/session-check.mjs` nằm đó, `npm run gate` thì không.
+
+Luật giống hệt tầng tài liệu, có ý: **THIẾU thì mang sang · KHÁC thì CHỈ kể tên.** Một khoá đã có
+giá trị khác là repo đích đã tự quyết (`test` chạy bộ phép kiểm riêng chẳng hạn); ghi đè là xoá
+quyết định của người ta, và hỏng **im lặng** — `npm test` vẫn xanh, chỉ là nó không còn chạy đúng
+những thứ nó từng chạy. Đọc không ra `package.json` là **KHÔNG BIẾT**, và lúc đó không chạm một byte.
+
+### Một lỗi lộ ra lúc đo, không phải lúc thiết kế
+
+Bảng của repo đích **tự gọi mình là "bộ khung"**: câu tự giới thiệu ở đầu trang được gõ cứng vào bộ
+sinh, mà bộ sinh thì đi theo bản trích. Kiểm được ở một repo đã lắp. Nay câu đó đọc từ
+`repo.tagline` của chính repo, và chưa khai thì bảng **nói thẳng là chưa khai** chứ không mượn câu
+của người khác.
+
+### Phép kiểm
+
+`tests/overview-doc-smoke.mjs` 10 → **12 vế**, `tests/upgrade-smoke.mjs` 22 → **23 vế**.
+**Mười hai đột biến đã chạy thật, cả mười hai đều bị bắt** — bảy cho hai vế bảng, năm cho vế tên
+lệnh; danh sách ghi ngay trong đầu hai file.
+
+Và một lỗi do **chính vế mới bắt được**, không phải do đọc lại: `soSanhLenh("[]")` — một mảng có
+`typeof === "object"`, nên phép kiểm "là object" cho nó đi lọt, rồi hàm trả `{}`, tức nói *"không
+thiếu lệnh nào"* về một file **không phải** `package.json`.
+
+### Hướng dẫn kiểm tra đầy đủ
+
+`docs/SO-TAY-AGENT.md` mục **8**: phát bản vá sang một repo đã lắp, rồi **kiểm nó thật sự chạy ở
+đó** — bảy bước, bốn tầng của bản kế hoạch với bốn luật khác nhau, bảng "lệnh nào trả lời câu gì",
+ba chỗ phải MỞ BẢNG RA XEM, và ba điều không làm. *"Phát xong" không phải là `--apply` thoát 0.*
+
 ## 1.3.34 — 2026-09-07 — Danh mục tính năng ĐO ĐƯỢC, và đề bài đưa AI repo đích go live
 
 Đức: *"tôi muốn tổng hợp feature list hiện có thành checklist… để đảm bảo khi migrate thì checklist

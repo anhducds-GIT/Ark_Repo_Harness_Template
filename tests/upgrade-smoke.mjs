@@ -3,6 +3,17 @@
  * Điều đáng canh nhất KHÔNG phải "có chép file sang không" (chép thì dễ), mà là **có biết dừng
  * lại khi file đích đã bị sửa tay không**. Không có vế đó thì `upgrade` chỉ là `cp -r` có nghi
  * thức, và nó sẽ xoá bản vá tại chỗ của người khác mà không để lại dấu vết nào.
+ *
+ * NAM DOT BIEN DA CHAY THAT cho ve 20 (tang TEN LENH, 07/09) — ca nam deu bi bat:
+ *   1. ghi de ca khoa lenh DA CO                              -> do
+ *   2. doc khong ra `package.json` thi coi nhu khong thieu gi  -> do
+ *   3. mot MANG cung tinh la `package.json`                    -> do
+ *   4. khoa co gia tri KHAC cung xep vao THIEU                 -> do
+ *   5. ghep lam mat cac truong khac cua `package.json`         -> do
+ *
+ * Ve 20 con bat duoc mot loi CUA CHINH MA NGUON luc viet: `soSanhLenh("[]")` — mot mang co
+ * `typeof === "object"`, nen phep kiem "la object" cho no di lot roi tra `{}`, tuc noi "khong
+ * thieu lenh nao" ve mot file khong phai `package.json`.
  */
 
 import assert from "node:assert/strict";
@@ -13,7 +24,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildTemplateFiles, kiemSoPhatHanh, loiSoPhatHanh, soVoiLichSu } from "../scripts/build-template.mjs";
-import { docSoGhim, fileMay, fileTaiLieu, fileTuyChon, soGhimMoi, soSanh } from "../scripts/upgrade.mjs";
+import { docSoGhim, fileMay, fileTaiLieu, fileTuyChon, ghepLenh, soGhimMoi, soSanh, soSanhLenh } from "../scripts/upgrade.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -701,6 +712,74 @@ const dungRepo = (ghiSoGhim) => {
       "ls-tree chay duoc ma tra rong = duong dan khong co o commit do — bo qua hop le");
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("phép dò ba trạng thái: không có → bỏ qua · dò không được → HỎNG");
+}
+
+/* ---- 20. TEN LENH: thieu thi mang sang, KHAC thi khong bao gio ghi de ----
+ *
+ * Ca that do 07/09 tai `ALL_SKILL_MANAGEMENT`: co `scripts/session-check.mjs` ma khong co
+ * `npm run gate`. Ba luot migrate deu dua CONG toi ma khong dua TEN GOI toi, vi lenh nang cap
+ * chep file va chua bao gio cham `package.json`. Cong co mat ma khong ai goi duoc bang ten
+ * chuan thi tren thuc te no khong ton tai — va bang thi dem ra "co file".
+ */
+{
+  const chuan = JSON.stringify({ name: "t", scripts: {
+    gate: "node scripts/session-check.mjs",
+    push: "node scripts/safe-push.mjs",
+    test: "node tests/harness-smoke.mjs"
+  } });
+
+  // THIEU thi ke ten de mang sang.
+  const a = soSanhLenh(JSON.stringify({ name: "d", scripts: { push: "node scripts/safe-push.mjs" } }), chuan);
+  assert.deepEqual(a.thieu.map((x) => x[0]).sort(), ["gate", "test"]);
+  assert.deepEqual(a.khac, []);
+
+  // KHAC thi CHI ke ten. Repo dich da tu quyet gia tri do — ghi de la xoa quyet dinh cua
+  // nguoi ta, va hong IM LANG: `npm test` van xanh, chi la no khong con chay dung cai cu.
+  const b = soSanhLenh(JSON.stringify({ scripts: { test: "vitest run", gate: "node scripts/session-check.mjs", push: "x" } }), chuan);
+  assert.deepEqual(b.khac.map((x) => x[0]).sort(), ["push", "test"]);
+  assert.deepEqual(b.thieu, []);
+  const daGhep = JSON.parse(ghepLenh(JSON.stringify({ scripts: { test: "vitest run" } }), b.thieu.concat(a.thieu)));
+  assert.equal(daGhep.scripts.test, "vitest run", "GHI DE mot khoa da co — dung ra phai giu nguyen");
+  assert.equal(daGhep.scripts.gate, "node scripts/session-check.mjs");
+
+  // GHEP KHONG DUOC LAM MAT gi khac trong package.json: ten, phien ban, phu thuoc.
+  const day = JSON.stringify({ name: "d", version: "9.9.9", type: "module",
+    dependencies: { x: "1" }, scripts: { push: "node scripts/safe-push.mjs" } });
+  const g = JSON.parse(ghepLenh(day, soSanhLenh(day, chuan).thieu));
+  assert.equal(g.name, "d");
+  assert.equal(g.version, "9.9.9");
+  assert.equal(g.type, "module");
+  assert.deepEqual(g.dependencies, { x: "1" });
+  assert.equal(Object.keys(g.scripts).length, 3);
+
+  // DOC KHONG RA = KHONG BIET, khong phai "khong thieu gi". Thieu han file, hong cu phap,
+  // hay khong phai mot khoi — ca ba phai tra `null`, va `--apply` khong cham mot byte nao.
+  // Lam tron ve `{thieu:[]}` la mot repo `package.json` hong lang le khong bao gio nhan lenh.
+  assert.equal(soSanhLenh(null, chuan), null, "thiếu package.json phải là KHÔNG BIẾT");
+  assert.equal(soSanhLenh("{ hong", chuan), null, "package.json hỏng cú pháp phải là KHÔNG BIẾT");
+  assert.equal(soSanhLenh("[]", chuan), null, "package.json không phải khối phải là KHÔNG BIẾT");
+  assert.equal(soSanhLenh(chuan, null), null, "bản trích đọc không ra cũng phải là KHÔNG BIẾT");
+
+  // Khong co khoi `scripts` la con so 0, KHAC voi doc khong ra.
+  const khongScripts = soSanhLenh(JSON.stringify({ name: "d" }), chuan);
+  assert.notEqual(khongScripts, null, "package.json đọc được mà chưa có `scripts` KHÁC với đọc không ra");
+  assert.equal(khongScripts.thieu.length, 3);
+
+  // BAN TRICH THAT phai mang du ten lenh cho moi file may that phat di. Ve nay la ve chong
+  // TROI: them mot script moi vao `scripts/` roi quen khai lenh la repo dich nhan file ma
+  // khong nhan ten goi — dung ca da xay ra ba lan.
+  const chuanThat = buildTemplateFiles();
+  const lenhThat = JSON.parse(chuanThat.get("package.json")).scripts;
+  const rong = soSanhLenh(JSON.stringify({ name: "moi" }), chuanThat.get("package.json"));
+  assert.equal(rong.thieu.length, Object.keys(lenhThat).length,
+    "repo trắng phải nhận ĐỦ mọi tên lệnh bản trích khai");
+  for (const [k, v] of Object.entries(lenhThat)) {
+    for (const m of String(v).matchAll(/node ((?:scripts|tests|bang-song)\/[\w.-]+)/g)) {
+      assert.ok(chuanThat.has(m[1]),
+        `lệnh \`npm run ${k}\` gọi ${m[1]} mà bản trích KHÔNG phát file đó — repo đích sẽ gõ một lệnh chết`);
+    }
+  }
+  ok(`tên lệnh: thiếu thì mang · khác thì chỉ kể tên · đọc không ra là KHÔNG BIẾT · ${Object.keys(lenhThat).length} lệnh bản trích đều trỏ tới file có thật`);
 }
 
 console.log(`

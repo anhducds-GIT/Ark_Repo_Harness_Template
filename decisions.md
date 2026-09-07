@@ -381,3 +381,37 @@ tôi ko ép."* — bảng chính là file đã commit (suy từ HEAD); bảng s�
 nhấp đúp. Danh mục khai `F1.3` là `tuy_chon: true` cho đúng câu này.
 
 Chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.34 · danh mục ở [features.json](features.json).
+
+---
+
+## 2026-09-07 — Bảng phải GỌN: năm phản hồi bố cục, và "F5 có thấy không" phải giải thích được
+
+Đức mở bảng rồi nêu năm chỗ, **nguyên văn**:
+
+1. *"content của tab cấu trúc quá lộn xộn & dàn trải, bị scroll nhiều -> cần gom lại, tối ưu nội
+   dung & cách thể hiện, giải thích."*
+2. *"tab vận hành cũng quá dài cần improve tương tự như trên."*
+3. *"artifact theme & layout bị thừa quá nhiều khoảng trống, margin blank, trong khi content lại
+   nhiều -> bị scroll nhiều, cần review lại toàn bộ & adjust phù hợp. (ví dụ như trang ý tưởng.
+   Scroll mỏi tay)"*
+4. *"trong ô AI điều phối, cần thêm 1 ô nhỏ để copy link của file dùng để refresh, chạy host
+   local.... etc nếu hiện tại F5 là check status mới nhất được rồi thì phải giải thích"*
+5. *"phần title… ở trên chiếm quá nhiều không gian, lãng phí, chiếm nửa màn hình vô nghĩa ->
+   compact lại cho tôi."*
+
+**Luật rút ra, áp cho mọi lần sửa bố cục sau này: ĐO CHIỀU CAO TỪNG TAB TRƯỚC KHI SỬA CSS.** Lượt
+này đo bằng chính trình duyệt, và số đo chỉ ra chỗ **khác hẳn** chỗ đang nghi: tab Vận hành cao
+16 màn hình vì **ba tài liệu đổ thẳng ra không gập** (11.223px trong 14.442px), tab Cấu trúc cao
+10 màn hình vì **bản đồ file in HAI LẦN trên cùng một tab**. Không phải vì CSS thưa. Sửa CSS mà
+không đo thì đã gọt chỗ không đau và để nguyên chỗ đau.
+
+**"F5 có thấy số mới không" có HAI câu trả lời, và chúng phải nằm cạnh nhau.** Bảng đã commit suy
+từ HEAD nên F5 không đổi số; bảng sống đọc bảng quyền từ đĩa nên F5 là thấy. Nói gộp là dạy sai
+một trong hai — nên khối "Làm mới bảng" in **cả hai ô**, và repo không có bảng sống thì nói thẳng
+là chưa có chứ không vẽ một cửa không tồn tại.
+
+**Chốt kèm:** checklist tính năng lên **tab Migrate**, mang theo **ngày đo** và **bản danh mục** —
+*"ở repo đích, đặc biệt là mục dashboard mới… cần ghi rõ checklist các feature list sẽ được migrate
+cũng như là ngày phiên bản."*
+
+Chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.35 · quy trình kiểm: [docs/SO-TAY-AGENT.md](docs/SO-TAY-AGENT.md) mục 8.
