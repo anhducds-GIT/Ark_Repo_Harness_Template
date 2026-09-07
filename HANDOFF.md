@@ -1337,3 +1337,32 @@ chen vào đúng khe đó bằng hook `reference-transaction`.
 Ranh giới còn hở, khai thẳng: đẩy `main` mà **không** ghi sự kiện tích hợp thì lõi này không thấy.
 Chặn được chỗ đó cần **một bên thứ ba** đọc sổ quyền, và bên thứ ba phải không phải bên đang bị
 kiểm — chưa làm, và **không** tự bật branch protection.
+
+## 2026-09-07 · claude-loi-hai-vai — vá ba lỗi P1 từ audit độc lập của Codex
+
+**Làm gì.** Phiên Codex audit `quyen.mjs` trên `44f0680` và tìm được ba lỗi thật. Tôi viết phép
+kiểm **trước** khi vá: 6 phép kiểm mới **đỏ trên mã cũ**, nên cả ba được xác nhận bằng đo, không
+bằng đọc báo cáo.
+
+**Kết quả số.** 41 → **52 phép kiểm xanh** · 10/10 → **14/14 đột biến bị bắt** · cổng XANH.
+
+**Ba lỗi, và cái chung của chúng.** ⑴ Cửa tích hợp chỉ kiểm *có điền không*, không kiểm *điền có
+đúng không*: `--co-so` là tuỳ chọn nên bỏ trống là hết kiểm; nền khai được so với lượt tích hợp
+trước chứ chưa bao giờ so với **chính commit kết quả**; và một SHA bịa ra (`deadbeef…`) đi qua
+trọn vẹn. ⑵ Sổ quyền **hỏng** bị hiểu thành sổ **trống** — `docSo` trả `[]` khi không đọc được,
+nên một ref tồn tại mà thiếu file sổ làm công cụ vừa in lỗi vừa **cấp quyền** ở thế hệ 1.
+⑶ Kết luận của tôi rộng hơn bằng chứng: tôi viết *"đóng lỗ TOCTOU"* không kèm giới hạn, mà nó chỉ
+đóng trong phạm vi **sổ**. Codex chạy được chuỗi A-ghi-nhận → B-thu-hồi → A-đẩy-`main`, cả ba
+thành công. **Được ghi nhận KHÁC đã tích hợp.**
+
+**Một chỗ tôi tự dán nhãn sai.** Ca ① tên là *"xin đồng thời"* nhưng gọi A rồi mới gọi B. Cơ chế
+vốn đúng — phép kiểm mới là thứ chưa chứng minh được điều nó nói. Ca ⑨ nay cho hai lượt nhận
+quyền chen nhau thật bằng hook `reference-transaction`.
+
+**Còn hở, khai thẳng.** `quyen.mjs` **không kiểm đường dẫn**: Codex khai `wrong-area` cho một thay
+đổi ở `product.txt` và đi qua được. Nên tên vùng ở đó là **lời khai**, không phải điều đã kiểm.
+Bản đồ vùng → đường dẫn nằm ở `.repo-structure.json` của từng repo, còn `quyen.mjs` cố ý không
+biết repo nào — nên đó là việc kế tiếp, không phải một dòng thêm vào.
+
+**Đo được lúc dọn cổng:** bảng máy sinh cần **hai lượt** sinh–commit mới hội tụ, vì nó suy từ HEAD
+mà chính lượt commit lại đổi HEAD. Cổng của phiên Codex đỏ `TRANG_CU` đúng vì thế.
