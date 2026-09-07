@@ -2,6 +2,7 @@
 kind: workflow
 ten: Đưa một repo đang sống lên chuẩn
 ai_chay: AI, chủ dự án duyệt từng bước lớn
+nhom: migrate
 mat: đã chạy thật 2 lần (2026-09-03) — hồ sơ ở docs/migrations/
 ---
 
