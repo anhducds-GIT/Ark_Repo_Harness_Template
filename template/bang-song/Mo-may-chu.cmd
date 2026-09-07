@@ -11,7 +11,7 @@ if errorlevel 1 (
   exit /b 1
 )
 echo Dang mo may chu tai cho. Dong cua so nay la tat may chu.
-start "" http://127.0.0.1:4747/
-node "bang-song/may-chu.mjs"
+REM Trinh duyet do chinh may chu mo, vi chi no biet cong that sau khi ne va cham.
+node "bang-song/may-chu.mjs" --mo
 pause
 exit /b 0

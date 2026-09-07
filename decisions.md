@@ -339,3 +339,20 @@ nâng bây giờ là giẫm chân. Không phải vấn đề kỹ thuật, và l
 **4 · Chuỗi đêm — bỏ mọi mục cần nói chuyện với Đức giữa chừng.** Nguyên văn: *"bỏ mục nào mà
 sẽ block flow tự chạy & cần giao tiếp với Đức"*. Nên `KHUNG-30` (đã hoãn) và `KHUNG-37` (Đức
 phải bấm nút giết tiến trình) ra khỏi chuỗi.
+
+## 2026-09-07 — Bảng sống ĐÃ CÀI trên máy Đức, và cách gỡ
+
+Đức duyệt cả ba cửa 07/09; lượt này **cài thật** và nghiệm thu thật trên máy Đức.
+
+**Đang chạy:** máy chủ ở `http://127.0.0.1:4747/`, và một mục khởi động
+`ArkBangSong.vbs` trong thư mục Startup của người dùng (không cần quyền quản trị, không phải
+dịch vụ hệ thống). Bật máy lên là nó tự chạy ngầm.
+
+**Gỡ:** nhấp đúp `bang-song\Tat-tu-chay.cmd`. Đã thử thật — nó xoá mục khởi động và đặt một
+**file cờ** để bản đang chạy tự thoát trong 30 giây. Cố ý **không giết theo tên tiến trình**:
+giết theo tên sẽ giết luôn `node` của một phiên AI đang làm việc.
+
+**Một va chạm đo được, đã vá:** repo `Chrome_Extension_AI_Agentic` cũng phát máy chủ bảng ở
+**cùng cổng 4747**, cũng có mục tự chạy. Bản đầu gặp cổng bận thì **thoát im lặng** — tức Đức mở
+trình duyệt sẽ thấy bảng của REPO KIA và tin là bảng repo này. Nay nó né sang cổng kế và **nói to**
+cổng nào đang dùng.

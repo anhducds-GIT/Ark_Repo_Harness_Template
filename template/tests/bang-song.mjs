@@ -31,8 +31,10 @@
  * trình chạy trên máy người chủ chặn push của tất cả mọi người.
  */
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { readdirSync, readFileSync } from "node:fs";
+import { createServer } from "node:http";
+import { once } from "node:events";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -44,6 +46,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const doc = (p) => readFileSync(join(ROOT, p), "utf8");
 
+const NL = String.fromCharCode(10);
 const bang = (khoa) => JSON.stringify({ claims: khoa });
 
 /* ---- 1. CHỐT ⑴ — lane giữ vùng của bộ sinh thì NGỪNG SINH ---------------
@@ -219,6 +222,73 @@ const bang = (khoa) => JSON.stringify({ claims: khoa });
   assert.match(dung, /DỪNG CẬP NHẬT/, "dang ngung thi phai NOI ngay tren trang, khong im lang de bang cu trong nhu bang moi");
   assert.match(dung, /lane-z/, "phai noi ai dang giu, de nguoi doc biet hoi ai");
   ok("9 · băng: một băng duy nhất, nói rõ hai chỗ mù, và nói khi đang dừng");
+}
+
+/* ---- 10. CỔNG BẬN ≠ "BẢN KHÁC CỦA CHÍNH MÌNH ĐANG CHẠY" -----------------
+ *
+ * Bản đầu thoát im lặng khi gặp cổng bận, dựa trên đúng giả định đó. ĐO 07/09 trên một máy thật: MỘT REPO KHÁC trên
+ * cùng máy đó cũng phát một máy chủ bảng ở **cùng cổng mặc định**, cũng kèm mục tự chạy lúc bật
+ * máy — vì nó lắp cùng bộ khung này. Hai repo, một cổng. Càng nhiều repo lắp bộ khung thì ca này
+ * càng chắc chắn xảy ra, chứ không phải càng hiếm.
+ *
+ * Hậu quả nếu giữ nguyên: bản bật sau thoát IM LẶNG, người mở trình duyệt thấy bảng CỦA REPO KIA
+ * và tin đó là bảng repo này. **Tệ hơn không có bảng** — bảng vẫn hiện, số vẫn đẹp, chỉ là của
+ * chỗ khác. Đây không phải giả thuyết: cả hai file đều đã nằm trên đĩa cùng một máy, đo được bằng một dòng.
+ *
+ * Vế này ghim HÀNH VI trong một tiến trình thật, không đọc mã: chiếm cổng trước, rồi bật máy chủ,
+ * rồi đòi nó (a) không chết, (b) nói ra cổng nó thật sự dùng.
+ *
+ * Đột biến đã chạy: trả `process.exit(0)` ngay ở `EADDRINUSE` → vế này ĐỎ. */
+{
+  const may = createServer((_q, r) => r.end("ke chiem cong")).listen(0, "127.0.0.1");
+  await once(may, "listening");
+  const bi = may.address().port;
+  const r = spawnSync(process.execPath, [join(ROOT, "bang-song", "may-chu.mjs"), "--cong", String(bi)],
+    { cwd: ROOT, encoding: "utf8", timeout: 60_000 });
+  may.close();
+  const ra = String(r.stdout || "") + String(r.stderr || "");
+
+  assert.match(ra, /đã có người nghe/, "phai NOI RA la cong bi chiem, dung im lang");
+  const dung = /phục vụ ở http:\/\/127\.0\.0\.1:(\d+)\//.exec(ra);
+  assert.ok(dung, `phai van mo duoc bang o mot cong khac, va phai IN RA cong do. Nhan duoc:${NL}${ra.slice(0, 400)}`);
+  assert.notEqual(Number(dung[1]), bi, "cong dang phuc vu phai KHAC cong bi chiem");
+  assert.match(ra, /KHÔNG phải cổng mặc định/,
+    "phai noi ro day khong phai cong quen thuoc — nguoi doc go dia chi cu se ra bang cua REPO KHAC");
+  ok(`10 · cổng bận → né sang cổng khác và NÓI RA (bị chiếm ${bi} → dùng ${dung[1]})`);
+}
+
+/* ---- 11. FILE LỆNH WINDOWS PHẢI LÀ CRLF ---------------------------------
+ *
+ * Vế này có vì một phép đo SAI của chính phiên viết nó, và cái sai đáng chép lại.
+ *
+ * Lượt 1: thêm `*.cmd text eol=crlf` theo LINH CẢM. Không có số đo.
+ * Lượt 2: viết một file `.cmd` NGẮN thuần LF, chạy, thấy đúng → kết luận "LF chạy được" và GỠ
+ *         luật đi. Fixture quá đơn giản để dựng nổi ca hỏng — luật vàng 2, đúng chữ.
+ * Lượt 3: chạy CHÍNH `Bat-tu-chay.cmd` ở hai dạng, cùng nội dung, chỉ khác xuống dòng:
+ *           LF   → 'cp' is not recognized · 'tlocal' is not recognized · mã thoát 1
+ *           CRLF → chạy đúng, mã thoát 0
+ *
+ * `cmd.exe` nhảy theo ĐỘ DỜI BYTE và giả định CRLF, nên với LF nó rơi vào giữa một từ và ăn mất
+ * ký tự đầu dòng. File càng dài càng lệch — nên một file thử ngắn KHÔNG bao giờ bắt được.
+ *
+ * Đọc BYTE THẬT trên đĩa, không đọc `.gitattributes`: một dòng cấu hình đúng mà file trong cây
+ * làm việc vẫn LF thì người vừa clone vẫn dính. Đó chính là bệnh `.gitattributes` sinh ra để chữa.
+ *
+ * Đột biến đã chạy: đổi một file `.cmd` về LF → vế này ĐỎ. */
+{
+  const cmds = readdirSync(join(ROOT, "bang-song")).filter((f) => f.endsWith(".cmd"));
+  assert.ok(cmds.length >= 1, "bang-song phai co it nhat mot file lenh");
+  for (const f of cmds) {
+    const b = readFileSync(join(ROOT, "bang-song", f));
+    let lf = 0, crlf = 0;
+    for (let i = 0; i < b.length; i += 1) {
+      if (b[i] === 10) { if (i > 0 && b[i - 1] === 13) crlf += 1; else lf += 1; }
+    }
+    assert.equal(lf, 0,
+      `bang-song/${f} co ${lf} dong ket bang LF tran — cmd.exe se an mat ky tu dau dong va bao 'tlocal is not recognized'`);
+    assert.ok(crlf > 0, `bang-song/${f} khong co dong nao?`);
+  }
+  ok(`11 · ${cmds.length} file lệnh Windows đều là CRLF thật trên đĩa`);
 }
 
 console.log(`bang-song: ${passed} vế xanh`);

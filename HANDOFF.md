@@ -1104,3 +1104,48 @@ giả thuyết ban đầu thì tôi đã hạ mức một phép kiểm đang XAN
 
 **Còn mở:** `KHUNG-30` (Đức hoãn) · `KHUNG-37` (`@Đức:bấm`) · `KHUNG-31` · `Y-09` phát bảng sang ba
 repo đã lắp · `Y-10` nghiệm thu ba cửa trên máy Đức.
+
+---
+
+## 2026-09-07 · claude-k6-nghiemthu · bản 1.3.28 — nghiệm thu ba cửa trên máy thật
+
+Đức: *"chạy file cmd bạn có thể gọi codex cli làm cho."* Giao Codex chạy thật, rồi kiểm chứng độc
+lập. **Lượt chạy thật bắt được hai lỗi mà mọi lượt suy luận trước đó bỏ qua.**
+
+### Tôi đã đo SAI, và lượt sai thứ hai nguy hiểm hơn lượt đầu
+
+Ba lượt về cùng một câu hỏi — file `.cmd` cần CRLF hay không:
+
+1. Thêm luật theo **linh cảm**. Không số đo. Kết luận đúng, lý do rỗng.
+2. Viết một file `.cmd` **ngắn** thuần LF, chạy thấy đúng → **gỡ luật đi**, kèm một đoạn giải
+   thích tự tin viết thẳng vào `.gitattributes`. **Fixture quá đơn giản để dựng nổi ca hỏng** —
+   luật vàng 2, đúng chữ. Lượt 1 chỉ thiếu bằng chứng; lượt 2 **tạo ra bằng chứng giả rồi viết nó
+   vào repo** cho phiên sau đọc.
+3. Chạy CHÍNH `Bat-tu-chay.cmd` ở hai dạng, cùng nội dung: **LF → mã thoát 1** (`'cp' is not
+   recognized`, `'tlocal' is not recognized`) · **CRLF → mã thoát 0**.
+
+`cmd.exe` nhảy theo **độ dời byte** và giả định CRLF, nên với LF nó rơi vào giữa một từ. File càng
+dài càng lệch — một file thử ngắn **không bao giờ** bắt được. Ghim nay đọc **byte thật trên đĩa**.
+
+### Lỗi thứ hai: cổng bận ≠ bản khác của chính mình
+
+Một repo khác trên cùng máy cũng phát máy chủ bảng ở **cùng cổng mặc định** (nó lắp cùng bộ khung
+này), cũng có mục tự chạy. Bản đầu gặp cổng bận thì **thoát im lặng** — người mở trình duyệt thấy
+bảng của repo kia và tin là bảng repo này. Bảng vẫn hiện, số vẫn đẹp, chỉ là của chỗ khác.
+
+Nay né sang cổng kế, **nói to** cổng đang dùng, ghi cổng thật vào `trang-thai.json`, và **chính máy
+chủ** mở trình duyệt chứ không phải file `.cmd` — chỉ nó biết cổng thật.
+
+### Nghiệm thu, chạy thật
+
+Cửa ① sinh một lượt · cửa ③ cài vào Startup, máy chủ lên `4747` · cửa gỡ xoá mục khởi động và đặt
+**file cờ** cho bản đang chạy tự thoát (đo: <35 giây) · bật lại, PID mới, phục vụ tiếp.
+
+Và **chốt ⑴ nổ thật giữa lượt nghiệm thu**: một khoá `_code` đang giữ → cửa ① từ chối sinh, nói rõ
+ai đang giữ. Không phải kịch bản dựng — nó xảy ra vì tôi đang giữ khoá thật.
+
+**Trạng thái để lại trên máy Đức:** bảng sống đang chạy ở `http://127.0.0.1:4747/`, có mục khởi
+động `ArkBangSong.vbs`. Gỡ bằng `bang-song\Tat-tu-chay.cmd`.
+
+**Còn mở:** `KHUNG-30` (Đức hoãn) · `KHUNG-37` (`@Đức:bấm`) · `KHUNG-31` · `Y-09` phát bảng sang
+ba repo đã lắp.

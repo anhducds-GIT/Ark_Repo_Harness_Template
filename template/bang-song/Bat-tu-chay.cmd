@@ -36,7 +36,5 @@ echo   Xem bang: http://127.0.0.1:4747/
 echo   Muon go: chay Tat-tu-chay.cmd trong chinh thu muc nay.
 echo.
 echo   Dang mo luon mot ban ngay bay gio...
-start "" /min cmd /c "cd /d "%GOC%" && node bang-song\may-chu.mjs"
-timeout /t 3 >nul
-start "" http://127.0.0.1:4747/
+start "" /min cmd /c "cd /d "%GOC%" && node bang-song\may-chu.mjs --mo"
 exit /b 0

@@ -15,10 +15,19 @@
 * text=auto eol=lf
 
 
-# ĐÃ THỬ THÊM MỘT NGOẠI LỆ CHO `*.cmd`, RỒI GỠ ĐI — ghi lại để không ai thêm lại vì cùng một
-# linh cảm. Lý do định thêm: nghe nói `cmd.exe` đọc file batch thuần LF không ổn định. ĐO THẬT
-# 07/09 trên Windows 11: file `.cmd` thuần LF chạy đúng, kể cả khối `if errorlevel (...)` nhiều
-# dòng và `chcp 65001` với chữ có dấu — mã thoát 0.
-# Chưa thử: nhãn và `goto`. Không cửa nào trong `bang-song/` dùng chúng.
-# Luật mục 8: chưa có ca hỏng thật thì đừng thêm luật. Một dòng cấu hình không ai chứng minh
-# được là cần thì sớm muộn có người gỡ, và lúc đó không ai biết gỡ có sao không.
+
+# NGOẠI LỆ DUY NHẤT — file lệnh Windows phải là CRLF. ĐO ĐƯỢC, và tôi đã đo SAI một lần trước
+# khi đo đúng, nên chép cả hai lượt vào đây.
+#
+# Lượt sai: viết một file `.cmd` ngắn thuần LF, chạy, thấy đúng, kết luận "LF chạy được" và GỠ
+# luật này đi. Fixture quá đơn giản để dựng nổi ca hỏng — đúng thứ luật vàng 2 cảnh báo.
+#
+# Lượt đúng: chạy CHÍNH `Bat-tu-chay.cmd` ở hai dạng, cùng nội dung, chỉ khác kiểu xuống dòng:
+#     LF   → 'cp' is not recognized · 'tlocal' is not recognized · MÃ THOÁT 1, không tạo được gì
+#     CRLF → chạy đúng, MÃ THOÁT 0
+# Triệu chứng là MẤT ĐÚNG MỘT KÝ TỰ ĐẦU DÒNG (`chcp`→`cp`, `setlocal`→`tlocal`): `cmd.exe` nhảy
+# theo độ dời byte và giả định CRLF, nên với LF nó rơi vào giữa một từ. File càng dài càng lệch.
+#
+# Đây KHÔNG phải nới luật trên: luật trên chốt kiểu xuống dòng cho thứ MÁY ĐỌC; dòng này chốt cho
+# thứ HỆ ĐIỀU HÀNH CHẠY. Và `tests/bang-song.mjs` ghim lại, nên gỡ nó lần nữa là ĐỎ chứ không im.
+*.cmd text eol=crlf

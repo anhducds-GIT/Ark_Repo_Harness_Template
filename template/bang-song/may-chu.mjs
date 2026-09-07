@@ -14,6 +14,7 @@
  * Dùng:  node bang-song/may-chu.mjs [--cong 4747]
  */
 import fs from "node:fs";
+import { spawn } from "node:child_process";
 import http from "node:http";
 
 import { chenBang, docTrangThai, FILE_BANG, FILE_DUNG, ghiTrangThai, gioVN, NHIP_MS, sinhLai, themCharset, vanTay, canSinh } from "./loi.mjs";
@@ -102,16 +103,52 @@ async function main() {
   };
 
   const may = http.createServer((req, res) => xuLy(req, res, { lamMoi: () => sinh(true) }));
+
+  /* CỔNG BẬN KHÔNG CÓ NGHĨA LÀ "BẢN KHÁC CỦA CHÍNH MÌNH ĐANG CHẠY".
+   *
+   * Bản đầu thoát im lặng khi gặp cổng bận, dựa trên đúng giả định đó. Đo 07/09 trên một máy thật: MỘT REPO KHÁC
+   * trên cùng máy đó cũng phát một máy chủ bảng ở **cùng cổng mặc định**, cũng có mục tự chạy lúc
+   * bật máy — vì nó lắp cùng bộ khung này. Hai repo, một cổng: bản nào bật sau sẽ thoát, IM LẶNG,
+   * và người mở trình duyệt thấy bảng CỦA REPO KIA rồi tin đó là bảng của repo này.
+   *
+   * Sai kiểu đó tệ hơn không có bảng: bảng vẫn hiện, số vẫn đẹp, chỉ là của repo khác.
+   *
+   * Nên: thử vài cổng kế tiếp, và NÓI TO cổng nào đang dùng. Hết cách thì vẫn thoát sạch — nhưng
+   * thoát kèm một câu giải thích, không thoát câm. */
+  const THU_THEM = 20;
+  let dangThu = cong;
   may.on("error", (loi) => {
-    // Cổng đã có người nghe = một bản khác đang chạy rồi. Thoát SẠCH, không cửa sổ lỗi lặp.
-    console.error(`không mở được cổng ${cong}: ${loi.code || loi.message}`);
+    if (loi.code === "EADDRINUSE" && dangThu < cong + THU_THEM) {
+      dangThu += 1;
+      console.log(`cổng ${dangThu - 1} đã có người nghe — thử ${dangThu}`);
+      may.listen(dangThu, DIA_CHI);
+      return;
+    }
+    console.error(`không mở được cổng ${dangThu}: ${loi.code || loi.message}`);
+    if (loi.code === "EADDRINUSE") {
+      console.error(`Đã thử ${cong}..${cong + THU_THEM} và cổng nào cũng bận. Không mở được bảng.`);
+    }
     process.exit(0);
   });
 
-  may.listen(cong, DIA_CHI, () => {
-    console.log(`Bảng sống đang phục vụ ở http://${DIA_CHI}:${cong}/`);
+  may.on("listening", () => {
+    console.log(`Bảng sống đang phục vụ ở http://${DIA_CHI}:${dangThu}/`);
+    if (dangThu !== cong) {
+      console.log(`  (KHÔNG phải cổng mặc định ${cong} — cổng đó đang có tiến trình khác nghe.)`);
+    }
+    // Ghi cổng thật vào trạng thái để cửa nhấp đúp mở đúng địa chỉ, đừng bắt ai đoán.
+    const tt = docTrangThai();
+    if (tt) ghiTrangThai({ ...tt, cong: dangThu });
+
+    /* `--mo` mở trình duyệt TỪ ĐÂY, không từ file `.cmd`. Chỉ chỗ này biết cổng thật sau khi né
+     * va chạm; một file `.cmd` mở sẵn `:4747` sẽ dẫn người xem tới bảng CỦA REPO KHÁC. */
+    if (process.argv.includes("--mo")) {
+      spawn("cmd", ["/c", "start", "", `http://${DIA_CHI}:${dangThu}/`], { detached: true, stdio: "ignore" }).unref();
+    }
     sinh(true);
   });
+
+  may.listen(cong, DIA_CHI);
 
   setInterval(() => {
     // Cửa tắt: `Tat-tu-chay.cmd` đặt một file cờ. KHÔNG giết theo tên tiến trình — giết theo tên

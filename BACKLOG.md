@@ -661,13 +661,31 @@ không chặn được gì. Vùng: `_code`.
 |---|---|---|---|
 | 1 | mỏ neo khớp 0 chỗ mà báo như đã kiểm | **CÓ, ngay lượt này** — nhưng ở công cụ sửa file của phiên AI, không ở script của repo | **nhận, dạng nhẹ**: luật đã có sẵn ở mục 3 luật vàng 2 (*fixture phải dựng nổi ca hỏng*). Không thêm phép kiểm máy: không dựng nổi ca hỏng cho hành vi của một phiên AI |
 | 2 | mỏ neo `
-` gặp file CRLF | **chưa** — `git ls-files --eol`: **133/133 file LF**, không một file CRLF nào | **bác.** Lượt này CÓ thêm ngoại lệ `*.cmd eol=crlf` rồi **gỡ đi**: nó dựa trên linh cảm *"cmd.exe đọc LF không ổn"*, mà đo thật trên Windows 11 thì file `.cmd` thuần LF chạy đúng, mã thoát 0. Lý do ghi trong `.gitattributes` để không ai thêm lại vì cùng linh cảm đó |
+` gặp file CRLF | **CÓ, và tôi đo SAI hai lần trước khi đo đúng** — xem ghi chú dưới bảng | **NHẬN.** `*.cmd text eol=crlf` + ghim đọc byte thật ở `tests/bang-song.mjs` vế 11 |
 | 3 | `git commit -o` không chặn cuốn sửa đổi cùng file | **chưa** — 0 chỗ dùng trong cả repo | **bác** |
 | 4 | byte NUL làm diff biến mất | **chưa** — quét 133 file được track, **0 file** có byte NUL | **bác** |
 | 5 | trạng thái ADR khai hai chỗ | **chưa** — cả 6 ADR khai đúng MỘT chỗ (frontmatter), thân bài 0 chỗ | **bác** |
 | 6 | trả khoá kèm lý do để lại cổng đỏ | **vừa thành live lượt này** — `--du-biet` là của `KHUNG-33` | **nhận** → `KHUNG-38` |
 | 7 | bộ đếm gộp mù khi nội dung dời sang lưu trữ | **đã giải sẵn** — `can-nang.mjs` có `THU_MUC_LUU_TRU`, `session-check.mjs` có `LA_LUU_TRU` | **không cần làm gì** |
 | 8 | bộ sinh lấy tiêu đề từ tên thư mục nên sai trong worktree | **chưa** — 0 chỗ dùng `basename(ROOT)`; tên suy từ `.repo-structure.json` | **bác** |
+
+**Bẫy số 2 — ba lượt đo, hai lượt sai, và lượt sai thứ hai nguy hiểm hơn lượt đầu.**
+
+1. Thêm `*.cmd text eol=crlf` theo **linh cảm**. Không số đo. (Kết luận đúng, lý do rỗng.)
+2. Viết một file `.cmd` **ngắn** thuần LF, chạy, thấy đúng → kết luận *"LF chạy được"* và **gỡ
+   luật đi**, kèm một đoạn giải thích tự tin trong `.gitattributes`. **Fixture quá đơn giản để
+   dựng nổi ca hỏng** — luật vàng 2, đúng chữ. Lượt này tệ hơn lượt 1: lượt 1 chỉ thiếu bằng
+   chứng, lượt 2 **tạo ra bằng chứng giả** rồi viết nó vào repo cho phiên sau đọc.
+3. Đức bảo *chạy file cmd đi*. Giao Codex chạy thật → `'tlocal' is not recognized`. Kiểm chứng
+   độc lập bằng cách chạy CHÍNH `Bat-tu-chay.cmd` ở hai dạng, cùng nội dung:
+
+   | | kết quả |
+   |---|---|
+   | LF | `'cp' is not recognized` · `'tlocal' is not recognized` · **mã thoát 1**, không tạo được gì |
+   | CRLF | chạy đúng · **mã thoát 0** |
+
+   `cmd.exe` nhảy theo **độ dời byte** và giả định CRLF, nên với LF nó rơi vào giữa một từ. **File
+   càng dài càng lệch** — nên một file thử ngắn không bao giờ bắt được.
 
 **Năm cái bị bác đều là bẫy THẬT ở repo tiêu thụ.** Bác không phải vì chúng vô lý, mà vì luật mục
 8 hỏi *"đã xảy ra thật chưa"* — và ở đây câu trả lời đo được là chưa. Chép chúng sang là nhập năm

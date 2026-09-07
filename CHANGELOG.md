@@ -3,6 +3,46 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.28 — 2026-09-07 — Nghiệm thu ba cửa trên máy thật, và một phép đo sai bị bắt
+
+Đức: *"chạy file cmd bạn có thể gọi codex cli làm cho."* Giao Codex chạy thật, rồi kiểm chứng
+độc lập — và lượt chạy thật bắt được **hai lỗi mà mọi lượt suy luận trước đó đã bỏ qua**.
+
+### Lỗi 1 — file lệnh Windows phải là CRLF, và tôi đã đo SAI để kết luận ngược lại
+
+Ba lượt: (1) thêm luật theo **linh cảm**, không số đo · (2) viết một file `.cmd` **ngắn** thuần LF,
+chạy thấy đúng → **gỡ luật đi** kèm một đoạn giải thích tự tin · (3) chạy CHÍNH `Bat-tu-chay.cmd`
+ở hai dạng, cùng nội dung:
+
+| | kết quả |
+|---|---|
+| LF | `'cp' is not recognized` · `'tlocal' is not recognized` · **mã thoát 1** |
+| CRLF | chạy đúng · **mã thoát 0** |
+
+`cmd.exe` nhảy theo **độ dời byte** và giả định CRLF, nên với LF nó rơi vào giữa một từ và ăn mất
+ký tự đầu dòng. **File càng dài càng lệch** — nên một file thử ngắn không bao giờ bắt được.
+
+**Lượt sai thứ hai nguy hiểm hơn lượt đầu:** lượt 1 chỉ thiếu bằng chứng; lượt 2 **tạo ra bằng
+chứng giả rồi viết nó vào repo** cho phiên sau đọc. Ghim nay đọc **byte thật trên đĩa**, không đọc
+`.gitattributes` — một dòng cấu hình đúng mà cây làm việc vẫn LF thì người vừa clone vẫn dính.
+
+### Lỗi 2 — cổng bận không có nghĩa là "bản khác của chính mình đang chạy"
+
+Đo trên máy Đức: repo `Chrome_Extension_AI_Agentic` phát máy chủ bảng ở **cùng cổng 4747**, cũng
+có mục tự chạy lúc bật máy. Bản đầu gặp cổng bận thì **thoát im lặng** — Đức mở trình duyệt sẽ
+thấy bảng của REPO KIA và tin là bảng repo này. **Tệ hơn không có bảng**: bảng vẫn hiện, số vẫn
+đẹp, chỉ là của chỗ khác.
+
+Nay nó né sang cổng kế, **nói to** cổng đang dùng, và ghi cổng thật vào `trang-thai.json`. Trình
+duyệt do **chính máy chủ** mở (`--mo`), không do file `.cmd` — chỉ máy chủ mới biết cổng thật.
+
+### Nghiệm thu, chạy thật trên máy Đức
+
+Cửa ① sinh một lượt · cửa ③ cài vào Startup, máy chủ lên `4747` · cửa gỡ xoá mục khởi động và
+**đặt file cờ** cho bản đang chạy tự thoát (đã đo: thoát sau <35s) · bật lại, PID mới, phục vụ
+tiếp. Và chốt ⑴ **nổ thật giữa lượt nghiệm thu**: một khoá `_code` đang giữ → cửa ① từ chối sinh
+và nói rõ lý do, đúng như thiết kế.
+
 ## 1.3.27 — 2026-09-07 — Lane đã đi rồi thì đừng bảo người ta chờ nó
 
 `KHUNG-38`, và **giả thuyết ban đầu của chính mục đó là sai** — phần đáng đọc nhất của bản này.
