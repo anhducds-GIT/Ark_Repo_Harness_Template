@@ -52,30 +52,19 @@ bản**. Bốn file trùng tên giữ **1824 dòng** — không file nào bị �
 **Hệ quả cho thứ tự việc:** một mục nợ chỉ đóng được khi **đã chạy trên dữ liệu thật** và **đã
 qua đột biến kiểm**. "Viết xong, test xanh" từ nay không phải điều kiện đủ.
 
-### Việc còn mở, xếp theo thứ RẺ NHẤT trước
+### Việc còn mở — KHÔNG liệt kê ở đây nữa
 
-Không mục nào chặn ai, và **không mục nào chờ Đức chốt**.
+Danh sách tay ở chỗ này đã ôi: đo 09/09, **5 trong 12** mã việc nó gọi là *đang mở* đã đóng hoặc
+đã xoá. Và nó vi phạm chính luật cuối file này — *không nhắc lại nội dung từng mục nợ*.
 
-**Nhóm A — phép đo đang nói dối (làm trước, vì nó làm mọi số đo khác đáng tin hơn)**
-`KHUNG-15` (cổng báo "Test xanh ĐỎ" trong khi mọi suite exit 0 — chập chờn, phải ghi lượt nào
-đỏ lượt nào xanh trước khi sửa) · `KHUNG-9` (`can-nang` xác nhận "đã có ca hỏng" bằng cách TÌM
-CHUỖI) · `KHUNG-10` (bảng nói 6/11 mục có ca đỏ, chưa đối chiếu lại).
+**Nguồn sống:** `npm run what-next` — giao bảng quyền × sổ nợ × sổ ý tưởng, nên nó không ôi được.
+Nội dung từng mục: [BACKLOG.md](../BACKLOG.md).
 
-**Nhóm B — chỗ hở còn lại của bản trích và migrate**
-`KHUNG-14` (chưa lượt migrate nào đi qua phép thử "assistant onboard") · `KHUNG-3` (hai pilot cũ
-chưa đo lại ở bản khung hiện tại) · `KHUNG-24` (tab "Đã xong" chỉ đọc sổ nợ repo NHÀ).
+**Thứ tự vẫn còn hiệu lực, và nó là thứ file này ĐƯỢC nói:** làm nhóm *phép đo đang nói dối*
+trước — một phép đo sai làm mọi số đo khác mất giá trị. Rồi tới chỗ hở của bản trích và migrate.
 
-**Nhóm C — nợ kỹ thuật nhỏ**
-`KHUNG-17` · `KHUNG-22` · `KHUNG-8`.
-
-**Nhóm D — cần Đức nếu muốn làm, nhưng KHÔNG chặn gì**
-`KHUNG-11` phần đuôi (`ORCHESTRATOR.md` 426 dòng — gọt là mất nội dung thật) ·
-`KHUNG-6` (danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin, đổi nó là đổi luật
-an toàn) · `KHUNG-4` (ba luật lớn của vai điều phối chưa có phép kiểm máy).
-
-**Một con số vượt trần, chưa ai xử:** thời gian chạy trọn bộ phép kiểm **~350/180 giây**. Nó
-nằm trong `KHUNG-11` nhưng thực chất là việc riêng: mỗi bản phát lại thêm một suite.
-
+**Một con số vượt trần, chưa ai xử:** thời gian chạy trọn bộ phép kiểm **~350/180 giây**. Mỗi bản
+phát lại thêm một suite. Nằm trong `KHUNG-11` nhưng thực chất là việc riêng.
 
 ## Cập nhật 2026-09-05 — pilot đổi thứ tự ưu tiên
 
@@ -94,9 +83,8 @@ Lượt migrate thật `n8n-orchestrator` cộng audit độc lập đã **đón
 lớp bảo vệ vừa bị nới. Cách duy nhất bắt được là **tự tay dựng ca hỏng**. Nên từ nay mọi lượt nới
 một cấu hình đều phải kèm một khối trong `tests/cong-do-that.mjs`.
 
-**Thứ tự đổi, và nó CÒN NGUYÊN hiệu lực:** migrate không còn là việc làm sau cùng, sau khi dọn
-xong nợ. Nó lên **sớm** — mỗi lượt migrate là một lượt tìm lỗi mà bảy phiên ở nhà không tìm ra.
-*(Câu gốc viết "lên đợt 1"; các đợt đã dời sang kho lưu trữ 09/09 nên bỏ số hiệu, giữ nguyên ý.)*
+**Thứ tự đổi, CÒN NGUYÊN hiệu lực:** migrate không còn là việc làm sau cùng sau khi dọn xong nợ —
+nó lên **sớm**, vì mỗi lượt migrate tìm ra lỗi mà bảy phiên ở nhà không tìm ra. *(Gốc: "lên đợt 1".)*
 
 ## Thứ tự việc — đọc ở đâu
 

@@ -1205,3 +1205,15 @@ trong khi khối đó đã dời đi), và câu *"lên đợt 1"* nay bỏ số 
 **Còn mở:** sổ nợ 20 mục. Rà luật: xong `AGENTS.md` · `decisions.md` · 15 ADR · `ROADMAP-V2` ·
 `MULTIFLOW` · `SO-TAY-AGENT` · `TINH-NANG` · `GIAO-VIEC-CHUNG`. **Chưa rà:** `ORCHESTRATOR.md`
 (vấn đề đã có mục nợ `KHUNG-4`) · `CHUYEN-REPO-LEN-CHUAN.md` · `BAO-TRI-DINH-KY.md` · `LEGEND.md`.
+
+### 2026-09-09 (7) · harness-loi-01 · ROADMAP-V2 tự vi phạm luật của chính nó
+
+**Đo:** mục *"Việc còn mở"* trong `docs/ROADMAP-V2.md` liệt kê tay 12 mã việc — **5 trong 12 đã
+đóng hoặc đã xoá**. Và nó vi phạm chính luật ở cuối file đó: *"Không nhắc lại nội dung từng mục
+nợ — hai nguồn sự thật cho cùng một việc là đúng bệnh bộ khung sinh ra để chữa."*
+
+**Chốt:** bỏ danh sách tay, trỏ sang nguồn SỐNG (`npm run what-next` + `BACKLOG.md`), giữ lại
+phần file này ĐƯỢC nói: thứ tự ưu tiên và con số vượt trần chưa ai xử.
+
+**Số:** `ROADMAP-V2.md` **120 → 109 dòng**. Kho chữ **3.197 → 3.185**. Thước cóc **3.196 → 3.185**
+(SIẾT lần thứ hai trong phiên). Bản **1.3.89**.
