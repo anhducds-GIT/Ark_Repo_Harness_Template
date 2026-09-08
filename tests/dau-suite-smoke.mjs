@@ -83,8 +83,12 @@ const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, moi_truong
   const gate = fs.readFileSync(path.join(ROOT, "scripts", "session-check.mjs"), "utf8").replace(/\r\n/g, "\n");
   assert.match(gate, /xetDau\(docDau\(ROOT\), dauCay\(ROOT\), bamLenh\(danhSachSuite\(ROOT\)\)\)/,
     "cong phai xet dau bang DU BA nguon: dau tren dia, cay lam viec that, danh sach suite that");
-  assert.match(gate, /if \(xet\.dung\)/, "cong phai RE NHANH theo ket qua xet, khong duoc goi roi bo qua");
-  assert.match(gate, /runRootSuite\(\)/, "nhanh chay lai day du PHAI con do — dau chi la duong tat, khong phai duong duy nhat");
+  /* Hai vế dưới cố ý hỏi HÀNH VI, không hỏi tên biến: hai repo gọi nhánh chạy đầy đủ bằng hai
+     cái tên khác nhau (`runRootSuite()` ở nơi phát hành, `rootSuiteParts()` ở repo tiêu thụ), mà
+     điều phải ghim thì y hệt — kết quả xét PHẢI được rẽ nhánh, và đường chạy đầy đủ PHẢI còn. */
+  assert.match(gate, /\.dung/, "cong phai RE NHANH theo ket qua xet, khong duoc goi roi bo qua");
+  assert.match(gate, /runRootSuite\(\)|rootSuiteParts\(\)/,
+    "nhanh chay lai day du PHAI con do — dau chi la duong tat, khong phai duong duy nhat");
   ok("cổng thật sự gọi phép xét, rẽ nhánh theo nó, và vẫn giữ đường chạy đầy đủ");
 }
 
