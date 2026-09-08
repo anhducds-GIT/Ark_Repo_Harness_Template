@@ -39,35 +39,5 @@
       "task": "ra soat luat",
       "released_at": null
     }
-  },
-  "tam": {
-    "docs/ROADMAP-V2.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    },
-    ".repo-structure.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T22:56:51.431Z"
-    }
   }
 }
