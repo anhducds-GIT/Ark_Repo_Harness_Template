@@ -176,12 +176,19 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
   const pkg = JSON.parse(files.get("package.json"));
   const lenh = pkg.scripts || {};
 
-  // (1) Suite nào bản trích MANG THEO thì chuỗi `test` phải GỌI nó. Đây là lỗ đã đo được.
+  /* (1) Suite nào bản trích MANG THEO thì CHUỖI THẬT phải GỌI nó. Đây là lỗ đã đo được.
+     "Chuỗi thật" từ bản 1.3.60 là `test:tuan-tu`: `test` nay trỏ sang bộ chạy song song, và bộ
+     chạy đọc `test:tuan-tu ?? test`. Phép kiểm phải đi theo ĐÚNG đường đó — hỏi `test` không
+     thôi thì nó chỉ thấy một dòng gọi bộ chạy, và kết luận "không suite nào được gọi" (sai), hoặc
+     tệ hơn: một ngày ai đó đổi lại thành chuỗi thẳng thì phép kiểm im lặng hết soi gì cả. */
   const suite = [...files.keys()].filter((f) => f.startsWith("tests/") && f.endsWith(".mjs"));
   assert.ok(suite.length > 0, "ban trich khong mang mot suite nao — phep kiem nay mat doi tuong, sua no dung cach");
+  const chuoiThat = String(lenh["test:tuan-tu"] ?? lenh.test ?? "");
+  assert.ok(chuoiThat.includes("tests/"),
+    "chuoi test that phai goi it nhat mot suite — neu `test` tro sang bo chay thi PHAI co `test:tuan-tu`");
   for (const f of suite) {
-    assert.ok(String(lenh.test || "").includes(f),
-      "ban trich mang `" + f + "` nhung chuoi `test` khong goi no — repo moi se IM LANG thoi chay suite do");
+    assert.ok(chuoiThat.includes(f),
+      "ban trich mang `" + f + "` nhung chuoi test that khong goi no — repo moi se IM LANG thoi chay suite do");
   }
 
   // (2) Chiều ngược lại: lệnh trỏ tới file nào thì file đó phải có mặt. Không có vế này thì

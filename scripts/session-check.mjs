@@ -17,6 +17,7 @@ import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
 import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
 
@@ -810,7 +811,25 @@ check("Test xanh", () => {
   }
   const lines = [];
   if (rootSuite) {
-    try {
+    /* DÙNG LẠI LƯỢT CHẠY VỪA XONG, THAY VÌ CHẠY LẠI Y HỆT.
+     *
+     * Đo 08/09: chuỗi suite bộ khung tốn **535s**, và cổng này gọi lại đúng chuỗi đó. Một vòng
+     * làm việc bình thường — chạy suite rồi chạy cổng — tốn **hơn 17 phút**, mà nửa sau không
+     * kiểm thêm được gì so với nửa đầu.
+     *
+     * KHÔNG PHẢI NỚI LỚP BẢO VỆ. Điều kiện để dùng lại chặt hơn vẻ ngoài của nó: dấu phải khớp
+     * **HEAD** + **băm của `git status --porcelain -uall`** + **danh sách suite** + còn **trong
+     * hạn**. Sửa một byte ở bất kỳ file nào, kể cả file chưa track, là băm đổi và cổng chạy lại
+     * đủ bộ. Suite đỏ thì `chay-test.mjs` XOÁ dấu chứ không ghi dấu đỏ, nên không có đường nào
+     * để một cây chưa xanh lại có dấu hợp lệ. Dấu không được commit, nên không mượn được của
+     * máy khác.
+     *
+     * Nói cách khác: cổng vẫn đòi ĐÚNG bằng chứng cũ — "cây làm việc này đã chạy suite và xanh"
+     * — nó chỉ thôi đòi làm lại một việc vừa làm xong. */
+    const xet = xetDau(docDau(ROOT), dauCay(ROOT), bamLenh(danhSachSuite(ROOT)));
+    if (xet.dung) {
+      lines.push(`suite gốc repo: DÙNG LẠI DẤU — ${xet.vi_sao}`);
+    } else try {
       const out = runRootSuite();
       const NEWLINE = String.fromCharCode(10);
       const totals = out.split(NEWLINE).filter((line) => /[0-9]+ passed, [0-9]+ failed/.test(line));

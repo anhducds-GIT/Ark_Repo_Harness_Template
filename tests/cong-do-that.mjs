@@ -22,7 +22,7 @@ let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
-const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs"];
+const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"];
 
 /* Kho nền: đủ để cổng chạy tới được mọi phép kiểm. Mỗi khối tự phá phần của mình. */
 function khoNen({ chuKhoa = "thu" } = {}) {

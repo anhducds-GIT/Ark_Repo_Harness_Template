@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T05:12:52.805Z",
-      "task": "khai khoi handoff + xoay HANDOFF.md sang kho luu tru",
-      "released_at": "2026-09-08T07:04:25.737Z",
+      "claimed_at": "2026-09-08T07:16:40.429Z",
+      "task": "khai test.serial + gitignore dau suite",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,11 +23,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T05:12:52.692Z",
-      "task": "mang co che xoay HANDOFF tu repo tieu thu len bo khung + cam rang",
-      "released_at": "2026-09-08T07:04:25.443Z",
+      "claimed_at": "2026-09-08T07:16:40.352Z",
+      "task": "tang toc: bo chay suite song song + dau xac nhan suite cho cong",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"

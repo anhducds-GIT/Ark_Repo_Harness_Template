@@ -99,5 +99,15 @@
     "_tru_adr": "Khong ke docs/adr/: ADR da Accepted la bat bien (ADR-0000) nen thu muc do chi co the to len. Tinh no vao thuoc thi moi quyet dinh moi lam cong do, va nguoi ta se noi con so cho xong.",
     "_do_that": "2026-09-08: docs/ tong 6.654 dong — ADR 910, phan tuy y 5.744. Lenh do lai: git ls-files docs | grep -v \"^docs/adr/\" | xargs -d \"\n\" cat | wc -l",
     "tran_dong_khong_ke_adr": 5744
+  },
+  "test": {
+    "_doc": "Suite nao PHAI chay MOT MINH. Bo chay chay song song cac suite con lai; suite doc git cua CAY LAM VIEC CHINH thi hai tien trinh tranh index.lock va bao ra mot loi NOI DUNG trong y het loi that.",
+    "_cach_tim": "Suite nao goi git voi cwd la goc repo (khong phai thu muc tam) thi khai vao day. Sai sot khong nguy hiem: bo chay tu chay lai mot minh moi suite do truoc khi ket luan.",
+    "serial": [
+      "bang-song.mjs",
+      "khoa-dau-vet.mjs",
+      "features-smoke.mjs",
+      "overview-doc-smoke.mjs"
+    ]
   }
 }
