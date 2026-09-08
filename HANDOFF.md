@@ -832,3 +832,27 @@ lại của phiên chạy **đúng cơ chế vừa port**: trả cả 4 khoá v�
 file đang sửa và `--xong --het` ngay sau. Đây là lượt chạy thật đầu tiên của nó ở repo này.
 
 **Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-52`.
+
+## 2026-09-08 (khuya, tiep) · harness-phat-01 · Duc chot dong KHUNG-42, giu dong VANG
+
+**Duc chot:** *"ok dong KHUNG-42 di, giu dong vang."* — co che khoa **tu het han** bo han, vi
+ADR-0012 ⑸ noi nguoc no. Giu lai **dung mot** viec: dong VANG cuoi cong, chi **neu ten**, khong
+doi ma thoat. Muc moi la **`KHUNG-54`** (51/52/53 lane ① da dung).
+
+**BAN VA DA SOAN SAN, chua ghi duoc vi khoa `_root` dang o lane ①** (16:35, dong ban 1.3.76).
+Ba viec, tu-kiem truoc khi ghi, khong doan:
+`node "…/scratchpad/ap-khung42.mjs"` — gach ma KHUNG-42 + chen khoi ly do · them KHUNG-54 ·
+them muc quyet dinh vao `decisions.md`. Duong day day du o Log phien nay.
+
+**Va mot canh bao cho ①, dung cho chuong dang lam:** dong VANG nay roi vao `scripts/session-check.mjs`
+— dung file lane ① dang giu khoa muc file luc 16:36. Neu ① lam luon thi khoi trung; neu khong,
+`KHUNG-54` cho o so.
+
+**Toi SUA lai mot chan doan cua chinh minh:** hai lan `RELEASE-LEDGER.json` hong hom nay toi ghi vao
+`KHUNG-50` la "dua ghi khong nguyen tu". SAI. Nguon that la `tests/upgrade-smoke.mjs` doi but sổ
+THAT o goc repo roi khoi phuc trong `finally`; mot luot bi cat giua duong de lai `1.2.10 →
+1111111111111111` trong cay lam viec. Lane ① tim ra doc lap va da ghi thanh `KHUNG-51`.
+Toi da khoi phuc file tu HEAD (ban sao dot bien luu o scratchpad truoc khi khoi phuc).
+
+**Con mo:** `KHUNG-54` (chua ghi vao so) · 3 commit chua day, trong do `b399d2a` la cua toi nam
+TREN hai commit cua ①, nen day rieng se phai `--carry` — de ① day cung luot 1.3.76 thi khong can.
