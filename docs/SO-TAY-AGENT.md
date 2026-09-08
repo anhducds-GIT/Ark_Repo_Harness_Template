@@ -109,7 +109,7 @@ việc lặp lại — **nâng · migrate · audit** — giao cho Codex CLI là 
 - [ ] `cd "<REPO ĐÍCH>" && codex exec -s workspace-write - < de-bai.txt` — **phải chạy từ TRONG
       repo đích**, Codex từ chối thư mục không phải kho git
 - [ ] Nhận báo cáo năm dòng → **tự kiểm chứng lại từng con số** (luật vàng 4). Báo cáo là lời
-      tự khai, chưa có lệnh nào đo lại — đó là `KHUNG-31`
+      tự khai, chưa có lệnh nào đo lại — đó là `KHUNG-6` (gộp `KHUNG-31` vào 09/09)
 - [ ] Phiên nhận việc báo **DỪNG vì luật của repo đích** → đó là kết quả ĐÚNG, không phải thất
       bại. Đưa lên người chốt, đừng bảo nó làm tiếp
 

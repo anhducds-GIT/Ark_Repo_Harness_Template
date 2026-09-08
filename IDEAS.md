@@ -35,7 +35,7 @@
 - **chủ:** chưa ai nhận
 - **phạm vi:** `_code`
 
-**nguồn** — `BACKLOG.md` mục `KHUNG-31`, và một lượt audit 05/09 đã khai ba lệnh thoát mã `2/1/1` trong khi đo lại cả ba đều exit 0.
+**nguồn** — `BACKLOG.md` mục `KHUNG-6` (nhận `KHUNG-31` 09/09), và một lượt audit 05/09 đã khai ba lệnh thoát mã `2/1/1` trong khi đo lại cả ba đều exit 0.
 
 **vì sao** — Bộ khung đo repo đích rất kỹ **trước** khi giao việc, nhưng sau khi giao thì không đo gì cả. Phiên nhận việc trả về năm dòng và không ai kiểm. Một con số khai sai đã xảy ra thật một lần rồi; càng giao cho nhiều AI khác nhau thì lời tự khai càng đáng ngờ.
 
