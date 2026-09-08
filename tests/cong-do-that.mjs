@@ -585,4 +585,59 @@ function docMuc(kho, ten, as = "thu") {
   } finally { rmSync(cha, { recursive: true, force: true }); }
 }
 
+/* ---- 13. Sổ quyết định: DỜI thì xanh, XOÁ thì đỏ ------------------------- */
+{
+  /* Luat "decisions.md chi them" co CHU tu lau ma khong co RANG: co che doi-cho-chu-khong-xoa
+   * (`dongXoaChuaLuuTru`) truoc 09/09 chi duoc goi cho HANDOFF.md. Do that: xoa sach mot quyet
+   * dinh khoi decisions.md thi KHONG gi keu.
+   *
+   * BA VE, va ve ⑵ la ve quan trong nhat. Mot phep kiem chi doi "co file nao do trong archive/"
+   * thi ai cung lach duoc bang cach tao mot file rong — nen phai doi KHOP BYTE. Va ve ⑶ giu cho
+   * no khong chan oan luot don that: doi dung chu thi phai XANH, khong thi khong ai dam don. */
+  const { cha, kho, at } = khoNen();
+  try {
+    const BA_DONG = ["## 2026-01-01 · quyet dinh cu", "", "Duc chot: giu nguyen."];
+    const so = (them) => ["# Quyet dinh", "", ...BA_DONG, "", ...them].join(NL) + NL;
+    const luot = (ten) => { at("add", "-A"); at("commit", "-q", "-m", ten + NL + NL + "Lane: thu"); };
+
+    /* SO PHAI CO MAT O MOC SO, khong thi phep do vo nghia. Cong diff tu `origin/main` toi cay lam
+     * viec; file MOI TINH thi moi dong deu la dong THEM, nen xoa bao nhieu cung khong hien ra.
+     * Da vap that o luot viet ve nay: ve ⑴ bao XANH voi ly do "chi them 5 dong". */
+    writeFileSync(join(kho, "decisions.md"), so([]), "utf8");
+    luot("dat so quyet dinh vao moc so");
+    at("push", "-q", "origin", "main");
+
+    // Doi chung: chi THEM -> XANH. Chua xanh o day thi moi khang dinh duoi la vo nghia.
+    writeFileSync(join(kho, "decisions.md"), so(["## 2026-02-02 · quyet dinh moi", "", "Duc chot: doi."]), "utf8");
+    luot("them mot quyet dinh");
+    let m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    assert.equal(m.trangThai, "XANH", `chi THEM phai XANH, dang: ${m.chiTiet}`);
+
+    // ⑴ Xoa han quyet dinh cu, KHONG co kho luu tru nao -> phai DO.
+    writeFileSync(join(kho, "decisions.md"), ["# Quyet dinh", "", "## 2026-02-02 · quyet dinh moi", "", "Duc chot: doi."].join(NL) + NL, "utf8");
+    luot("xoa quyet dinh cu, khong luu tru");
+    m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    assert.equal(m.trangThai, "ĐỎ", `xoa ma khong luu tru phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+    assert.ok(/kho lưu trữ/.test(m.chiTiet),
+      `loi nhan phai chi dung cho phai sua (kho luu tru), khong noi chung chung: ${m.chiTiet}`);
+
+    // ⑵ VE QUAN TRONG NHAT: co file trong archive/ nhung LECH MOT KY TU -> van phai DO.
+    mkdirSync(join(kho, "docs", "archive"), { recursive: true });
+    writeFileSync(join(kho, "docs", "archive", "qd-cu.md"),
+      BA_DONG.join(NL).replace("giu nguyen", "giu nguyenX") + NL, "utf8");
+    luot("luu tru lech mot ky tu");
+    m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    assert.equal(m.trangThai, "ĐỎ",
+      `ban luu tru LECH MOT KY TU van phai DO — khong thi ai cung lach bang mot file rong. Dang: ${m.chiTiet}`);
+
+    // ⑶ Sua cho khop byte -> XANH lai. Cua ra phai mo, khong thi khong ai dam don so.
+    writeFileSync(join(kho, "docs", "archive", "qd-cu.md"), BA_DONG.join(NL) + NL, "utf8");
+    luot("luu tru khop byte");
+    m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    assert.equal(m.trangThai, "XANH",
+      `doi dung chu (khop byte) phai XANH lai — cong chan ca luot don dung luat thi luat tu chet. Dang: ${m.chiTiet}`);
+    ok("13 · sổ quyết định: chỉ thêm XANH · xoá mất hẳn ĐỎ · lưu trữ lệch một ký tự vẫn ĐỎ · dời khớp byte XANH lại");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+}
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

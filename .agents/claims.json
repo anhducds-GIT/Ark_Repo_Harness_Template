@@ -39,5 +39,47 @@
       "task": "don luat trung, so no 25->20",
       "released_at": "2026-09-08T20:19:22.034Z"
     }
+  },
+  "tam": {
+    "decisions.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:28:03.801Z"
+    },
+    "docs/archive/DECISIONS-khoa-2026-09.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:28:03.801Z"
+    },
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:30:43.494Z"
+    },
+    "tests/cong-do-that.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:32:41.881Z"
+    },
+    "AGENTS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:38:49.621Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:39:12.993Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:39:45.180Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:39:45.180Z"
+    },
+    "template/scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:39:45.180Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T20:39:45.180Z"
+    }
   }
 }

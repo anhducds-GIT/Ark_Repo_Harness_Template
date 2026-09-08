@@ -764,6 +764,41 @@ check("HANDOFF đã ghi Log phiên này", () => {
   return { ok: true, msg: coViec ? "Đã ghi Log." : "Không có gì phải ghi." };
 });
 
+/* ---- 5b. Sổ quyết định: dời chỗ thì được, XOÁ thì không ------------------
+ *
+ * LUẬT NÀY ĐÃ CÓ CHỮ TỪ LÂU MÀ CHƯA CÓ RĂNG. `AGENTS.md` mục 6 khai `decisions.md` là sổ
+ * **"chỉ thêm"**, nhưng đo 09/09: cơ chế *dời-chỗ-chứ-không-xoá* (`dongXoaChuaLuuTru`) chỉ được
+ * gọi cho **HANDOFF.md**. Xoá sạch một quyết định cũ khỏi `decisions.md` thì KHÔNG gì kêu.
+ *
+ * Vì sao đáng lắp răng chứ không đáng bỏ luật: sổ quyết định là chỗ trả lời *"Đức đã chốt gì"*.
+ * Một quyết định biến mất không dấu vết thì lượt sau không có cách nào biết luật hiện hành đến
+ * từ đâu — và chính lượt 09/09 này là lượt ĐẦU TIÊN có người (tôi) dời quyết định đi thật.
+ *
+ * KHÔNG PHẢI LUẬT MỚI, và không phải cấm dọn: dùng lại nguyên cỗ máy của `HANDOFF.md`, nên
+ * **dời sang thư mục lưu trữ vẫn XANH**, chỉ xoá-mất-hẳn mới ĐỎ. `EXPECTED_CHECKS` 15 -> 16,
+ * khai tường minh ngay dưới đây theo đúng luật của chính cổng.
+ *
+ * (Đừng viết mẫu đường dẫn kho lưu trữ vào khối chú thích này: dấu sao-gạch trong đó ĐÓNG luôn
+ *  khối chú thích, và cả file chết ngay lúc nạp. Đã vấp thật ở lượt viết phép kiểm này.) */
+check("Sổ quyết định chỉ THÊM hoặc DỜI", () => {
+  const SO = "decisions.md";
+  if (!touched.includes(SO)) return { ok: true, msg: "Phiên này không đụng sổ quyết định." };
+  const so = doThemXoa(SO);
+  if (!so) return { ok: true, skipped: true, msg: `Không đọc được diff của ${SO} — nói KHÔNG BIẾT, không nói ĐẠT.` };
+  if (so.xoa === 0) return { ok: true, msg: `Chỉ thêm ${so.them} dòng vào sổ quyết định.` };
+  const thieu = dongXoaChuaLuuTru(SO);
+  if (thieu === null) return { ok: true, skipped: true, msg: `Không đối chiếu được kho lưu trữ cho ${SO}.` };
+  if (thieu.length === 0) {
+    return { ok: true, msg: `${so.xoa} dòng được DỜI sang kho lưu trữ (khớp byte, không dòng nào mất).` };
+  }
+  const mau = (thieu.find((d) => d.trim()) ?? thieu[0]).slice(0, 60);
+  return {
+    ok: false,
+    msg: `xoá ${so.xoa} dòng khỏi ${SO} mà ${thieu.length} dòng KHÔNG có bản khớp byte trong kho lưu trữ (\`*/archive/*\`)`
+      + `, ví dụ: "${mau}". Quyết định cũ thì DỜI đi, đừng xoá — lượt sau còn tra được luật hiện hành đến từ đâu.`
+  };
+});
+
 /* ---- 6. Test ------------------------------------------------------------ */
 check("Test xanh", () => {
   if (quick) return { ok: true, skipped: true, msg: "ĐÃ BỎ QUA (--quick). Chưa được báo 'xong' khi chưa chạy thật." };
@@ -1323,7 +1358,7 @@ check("Mọi lệnh git đọc được", () => {
 // 2026-09-08, phiên claude-cua-kiem: 11 → 12. Thêm "Sổ nợ dưới trần". Đức uỷ quyền chọn con số
 // và cách cưỡng chế; lý do ở ADR-0010. Trần khai trong `.repo-structure.json`, repo không khai
 // thì phép kiểm xanh — nên bản khung phát đi không tự đặt trần cho repo nào.
-const EXPECTED_CHECKS = 15;
+const EXPECTED_CHECKS = 16;
 if (results.length !== EXPECTED_CHECKS) {
   console.error(`\nCỔNG BỊ SỬA: đang có ${results.length} phép kiểm, phải có ${EXPECTED_CHECKS}.`);
   console.error("Ai đó đã bớt (hoặc thêm) phép kiểm mà không cập nhật EXPECTED_CHECKS. Xem lại scripts/session-check.mjs.\n");

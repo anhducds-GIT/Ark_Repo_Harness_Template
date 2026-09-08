@@ -250,17 +250,6 @@ Lưu ý cách đọc: quyết định 06/09 *"bộ khung là chuẩn, cơ chế 
 hiệp đồng SAU KHI đã migrate**. Nó không cho phép một phiên nhận việc tự ý bước qua luật của
 repo đích ngay trong lượt đang làm.
 
-## 2026-09-06 · Khoá vùng: nhận muộn, một lane một khoá, và cấm nhả hộ
-
-Đức: *"tôi muốn adjust rule về việc giữ khóa để tối ưu flow làm việc hơn"*. Ba luật vào
-`AGENTS.md` mục 1: **nhận khoá ngay trước lượt ghi đầu tiên** (đọc và đo không cần khoá) ·
-**một lane một khoá gói** · **không nhả khoá hộ lane khác** vì đo thấy vùng chưa bị chạm.
-
-Tín hiệu mới `"repo chưa thấy dấu vết"` hiện ở ba chỗ và là **VÀNG, không ĐỎ** — chặn một lane
-đang đọc kỹ là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ. Bằng chứng gốc: 06/09 một
-phiên điều phối đo thấy "0 commit 0 sửa đổi" rồi nhả khoá hộ, trong khi lane đó đang làm thật ở
-thư mục ngoài repo — lane phải hoàn nguyên phần đã xong. Ghim: `tests/khoa-dau-vet.mjs`.
-
 ## 2026-09-06 · Sổ migrate: chỉ nuôi TAB, thôi nuôi trang riêng
 
 Đức: *"chúng ta sẽ maintain tab Migrate ở trong dashboard chung của template, không cần phải
@@ -492,22 +481,6 @@ quan trọng nhất.
 
 Chi tiết việc và điều kiện đóng: [BACKLOG.md](BACKLOG.md) mục `KHUNG-48`. Việc của Vai ① — đây là
 tầng máy nên đòi tăng `version` và sinh lại bản trích.
-## 2026-09-08 · Đóng `KHUNG-42` — giữ đúng dòng VÀNG, bỏ cơ chế khoá tự hết hạn
-
-**Đức chốt:** *"ok đóng KHUNG-42 đi, giữ dòng vàng."*
-
-**Vì sao cần chốt:** `KHUNG-42` đề xuất một bảng ba dòng cho khoá **tự hết hạn** khi có phiên khác
-chờ. Nhưng [ADR-0012](docs/adr/0012-khoa-muc-file.md) (Accepted cùng ngày, người chốt cũng là Đức)
-nói **ngược** ở vế ⑸: *"Quá 30 phút thì NÊU TÊN, tuyệt đối không tự nhả"* — vì tự nhả là tự động hoá
-đúng vụ nhả-khoá-hộ 06/09, lần đó một lane mất phần đã xong. Hai luật ngược nhau về cùng một khoá
-thì lane nào cũng có cớ làm theo bên có lợi cho mình, nên phải bỏ hẳn một bên.
-
-**Chốt:** ADR-0012 thắng. `KHUNG-42` đóng. Giữ lại **một** việc duy nhất của nó — dòng **VÀNG** ở
-cuối cổng đóng phiên, chỉ **nêu tên** và **không đổi mã thoát**.
-
-Việc và điều kiện đóng: [BACKLOG.md](BACKLOG.md) mục `KHUNG-54`. Việc của Vai ① — tầng máy.
-
-
 ## 2026-09-08 · Lưu đồ trên bảng phải RA HÌNH, và danh sách dài phải chảy thành cột
 
 **Đức chốt:** *"dashboard tôi thấy flow chart này toàn chữ, tôi cần hình ảnh trực quan"* · *"các
@@ -544,16 +517,6 @@ gần một nửa**, nên đây là chữa mâu thuẫn chứ không phải nớ
 **Bằng chứng:** mọi lượt `safe-push` in nguyên văn từ remote: `Bypassed rule violations for
 refs/heads/main: Required status check "cong-kiem" is expected`. Cổng **có khai**, tài khoản đang
 đẩy **đi qua được**. Tần suất CAO, tác hại THẤP — ba lớp trước nó còn răng. Ghi ở `IDEAS.md` `Y-08`.
-
-## 2026-09-08 · Khoá mức FILE: giữ ngắn, trả ngay; chỉ đọc thì không khoá
-
-**Đức chốt, nguyên văn:** *"AI Assistant chỉ giữ khóa đúng ở file mà AI đó đang sửa, các file khác
-không giữ, khóa được giữ và trả ngay trước và sau khi AI sửa … Nếu chỉ đọc ko cần giữ khóa."*
-Và giữa phiên: *"bạn tạm nhả khóa được ko? bao giờ ghi file hãy lấy lại khóa"*.
-
-**Chốt:** [ADR-0012](docs/adr/0012-khoa-muc-file.md) — sáu quyết định, số đo của CHÍNH repo này
-(620 cặp va chạm, **57% là chặn oan**, p90 **12 file** một lượt sửa), và mục **"cái này KHÔNG
-chữa"**. Ghim `tests/khoa-file.mjs`. Còn hở: `KHUNG-53`.
 
 ## 2026-09-09 · Bảng phải LIỆT KÊ sổ nợ, và có ô tìm trên cả trang
 
@@ -638,3 +601,28 @@ việc lặp lại hay hướng đi chưa hỏng → sổ riêng, khai vào bả
 
 **Cái mất:** thêm một luật nay tốn thêm một bước (chọn nhà). Đổi lại: hết cảnh nối luật mới vào
 chỗ gần nhất, rồi hai chỗ nói hai kiểu.
+
+## 2026-09-09 · LUẬT KHOÁ — gộp 3 quyết định 06/09–08/09 thành một
+
+**Đức chốt:** *"gộp, xóa, sử dụng decision mới nhất, bỏ các cái cũ đã bị obsolete để ko gây confuse."*
+
+**Vì sao:** muốn biết luật khoá hiện hành, trước lượt này phải đọc **ba mục ở ba chỗ** rồi tự ghép
+— viết cách nhau ba ngày, mục sau không nói nó phủ mục nào. Ca thật: một phiên nhớ đúng câu *"quá
+30 phút thì nêu tên, tuyệt đối không tự nhả"* rồi áp cho khoá của **chính nó**, giữ khoá suốt phiên
+— ngược hẳn mục cùng ngày bảo *"trả ngay sau khi sửa"*. Phiên đó **không nhớ nhầm**: nó đọc đúng
+một trong ba câu đang cùng có hiệu lực.
+
+**Luật khoá hiện hành ở đâu:** [AGENTS.md](AGENTS.md) mục 1 — **một bản duy nhất**, đừng chép lại.
+Lý lẽ và số đo: [ADR-0012](docs/adr/0012-khoa-muc-file.md) · [ADR-0013](docs/adr/0013-cua-tu-choi-mat-tin-hieu.md).
+
+**Cái ĐỔI so với ba mục cũ:** ⑴ mốc trả khoá file: *"hết phiên"* → **ngay sau commit** chứa lượt
+ghi; ⑵ câu *"một lane một khoá gói"* (thời chỉ có khoá vùng) nay dễ đọc nhầm — một lane giữ **nhiều**
+khoá file là bình thường, điều còn đúng là **một VÙNG chỉ một lane**; ⑶ câu *"KHÔNG tự nhả"* nhận
+chủ ngữ: **MÁY** không tự nhả, không phải "bạn đừng trả khoá của mình".
+
+**Ba mục cũ:** dời nguyên văn sang
+[docs/archive/DECISIONS-khoa-2026-09.md](docs/archive/DECISIONS-khoa-2026-09.md) — giữ từng byte,
+chỉ đổi chỗ, đã đối chiếu bằng `git diff` (37 dòng cắt, 37 dòng vào kho, 0 dòng mất).
+
+**Còn hở:** `KHUNG-53` — cổng buộc mục *"Test xanh"* vào khoá VÙNG, nên trả hết khoá file là mục đó
+thành BỎ. Đã cắn **hai lượt**.
