@@ -12,7 +12,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { bamLenh, danhSachSuite, danhSachTuanTu, xetDau, TEN_DAU } from "../scripts/chay-test.mjs";
+import { bamLenh, danhSachSuite, danhSachTuanTu, moiTruongNay, xetDau, TEN_DAU } from "../scripts/chay-test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let so = 0;
@@ -22,7 +22,7 @@ const CAY = { head: "a".repeat(40), bam: "b".repeat(32) };
 const LENH = bamLenh(["node tests/x.mjs", "node tests/y.mjs"]);
 const LUC = "2026-09-08T10:00:00.000Z";
 const NOW = Date.parse("2026-09-08T10:05:00.000Z");   // 5 phút sau
-const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, luc: LUC };
+const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, moi_truong: moiTruongNay(), luc: LUC };
 
 /* ---- 1. Chiều NHẬN: mọi thứ khớp thì dùng lại được -------------------------
    Không có vế này thì một hàm luôn trả `false` cũng qua hết các vế dưới, và cơ chế thành
@@ -46,13 +46,16 @@ const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, luc: LUC }
     ["QUÁ HẠN (31 phút)", { ...DAU_TOT, luc: "2026-09-08T09:29:00.000Z" }],
     ["mốc thời gian rác", { ...DAU_TOT, luc: "hôm qua" }],
     ["mốc ở TƯƠNG LAI (đồng hồ bị vặn)", { ...DAU_TOT, luc: "2026-09-08T11:00:00.000Z" }],
+    // Phiên Codex bắt được cửa này khi chấm chéo: HEAD + cây làm việc KHÔNG nói gì về môi trường.
+    ["ĐỔI MÔI TRƯỜNG (nâng bản Node)", { ...DAU_TOT, moi_truong: "v22.0.0 win32 x64" }],
+    ["dấu cũ KHÔNG ghi môi trường", (() => { const d = { ...DAU_TOT }; delete d.moi_truong; return d; })()],
   ];
   for (const [ten, dau] of ca) {
     const r = xetDau(dau, CAY, LENH, { now: NOW });
     assert.equal(r.dung, false, `PHAI TU CHOI: ${ten}`);
     assert.ok(String(r.vi_sao).length > 5, `${ten}: phai noi VI SAO tu choi, khong im lang`);
   }
-  ok(`từ chối đủ ${ca.length} cửa: chưa có · rỗng · đỏ · đổi HEAD · đổi cây · đổi danh sách · quá hạn · mốc rác · mốc tương lai`);
+  ok(`từ chối đủ ${ca.length} cửa: chưa có · rỗng · đỏ · đổi HEAD · đổi cây · đổi danh sách · quá hạn · mốc rác · mốc tương lai · đổi môi trường · dấu cũ thiếu môi trường`);
 }
 
 /* ---- 3. Hạn dùng đọc được từ ngoài, và biên là ">" ------------------------- */

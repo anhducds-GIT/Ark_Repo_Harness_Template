@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T07:16:40.429Z",
-      "task": "khai test.serial + gitignore dau suite",
-      "released_at": "2026-09-08T08:50:34.552Z",
+      "claimed_at": "2026-09-08T08:51:18.573Z",
+      "task": "bump ban sau khi va dau",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,21 +23,21 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T07:16:40.352Z",
-      "task": "tang toc: bo chay suite song song + dau xac nhan suite cho cong",
-      "released_at": "2026-09-08T08:50:34.413Z",
+      "claimed_at": "2026-09-08T08:51:18.504Z",
+      "task": "va lo Codex bat: dau chua rang buoc phien ban Node",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T08:40:18.299Z",
-      "task": "phat bo chay song song + dau xac nhan ra ban trich",
-      "released_at": "2026-09-08T08:50:34.699Z"
+      "claimed_at": "2026-09-08T08:51:18.656Z",
+      "task": "phat lai sau khi va dau",
+      "released_at": null
     }
   }
 }
