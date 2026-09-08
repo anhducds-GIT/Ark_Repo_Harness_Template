@@ -31,9 +31,35 @@ thể, không phải một lượt thất bại.
 
 | Giới hạn | Hệ quả | Ai lo |
 |---|---|---|
-| **Không chạy được `git fetch`** — sandbox từ chối ghi `.git/FETCH_HEAD` | Không đọc được nhánh xa; repo nào có luật "đồng bộ trước khi ghi" là dừng | **NGƯỜI GIAO** phải `git fetch` ở repo đích trước |
+| **Không chạy được `git fetch`** — sandbox từ chối ghi `.git/FETCH_HEAD` | Không đọc được nhánh xa; repo nào có luật "đồng bộ trước khi ghi" là dừng | **NGƯỜI GIAO** phải `git fetch` ở repo đích trước, **và phải NÓI trong đề bài là đã fetch** — xem ô ngay dưới bảng |
 | **Từ chối chạy ngoài kho git** (`Not inside a trusted directory`) | Phiên chết ngay lệnh đầu | **NGƯỜI GIAO** phải `cd` vào repo đích rồi mới gọi |
 | **Một lượt, không hỏi lại được** | Gặp chỗ phải xin phép là hết đường đi tiếp | Nên đề bài phải nói rõ **dừng ở đâu và báo cái gì** |
+
+### Fetch hộ là CHƯA ĐỦ — đo được 08/09, mất trọn một lượt
+
+Dòng trên từng chỉ ghi *"người giao phải `git fetch` trước"*. **Làm đúng vậy vẫn mất một lượt.**
+
+Người giao đã `git fetch` lúc 18:34 rồi mới sinh đề bài. Phiên Codex vẫn chết:
+
+```
+CỔNG: CHƯA ĐỦ BẰNG CHỨNG — git fetch lỗi `.git/FETCH_HEAD: Permission denied`
+```
+
+**Vì sao:** repo đích có luật riêng bắt *"phải `git fetch` trước khi ghi file local"*. Phiên nhận việc
+đọc luật chủ nhà, tuân nó, và chết — **nó không có cách nào biết là ai đã fetch hộ rồi.** Fetch hộ giải
+quyết nhu cầu **kỹ thuật**; nó không giải quyết nhu cầu **bằng chứng** của phiên nhận việc.
+
+Nên đề bài phải mang **ba thứ**, thiếu một là hỏng:
+
+1. **Giờ fetch** — câu khẳng định *"người giao đã fetch lúc ..."* kèm giờ thật.
+2. **Câu lệnh kiểm CHỈ-ĐỌC thay cho fetch** — `git rev-list --left-right --count origin/main...main`,
+   kèm **con số kỳ vọng**. Có số kỳ vọng thì phép kiểm mới là bằng chứng; không có thì nó chỉ là một lệnh.
+3. **Câu cấm thử lại** — *"đừng `git fetch`, đừng xin nâng quyền"*. Không cấm thì phiên sau vẫn thử,
+   vì luật chủ nhà bắt nó thử.
+
+> Bài học rộng hơn `git fetch`: với **mọi** việc người giao làm hộ, đề bài phải nói **đã làm hộ**,
+> kèm **cách tự kiểm chỉ-đọc**. Một việc đã xong mà phiên nhận việc không kiểm được thì với nó
+> là việc **chưa xong**.
 
 Lệnh gọi đúng:
 
