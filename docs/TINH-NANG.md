@@ -32,7 +32,7 @@ flowchart TD
 | Nó canh gì | Không có nó thì | Lệnh |
 |---|---|---|
 | Không cho báo "xong" khi việc chưa xong | "xong" thành lời tự khai, không ai kiểm được | `npm run gate -- --as <tên-phiên>` |
-| Không cho hai người sửa cùng một chỗ | người ghi sau xoá việc người ghi trước, **không ai biết** | `node scripts/claim.mjs --take <vùng> --as <tên-phiên>` |
+| Không cho hai người sửa cùng một chỗ | người ghi sau xoá việc người ghi trước, **không ai biết** | `node scripts/claim.mjs --sua <file>… --as <tên-phiên>` (khoá cả vùng: `--take`) |
 | Không cho đẩy nhầm việc của người khác | việc chưa được duyệt bị công bố ra ngoài | `npm run push -- --as <tên-phiên>` |
 | Bảng trạng thái tự viết, không ai gõ tay | bảng nói một đằng, repo một nẻo — và bảng thì luôn đẹp hơn | `npm run dashboard` |
 | Trang có hình cho người xem | không có gì đưa cho người không đọc code | `npm run overview` → `DASHBOARD-Ark-Repo-Harness.html` ở gốc repo |

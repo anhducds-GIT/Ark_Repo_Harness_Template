@@ -297,16 +297,6 @@ cho mình cái phép mà Đức chưa hề cho.
 
 Chi tiết: [CHANGELOG.md](CHANGELOG.md) bản 1.3.23.
 
-## 2026-09-06 — Bảng phải tự tươi, Đức F5 là thấy — xếp hàng đợi, chưa làm
-
-Đức nêu: *"tôi có thể F5 trên dashboard html là latest status sẽ được hiển thị lên các luồng làm
-việc cùng lúc. Hãy xếp việc này vào hàng đợi."*
-
-Xếp vào [IDEAS.md](IDEAS.md) mục `Y-10`, bậc **ý tưởng**. Chưa viết dòng mã nào vì một chỗ chặn
-chưa đo: bảng của bộ khung mang dữ liệu khoá **sống**, nên tiến trình nền ghi đè nó mỗi lượt
-nhận/trả khoá có thể làm bẩn cây làm việc và **chặn push của mọi lane**. Việc kế là đo đúng chỗ
-đó, không phải viết mã.
-
 ## 2026-09-07 — Bốn quyết định cho chuỗi chạy đêm
 
 Đức trả lời bốn câu trong một lượt, để phiên chạy được một mình qua đêm.
@@ -647,3 +637,23 @@ minh mới làm đổi bộ luật hiệu lực.
 
 **Cái mất:** thêm một ADR nay tốn thêm một bước (chọn chủ đề); và bộ biên dịch **không hiểu nghĩa**
 — nó cưỡng chế khai báo, không phát hiện được hai luật mâu thuẫn cùng khai đúng chỗ.
+
+## 2026-09-09 · Tài liệu KHÔNG được dạy mặc định đã bị thay thế
+
+**Đức chốt:** *"nhiều quyết định sau cover hoặc reverse cái cũ → sẽ sinh noise."* Đây là ca đo
+được của chính câu đó.
+
+**Đo 09/09:** luật đổi mặc định khoá từ VÙNG sang FILE hôm 08/09 và chỉ sửa `AGENTS.md`. Đo lại
+cả kho tài liệu: `--sua` (lệnh MỚI) xuất hiện ở **1 file**, `--take` (lệnh CŨ) ở **4 file**.
+`docs/SO-TAY-AGENT.md` còn bảo nhận khoá **lúc mở phiên** — ngược cả luật *"nhận ngay trước lượt
+ghi"*. Nặng nhất là `docs/briefs/GIAO-VIEC-CHUNG.md`: **đề bài giao cho AI khác**, nên mọi phiên
+được giao việc đều đang học mặc định đã bị thay thế, và **không sai ở chỗ nào cả** — nó đọc đúng
+một câu đang nằm trong repo.
+
+**Chốt:** ⑴ sửa cả bốn file trỏ về `AGENTS.md` mục 1 thay vì chép luật; ⑵ ghim bằng **F20** ở
+`tests/core-contract.mjs` — file nào nhắc `--take` thì **phải** nhắc cả `--sua`. Đo bằng SỰ CÓ
+MẶT, không đoán ngữ nghĩa; nó không cấm nhắc khoá vùng, chỉ cấm **dạy một nửa**.
+
+**Bài học về chính phép đo:** bản đầu của F20 dò chuỗi đầy đủ `claim.mjs --take` và chỉ thấy 1
+file — **bỏ sót đúng file nặng nhất**. Phép đo hẹp hơn thực tế thì nó báo xanh ở đúng chỗ đang
+hỏng.

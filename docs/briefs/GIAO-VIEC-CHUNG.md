@@ -82,15 +82,19 @@ không phải `phien-3`. Nó đi vào ba chỗ và **cả ba phải khớp nhau*
 `safe-push` báo bạn đang cuốn theo commit của người khác và **từ chối đẩy**, phải viết lại
 lịch sử mới gỡ được.
 
-## D. Nhận quyền trước khi chạm file
+## D. Nhận quyền — NGAY TRƯỚC lượt ghi, không phải lúc mở phiên
 
 ```bash
-node scripts/claim.mjs --list
-node scripts/claim.mjs --take <khoá> --as <tên-phiên> --task "một câu"
+node scripts/claim.mjs --list                        # ai đang giữ gì
+node scripts/claim.mjs --sua <file>… --as <tên-phiên>   # NGAY TRƯỚC lượt ghi đầu tiên
+node scripts/claim.mjs --xong --het --as <tên-phiên>    # NGAY SAU khi commit
 ```
 
-- Vùng **trống** → nhận rồi làm.
-- Vùng **có chủ khác** → **DỪNG**, hỏi người chốt. Không tự giành.
+- **Chỉ ĐỌC thì KHÔNG cần khoá.** Đọc, đo, hiểu việc — không giữ gì cả. Đo được: **57%** lượt
+  chặn là **chặn oan**, khác file hoàn toàn mà vẫn bị khoá vùng chặn.
+- **Mặc định là khoá mức FILE.** Khoá cả **vùng** (`--take` / `--release <khoá> --task "…"`) để
+  dành cho việc đụng cả một vùng, và nó trả **sau khi đã đẩy** — khác mốc của khoá file.
+- Vùng, hoặc file, **có chủ khác** → **DỪNG**, hỏi người chốt. Không tự giành.
 - **Đừng sửa `.agents/claims.json` bằng tay.** Sửa tay là đọc-sửa-ghi, và hai phiên cùng đọc
   thấy "trống" rồi cùng ghi thì người ghi sau đè im lặng lên người ghi trước. Đã xảy ra thật.
 

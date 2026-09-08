@@ -927,4 +927,50 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok("F19 - upgrade mang tai lieu THIEU va khong dung file KHAC; bo sinh dung TRUOC khi ghi khi ten lech");
 }
 
+/* ---- F20. Tai lieu khong duoc day MAT DINH DA BI THAY THE ----------------
+ *
+ * HINH DANG LOI, do that 09/09: luat doi mac dinh khoa tu VUNG sang FILE hom 08/09, va sua
+ * `AGENTS.md`. Nhung ba file khac van day nguyen cach cu — `claim.mjs --sua` xuat hien o DUNG
+ * MOT file, con `claim.mjs --take` xuat hien o BON. `docs/SO-TAY-AGENT.md` con bao nhan khoa
+ * ngay luc MO PHIEN, tuc nguoc ca luat "nhan ngay truoc luot ghi".
+ *
+ * Day dung cai Duc goi ten: "nhieu quyet dinh sau cover hoac reverse cai cu -> sinh noise".
+ * Mot phien doc so tay se hoc mac dinh CU, va no khong sai o cho nao ca — no doc dung mot cau
+ * dang nam trong repo.
+ *
+ * PHEP KIEM NAY KHONG CAM NHAC KHOA VUNG: khoa vung van ton tai, van dung cho viec dung ca vung.
+ * No chi cam DAY MOT NUA — file nao noi `--take` thi phai noi ca `--sua`, de nguoi doc thay CA
+ * HAI va biet cai nao la mac dinh. Do bang su CO MAT, khong doan ngu nghia. */
+{
+  /* Do bang `--take` / `--sua` chu khong bang chuoi day du `claim.mjs --take`: mot file co the
+     nhac khoa vung trong cau van xuoi ("khoa ca vung: `--take`") ma van dang day mac dinh cu.
+     Ban dau ve nay do chuoi day du va chi thay 1 file — no BO SOT `docs/briefs/GIAO-VIEC-CHUNG.md`,
+     tuc dung file NANG NHAT: de bai giao cho AI khac, nen moi phien duoc giao viec deu hoc mac
+     dinh da bi thay the. Phep do hep hon thuc te thi no bao xanh o dung cho dang hong. */
+  const NHAC = (t) => ({ cu: /--take\b/.test(t), moi: /--sua\b/.test(t) });
+  const dsFile = [
+    "AGENTS.md", "docs/SO-TAY-AGENT.md", "docs/TINH-NANG.md", "docs/HUONG-DAN.md",
+    "docs/protocols/MULTIFLOW.md", "docs/protocols/ORCHESTRATOR.md",
+    "docs/protocols/CHUYEN-REPO-LEN-CHUAN.md", "docs/briefs/GIAO-VIEC-CHUNG.md"
+  ].filter((f) => existsSync(join(ROOT, f)));
+  assert.ok(dsFile.length >= 5, `ve nay mat doi tuong do: chi thay ${dsFile.length} file tai lieu`);
+
+  const mocPhai = dsFile.filter((f) => NHAC(readFileSync(join(ROOT, f), "utf8")).cu);
+  assert.ok(mocPhai.length >= 2,
+    "khong file nao nhac `--take` — hoac khoa vung da bo (thi bo luon ve nay), hoac ve nay dang do nham thu");
+
+  const dayMotNua = mocPhai.filter((f) => !NHAC(readFileSync(join(ROOT, f), "utf8")).moi);
+  assert.deepEqual(dayMotNua, [],
+    `tai lieu day khoa VUNG ma khong nhac khoa FILE (mac dinh tu 08/09): ${dayMotNua.join(", ")}`
+    + " — nguoi doc se hoc mac dinh CU va khong sai o cho nao ca");
+
+  // DOT BIEN CHAY TAI CHO: van ban day mot nua PHAI bi neu ra. Khong co ve nay thi ve tren
+  // xanh vinh vien o mot repo sach, va khong ai biet no co phan biet noi hai nhanh hay khong.
+  const gia = { "gia/a.md": "chay `node scripts/claim.mjs --take _code --as x`", "gia/b.md": "ca hai: --take va --sua" };
+  const neuRa = Object.keys(gia).filter((f) => NHAC(gia[f]).cu && !NHAC(gia[f]).moi);
+  assert.deepEqual(neuRa, ["gia/a.md"],
+    "phep loc phai neu file day mot nua VA khong bao oan file day ca hai");
+  ok(`F20 - ${mocPhai.length} file nhac khoa vung, ca ${mocPhai.length} deu nhac ca khoa file (mac dinh)`);
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

@@ -39,5 +39,67 @@
       "task": "bo bien dich luat",
       "released_at": "2026-09-08T21:56:27.004Z"
     }
+  },
+  "tam": {
+    "scripts/check-bootstrap.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "decisions.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "docs/archive/DECISIONS-bang-2026-09.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "docs/SO-TAY-AGENT.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "docs/TINH-NANG.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "tests/core-contract.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "docs/briefs/GIAO-VIEC-CHUNG.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "template/docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    },
+    "template/scripts/check-bootstrap.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:05:51.805Z"
+    }
   }
 }

@@ -35,7 +35,9 @@ ttl_days: 365
 - [ ] Đọc `AGENTS.md` — hiến pháp, một trang
 - [ ] Đọc mục 6 của nó — bản đồ "sắp làm X thì mở file nào"
 - [ ] Đọc **phần cuối** `HANDOFF.md` — phiên trước làm tới đâu
-- [ ] Nhận vùng mình sắp sửa: `node scripts/claim.mjs --take <vùng> --as <tên-phiên>`
+- [ ] **ĐỪNG nhận khoá lúc này.** Đọc và đo thì không cần khoá — luật đổi 08/09, đo được **57%**
+      lượt chặn là chặn oan. Khoá lấy **ngay trước lượt ghi đầu tiên**, và là khoá mức **FILE**:
+      `node scripts/claim.mjs --sua <file>… --as <tên-phiên>`, trả `--xong --het` **ngay sau commit**
 - [ ] **Vùng có chủ khác → chỉ đọc.** Muốn giành thì hỏi chủ dự án, không tự lấy
 - [ ] Chạy cửa kiểm **trước khi làm gì**: `npm run gate -- --as <tên-phiên>`
 - [ ] Đỏ sẵn từ trước → **dừng và báo nguyên văn**. Đừng tự sửa cho nó xanh

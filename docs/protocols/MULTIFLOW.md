@@ -54,13 +54,19 @@ Vùng nào có những khoá gì thì khai ở `.repo-structure.json`, khối `a
 ## 3. Một ngày làm việc — năm bước
 
 ```bash
-node scripts/claim.mjs --list                                    # 1. xem vùng nào còn trống
+node scripts/claim.mjs --list                                    # 1. xem ai đang giữ gì
 #    ... ĐỌC, đo, hiểu việc — bước này KHÔNG cần khoá ...        # 2.
-node scripts/claim.mjs --take <khoá> --as <phiên> --task "..."    # 3. nhận NGAY TRƯỚC lượt ghi đầu
+node scripts/claim.mjs --sua <file>… --as <phiên>                # 3. NGAY TRƯỚC lượt ghi đầu
 #    ... làm việc, commit với dòng cuối `Lane: <phiên>` ...       # 4.
-node scripts/session-check.mjs --as <phiên>                      # 5. cổng đóng phiên, phải XANH
-node scripts/safe-push.mjs --as <phiên>                          # 6. đẩy, rồi --release vùng
+node scripts/claim.mjs --xong --het --as <phiên>                 # 5. trả NGAY SAU commit
+node scripts/session-check.mjs --as <phiên>                      # 6. cổng đóng phiên, phải XANH
+node scripts/safe-push.mjs --as <phiên>                          # 7. đẩy
 ```
+
+**Bước 3 là khoá mức FILE, không phải khoá vùng** — mặc định đổi 08/09, đo được **57%** lượt chặn
+là chặn oan. Khoá **vùng** (`--take`/`--release`) để dành cho việc đụng cả một vùng, và nó trả
+**sau khi đã đẩy**, khác mốc của khoá file. Luật đầy đủ ở `AGENTS.md` mục 1 — **bản duy nhất**,
+đừng chép sang đây; sổ này chỉ nói NHỊP, không nói luật.
 
 **Bước 2 tách khỏi bước 3 là cố ý.** Trước 06/09 hai bước này gộp làm một, và đo được: mọi bản
 giao việc hôm đó mở đầu bằng *"nhận khoá trước"*, trong khi lane dành 5–20 phút đầu chỉ để đọc.

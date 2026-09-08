@@ -863,9 +863,9 @@ export function renderChecks(checks, { showLimit = DEFAULT_SHOW, extras = null }
       lines.push("        → sửa hình dạng, kẻo phép kiểm đứng đó mà không kiểm gì.");
     }
     // KHÔNG nói "phiên S7 sẽ dùng" nữa: S7 đã chạy và cố ý KHÔNG dùng khối này. Phép kiểm tên
-    // đường dẫn chưa tồn tại trong B1…B15, nên nói nó "sắp được dùng" là hứa hộ một phiên
+    // đường dẫn chưa tồn tại trong dãy B, nên nói nó "sắp được dùng" là hứa hộ một phiên
     // không có thật. Nói đúng cái nó đang làm: kiểm ngược, chống danh sách miễn trừ mục nát.
-    lines.push(`MIỄN TRỪ VĨNH VIỄN: ${declared} đường dẫn cũ (có dấu cách / tiếng Việt có dấu) khai ở khối "grandfathered" của .repo-structure.json. B1…B15 KHÔNG có phép kiểm tên đường dẫn, nên khối này hiện chỉ được kiểm NGƯỢC: đường dẫn nào đã biến mất khỏi HEAD thì phải xoá khỏi danh sách.`);
+    lines.push(`MIỄN TRỪ VĨNH VIỄN: ${declared} đường dẫn cũ (có dấu cách / tiếng Việt có dấu) khai ở khối "grandfathered" của .repo-structure.json. Dãy B KHÔNG có phép kiểm tên đường dẫn, nên khối này hiện chỉ được kiểm NGƯỢC: đường dẫn nào đã biến mất khỏi HEAD thì phải xoá khỏi danh sách.`);
     if (gone.length) {
       lines.push(`  ✗ ${gone.length} đường dẫn trong danh sách miễn trừ KHÔNG còn ở HEAD: ${gone.slice(0, 3).join(", ")}${gone.length > 3 ? ", …" : ""}`);
       lines.push("        → xoá chúng khỏi khối \"grandfathered\" — danh sách miễn trừ để mục nát cũng là một khoản nợ.");
