@@ -555,3 +555,36 @@ sách · ⑵ chép lại danh sách vào một file `tests/` → vế cấm-ché
 
 **Còn mở:** không có gì của phiên này. Mục `KHUNG-44` (port `npm run test:backlog`) vẫn mở —
 điều kiện đóng của nó cũng là một lệnh chạy được, phiên sau nhặt được ngay.
+
+## 2026-09-08 (khuya, tiếp) · harness-phat-01 · Hai repo nhận gói assistant + tốc độ
+
+**Đo trước, không đọc hồ sơ cũ.** Quét `.ark/harness.lock.json` khắp `C:\WORKING ZONE`: **4 repo**
+có sổ ghim, **3** có hồ sơ — `n8n-orchestrator` migrate từ 05/09 mà **không hồ sơ nào**, nên tab
+Migrate nói *"3 repo"* suốt từ đó. Đã viết hồ sơ kèm checklist đo 08/09.
+
+**`ALL_SKILL_MANAGEMENT`** — luật hai vai (mục B6). Cổng XANH TOÀN BỘ, đã đẩy, đã trả khoá.
+
+**`n8n-orchestrator`** — 1.3.19 → **1.3.67**, 27 file máy. Luật hai vai thêm làm **tầng thứ hai**,
+không thay ma trận theo hãng của nó (`tools/validate.py` đọc `state/roles.yaml`; đụng vào là làm
+đỏ cổng chủ nhà). Đo tại đó: chuỗi **145s → 60,4s**, cổng **~145s → 11s**, cả vòng **290 → 72s**.
+Cổng 14/14 XANH, đã đẩy 7 commit, đã trả khoá.
+
+**BỐN CHỖ BẢN TRÍCH KHÔNG MANG ĐƯỢC — ba đỏ ngay lúc file tới, một KHÔNG đỏ** (`KHUNG-47`):
+`bang-song` + `dau-suite-smoke` đòi 4 dòng `.gitignore`, mà file đó không thuộc tầng nào ·
+`handoff-smoke` đòi dòng **đúng chữ** `## Log`, mà n8n giữ nhật ký ở `log/YYYY-MM.md` — **cố ý
+khác, không phải sai** · và `--apply` thêm `test:tuan-tu` mà **không tên lệnh nào trỏ vào
+`chay-test.mjs`**, nên tính năng nhanh nhất **tới rồi mà nằm không**. Con số 60,4s chỉ có sau khi
+tôi vá tay. Bài học 1.3.66 — *hợp đồng nói HÀNH VI, đừng soi chi tiết triển khai* — chưa được áp
+cho ba phép ghim này.
+
+**`F4.7` XANH GIẢ ở mọi nơi** (`KHUNG-49`): phép đo chỉ hỏi hai file **có tồn tại**. Đo bằng câu
+chữ thì **0/4 repo** có luật hai vai, trong khi danh mục báo 2 `[x]`.
+
+**Đức chốt 08/09:** pack suite song song thành một mục danh mục — `decisions.md` + `KHUNG-48`.
+Việc của Vai ①, vì `features.json` là tầng máy nên đòi tăng `version`.
+
+**Nhịp DỌN:** `HANDOFF.md` 1692 → 557 dòng · `CHANGELOG.md` 1294 → 235.
+
+**Còn mở — ba repo, cả ba chặn vì người khác giữ khoá hoặc chờ Đức:** `nav_platform_main`
+(`claude-bang-gon` giữ 1 ngày, quá hạn) · `Chrome_Extension_AI_Agentic` (`claude-ext-cum5` giữ ba
+khoá; repo đó **chưa có sổ ghim**) · `Project 3` (KHUNG-30, luật 8A của chính nó; F4 **2/7**).
