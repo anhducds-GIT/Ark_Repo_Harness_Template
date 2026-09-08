@@ -300,6 +300,45 @@ node scripts/session-check.mjs --as <nhãn>   # XANH TOÀN BỘ
 Không đạt cả hai thì chưa xong. **Đừng nới cổng cho nó xanh** — sửa bug thì được, gỡ bảo vệ thì
 không. Đó là luật vàng số 3, và nó áp cho cả người đang migrate.
 
+## XEM TOÀN CẢNH — repo nào đã nhận tính năng nào
+
+**Đức hỏi 08/09: *"check list xem tổng thể đã migrate như thế nào thì xem ở đâu?"* — câu trả lời
+thật lúc đó: **không ở đâu cả.** Ghi ra đây để không ai phải hỏi lại.
+
+### Có gì dùng được ngay
+
+| Muốn biết | Lệnh / chỗ đọc | Giới hạn |
+|---|---|---|
+| Một repo thiếu tính năng nào | `node scripts/features.mjs <repo>` | **một repo một lượt** |
+| Một repo, dạng dán được vào hồ sơ | `node scripts/features.mjs --migrate <repo>` | như trên |
+| Lần đo gần nhất của từng repo | khối **CUỐI** trong `docs/migrations/<lượt>.md` | chỉ tươi bằng lần dán cuối |
+| Một con số tổng cho mỗi lượt | cột *Tính năng* ở tab **Migrate** | **một số**, không phải từng mục |
+
+### Cái còn thiếu: ma trận tính năng × repo
+
+Không chỗ nào trả lời được *"tính năng F8.5 đã tới những repo nào"* — mọi phép đo đều
+**theo repo**, không có phép nào **theo tính năng**. Đo thử 08/09 bằng một script tạm: ma trận
+dụng ngay ra hai thứ không thấy được khi đọc từng repo — `F1.4` và `F6.5` **thiếu ở CẢ NĂM repo**
+(tức vấn đề của bộ khung, không phải của repo nào), còn `F6.1` thì `[~]` ở **cả năm**.
+
+**Nguyên tắc thiết kế cho bản tự động — đọc trước khi gõ:** bảng **suỷ hoàn toàn từ HEAD**, cố ý.
+Nên bộ sinh **KHÔNG được đọc đĩa của repo khác** để dựng ma trận — làm thế là bảng đổi byte mỗi
+lượt ai động vào một repo nào đó, và cổng *"Sự thật máy sinh còn tươi"* ĐỎ với mọi phiên.
+Đúng cái hàng rào `KHOA_SONG` của `bang-song/` dựng ra để chặn.
+
+**Nguồn đúng là các khối checklist trong `docs/migrations/`** — chúng đã nằm trong HEAD, đã mang
+**ngày đo** và **bản danh mục**, và luật *"lấy khối CUỐI"* đã có. Bộ sinh chỉ việc đọc chúng rồi
+xếp lại thành **tính năng ở hàng ngang, repo ở hàng dọc**, gom theo khối `F1`…`F9`.
+
+Cái giá của lựa chọn này, nói rõ: ma trận **chỉ tươi bằng lần dán khối cuối**. Đó là đánh đổi
+đúng hướng: một con số hơi cũ mà **truy được ai đo, ngày nào** thì dùng được; một con số luôn mới
+mà làm đỏ cổng của mọi lane thì không.
+
+**Hai repo tiêu thụ không có hồ sơ migrate** nên sẽ không có hàng trong ma trận:
+`Chrome_Extension_AI_Agentic` — bộ khung **sinh ra tứ đó** rồi mới tách ra, nên nó chưa từng có
+một *lượt* migrate nào để ghi hồ sơ. Cần người chốt quyết: hoặc cho phép một hồ sơ loại
+*"repo nguồn"*, hoặc ma trận khai rõ nó vắng và vì sao.
+
 ## Việc KHÔNG thuộc quy trình này
 
 - **Dọn nợ cũ của repo đích.** Đưa lên chuẩn là thêm một lớp, không phải viết lại repo. Thấy nợ
