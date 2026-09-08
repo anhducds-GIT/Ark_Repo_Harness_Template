@@ -492,3 +492,18 @@ quan trọng nhất.
 
 Chi tiết việc và điều kiện đóng: [BACKLOG.md](BACKLOG.md) mục `KHUNG-48`. Việc của Vai ① — đây là
 tầng máy nên đòi tăng `version` và sinh lại bản trích.
+## 2026-09-08 · Đóng `KHUNG-42` — giữ đúng dòng VÀNG, bỏ cơ chế khoá tự hết hạn
+
+**Đức chốt:** *"ok đóng KHUNG-42 đi, giữ dòng vàng."*
+
+**Vì sao cần chốt:** `KHUNG-42` đề xuất một bảng ba dòng cho khoá **tự hết hạn** khi có phiên khác
+chờ. Nhưng [ADR-0012](docs/adr/0012-khoa-muc-file.md) (Accepted cùng ngày, người chốt cũng là Đức)
+nói **ngược** ở vế ⑸: *"Quá 30 phút thì NÊU TÊN, tuyệt đối không tự nhả"* — vì tự nhả là tự động hoá
+đúng vụ nhả-khoá-hộ 06/09, lần đó một lane mất phần đã xong. Hai luật ngược nhau về cùng một khoá
+thì lane nào cũng có cớ làm theo bên có lợi cho mình, nên phải bỏ hẳn một bên.
+
+**Chốt:** ADR-0012 thắng. `KHUNG-42` đóng. Giữ lại **một** việc duy nhất của nó — dòng **VÀNG** ở
+cuối cổng đóng phiên, chỉ **nêu tên** và **không đổi mã thoát**.
+
+Việc và điều kiện đóng: [BACKLOG.md](BACKLOG.md) mục `KHUNG-54`. Việc của Vai ① — tầng máy.
+

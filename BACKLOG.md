@@ -1008,7 +1008,12 @@ ngưỡng thì **bảng phải nói ra**, không để người chủ tự đoá
 thẳng sang được**. Phải định nghĩa lại "sản phẩm" theo từng repo, khai ở cấu hình; nếu không, luật
 này sẽ nói sai ở đúng repo phát hành ra nó.
 
-### KHUNG-42 · Khoá hết hạn khi CÓ NGƯỜI CHỜ, và vai điều phối không thể bị chặn @Đức:chốt
+### ~~KHUNG-42~~ · ĐÓNG 08/09 · Khoá hết hạn khi CÓ NGƯỜI CHỜ, và vai điều phối không thể bị chặn
+
+> **ĐÓNG 08/09 — Đức chốt:** *"ok đóng KHUNG-42 đi, giữ dòng vàng."* Cơ chế khoá **tự hết hạn**
+> bị bỏ hẳn — [ADR-0012](docs/adr/0012-khoa-muc-file.md) ⑸ nói ngược nó, và hai luật ngược nhau về
+> cùng một khoá thì lane nào cũng có cớ chọn bên có lợi cho mình. Giữ lại **đúng một** việc: dòng
+> **VÀNG** ở cuối cổng — nay là `KHUNG-54`. Phân tích bên dưới **giữ nguyên**, nó là lý do của quyết định.
 
 > **08/09 — MỤC NÀY GẦN NHƯ ĐÃ BỊ VƯỢT QUA, đọc trước khi làm.** `harness-phat-01` đối chiếu với
 > **ADR-0012 (Accepted 08/09, người chốt Đức)** — khoá mức FILE: giữ ngắn, trả ngay, chỉ đọc thì
@@ -1444,3 +1449,30 @@ vì kết luận sổ lệch; kèm một phép ghim dựng repo có file `.mjs` 
 được** (hoặc từ chối với đúng lý do); **và** ⑵ lượt ghi sổ phát hành là **nguyên tử** (ghi file tạm
 rồi `renameSync`), kèm một phép ghim đọc sổ giữa hai bước và đòi **không bao giờ** thấy trạng thái
 thiếu dòng.
+
+### KHUNG-54 · Cổng đóng phiên biết cả ba dữ kiện "nên trả khoá" mà không nói thành một câu
+
+**Đức chốt 08/09:** *"ok đóng KHUNG-42 đi, giữ dòng vàng."* — đóng cơ chế hết hạn tự động (ADR-0012
+⑸ đã bác nó), giữ lại đúng **một** việc: dòng VÀNG. Đây là **bớt một cơ chế, không thêm** — nó thay
+chỗ toàn bộ bảng ba dòng hết-hạn của `KHUNG-42`.
+
+Cổng đã biết cả ba dữ kiện: phiên này giữ những khoá **vùng** nào · cây làm việc sạch chưa · còn
+commit chưa đẩy không. Nó chưa gộp ba thứ đó thành một câu, nên khoá vô thừa nhận chỉ lộ ra khi có
+người tình cờ chạy `--list`. Thêm một dòng ở cuối cổng:
+
+> `⚠ Bạn còn giữ N khoá vùng (<tên>), cây sạch, mọi commit đã đẩy — cân nhắc trả khoá.`
+
+**Hàng rào không được vượt.** `tests/khoa-dau-vet.mjs` vế 7 đã ghim: tín hiệu loại này là **VÀNG**,
+nó **không được đổi mã thoát của cổng**. Chặn một lane đang đọc kỹ là dạy mọi lane ghi bừa một byte
+để giữ khoá cho hợp lệ. Và nó **chỉ nêu tên, không nhả** — ADR-0012 ⑸.
+
+**Chỗ hở nó KHÔNG chữa, ghi ra để không ai tưởng là kín:** khoá vùng của một phiên **đã chết**.
+Phiên đã tắt thì không bao giờ chạy cổng, nên không dòng vàng nào tới được nó. Ca thật 08/09:
+`claude-bang-gon` giữ hai khoá ở `nav_platform_main` **một ngày** sau khi phiên tắt. Cơ chế cho ca
+đó là `--list` nêu tên và **một người quyết** — cố ý, vì tự nhả chính là tự động hoá vụ nhả-khoá-hộ
+06/09. Chi phí đo được: một câu hỏi cho Đức, một lượt trả lời.
+
+**đóng khi:** cổng in dòng vàng đó **khi và chỉ khi** đủ ba điều kiện, **mã thoát không đổi**, và có
+một phép ghim dựng nổi cả hai nhánh — một kho đủ ba điều kiện (**phải** in), một kho thiếu đúng một
+trong ba (**không được** in). Phép ghim phải chạy được ở repo tiêu thụ và soi **hành vi**, không soi
+tên lệnh của nơi phát hành (bài học `KHUNG-47`).
