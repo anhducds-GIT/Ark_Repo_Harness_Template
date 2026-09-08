@@ -973,3 +973,26 @@ Vùng: `_template` + `_code`.
 **đóng khi:** repo đích chạy được một phép kiểm canh khối hai vai (số suy từ đầu vào, không gõ
 cứng), và một đột biến gõ cứng con số làm nó ĐỎ ở repo đích — đo trên một repo đích thật, không
 suy ra. Hoặc: ghi vào `PLATFORM.md` rằng bộ sinh bảng phát **không kèm** phép ghim, kèm lý do.
+
+### KHUNG-8 · Luật bàn giao hai vai chưa được cưỡng chế ở chính repo phát hành
+
+ADR-0008 khai rằng vế bàn giao (`② ghi BACKLOG kèm đóng khi: → ① biến thành bản vá`) là **vế duy
+nhất máy kiểm được**. Ở repo Extension nó **được** cưỡng chế: `npm run test:backlog` chạy
+`scripts/backlog-check.mjs`. Ở đây thì **không có lệnh đó**, nên câu trong hiến pháp đang mô tả một
+năng lực repo này chưa có.
+
+Đo 08/09: **43 trên 44 mục** của chính sổ này thiếu trường `đóng khi:` — chỉ `KHUNG-7` có.
+
+**Vì sao KHÔNG port bộ kiểm ngay tối nay, và đây là phần đáng đọc:** bật nó lên là cổng đỏ 43 mục,
+mà phần lớn là **chữ của phiên khác**. Sửa chúng là viết lại lời người khác — thứ mục 1 cấm. Và
+một cổng đỏ 43 mục ngay lượt đầu thì phiên sau sẽ học cách bỏ qua nó, tức lớp bảo vệ chết ngay khi
+sinh ra.
+
+Lối rẻ: port bộ kiểm ở **chế độ đếm và cảnh báo** trước, chỉ CHẶN với mục tạo ra **sau** một ngày
+mốc — y như cách `IDEAS.md` của repo Extension miễn trừ 14 mục ra đời trước luật.
+
+Vùng: `_code` + `_root`.
+
+**đóng khi:** `npm run test:backlog` tồn tại ở repo này VÀ chặn thật một mục MỚI thiếu `đóng khi:`
+(dựng được ca hỏng, không chỉ chạy xanh), VÀ mục cũ không bị đỏ oan — đo bằng một lượt chạy trên
+chính sổ này.

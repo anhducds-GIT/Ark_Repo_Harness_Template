@@ -123,36 +123,18 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và m�
 
 ## 5. Vai từng AI — chia theo VIỆC, không chia theo hãng
 
-**Đức chốt 08/09.** Bảng cũ chia việc theo hãng — **đi ra** (mục 8). Đo 14 ngày, 306 commit có
-nhãn (`git log --since=2026-08-25 --format=%B | grep -oE "^Lane: \S+" | sort | uniq -c | sort -rn`):
-**Antigravity 0** · **Codex 1** (0,33%) · và lane lớn nhất `harness-vong2` **112 commit** có tên
-**không nói hãng nào** — bảng cũ không xếp nổi chính người làm nhiều nhất vào đâu.
+Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một vai**. Số đo và lý lẽ: [ADR-0008](docs/adr/0008-hai-vai-assistant.md).
 
-Thay bằng **HAI VAI, chia theo hướng đi của việc**. Vai là của **PHIÊN**, không của hãng: hãng nào
-cũng đóng được vai nào, và một phiên đóng **đúng một vai** cho tới khi đóng phiên.
+| Vai | Việc chính | KHÔNG được |
+|---|---|---|
+| **Đức** | Chốt mọi thứ | — |
+| **① Giữ lõi** | luật · bộ máy · trạng thái. Mỗi bản vá kèm **một phép kiểm ghim** | nới lớp bảo vệ cho cổng xanh · **tự ký nghiệm thu việc của mình** |
+| **② Phát & thu** | cửa duy nhất ra ngoài. **Mang chỗ vấp về** thành mục sổ nợ | sửa lõi để bên ngoài chạy được · báo ĐẠT khi chưa chạy thật |
 
-| Vai | Giữ gì | Việc chính | KHÔNG được |
-|---|---|---|---|
-| **Đức** | — | Chốt mọi thứ | — |
-| **① Giữ lõi** | luật · bộ máy · trạng thái của repo nhà | mỗi bản vá kèm **một phép kiểm ghim** · xoá luật không nổ lần nào · giữ cổng kiểm còn răng | nới một lớp bảo vệ cho cổng xanh · **tự ký nghiệm thu việc của chính mình** |
-| **② Phát & thu** | cửa duy nhất giữa bộ khung và repo đích | gói bản phát · đo repo đích rồi ghép đề bài · **mang chỗ vấp về** thành mục sổ nợ của lõi · tối ưu chính quy trình | sửa lõi để repo đích chạy được — chỗ vấp phải **về Vai ①** · báo một quy trình ĐẠT khi chưa chạy thật trên một repo đích |
-
-**Ranh giới chịu tải, một câu: Vai ② được *phát hiện*, Vai ① được *sửa*.** Gộp hai vai lại thì
-người tìm ra lỗi cũng là người tự chấm bản sửa của mình — và một tờ nghiệm thu do bên bị kiểm ký
-là **lời tự khai, không phải hàng rào**.
-
-**Bàn giao chỉ có một hình dạng:** Vai ② ghi chỗ vấp vào `BACKLOG.md` kèm `đóng khi:`, Vai ① biến
-nó thành **bản vá cộng một phép kiểm ghim**. Nhắn thẳng *"sửa hộ tôi"* là mất dấu vết — người đến
-sau không đọc được tin nhắn. Đây là **vế duy nhất máy kiểm được** (`npm run test:backlog` đếm
-trường `đóng khi:`); phần *"② phát hiện · ① sửa"* là **chữ, không phải luật** theo đúng câu ③ của
-mục 8 — nói thẳng ra để không ai tin nó đang được cưỡng chế.
-
-Hai vai cùng lúc trong repo được, nhưng **KHÁC VÙNG** (mục 1). Sơ đồ đầy đủ: tab Mô hình vận hành
-của bảng, và [ADR-0007](docs/adr/0007-tab-migrate-tach-rieng.md) là lượt gần nhất sửa bảng đó.
-
-**Cửa vào của từng AI:** Claude tự đọc `CLAUDE.md` gốc → trỏ sang file này. Codex tự đọc `AGENTS.md`
-gốc. Antigravity thì Đức phải dán **một câu mở màn** mỗi phiên: *"Đọc AGENTS.md ở gốc repo trước khi
-làm gì."* — thử live 26/08: nó đọc và tuân luật, nhưng chưa chứng minh được nó **tự** nạp lúc mở phiên.
+**Vai ② được *phát hiện*, Vai ① được *sửa*** — gộp lại thì người tìm ra lỗi tự chấm bản sửa của mình.
+Bàn giao: ② ghi `BACKLOG.md` kèm `đóng khi:`, ① biến thành bản vá cộng một phép ghim — **vế duy
+nhất máy kiểm ĐƯỢC**, và repo này chưa cưỡng chế (`KHUNG-8`). Hai vai cùng lúc được, nhưng **khác
+vùng**. AI nào không tự nạp file này thì Đức dán: *"Đọc AGENTS.md ở gốc repo trước khi làm gì."*
 
 ## 6. Sổ tay mở khi cần — Tầng 2
 

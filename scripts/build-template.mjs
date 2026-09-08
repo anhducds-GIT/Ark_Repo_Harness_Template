@@ -473,8 +473,16 @@ function phanLuatChung(text) {
  *   việc (① giữ lõi · ② phát & thu). Lý do đo được: 14 ngày / 306 commit — Antigravity 0,
  *   Codex 1 (0,33%), và lane lớn nhất 112 commit có tên không nói hãng nào. Đức chốt cho lan
  *   sang mọi repo tiêu thụ, nguyên văn: "Template repo AI sẽ đồng bộ đến các Repo khác".
- *   Vân tay cũ: a69e334f455b2056d7d3338f6924c70bde1088ed914dbd4d986a9db04decfe55 */
-const COMMON_LAW_SHA256 = "c35949d49d31d27fe99e75054e853eed90f961d7814431bd1e99a87841824802";
+ *   Vân tay trước lượt đổi: a69e334f455b2056d7d3338f6924c70bde1088ed914dbd4d986a9db04decfe55
+ *
+ *   2026-09-08 (cùng lượt, viết gọn lại) · CÙNG quyết định trên, không phải quyết định thứ hai.
+ *   Bản chữ đầu làm `template/AGENTS.md` dài 200 → 218 dòng và **B9 đỏ** (trần 200 dòng cho hiến
+ *   pháp). Nên mục 5 bị nén lại cho vừa đúng chỗ cái bảng nó thay — tức "một luật vào một luật
+ *   ra" ở đây do MÁY cưỡng chế, không do người tự giác. Nội dung luật không đổi một ý nào.
+ *   Nén hai lượt: bản chữ đầu c35949d4… (218 dòng, B9 đỏ) → bản nén 4f87d44f… (210, vẫn đỏ) →
+ *   bản này, sau khi CHUYỂN số đo và lý lẽ sang ADR-0008. Chỗ của lý lẽ là ADR, không phải hiến
+ *   pháp — tôi đặt sai chỗ ở hai lượt đầu, và B9 là thứ bắt được. */
+const COMMON_LAW_SHA256 = "1153a4aaa624c72ae8a84d3bda7c6981e12579eb39beb0aff0a0c9377543c80f";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
