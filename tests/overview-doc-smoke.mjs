@@ -448,10 +448,18 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   assert.deepEqual(lap, [],
     `mỗi khái niệm chỉ được vẽ ĐẦY ĐỦ một chỗ; chỗ khác chỉ tóm tắt + liên kết. Đang lặp: ${lap.join(" · ")}`);
 
-  // Va dung BON nhom, khong phai muoi tab.
+  /* NĂM nhóm từ 08/09 — ADR-0007 bổ sung ADR-0006 (tab Migrate tách riêng).
+   *
+   * BẢN THỨ HAI CỦA CÙNG MỘT LUẬT, và đó là chỗ đáng ghi hơn con số. Danh sách nhóm bị khẳng
+   * định ở HAI file: `overview-smoke.mjs` và đây. Tôi sửa bản kia rồi tưởng xong; cổng đỏ thêm
+   * một vòng 9 phút chỉ để tìm ra bản này. Cùng bệnh một-luật-hai-chỗ mà repo này đã gặp:
+   * `append_only_exempt` từng gõ cứng ở hai script và trả hai câu khác nhau cho cùng một file.
+   *
+   * Chưa gộp về một nguồn, cố ý — gộp lúc đang đóng phiên là mở một việc mới ở chỗ dễ sai nhất.
+   * Đã ghi nợ để phiên sau nhặt. */
   const nhom = [...new Set([...html.matchAll(/data-tab="([a-z-]+)"/g)].map((m) => m[1]))];
-  assert.deepEqual(nhom.sort(), ["cong-viec", "he-thong", "lich-su", "tong-quan"],
-    `bảng phải có đúng bốn nhóm, đang có: ${nhom.join(" ")}`);
+  assert.deepEqual(nhom.sort(), ["cong-viec", "he-thong", "lich-su", "migrate", "tong-quan"],
+    `bảng phải có đúng năm nhóm (ADR-0006 + ADR-0007), đang có: ${nhom.join(" ")}`);
 
   // Khong lien ket chet: moi `data-goto` phai tro toi mot nhom CO THAT.
   const di = [...new Set([...html.matchAll(/data-goto="([a-z-]+)"/g)].map((m) => m[1]))];

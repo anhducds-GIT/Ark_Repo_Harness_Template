@@ -1027,3 +1027,27 @@ Vùng: `_code`.
 
 **đóng khi:** có một ca dựng đúng phép thử của vai SẢN PHẨM — bản đồ giả đúng hình dạng, đường dẫn
 do bên đẩy chọn — và cửa TỪ CHỐI nó; kèm một ca đối chứng cho thấy bản đồ thật vẫn đi qua.
+
+### KHUNG-46 · Danh sách nhóm của bảng bị khẳng định ở HAI file, và tôi sửa lệch nhau
+
+Đo 08/09 khi tách tab Migrate: danh sách nhóm (`tong-quan` · `cong-viec` · `migrate` · `he-thong`
+· `lich-su`) bị `assert.deepEqual` ở **hai** chỗ — `tests/overview-smoke.mjs` và
+`tests/overview-doc-smoke.mjs`. Tôi sửa bản đầu, tưởng xong, và **cổng đỏ thêm một vòng 9 phút**
+chỉ để tìm ra bản thứ hai.
+
+Cùng bệnh repo này đã gặp: `append_only_exempt` từng gõ cứng ở cả `session-check.mjs` lẫn
+`safe-push.mjs`, và **hai bản sao của một luật đã trả hai câu khác nhau cho cùng một file**
+(02/09). Bệnh không mới; chỗ mắc thì mới.
+
+**Vì sao đáng sửa chứ không đáng bỏ qua:** hai bản không chỉ tốn công sửa hai lần — chúng **lệch
+được**. Một bản nói năm nhóm, bản kia nói bốn, và cả hai đều "xanh" ở suite của riêng nó cho tới
+khi có người chạy đủ cả hai.
+
+Lối rẻ: khai danh sách nhóm **một chỗ** (hằng số export từ `build-overview.mjs`, hoặc một dòng
+trong `.repo-structure.json`), hai suite cùng đọc. Lúc đó thêm/bớt một tab là sửa **một** chỗ.
+
+Vùng: `_code`.
+
+**đóng khi:** danh sách nhóm chỉ còn khai ở MỘT nơi — `grep -c 'tong-quan' tests/*.mjs` ra 0 ở
+phần khẳng định — và một lượt thêm tab giả làm CẢ HAI suite đỏ cùng lúc (dựng được ca hỏng, không
+chỉ chạy xanh).
