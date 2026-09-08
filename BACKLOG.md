@@ -974,7 +974,12 @@ Vùng: `_template` + `_code`.
 cứng), và một đột biến gõ cứng con số làm nó ĐỎ ở repo đích — đo trên một repo đích thật, không
 suy ra. Hoặc: ghi vào `PLATFORM.md` rằng bộ sinh bảng phát **không kèm** phép ghim, kèm lý do.
 
-### KHUNG-8 · Luật bàn giao hai vai chưa được cưỡng chế ở chính repo phát hành
+### KHUNG-44 · Luật bàn giao hai vai chưa được cưỡng chế ở chính repo phát hành
+
+> **Mục này từng mang số `KHUNG-8` — TRÙNG với một mục đã có.** Đổi sang 44 ngay trong cùng phiên.
+> `ADR-0009` vẫn gọi nó là `KHUNG-8`: ADR đã `Accepted` là **bất biến**, không sửa được kể cả để
+> chữa một con số — nên chỗ đối chiếu đặt ở đây, tức chỗ sửa được. Đọc `KHUNG-8` trong ADR-0009
+> thì hiểu là mục này.
 
 ADR-0008 khai rằng vế bàn giao (`② ghi BACKLOG kèm đóng khi: → ① biến thành bản vá`) là **vế duy
 nhất máy kiểm được**. Ở repo Extension nó **được** cưỡng chế: `npm run test:backlog` chạy
