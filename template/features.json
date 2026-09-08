@@ -2,7 +2,7 @@
   "_doc": "DANH MỤC TÍNH NĂNG — nguồn sự thật duy nhất cho câu 'bộ khung này làm được gì', và cho checklist migrate. MỖI MỤC PHẢI CÓ PHÉP ĐO: khối `can` khai file và lệnh phải tồn tại, nên `scripts/features.mjs` chạy được ở BẤT KỲ repo nào và trả lời được 'tính năng này ở đây có sống không'. Một danh mục không đo được thì nó là quảng cáo, không phải checklist.",
   "_doc2": "pham_vi có ba giá trị, và phân biệt được ba giá trị đó là toàn bộ giá trị của file này lúc migrate: 'ca-hai' = repo nào cũng cần · 'chi-repo-nha' = chỉ nơi PHÁT HÀNH bộ khung mới cần (repo đích không thiếu nó, và đòi nó ở repo đích là báo thiếu sai) · 'chi-repo-dich' = chỉ repo tiêu thụ.",
   "_doc3": "tu_ban = bản bộ khung mà mục đó bắt đầu có. Đây là chỗ một phiên AI ở repo đích đối chiếu để biết mình đang thiếu tính năng nào so với bản mới — cùng với .ark/harness.lock.json.",
-  "version": "1.3.42",
+  "version": "1.3.43",
   "blocks": [
     {
       "ma": "F1",
@@ -301,13 +301,14 @@
         {
           "ma": "F4.7",
           "ten": "Hai vai chia theo VIỆC — ① giữ lõi · ② phát & thu, kèm hình dạng bàn giao",
-          "tu_ban": "1.3.42",
+          "tu_ban": "1.3.43",
           "pham_vi": "ca-hai",
           "can": {
             "file": [
               "AGENTS.md",
               "BACKLOG.md",
-              "docs/adr/0008-hai-vai-assistant.md"
+              "docs/adr/0008-hai-vai-assistant.md",
+              "docs/adr/0009-sua-ba-khang-dinh-cua-adr-0008.md"
             ],
             "lenh": []
           },

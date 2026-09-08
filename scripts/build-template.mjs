@@ -482,7 +482,7 @@ function phanLuatChung(text) {
  *   Nén hai lượt: bản chữ đầu c35949d4… (218 dòng, B9 đỏ) → bản nén 4f87d44f… (210, vẫn đỏ) →
  *   bản này, sau khi CHUYỂN số đo và lý lẽ sang ADR-0008. Chỗ của lý lẽ là ADR, không phải hiến
  *   pháp — tôi đặt sai chỗ ở hai lượt đầu, và B9 là thứ bắt được. */
-const COMMON_LAW_SHA256 = "8008a2fad2bb313700ddae804a370a5a886c4d48dcada3c0a6ab75caa74e6350";
+const COMMON_LAW_SHA256 = "8ddbdab0c4543a709230ebee3246b669c5abbfe61f78c0e7d0bace0e9a2e73bc";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

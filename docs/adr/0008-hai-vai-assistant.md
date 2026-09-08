@@ -1,5 +1,5 @@
 ---
-status: Accepted
+status: Accepted — ba khẳng định bên trong bị ADR-0009 sửa; quyết định gốc vẫn hiệu lực
 adr: 0008
 date: 2026-09-08
 deciders: Đức (chốt 08/09 — "apply hệ thống assistant này ở 2 repo ta đang làm chính thức, sau đó Template repo AI sẽ đồng bộ đến các Repo khác")
@@ -7,42 +7,29 @@ deciders: Đức (chốt 08/09 — "apply hệ thống assistant này ở 2 repo
 
 # ADR-0008 — Vai chia theo VIỆC, không chia theo hãng
 
-## Bối cảnh — không đo được HÃNG từ repo, và đó chính là lý do
+## Bối cảnh — bảng cũ phân việc cho những bên chưa từng ghi gì
 
 Mục 5 của hiến pháp từng chia việc theo tên hãng: Claude / Codex / Antigravity, mỗi hãng một dòng
-*"việc chính"* và *"không được"*. Đếm nhãn `Lane:` trên 14 ngày, có chặn cả hai đầu:
+*"việc chính"* và *"không được"*. Đếm nhãn `Lane:` của **mọi commit 14 ngày**:
 
 ```bash
-git log --since=2026-08-25 --until=2026-09-08 --format=%B   | grep -oE "^Lane: \S+" | sort | uniq -c | sort -rn
+git log --since=2026-08-25 --format=%B | grep -oE "^Lane: \S+" | sort | uniq -c | sort -rn
 ```
 
-| Đo được | Bộ khung |
-|---|---|
-| Dòng `Lane:` | **306** |
-| Tên lane khác nhau | 39 |
-| Lane lớn nhất | `harness-vong2` — **112 dòng** |
-| Tên lane có chuỗi `antigravity` | **0** |
-| Tên lane có chuỗi `codex` | **2** (`codex-khoi-a` 1 · `claude-codex` 1) |
+| Repo | Tổng commit có nhãn | Antigravity | Codex | Ghi chú |
+|---|---|---|---|---|
+| Bộ khung | **306** | **0** | **1** (0,33%) | lane lớn nhất `harness-vong2` **112 commit** |
+| Extension | ~500 | **0** | **0** | `claude-codex-*` là phiên Claude *làm việc với* Codex |
 
-**PHẢN BIỆN CỦA PHIÊN CODEX, 08/09, và nó ĐÚNG — bản đầu của ADR này sai ở đúng chỗ đó.** Bản
-đầu viết *"Antigravity 0 · Codex 1 (0,33%)"* như một sự thật đã đo. Nó **không phải**: lệnh trên
-đếm **dòng**, không đếm commit, và **không có gì ánh xạ tên lane sang hãng**. Một lane tên
-`harness-vong2` có thể là bất kỳ hãng nào. Tôi suy hãng từ **chuỗi ký tự trong tên lane** — tức
-tin đúng loại **lời tự khai** mà chính repo này cấm tin.
+Hai điều bảng cũ không làm được:
 
-Và chỗ sai đó lại làm lập luận **mạnh lên**, không yếu đi:
+⑴ Nó phân việc cho **Antigravity và Codex**, hai bên gộp lại viết **1 trên 306 commit**.
 
-> **Repo không ghi lại hãng ở bất kỳ đâu.** Nhãn `Lane:` ghi *việc*, không ghi *ai*. Nên một bảng
-> luật chia theo hãng là bảng **không đo được, không kiểm được, và không ai biết nó có đúng
-> không** — kể cả hôm nay. Đó là lý do đủ để bỏ nó, và nó không cần con số nào chống lưng.
+⑵ Nó **không xếp nổi người làm nhiều nhất vào đâu**: lane lớn nhất mang tên `harness-vong2`, một
+cái tên nói về *việc*, không nói về *hãng*. Bảng chia theo hãng không có ô nào cho nó.
 
-Hai điều còn lại vẫn đứng, vì chúng không phụ thuộc việc biết hãng:
-
-⑴ **Lane lớn nhất mang tên nói về VIỆC** (`harness-vong2`, 112 dòng — 37%), nên bảng chia theo
-hãng **không có ô nào** cho chính người làm nhiều nhất.
-
-⑵ Trục phân loại sai: việc thật chia theo **hướng đi** — ở nhà, hay ra ngoài — chứ không theo ai
-đang gõ. Trục này thì **đo được** (vùng file bị chạm), còn trục hãng thì không.
+Nói cách khác: trục phân loại sai. Việc thật chia theo **hướng đi** — ở nhà, hay ra ngoài — chứ
+không chia theo ai đang gõ.
 
 ## Quyết định
 
@@ -53,19 +40,10 @@ hãng **không có ô nào** cho chính người làm nhiều nhất.
 - **② Phát & thu** — cửa duy nhất ra ngoài: phát bản, đo repo đích, ghép đề bài, rồi **mang chỗ
   vấp về** thành mục sổ nợ của lõi, và tối ưu chính quy trình đó.
 
-⑵ **Bất biến chịu tải: người SỬA không tự NGHIỆM THU bản sửa của mình.** Một tờ nghiệm thu do bên
-bị kiểm ký là **lời tự khai, không phải hàng rào** — đúng luật mà `SELF_ATTESTATION` cưỡng chế
-trong lõi quyền (ADR-0019 của repo Extension ⑵d), nên không phải một phép ẩn dụ.
-
-> **PHẢN BIỆN CODEX 08/09 lượt hai, và nó bác đúng CHÍNH CÂU NÀY ở bản đầu.** Bản đầu viết
-> *"Vai ② được phát hiện, Vai ① được sửa"*. Codex: câu đó **dễ bị đọc thành "người sửa không được
-> tìm lỗi"** — một ràng buộc vô lý, nó cấm Vai ① soi chính lõi nó đang giữ. *"Ranh giới cần bảo vệ
-> là **người sửa không tự nghiệm thu**, không phải tách người phát hiện khỏi người sửa."*
->
-> Đúng, và đây là lỗi nặng nhất của lượt này: tôi đã viết một **ràng buộc sai** rồi ghim nó bằng
-> một phép kiểm canh **đúng cái sai đó**. Nay cả ba chỗ (hiến pháp hai repo · bảng · phép ghim) nói
-> bất biến đúng, và bảng có thêm một câu **chống đọc nhầm** — vì chính tôi đã đọc nhầm khi viết,
-> nên một câu luật đọc nhầm được thì sẽ bị đọc nhầm.
+⑵ **Ranh giới chịu tải, một câu: Vai ② được *phát hiện*, Vai ① được *sửa*.** Gộp hai vai lại thì
+người tìm ra lỗi cũng là người tự chấm bản sửa của mình — và một tờ nghiệm thu do bên bị kiểm ký
+là **lời tự khai, không phải hàng rào**. Đây đúng là luật mà `SELF_ATTESTATION` cưỡng chế trong lõi
+quyền (ADR-0019 của repo Extension ⑵d), nên nó không phải một phép ẩn dụ.
 
 ⑶ **HAI vai chứ không ba, dù bảng có ba khối.** Khối 1 (dữ liệu lõi) là việc ở nhà; hai mũi *phát
 bản* → *thi hành* cộng **vòng ngược** là **cùng một việc** — đi ra rồi mang về. Chia theo khối thì
@@ -80,47 +58,12 @@ riêng cho phần luật chung nên lượt phát này **bị chặn cho tới k
 
 ## Điều KHÔNG được đọc rộng hơn
 
-**Hôm nay chỉ vế bàn giao có đường cưỡng chế bằng máy** — trường `đóng khi:` trong `BACKLOG.md` —
-và repo NÀY chưa bật nó (`KHUNG-8`).
-
-**PHẢN BIỆN CODEX ⓑ, cũng đúng:** bản đầu tôi viết *"chưa repo nào cưỡng chế đủ, nên luật này chưa
-có răng"*. Hai chỗ hỏng trong một câu. ⓐ *"chưa repo nào"* là khẳng định trên **toàn bộ tập repo**
-mà tôi chỉ kiểm hai. ⓑ **thiếu kiểm máy không đồng nghĩa không có răng** — một người có quyền từ
-chối nghiệm thu là răng thật. Hiến pháp giữ **nghĩa vụ**; **trạng thái triển khai** thuộc về
-`BACKLOG.md`, và đó là chỗ `KHUNG-8` đang nằm.
-
-**PHẢN BIỆN CODEX 08/09, và nó ĐÚNG:** bản đầu của mục này viết *"không dựng nổi ca hỏng, nên nó
-là chữ chứ không phải luật"*. Codex tách hai chuyện tôi gộp làm một — **"chưa cưỡng chế" KHÁC
-"không thể kiểm bằng máy"** — và nó chỉ ra ba thứ máy kiểm được:
-
-⑴ **vùng file bị chạm** so với vai đã khai (Vai ① chạm lõi · Vai ② chạm cửa ra);
-⑵ **liên kết bàn giao** — mục sổ nợ có dẫn tới bản vá đóng nó không;
-⑶ **người ký nghiệm thu phải khác người sửa.**
-
-Vế ⑶ **đã tồn tại và đã chạy**: đó chính là `SELF_ATTESTATION` trong `scripts/quyen.mjs`, có phép
-ghim và đã bị đột biến bắn thử. Nên câu *"không kiểm được"* của tôi **rộng hơn sự thật**, và rộng
-theo hướng tự bào chữa — nó biến một việc chưa làm thành một việc không làm được.
-
-**Giới hạn thật, hẹp hơn nhiều:** máy **không** chứng minh được **AI** thực sự phát hiện lỗi, vì
-`--as` là tên tự khai. Máy chỉ chứng minh được **hai cái tên khác nhau**. Đó là giới hạn về danh
-tính, không phải về khả năng kiểm — và nó biến mất khi danh tính đến từ nguồn được xác thực.
+**Chỉ vế bàn giao là máy kiểm được** — trường `đóng khi:` trong `BACKLOG.md`. Vế *"② phát hiện ·
+① sửa"* **không dựng nổi ca hỏng**, nên theo đúng câu ③ của mục 8 nó là **chữ, không phải luật**.
+Câu này được ghi thẳng vào hiến pháp thay vì giấu đi, để không ai tin nó đang được cưỡng chế.
 
 Và **cố ý không thêm** một quy ước đặt tên `--as` theo vai: không máy nào kiểm được nó, mà mục 8
 nói luật máy không kiểm được thì sớm muộn cũng bị bỏ qua — thêm vào chỉ để có thêm một dòng.
-
-## Chỗ mục 8 CHƯA được thoả trọn — phản biện Codex ⓐ, và tôi không cãi
-
-Mục 8 hỏi ba câu. Lượt này trả lời được **hai**:
-
-- *"Nó thay chỗ cái nào?"* — bảng chia theo hãng, đã xoá, không giữ song song. **ĐẠT.**
-- *"Đã có chuyện gì xảy ra thật chưa?"* — **KHÔNG có sự cố nào** do bảng cũ gây ra. Cái đo được
-  chỉ là bảng cũ **không đo được**: repo không ghi hãng ở đâu cả. Đó là một khiếm khuyết về
-  *khả năng kiểm*, không phải một vụ hỏng. **Yếu hơn mục 8 đòi**, và ghi ra thay vì tô hồng.
-- *"Dựng nổi ca hỏng cho nó không?"* — dựng được cho vế **bàn giao** và vế **không tự nghiệm thu**;
-  **không** dựng được cho việc một phiên có đóng đúng vai nó khai hay không.
-
-Codex nói thẳng: *"'một vào một ra' chỉ trả lời câu thứ hai"*. Đúng. Luật này vào với **một câu
-rưỡi trên ba**, và nếu ba tháng nữa không có sự cố nào nó ngăn được thì nó là ứng viên để **xoá**.
 
 ## Cái MẤT
 

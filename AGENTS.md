@@ -123,7 +123,7 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và m�
 
 ## 5. Vai từng AI — chia theo VIỆC, không chia theo hãng
 
-Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một vai**. Số đo và lý lẽ: [ADR-0008](docs/adr/0008-hai-vai-assistant.md).
+Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một vai**. Số đo và lý lẽ: [ADR-0008](docs/adr/0008-hai-vai-assistant.md) + [0009](docs/adr/0009-sua-ba-khang-dinh-cua-adr-0008.md).
 
 | Vai | Việc chính | KHÔNG được |
 |---|---|---|
@@ -183,7 +183,7 @@ vùng**. AI nào không tự nạp file này thì Đức dán: *"Đọc AGENTS.m
 | **Đưa một repo đang sống lên chuẩn** | [docs/protocols/CHUYEN-REPO-LEN-CHUAN.md](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md) — **đã chạy thật 3 lần** (03/09 ×2 · 06/09), hồ sơ từng lượt ở [docs/migrations/](docs/migrations/). Đọc hồ sơ trước: chỗ vấp thật nằm ở đó, không nằm trong quy trình |
 | **Sinh lại bản trích trong `template/`** | `npm run template` · chỉ kiểm không ghi: `npm run template -- --check` |
 | **Biết vì sao công cụ ở đây mà không đi theo bản trích** | [docs/adr/0002](docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md) · vì sao bộ khung tách ra ở riêng: [docs/adr/0001](docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md) |
-| **Sắp đổi VAI của một phiên, hay thắc mắc vì sao bỏ bảng chia-theo-hãng** | [ADR-0008](docs/adr/0008-hai-vai-assistant.md) — số đo 306 commit, và **chỗ nào của luật hai vai máy kiểm được, chỗ nào chỉ là chữ** |
+| **Sắp đổi VAI của một phiên, hay thắc mắc vì sao bỏ bảng chia-theo-hãng** | [ADR-0008](docs/adr/0008-hai-vai-assistant.md) — số đo, và vì sao không đo được HÃNG từ repo. **Đọc kèm [ADR-0009](docs/adr/0009-sua-ba-khang-dinh-cua-adr-0008.md)**, nó sửa ba khẳng định của 0008 — trong đó có **bất biến bị viết sai rồi ghim nhầm** |
 | **Sắp gom hay tách một TAB của bảng** | [ADR-0007](docs/adr/0007-tab-migrate-tach-rieng.md) — vì sao tab Migrate tách ra khỏi lượt gộp của ADR-0006, và phép ghim đo **hai nửa một việc phải cùng một tab** |
 | **Sắp SỬA BẢNG — thêm một khối, đổi một nhóm, hay nới luật một-chỗ** | [docs/adr/0006](docs/adr/0006-bang-mot-khai-niem-mot-cho.md) — **đọc trước khi gõ**: IA trước/sau, bằng chứng đếm được về chỗ trùng lặp, và **phần MẤT** của cả bốn quyết định. Hai luật cưỡng chế bằng máy ở `tests/overview-doc-smoke.mjs` vế 13–15, **tám đột biến đã chạy, cả tám chết ở đúng vế nó đo**. Lỗ đã biết, ghi trong ADR: luật một-chỗ đếm **tiêu đề** khối nên đổi tên là lách được |
 | **Biết vì sao hai lệnh của vai điều phối lại phát đi từ đây, dù bộ khung đang ở chế độ bảo trì** | [docs/adr/0005](docs/adr/0005-goi-assistant-phat-hanh-tu-bo-khung.md) — từ bản 1.3.0 bộ khung là **nơi phát hành** gói này; repo đã sinh ra nó thành người tiêu thụ. Hai bất biến cấm đổi ghi ngay trong ADR |
