@@ -1603,3 +1603,36 @@ commit → **chạy suite** → **chạy cổng** → đẩy. Chạy suite trư�
 **Lỗi cũ lặp lần thứ 5:** `chay-test.mjs` sinh ra có **một byte NUL** trong mã nguồn, nên git coi
 nó là nhị phân và bộ quét secret bỏ qua nó. Bắt được vì một phép ghim đếm "bỏ qua 2 file nhị
 phân" thay vì 1. Sửa bằng `String.fromCharCode(31)`.
+
+## 2026-09-08 (tối, tiếp) · claude-cua-kiem · Luật tốc độ vào hiến pháp, và B9 bắt tôi trả giá
+
+**Codex chấm chéo bắt được một lỗ thật trong dấu xác nhận:** *"đừng tin một cache chỉ dựa vào
+HEAD — HEAD bỏ sót file bẩn, phụ thuộc, môi trường."* File bẩn tôi đã che bằng
+`git status --porcelain -uall`. **Môi trường thì chưa** — đổi bản Node rồi chạy cổng là suite
+chưa từng chạy trên bản đó mà dấu vẫn hợp lệ. Nay dấu ghi cả `version platform arch`; ghim lên
+**11 cửa từ chối**.
+
+**Một khe CỐ Ý để ngỏ, ghi ra để không ai tưởng nó kín:** thư mục bị `.gitignore`
+(`node_modules/`) không nằm trong băm. Khai báo phụ thuộc thì có — `package-lock.json` được track
+nên HEAD ghim nội dung và porcelain bắt sai lệch. Chỉ lượt **sửa tay** trong `node_modules` là
+lọt, và hạn 30 phút là thứ chặn nó.
+
+**Mục 0b vào hiến pháp** — ba luật tốc độ, mỗi luật có số đo đứng sau. Nó là **luật CHUNG** nên
+lan sang mọi repo tiêu thụ, và **cổng dấu vân tay chặn đúng như thiết kế**. Đã ghi nguyên văn câu
+duyệt của Đức vào sổ đổi vân tay ngay cạnh hằng số.
+
+**Ba lần bị chặn liên tiếp, và cả ba đều đúng:**
+
+⑴ Luật chung của tôi gọi thẳng `npm run template` — **repo tiêu thụ không có lệnh đó**. Phép kiểm
+*"tài liệu dạy lệnh nào thì bản trích phải khai lệnh đó"* bắt. Sửa: nói về *"bộ sinh ghi vào một
+sổ có ràng buộc"*, không nêu tên lệnh.
+
+⑵ **B9: bản trích 228/200 dòng.** Đây là *"một luật vào thì một luật ra"* được cưỡng chế bằng máy,
+không phải lời hứa. Chỗ trả lại: **sơ đồ mermaid ở mục 2** — nó nói lại đúng điều bảng sáu việc và
+câu nguyên tắc ngay dưới đã nói, tức **bản thứ BA của một luật**. Bỏ sơ đồ (10 dòng) + nén 0b
+(29 → 12) → **200/200 khít**, không mất một luật nào.
+
+⑶ Nén xong vẫn 204 → 202 → 201 dòng. Phải cắt thêm bốn lượt nữa mới khít. Ghi ra vì nó là số đo
+thật của việc *thêm luật*: một mục 12 dòng đòi trả lại đúng 12 dòng, không có chỗ nào rẻ hơn.
+
+**Còn mở:** mang cơ chế này sang repo Extension; viết prompt khởi tạo hai phiên AI cho bộ khung.
