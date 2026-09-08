@@ -1636,3 +1636,28 @@ câu nguyên tắc ngay dưới đã nói, tức **bản thứ BA của một lu
 thật của việc *thêm luật*: một mục 12 dòng đòi trả lại đúng 12 dòng, không có chỗ nào rẻ hơn.
 
 **Còn mở:** mang cơ chế này sang repo Extension; viết prompt khởi tạo hai phiên AI cho bộ khung.
+
+## 2026-09-08 (khuya) · claude-cua-kiem · Cơ chế tăng tốc đã sang repo tiêu thụ; bản 1.3.66
+
+**Repo `Chrome_Extension_AI_Agentic` nhận xong** (N-43 đóng ở sổ nợ bên đó). Số đo bên ấy:
+chuỗi suite **241,7s → 93s**, cổng **~280s → 33s**, cả vòng **521s → 126s — nhanh 76%**.
+
+**Bản trích phải sửa MỘT chỗ vì repo đích khác bộ khung.** Phép ghim của tôi soi **tên biến**
+(`runRootSuite()`), mà repo tiêu thụ gọi nhánh chạy đầy đủ là `rootSuiteParts()` — điều phải ghim
+thì y hệt, chỉ tên khác. Nó **đỏ oan ngay ở repo đầu tiên nhận**. Nay phép ghim hỏi **hành vi**:
+kết quả xét phải được rẽ nhánh, và đường chạy đầy đủ phải còn — chấp nhận cả hai tên.
+
+> Bài học mang đi: một phép ghim viết ở nơi phát hành mà soi **chi tiết triển khai** thì nó không
+> phải hợp đồng, nó là bản sao. Hợp đồng phải nói về **hành vi**.
+
+**Chỗ repo đích cố ý làm khác, và nó đúng:** ở đó `npm test` **giữ nguyên chuỗi tuần tự**, đường
+nhanh mang tên riêng `npm run test:song-song`. Lý do: một phép ghim **trong gói ĐÃ ĐÓNG BĂNG** đọc
+thẳng `scripts.test` để bắt "xanh giả", mà gói đóng băng thì **chỉ-đọc**. Đổi `test` là làm đỏ một
+phép kiểm mình không có quyền sửa — nên đường nhanh nhường chỗ.
+
+**Byte điều khiển thô, lần thứ SÁU trong một ngày.** Sáng nay là byte NUL trong `chay-test.mjs`
+(git coi file là nhị phân, bộ quét secret bỏ qua nó). Tối nay là byte **BACKSPACE** lọt vào phép
+ghim khi tôi dựng regex bằng chuỗi Python — `\b` thành ký tự thật, và phép khẳng định **im lặng
+mất hiệu lực**. Cả hai lần đều chỉ lộ ra vì một phép kiểm khác đếm sai một đơn vị.
+
+**Còn mở:** không có gì của phiên này ở repo này.
