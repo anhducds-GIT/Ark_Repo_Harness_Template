@@ -657,3 +657,25 @@ MẶT, không đoán ngữ nghĩa; nó không cấm nhắc khoá vùng, chỉ c�
 **Bài học về chính phép đo:** bản đầu của F20 dò chuỗi đầy đủ `claim.mjs --take` và chỉ thấy 1
 file — **bỏ sót đúng file nặng nhất**. Phép đo hẹp hơn thực tế thì nó báo xanh ở đúng chỗ đang
 hỏng.
+
+## 2026-09-09 · Số mô tả một tập hợp thì phải ĐẾM, không gõ tay
+
+**Không phải Đức chốt — đây là luật tôi rút ra từ SÁU ca đo được trong một ngày**, ghi theo luật
+mục 8 (thêm một luật phải trả lời được "đã có chuyện gì xảy ra thật chưa").
+
+**Sáu con số gõ tay đã sai, cùng một hình dạng:** bảng tra nói *"6 trên 11 mục cổng có ca đỏ"*
+(cổng có 15) · cổng phiên gọi bộ kiểm cấu trúc là *"B1–B14"* (nó có 15) · bộ đó tự xưng *"15 phép
+kiểm B1…B15"* ngay lượt thêm B16 · `features.json` khai *"41 mục"* (có 44) · `bang-song` *"chín
+vế"* (11) · `khoa-dau-vet` *"tám vế"* (11).
+
+**Không cái nào làm đỏ bất cứ thứ gì — và đó chính là vấn đề.** Nên cả sáu cùng sống. Người đọc
+luật thì TIN con số: một phiên đọc *"6 vế"* sẽ nghĩ hai vế cuối không tồn tại.
+
+**Chốt:** ⑴ chỗ nào máy đếm được thì để máy đếm (tiêu đề cổng cấu trúc nay tự đếm; tên mục cổng
+thôi mang số); ⑵ ghim **F21** ở `core-contract` — mọi khẳng định *"N vế"* đi kèm liên kết tới
+`tests/*.mjs` phải khớp số vế thật.
+
+**Lỗ của chính F21, tìm ra bằng đột biến:** bản đầu chỉ đọc chữ số, nên đổi *"11 vế"* thành *"chín
+vế"* là khẳng định đó **rơi ra khỏi tập đo** và phép kiểm vẫn xanh — mà *"chín vế"* đúng là một
+trong sáu con số sai. **Một phép kiểm chừa ca hỏng của chính nó là đồ trang trí.** Nới ra đọc cả
+số viết bằng chữ thì nó bắt ngay con số sai **thứ sáu** mà tôi chưa hề biết.

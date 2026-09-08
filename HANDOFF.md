@@ -1182,3 +1182,26 @@ Bản **1.3.86**.
 
 **Chỗ thay vào:** một mục ngắn nói thứ tự hiện hành nằm ở đâu (`npm run what-next`), và giữ lại
 luật còn hiệu lực *GOM BẢN PHÁT*.
+
+### 2026-09-09 (6) · harness-loi-01 · Sáu con số gõ tay trong luật đều sai — ghim F21
+
+**Làm gì:** quét mọi khẳng định bằng số trong `AGENTS.md`, đối chiếu với thực tế.
+
+**Số:** **6 con số sai**: `features.json` 41→**44** mục · `bang-song` "chín"→**11** vế ·
+`khoa-file` 6→**8** vế · `khoa-dau-vet` "tám"→**11** vế · hàng ROADMAP còn nói *"12 mục nợ xếp
+thành 5 đợt"* (các đợt đã dời sang kho) · cộng ba con số dãy B đã sửa ở lượt trước. Đã sửa cả sáu.
+
+**Ghim:** `core-contract` **F21** — mọi khẳng định *"N vế"* kèm liên kết `tests/*.mjs` phải khớp
+số vế thật. 5 khẳng định đang được đo.
+
+**Lỗ của chính F21, đột biến tìm ra:** bản đầu chỉ đọc CHỮ SỐ, nên đổi *"11 vế"* → *"chín vế"* là
+khẳng định đó rơi khỏi tập đo và phép kiểm vẫn xanh — mà *"chín vế"* chính là một trong sáu con số
+sai. Nới ra đọc cả số viết bằng chữ (`một`…`mười`) thì nó **bắt ngay con số sai thứ sáu**
+(`khoa-dau-vet`) mà tôi chưa hề biết. Bài học: một phép kiểm chừa ca hỏng của chính nó là đồ trang trí.
+
+**Cũng sửa:** con trỏ treo do chính tôi tạo ở `ROADMAP-V2.md` (dòng *"thay phần xếp đợt bên dưới"*
+trong khi khối đó đã dời đi), và câu *"lên đợt 1"* nay bỏ số hiệu vì các đợt không còn.
+
+**Còn mở:** sổ nợ 20 mục. Rà luật: xong `AGENTS.md` · `decisions.md` · 15 ADR · `ROADMAP-V2` ·
+`MULTIFLOW` · `SO-TAY-AGENT` · `TINH-NANG` · `GIAO-VIEC-CHUNG`. **Chưa rà:** `ORCHESTRATOR.md`
+(vấn đề đã có mục nợ `KHUNG-4`) · `CHUYEN-REPO-LEN-CHUAN.md` · `BAO-TRI-DINH-KY.md` · `LEGEND.md`.

@@ -18,8 +18,8 @@ ttl_days: 120
 
 ## Cập nhật 2026-09-06 — MƯỜI BẢN PHÁT TRONG MỘT NGÀY, và bộ khung đổi chất
 
-> Ngày 06/09 đi từ **1.3.4** tới **1.3.13**. Mục này thay phần xếp đợt bên dưới ở những chỗ
-> mâu thuẫn — đọc mục này trước.
+> Ngày 06/09 đi từ **1.3.4** tới **1.3.13**. Đây là **trạng thái hiện hành** của lớp điều phối;
+> kế hoạch sáu đợt cũ mà mục này từng phủ lên nay đã dời sang kho lưu trữ (xem cuối file).
 
 ### Bộ khung nay có ba thứ nó chưa từng có
 
@@ -94,8 +94,9 @@ Lượt migrate thật `n8n-orchestrator` cộng audit độc lập đã **đón
 lớp bảo vệ vừa bị nới. Cách duy nhất bắt được là **tự tay dựng ca hỏng**. Nên từ nay mọi lượt nới
 một cấu hình đều phải kèm một khối trong `tests/cong-do-that.mjs`.
 
-**Thứ tự đổi:** migrate không còn là "đợt 5, sau khi dọn xong nợ". Nó lên **đợt 1** — mỗi lượt
-migrate là một lượt tìm lỗi mà bảy phiên ở nhà không tìm ra.
+**Thứ tự đổi, và nó CÒN NGUYÊN hiệu lực:** migrate không còn là việc làm sau cùng, sau khi dọn
+xong nợ. Nó lên **sớm** — mỗi lượt migrate là một lượt tìm lỗi mà bảy phiên ở nhà không tìm ra.
+*(Câu gốc viết "lên đợt 1"; các đợt đã dời sang kho lưu trữ 09/09 nên bỏ số hiệu, giữ nguyên ý.)*
 
 ## Thứ tự việc — đọc ở đâu
 

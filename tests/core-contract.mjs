@@ -973,4 +973,70 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok(`F20 - ${mocPhai.length} file nhac khoa vung, ca ${mocPhai.length} deu nhac ca khoa file (mac dinh)`);
 }
 
+/* ---- F21. Con so trong luat phai KHOP thuc te -----------------------------
+ *
+ * LOP LOI DA CAN NAM LAN TRONG MOT NGAY (09/09), va lan nao cung cung hinh dang: mot con so GO
+ * TAY mo ta mot tap hop, roi tap hop doi ma con so o lai.
+ *   · bang tra noi "6 tren 11 muc cong co ca do" khi cong da co 15 muc
+ *   · cong phien goi bo kiem cau truc la "B1-B14" khi no co 15
+ *   · bo do tu xung "15 phep kiem B1...B15" ngay luot them B16
+ *   · bang tra noi `features.json` co "41 muc" khi no co 44
+ *   · bang tra noi `bang-song` co "chin ve" (11) va `khoa-file` co "6 ve" (8)
+ *
+ * Khong cai nao la loi nang, va do dung la van de: khong cai nao lam do bat cu thu gi, nen ca
+ * nam cung song. Nguoi doc luat thi tin con so — mot phien doc "6 ve" se nghi hai ve cuoi khong
+ * ton tai.
+ *
+ * PHEP KIEM NAY CHI DO MOT DANG: "<N> ve" di kem mot lien ket toi `tests/*.mjs` trong bang tra.
+ * Do la dang DE DO NHAT va cung la dang hay sai nhat. No KHONG do duoc moi con so trong luat —
+ * noi thang ra day de khong ai doc no nhu mot lop bao dam. Cach chua that cho phan con lai la
+ * DUNG GO SO vao van ban mo ta tap hop; may dem duoc thi de may dem. */
+{
+  /* SO VIET BANG CHU CUNG LA SO. Ban dau ve nay chi doc `\d+`, va mot dot bien chay that da lo
+     ngay ra lo: doi "11 ve" thanh "chin ve" thi khang dinh do RA KHOI tap do va phep kiem van
+     xanh. Ma "chin ve" chinh la mot trong nam con so sai da tim thay — tuc ve nay khong bat
+     duoc dung ca da sinh ra no. Mot phep kiem chua ca hong cua chinh minh la do trang tri. */
+  const CHU_SO = new Map([
+    ["một", 1], ["hai", 2], ["ba", 3], ["bốn", 4], ["năm", 5],
+    ["sáu", 6], ["bảy", 7], ["tám", 8], ["chín", 9], ["mười", 10]
+  ]);
+  const doSo = (s) => (/^\d+$/.test(s) ? Number(s) : CHU_SO.get(s.toLowerCase()));
+  const MAU_SO = new RegExp(`(\\d+|${[...CHU_SO.keys()].join("|")})\\s+vế`, "gi");
+
+  const luat = readFileSync(join(ROOT, "AGENTS.md"), "utf8");
+  const re = /\[tests\/([a-z0-9-]+\.mjs)\]\(tests\/\1\)([\s\S]{0,400}?)(?=\n\||$)/g;
+  const lech = [];
+  let soDo = 0;
+  let khop;
+  while ((khop = re.exec(luat)) !== null) {
+    const ten = khop[1];
+    const khai = [...khop[2].matchAll(MAU_SO)].map((x) => doSo(x[1])).filter((x) => x !== undefined)[0];
+    if (khai === undefined) continue;
+    if (!existsSync(join(ROOT, "tests", ten))) {
+      lech.push(`tests/${ten}: luat tro toi mot suite KHONG TON TAI`);
+      continue;
+    }
+    const that = (readFileSync(join(ROOT, "tests", ten), "utf8").match(/^\s*ok\(/gm) || []).length;
+    soDo += 1;
+    if (khai !== that) lech.push(`tests/${ten}: luat noi ${khai} ve, thuc te ${that}`);
+  }
+  // Phai con doi tuong do. Doi cach viet bang tra ma ve nay ve 0 thi no thanh do trang tri.
+  assert.ok(soDo >= 3,
+    `ve nay MAT DOI TUONG DO: chi doc duoc ${soDo} khang dinh "<N> ve" trong AGENTS.md. Doi cach viet bang tra thi sua ve nay cho dung, dung de no xanh rong`);
+  assert.deepEqual(lech, [],
+    `con so trong luat khong khop thuc te: ${lech.join(" · ")} — nguoi doc luat TIN con so, va mot con so sai khong lam do bat cu thu gi nen no song rat lau`);
+
+  // DOT BIEN CHAY TAI CHO: van ban khai sai PHAI bi neu ra. Khong co ve nay thi ve tren xanh
+  // vinh vien o mot repo sach va khong ai biet no co phan biet noi hai nhanh hay khong.
+  {
+    const gia = "| x | [tests/core-contract.mjs](tests/core-contract.mjs) — 999 vế, ghim moi thu |";
+    const g = /\[tests\/([a-z0-9-]+\.mjs)\]\(tests\/\1\)([\s\S]{0,400}?)(?=\n\||$)/g.exec(gia);
+    const khaiGia = [...g[2].matchAll(/(\d+)\s+vế/g)].map((x) => Number(x[1]))[0];
+    const thatGia = (readFileSync(join(ROOT, "tests", g[1]), "utf8").match(/^\s*ok\(/gm) || []).length;
+    assert.notEqual(khaiGia, thatGia, "phep loc phai NEU RA duoc mot con so khai sai");
+    assert.equal(khaiGia, 999, "phep loc phai doc dung con so trong van ban, khong doc nham cai khac");
+  }
+  ok(`F21 - ${soDo} khang dinh "<N> ve" trong luat, ca ${soDo} deu khop so ve thuc te`);
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);
