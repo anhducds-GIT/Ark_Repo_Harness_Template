@@ -289,11 +289,18 @@ const html = trang(dl);
   assert.ok(a.includes("<b>1</b> quy trình lên <b>1</b> repo đích"), "Vai ② phải chở số quy trình/repo đích");
   assert.ok(b.includes("<b>2</b> quy trình lên <b>3</b> repo đích"), "đổi đầu vào thì số Vai ② phải đổi theo");
 
-  // RANH GIỚI CHỊU TẢI, không phải trang trí: Vai ② phát hiện, Vai ① sửa. Gộp lại thì người tìm
-  // ra lỗi tự chấm bản sửa của mình. Câu đó mất khỏi trang là mất chính lý do có hai vai.
-  const iPhat = a.indexOf("Vai ② được");
-  const iSua = a.indexOf("Vai ① được");
-  assert.ok(iPhat > 0 && iSua > iPhat, "trang phải nói rõ Vai ② phát hiện rồi Vai ① sửa, đúng thứ tự đó");
+  /* BẤT BIẾN CHỊU TẢI — và phép ghim này từng canh SAI THỨ, sửa 08/09 sau khi phiên Codex bác.
+   *
+   * Bản đầu đo rằng trang nói *"Vai ② phát hiện, Vai ① sửa"*. Codex chỉ ra câu đó **dễ bị đọc
+   * thành "người sửa không được tìm lỗi"** — một ràng buộc vô lý, nó cấm Vai ① soi chính lõi nó
+   * giữ. Bất biến thật là cái `SELF_ATTESTATION` vẫn cưỡng chế: **người sửa không tự nghiệm thu**.
+   *
+   * Nên vế dưới đo bất biến ĐÚNG, và đo luôn rằng trang có câu chống-đọc-nhầm — vì chính tôi đã
+   * đọc nhầm nó khi viết, và một câu luật đọc nhầm được thì sẽ bị đọc nhầm. */
+  assert.ok(/người <em>sửa<\/em> không tự\s+<em>nghiệm thu<\/em>/.test(a),
+    "trang phải nói bất biến: người SỬA không tự NGHIỆM THU");
+  assert.ok(/Đừng đọc thành/.test(a) && /không được tìm lỗi/.test(a),
+    "trang phải có câu chống đọc nhầm thành 'người sửa không được tìm lỗi'");
 
   // Và nó phải nằm CHUNG khối với mô hình ba khối — tách ra là hai trang lệch nhau về sau.
   assert.ok(a.includes("Mô hình vận hành — ba khối") && a.includes("Hai vai Assistant"),

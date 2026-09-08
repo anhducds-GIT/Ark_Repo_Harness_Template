@@ -938,10 +938,11 @@ export function khoiMoHinh({ lenh = [], protocols = [], briefs = [], dichDen = [
   ])}
     </div>
   </div>
-  <div class="mh-bat"><b>Ranh giới chịu tải, và nó chỉ có một câu:</b> Vai ② được <em>phát hiện</em>,
-  Vai ① được <em>sửa</em>. Vai ② mang một chỗ vấp về; Vai ① biến nó thành bản vá cộng một phép kiểm
-  ghim. Gộp hai vai lại thì người tìm ra lỗi cũng là người tự chấm bản sửa của mình — và một tờ
-  nghiệm thu do bên bị kiểm ký là lời tự khai, không phải hàng rào.</div>`;
+  <div class="mh-bat"><b>Bất biến chịu tải, một câu:</b> người <em>sửa</em> không tự
+  <em>nghiệm thu</em> bản sửa của mình. Một tờ nghiệm thu do bên bị kiểm ký là lời tự khai, không
+  phải hàng rào.<br><b>Đừng đọc thành</b> &#8220;người sửa không được tìm lỗi&#8221; — vai nào cũng
+  được tìm lỗi ở bất kỳ đâu; tách <em>ai tìm</em> khỏi <em>ai sửa</em> là cấm Vai &#9312; soi chính
+  lõi nó giữ. Thứ phải tách là <b>người ký</b> khỏi <b>người sửa</b>.</div>`;
 
   return `<div class="the">
   <h2>Mô hình vận hành — ba khối</h2>

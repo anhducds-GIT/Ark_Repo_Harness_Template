@@ -53,10 +53,19 @@ hãng **không có ô nào** cho chính người làm nhiều nhất.
 - **② Phát & thu** — cửa duy nhất ra ngoài: phát bản, đo repo đích, ghép đề bài, rồi **mang chỗ
   vấp về** thành mục sổ nợ của lõi, và tối ưu chính quy trình đó.
 
-⑵ **Ranh giới chịu tải, một câu: Vai ② được *phát hiện*, Vai ① được *sửa*.** Gộp hai vai lại thì
-người tìm ra lỗi cũng là người tự chấm bản sửa của mình — và một tờ nghiệm thu do bên bị kiểm ký
-là **lời tự khai, không phải hàng rào**. Đây đúng là luật mà `SELF_ATTESTATION` cưỡng chế trong lõi
-quyền (ADR-0019 của repo Extension ⑵d), nên nó không phải một phép ẩn dụ.
+⑵ **Bất biến chịu tải: người SỬA không tự NGHIỆM THU bản sửa của mình.** Một tờ nghiệm thu do bên
+bị kiểm ký là **lời tự khai, không phải hàng rào** — đúng luật mà `SELF_ATTESTATION` cưỡng chế
+trong lõi quyền (ADR-0019 của repo Extension ⑵d), nên không phải một phép ẩn dụ.
+
+> **PHẢN BIỆN CODEX 08/09 lượt hai, và nó bác đúng CHÍNH CÂU NÀY ở bản đầu.** Bản đầu viết
+> *"Vai ② được phát hiện, Vai ① được sửa"*. Codex: câu đó **dễ bị đọc thành "người sửa không được
+> tìm lỗi"** — một ràng buộc vô lý, nó cấm Vai ① soi chính lõi nó đang giữ. *"Ranh giới cần bảo vệ
+> là **người sửa không tự nghiệm thu**, không phải tách người phát hiện khỏi người sửa."*
+>
+> Đúng, và đây là lỗi nặng nhất của lượt này: tôi đã viết một **ràng buộc sai** rồi ghim nó bằng
+> một phép kiểm canh **đúng cái sai đó**. Nay cả ba chỗ (hiến pháp hai repo · bảng · phép ghim) nói
+> bất biến đúng, và bảng có thêm một câu **chống đọc nhầm** — vì chính tôi đã đọc nhầm khi viết,
+> nên một câu luật đọc nhầm được thì sẽ bị đọc nhầm.
 
 ⑶ **HAI vai chứ không ba, dù bảng có ba khối.** Khối 1 (dữ liệu lõi) là việc ở nhà; hai mũi *phát
 bản* → *thi hành* cộng **vòng ngược** là **cùng một việc** — đi ra rồi mang về. Chia theo khối thì
@@ -71,8 +80,14 @@ riêng cho phần luật chung nên lượt phát này **bị chặn cho tới k
 
 ## Điều KHÔNG được đọc rộng hơn
 
-**Hôm nay chỉ vế bàn giao được cưỡng chế** — trường `đóng khi:` trong `BACKLOG.md`, và ngay cả vế
-đó thì repo NÀY cũng chưa bật (`KHUNG-8`). Nên tính tới 08/09, luật hai vai **chưa có răng**.
+**Hôm nay chỉ vế bàn giao có đường cưỡng chế bằng máy** — trường `đóng khi:` trong `BACKLOG.md` —
+và repo NÀY chưa bật nó (`KHUNG-8`).
+
+**PHẢN BIỆN CODEX ⓑ, cũng đúng:** bản đầu tôi viết *"chưa repo nào cưỡng chế đủ, nên luật này chưa
+có răng"*. Hai chỗ hỏng trong một câu. ⓐ *"chưa repo nào"* là khẳng định trên **toàn bộ tập repo**
+mà tôi chỉ kiểm hai. ⓑ **thiếu kiểm máy không đồng nghĩa không có răng** — một người có quyền từ
+chối nghiệm thu là răng thật. Hiến pháp giữ **nghĩa vụ**; **trạng thái triển khai** thuộc về
+`BACKLOG.md`, và đó là chỗ `KHUNG-8` đang nằm.
 
 **PHẢN BIỆN CODEX 08/09, và nó ĐÚNG:** bản đầu của mục này viết *"không dựng nổi ca hỏng, nên nó
 là chữ chứ không phải luật"*. Codex tách hai chuyện tôi gộp làm một — **"chưa cưỡng chế" KHÁC
@@ -92,6 +107,20 @@ tính, không phải về khả năng kiểm — và nó biến mất khi danh t
 
 Và **cố ý không thêm** một quy ước đặt tên `--as` theo vai: không máy nào kiểm được nó, mà mục 8
 nói luật máy không kiểm được thì sớm muộn cũng bị bỏ qua — thêm vào chỉ để có thêm một dòng.
+
+## Chỗ mục 8 CHƯA được thoả trọn — phản biện Codex ⓐ, và tôi không cãi
+
+Mục 8 hỏi ba câu. Lượt này trả lời được **hai**:
+
+- *"Nó thay chỗ cái nào?"* — bảng chia theo hãng, đã xoá, không giữ song song. **ĐẠT.**
+- *"Đã có chuyện gì xảy ra thật chưa?"* — **KHÔNG có sự cố nào** do bảng cũ gây ra. Cái đo được
+  chỉ là bảng cũ **không đo được**: repo không ghi hãng ở đâu cả. Đó là một khiếm khuyết về
+  *khả năng kiểm*, không phải một vụ hỏng. **Yếu hơn mục 8 đòi**, và ghi ra thay vì tô hồng.
+- *"Dựng nổi ca hỏng cho nó không?"* — dựng được cho vế **bàn giao** và vế **không tự nghiệm thu**;
+  **không** dựng được cho việc một phiên có đóng đúng vai nó khai hay không.
+
+Codex nói thẳng: *"'một vào một ra' chỉ trả lời câu thứ hai"*. Đúng. Luật này vào với **một câu
+rưỡi trên ba**, và nếu ba tháng nữa không có sự cố nào nó ngăn được thì nó là ứng viên để **xoá**.
 
 ## Cái MẤT
 

@@ -1470,3 +1470,35 @@ lượt này và chú thích ngay trên `gapKhoi`.
 
 **Đức chốt hai câu:** không thêm block mục lục riêng (lưới đã là mục lục — thêm nữa là in cùng một
 danh sách hai lần) · giữ khối *"Bắt đầu ở đâu"* mở sẵn để trang còn nói được câu đầu tiên.
+
+## 2026-09-08 · claude-cua-kiem — hai vai thành luật, tab Migrate tách, Codex bác đúng hai chỗ
+
+**Số đo.** `overview-smoke` 11 → **12 ghim** · đột biến khối gập+lưới **8/8** · bản phát hành
+1.3.39 → **1.3.41** · `features.mjs` **41 xong · 0 thiếu** (thêm F4.7). Tab `cong-viec`
+131.532 → **32.743 byte**; tab `migrate` mới **102.333**. Chi tiết: ADR-0007 · ADR-0008.
+
+**BA CỔNG CHẶN TÔI, cả ba chặn đúng — phần đáng đọc nhất của mục này:**
+
+⑴ **B9 (trần 200 dòng cho hiến pháp).** Tôi nhét số đo và lý lẽ vào `AGENTS.md`; bản trích phồng
+200 → **218**. Tôi nén **hai lượt** (218 → 210 → 204) mà vẫn đỏ, vì đang nén **văn** trong khi vấn
+đề là **thứ đó không thuộc về đây**. Chuyển sang ADR-0008 thì vừa: nay **đúng 200/200**.
+**Hiến pháp chứa LUẬT; ADR chứa VÌ SAO.**
+
+⑵ **Dấu vân tay luật chung.** Bộ phát hành từ chối vì tôi đổi phần **lan sang mọi repo**. Không tự
+mở — Đức duyệt rồi mới cập nhật, kèm **một sổ đổi vân tay** ngay cạnh hằng số: một chuỗi 64 ký tự
+đổi lặng lẽ trông y hệt một lượt đổi được duyệt.
+
+⑶ **Sổ phát hành đòi một-số-một-nội-dung** — mỗi lượt sửa tầng máy là một lượt tăng bản.
+
+**MỘT CÂU SAI TÔI TỰ ĐƯA VÀO HIẾN PHÁP rồi tự bắt được:** viết `npm run test:backlog` đếm
+`đóng khi:` — **bộ khung không có lệnh đó**. Sửa thành nói thật, kèm `KHUNG-8`. **Không port bộ
+kiểm ngay**: **43/44 mục** sổ này thiếu `đóng khi:`, phần lớn là chữ phiên khác; bật lên là đỏ 43
+mục và phiên sau sẽ học cách bỏ qua nó.
+
+**Codex chấm chéo — KHÔNG chạy được lệnh nào** (`deny-read ACLs`), bốn câu CHƯA THỬ. Nhưng bác
+đúng hai chỗ **về phương pháp**, không cần chạy: ⓐ số đo của tôi đếm **dòng** `Lane:` chứ không
+đếm commit, và **không gì ánh xạ lane → hãng** — tôi suy hãng từ chuỗi trong tên lane, tức tin
+đúng loại **lời tự khai** repo này cấm; ⓑ *"chưa cưỡng chế"* **khác** *"không thể kiểm bằng máy"*,
+tôi gộp hai chuyện theo hướng **tự bào chữa**. Đã sửa cả hai; chỗ ⓐ hoá ra làm lập luận **mạnh lên**.
+
+**Còn mở:** `KHUNG-8` · `KHUNG-7` · sổ nợ bộ khung **45 mục**, không ai đặt trần.
