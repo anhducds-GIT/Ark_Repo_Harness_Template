@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T09:40:43.117Z",
-      "task": "bump ban sau dong bo",
-      "released_at": "2026-09-08T09:51:51.858Z",
+      "claimed_at": "2026-09-08T10:00:27.386Z",
+      "task": "KHUNG-46: khai bang.nhom trong .repo-structure.json",
+      "released_at": "2026-09-08T10:25:08.101Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T09:40:43.020Z",
-      "task": "dong bo phep ghim dau: hoi HANH VI thay vi ten bien",
-      "released_at": "2026-09-08T09:51:51.732Z",
+      "claimed_at": "2026-09-08T10:00:27.336Z",
+      "task": "KHUNG-46: gom danh sach nhom bang ve MOT noi",
+      "released_at": "2026-09-08T10:25:07.988Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T09:40:43.201Z",
-      "task": "phat lai",
-      "released_at": "2026-09-08T09:51:52.017Z"
+      "claimed_at": "2026-09-08T10:00:27.460Z",
+      "task": "KHUNG-46: mang khoi bang.nhom vao ban trich",
+      "released_at": "2026-09-08T10:25:08.216Z"
     }
   }
 }
