@@ -1217,3 +1217,23 @@ phần file này ĐƯỢC nói: thứ tự ưu tiên và con số vượt trần
 
 **Số:** `ROADMAP-V2.md` **120 → 109 dòng**. Kho chữ **3.197 → 3.185**. Thước cóc **3.196 → 3.185**
 (SIẾT lần thứ hai trong phiên). Bản **1.3.89**.
+
+### 2026-09-09 (8) · harness-loi-01 · Quét cả kho tài liệu — chốt phiên rà soát luật
+
+**Quét máy toàn bộ tài liệu** (trừ `adr/` · `archive/` · `migrations/`) tìm ba hình dạng:
+liên kết trỏ vào hư không · mã việc đã đóng bị nói như đang mở · số gõ tay.
+
+**Số:** **0 liên kết treo**. 4 file nhắc mã đã đóng — ba là kể chuyện lịch sử (hợp lệ), riêng
+`KHUNG-31` là mã tôi vừa gộp vào `KHUNG-6` sáng nay nên hai chỗ đã trỏ lại. Kho chữ **3.185**,
+đúng bằng thước cóc. Bộ luật: **15 ADR · 6 chủ đề · 0 vi phạm · 0 đề xuất tồn đọng**.
+
+**Tổng cả phiên (bảy lượt commit):** sổ nợ **25 → 20** · sổ quyết định **30 → 28** (dời 4 mục
+sang kho, 0 dòng mất) · 15 ADR **chưa phân nhóm → 6 chủ đề** có đầu mối · cổng cấu trúc **15 → 16**
+phép kiểm · cổng phiên **15 → 16** · suite **21 → 22** · kho chữ **3.260 → 3.185** (thước SIẾT hai
+lần, **không lần nào nới**) · **6 con số gõ tay trong luật** đều sai, đã sửa và ghim.
+
+**Ba phép ghim mới:** `F20` (tài liệu không được dạy mặc định đã bị thay thế) · `F21` (số trong
+luật phải khớp thực tế) · `tests/rule-compiler.mjs` 8 vế + `B16`.
+
+**Còn mở:** sổ nợ 20 mục, **6 chờ Đức** (`KHUNG-6` · `11` · `14` · `30` · `37` · `40`).
+`ORCHESTRATOR.md` chưa rà sâu — vấn đề của nó đã có mục nợ `KHUNG-4` nên không mở mục mới.

@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T22:49:42.364Z",
-      "task": "ra soat luat",
-      "released_at": "2026-09-08T23:08:32.135Z",
+      "claimed_at": "2026-09-08T23:09:31.005Z",
+      "task": "chot phien ra soat luat",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T22:49:42.429Z",
-      "task": "ra soat luat",
-      "released_at": "2026-09-08T23:08:32.233Z",
+      "claimed_at": "2026-09-08T23:09:31.069Z",
+      "task": "chot phien ra soat luat",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T22:49:42.481Z",
-      "task": "ra soat luat",
-      "released_at": "2026-09-08T23:08:32.335Z",
+      "claimed_at": "2026-09-08T23:09:31.132Z",
+      "task": "chot phien ra soat luat",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T22:49:42.555Z",
-      "task": "ra soat luat",
-      "released_at": "2026-09-08T23:08:32.431Z"
+      "claimed_at": "2026-09-08T23:09:31.197Z",
+      "task": "chot phien ra soat luat",
+      "released_at": null
     }
   }
 }
