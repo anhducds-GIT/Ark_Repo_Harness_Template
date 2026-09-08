@@ -622,38 +622,35 @@ Nó **không treo** — nó vẽ lưu đồ NGƯỢC, nút đầu rơi xuống �
 
 ## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Suite đột biến làm HỎNG một commit thật
 
-**Bắt được trong lúc đóng phiên trên, và nó không phải lo xa — nó đã xảy ra.**
+**Bắt được trong lúc đóng phiên trên — và nó đã xảy ra, không phải lo xa.**
 `tests/upgrade-smoke.mjs` khối 14 kiểm luật *"sổ phát hành chỉ được THÊM"* bằng cách ghi đè một
-dòng của `RELEASE-LEDGER.json` **thật ở gốc repo**, chạy ba lệnh để đòi chúng DỪNG, rồi khôi phục
-trong `finally`. Ở repo một lane thì đúng.
+dòng của `RELEASE-LEDGER.json` **thật ở gốc repo**, rồi khôi phục trong `finally`. Ở repo một lane
+thì đúng. Chạy song song thì hai kiểu hỏng, cả hai đo được hôm nay:
 
-**Hai kiểu hỏng, cả hai đo được hôm nay:**
+⑴ **Đỏ oan** — `build-template.mjs --check` đọc sổ ĐÚNG LÚC nó đang hỏng, ba lệnh đỏ với thông báo
+trông y hệt lỗi thật. ⑵ **Hỏng dữ liệu** — hai lượt chồng nhau thì `finally` khôi phục **một ảnh
+chụp ĐÃ HỎNG**, sổ mất hẳn dòng `1.2.10`. Trước đó commit `c385f4c` đã mang theo
+`"1.2.10": "1111111111111111"` — đúng thứ khối 14 sinh ra để chặn, lọt vào lịch sử qua cửa sau.
+Đã trả lại `946065fa2778e0e4`.
 
-⑴ **Đỏ oan.** `build-template.mjs --check` chạy song song, đọc sổ ĐÚNG LÚC nó đang hỏng → ba lệnh
-đỏ với một thông báo trông y hệt lỗi thật (`SO_PHAT_HANH_SUA_LICH_SU`).
+**Vì sao im lặng:** ca thường thì `finally` kịp, cây làm việc sạch lại, mọi phép kiểm sau đó xanh.
+Chỉ lộ vì `git status` báo sổ *"sửa dở"* — mà nội dung "sửa dở" chính là bản ĐÚNG. Nhìn ngược.
 
-⑵ **Hỏng dữ liệu, nặng hơn.** Hai lượt chạy chồng nhau thì lớp `finally` khôi phục **một ảnh chụp
-ĐÃ HỎNG**, và sổ mất hẳn dòng `1.2.10`. Trước đó commit `c385f4c` của tôi đã mang theo
-`"1.2.10": "1111111111111111"` — đúng thứ chính khối 14 sinh ra để chặn, lọt vào lịch sử qua cửa
-sau. Đã trả lại giá trị đúng `946065fa2778e0e4` ở commit sau.
+**Vá:** `test.serial` khai thêm ba suite, kèm `_ghi_de_file_that` nói rõ tiêu chí thứ hai để khai
+vào đó — **suite GHI ĐÈ một file đã commit ở gốc repo**, không chỉ suite đọc git. Ghim ở
+`tests/dau-suite-smoke.mjs`: quét NGUỒN mọi file trong `tests/`, ai chạm sổ mà quên khai thì ĐỎ.
 
-**Vì sao im lặng:** `finally` khôi phục kịp trong ca thường, nên cây làm việc sạch lại và mọi phép
-kiểm sau đó xanh. Chỉ lộ vì lượt sau `git status` báo sổ *"sửa dở"* — mà nội dung "sửa dở" chính
-là bản ĐÚNG. Phải nhìn ngược mới thấy.
+**Phép ghim ĐỎ OAN ngay lượt đầu — đúng cái bẫy nhật ký hôm nay vừa ghi.** Bản đầu gõ thẳng tên
+`build-template.mjs`, mà đó là công cụ của NƠI PHÁT HÀNH; repo tiêu thụ không có nó nên
+`template-null-repo.mjs` đỏ ở một repo vừa dựng. Sửa thành hỏi **hành vi**: bước công cụ nào
+trong chuỗi có đọc sổ. **Hai lần trong một ngày cùng một bài học.**
 
-**Vá:** `test.serial` nay khai thêm `build-template.mjs` · `upgrade-smoke.mjs` · `core-contract.mjs`,
-kèm một dòng `_ghi_de_file_that` nói rõ tiêu chí thứ hai để khai vào đó: **suite nào GHI ĐÈ một
-file đã commit ở gốc repo**, không chỉ suite đọc git.
+**Lỗ đã biết, ghi ra để không ai tưởng kín:** vế chỉ bắt người chạm sổ TRỰC TIẾP.
+`core-contract.mjs` gọi `upgrade.mjs --apply`, và lệnh đó mới đọc sổ — gỡ nó khỏi `test.serial`
+thì vế VẪN XANH (đã thử, sống sót). Nó nằm trong danh sách vì đo được nó đỏ oan, không vì vế bắt.
 
-**Ghim:** `tests/dau-suite-smoke.mjs` thêm vế quét **NGUỒN** của mọi file trong `tests/` — file nào
-nhắc `join(ROOT, "RELEASE-LEDGER.json")` mà không khai chạy-riêng thì ĐỎ. Quét nguồn chứ không
-quét danh sách, nên thêm suite đột biến mới mà quên khai là bắt được ngay. **2 đột biến đã chạy,
-cả hai bị bắt** (bỏ `upgrade-smoke` · bỏ `build-template` khỏi danh sách).
-
-**Còn mở:** `KHUNG-47` — vá này chỉ đóng ca **trong MỘT lượt chạy**. Hai LANE cùng chạy `npm test`
-trên chung một cây làm việc thì vẫn hỏng như cũ, vì `test.serial` chỉ điều phối trong một tiến
-trình. Điều kiện đóng của mục đó là một lệnh chạy được.
-
+**Còn mở:** `KHUNG-47` — vá này chỉ đóng ca trong MỘT lượt chạy. Hai LANE cùng chạy `npm test`
+trên chung một cây làm việc thì vẫn hỏng như cũ.
 ## 2026-09-08 (khuya) · harness-phat-01 · BÀN GIAO cho lane ① — hai mục đỏ của cổng là việc của ①
 
 SendMessage tắt ở phiên tôi, nên bàn giao **qua sổ** — đúng luật mục 5. Đức approve ① lấy `_root`.

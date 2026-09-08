@@ -130,12 +130,34 @@ const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, moi_truong
   assert.deepEqual(thieu, [],
     `suite chạm ${soPhatHanh} ở gốc repo phải khai vào test.serial của .repo-structure.json. Đang thiếu: ${thieu.join(" · ")}`);
 
-  // Và bên ĐỌC nó cũng phải chạy riêng — đỏ oan cũng là một cách làm người ta thôi tin cổng.
-  for (const can of ["build-template.mjs", "upgrade-smoke.mjs"]) {
-    assert.ok(rieng.some((r) => can.includes(r) || r.includes(can)),
-      `${can} đọc/ghi ${soPhatHanh} ở gốc repo nên phải khai chạy-riêng`);
+  /* Và bên ĐỌC sổ cũng phải chạy riêng — đỏ oan cũng là một cách làm người ta thôi tin cổng.
+   *
+   * SUY TỪ CHUỖI SUITE THẬT, KHÔNG GÕ CỨNG TÊN LỆNH. Bản đầu của vế này liệt kê thẳng
+   * `build-template.mjs` và nó **đỏ oan ở repo vừa dựng** (bắt được ngay lượt chạy đầu, ở
+   * `tests/template-null-repo.mjs`): lệnh đó là công cụ của NƠI PHÁT HÀNH, repo tiêu thụ không
+   * có nó. Cùng đúng cái bẫy nhật ký 08/09 đã ghi — phép ghim soi *tên* thì là bản sao, soi
+   * *hành vi* thì mới là hợp đồng. */
+  let benDoc = 0;
+  for (const lenh of danhSachSuite(ROOT)) {
+    // CHỈ soi bước CÔNG CỤ (`scripts/`) — file trong `tests/` đã do nửa trên lo, và nửa trên
+    // dùng tiêu chí chặt hơn (chạm thật, không chỉ nhắc tên). Không tách hai nửa thì chính vế
+    // này tự làm mình đỏ: nó có nhắc tên sổ, mà nó không hề chạm vào sổ.
+    const m = /node\s+(scripts\/\S+\.mjs)/.exec(lenh.replaceAll("\\", "/"));
+    if (!m) continue;
+    let nguon;
+    try { nguon = fs.readFileSync(path.join(ROOT, m[1]), "utf8"); } catch { continue; }
+    if (!nguon.includes(soPhatHanh)) continue;
+    benDoc += 1;
+    assert.ok(rieng.some((r) => lenh.includes(r)),
+      `${m[1]} chạm ${soPhatHanh} ở gốc repo nên phải khai chạy-riêng`);
   }
-  ok(`không suite nào chạm ${soPhatHanh} thật mà quên khai chạy-riêng (${rieng.length} suite khai riêng)`);
+  /* LỖ ĐÃ BIẾT, ghi ra để không ai tưởng vế này kín: nó chỉ bắt được người chạm sổ TRỰC TIẾP.
+   * `tests/core-contract.mjs` gọi `upgrade.mjs --apply`, mà chính lệnh đó mới đọc sổ — nên gỡ
+   * `core-contract.mjs` khỏi `test.serial` thì vế này VẪN XANH (đã thử, nó sống sót). Nó nằm
+   * trong danh sách vì đã đo được nó đỏ oan 08/09, không phải vì vế này bắt được.
+   * Bịt lỗ thì phải dò một tầng gọi gián tiếp — chưa làm, vì một phép dò nửa vời còn tệ hơn một
+   * lỗ được ghi rõ. */
+  ok(`không ai chạm ${soPhatHanh} thật mà quên khai chạy-riêng — ${rieng.length} suite khai riêng, ${benDoc} bước công cụ đọc sổ`);
 }
 
 console.log(`\n${so} passed, 0 failed, ${so} total`);

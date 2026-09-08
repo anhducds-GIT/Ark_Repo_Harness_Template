@@ -30,6 +30,7 @@
   "test": {
     "_doc": "Suite nào PHẢI chạy MỘT MÌNH. Bộ chạy scripts/chay-test.mjs chạy song song những suite còn lại; suite đọc git của CÂY LÀM VIỆC CHÍNH thì hai tiến trình tranh index.lock và báo ra một lỗi NỘI DUNG trông y hệt lỗi thật.",
     "_khong_sao_neu_thieu": "Khai sót không nguy hiểm: bộ chạy tự chạy lại MỘT MÌNH mỗi suite đỏ trước khi kết luận, nên tranh chấp bị loại trừ chứ không bị báo nhầm thành lỗi.",
+    "_ghi_de_file_that": "TIÊU CHÍ THỨ HAI, và ở đây khai sót thì NGUY HIỂM: suite nào GHI ĐÈ một file ĐÃ COMMIT ở gốc repo cũng phải khai vào đây. Đột biến kiểm của nó đứng ở cây làm việc THẬT, không ở thư mục tạm. Đo ở repo phát hành 2026-09-08: một suite ghi đè một dòng sổ phát hành rồi khôi phục trong finally; chạy song song thì bên đọc thấy sổ đang hỏng (đỏ oan), và hai lượt chồng nhau thì lớp khôi phục ghi đè một ảnh chụp ĐÃ HỎNG — mất hẳn một dòng của một sổ chỉ-thêm. Một commit đã mang theo dòng hỏng vì thế.",
     "serial": ["bang-song.mjs", "khoa-dau-vet.mjs", "features-smoke.mjs", "overview-doc-smoke.mjs"]
   },
   "areas": {
