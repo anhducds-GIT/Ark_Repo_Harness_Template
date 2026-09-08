@@ -1535,3 +1535,38 @@ thử phải chép thêm file đó. Vá hết trong một lượt, và ghi chú 
 
 **Còn mở:** `KHUNG-7` · `KHUNG-44` · `KHUNG-46` · sổ nợ **23/25**. Repo Extension chưa khai
 `backlog.tran` nên phép kiểm mới sẽ xanh ở đó mà không canh gì — **hỏi Đức con số trước**.
+
+<!-- HANDOFF-THANG: 2026-09 -->
+
+## 2026-09-08 (chiều) · claude-cua-kiem · Cắm răng cho kho chữ; bản 1.3.58
+
+**Việc lớn ⓶ của roadmap** (*dọn kho chữ*), làm phần **không cần chủ dự án**. ADR-0011.
+
+**Số đo mở đầu:** `docs/` **5.915 → 6.654 dòng trong MỘT ngày**, phần tăng phần lớn là chữ do
+chính AI viết. Không con số nào canh. Cùng bệnh với hai trần sổ nợ vá sáng nay: luật có, răng
+không.
+
+**⑴ Cơ chế nhật ký mang LÊN nơi phát hành.** `handoff.mjs` + phép ghim + `handoffCapFrom` trước
+nay chỉ có ở repo tiêu thụ. Nay ở bộ khung, **vào bản trích**, khai `tran_byte_moi_muc: 2600` —
+giữ nguyên con số cũ để một số chỉ có một nghĩa. Cổng có phép kiểm thứ **13**.
+
+**⑵ `docs/` canh bằng THƯỚC CÓC** (phép kiểm thứ **14**): trần đặt ở **đúng con số hôm nay**
+(5.744), chỉ đỏ khi **tăng**. Không đòi ai dọn — đặt trần thật là đỏ ngay với mọi lane, và cổng
+đỏ vì việc người khác thì bị tháo trong một ngày. **Trừ `docs/adr/`**: ADR bất biến nên chỉ có
+thể to lên; tính vào thì mỗi quyết định mới làm cổng đỏ.
+
+**⑶ Bản đồ việc đọc cờ đóng băng.** Trước đó cổng đọc cờ mà `what-next.mjs` không, nên nó xếp
+một gói ĐÃ ĐÓNG BĂNG vào *"chạy song song được ngay, ưu tiên #2, 22 việc mở"*. Nay có mục riêng
+**B2 · ĐÃ ĐÓNG BĂNG** — loại khỏi mục A nhưng **không giấu đi**.
+
+**MỘT LỜI TÔI NÓI SAI, ĐÃ SỬA:** roadmap viết *"xoay là 1.537 → dưới trần ngay"*. Công cụ **từ
+chối xoay ở lượt đầu**, nó chỉ đóng dấu tháng — vì đoán tháng từ tiêu đề là câu máy không xác
+định được. Nhật ký co ở **mốc sang tháng**, không phải hôm nay.
+
+**Bảy bản phát 1.3.52→58, và tất cả là lỗi thứ tự của tôi.** Mỗi lượt lộ một chỗ bản trích chưa
+mang đủ: thiếu file · thiếu lời gọi trong chuỗi test · thiếu con số trong cấu hình · rồi **ba vế
+của phép ghim chỉ đúng với repo ĐÃ CHẠY LÂU** (đòi mọi quyển nhật ký có mục · đòi khai tháng ·
+đòi trần chặn được mục dài nhất) — repo vừa dựng có quyển TRẮNG và cả ba đều đỏ oan. Neo lại vào
+**phép đếm thô**: `0 == 0` là đúng, `0` trên file có 37 tiêu đề mới là hỏng.
+
+**Còn mở:** xoá thật trong `docs/` — cần chủ dự án duyệt.

@@ -16,7 +16,8 @@ import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
 
 // fileURLToPath, không phải url.pathname: đường dẫn của Đức có dấu cách
@@ -56,6 +57,18 @@ const git = (...a) => {
     gitLoi.push(`git ${a.slice(0, 2).join(" ")} → ${String(e.message).split(String.fromCharCode(10))[0].slice(0, 80)}`);
     return "";
   }
+};
+
+/* HỎI MỘT CÂU MÀ "KHÔNG" LÀ CÂU TRẢ LỜI HỢP LỆ.
+ *
+ * `git` ở trên ghi mọi lượt thất bại vào `gitLoi`, và cuối phiên một dòng trong đó làm cổng ĐỎ.
+ * Đúng cho lệnh mà thất bại nghĩa là cổng đang mù. SAI cho câu hỏi kiểu *"file này đã có trên
+ * nhánh xa chưa?"* — ở đó `git ls-tree` trả rỗng là **một câu trả lời**, không phải một sự cố,
+ * và ghi nó vào `gitLoi` là tự làm mình đỏ vì một file mới hoàn toàn bình thường. */
+const gitLoiLaBinhThuong = (...a) => {
+  try {
+    return execFileSync("git", ["-c", "core.quotepath=false", ...a], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  } catch { return ""; }
 };
 
 /* MỐC SO = UPSTREAM CỦA NHÁNH ĐANG ĐỨNG, không phải `origin/main` đóng cứng.
@@ -1035,6 +1048,131 @@ check("Nhãn lane trong commit", () => {
   return { ok: true, msg: `${shas.length} commit chưa push đều quy thuộc được: ${ke.join(" · ")}.` };
 });
 
+/* TRẦN MỘT MỤC NHẬT KÝ, VÀ XOAY FILE THEO THÁNG.
+ *
+ * Cơ chế mang từ repo tiêu thụ lên đây 2026-09-08 (ADR-0011) để phát cho mọi repo. Nó chặn
+ * **đúng mục vừa thêm trong phiên này** — mục cũ KHÔNG bị chặn, vì chặn cả file là mọi lane đỏ
+ * ngay vì chữ của người khác, và một cổng như thế bị tháo trong một ngày.
+ *
+ * Repo chưa khai `handoff.tran_byte_moi_muc` thì phép kiểm **BỎ** (không xanh, không đỏ): nó
+ * chưa kiểm được gì, và nói "xanh" ở đó là nói dối. Khác hẳn trần sổ nợ ngay dưới — ở đó không
+ * khai là một lựa chọn hợp lệ, còn ở đây file nhật ký vẫn đang bị chạm mà ta không đo nổi. */
+check("HANDOFF: mục mới trong trần, file đúng tháng", () => {
+  const files = touched.filter((f) => /(^|\/)HANDOFF\.md$/.test(f));
+  if (!files.length) return { ok: true, msg: "Phiên này không chạm HANDOFF.md nào." };
+  const tran = handoffCapFrom(structure);
+  if (tran === null) return { ok: true, skipped: true, msg: "Chưa khai `handoff.tran_byte_moi_muc` trong .repo-structure.json — CHƯA KIỂM ĐƯỢC GÌ." };
+
+  const docFile = (f) => { try { return fs.readFileSync(path.join(ROOT, f), "utf8"); } catch { return null; } };
+  const beo = [];
+  const canXoay = [];
+  const chuaKhai = [];
+  let neo = 0;        // số mục bổ được — ra 0 là BỘ ĐO HỎNG, xem dưới
+  let nhatKy = 0;     // số quyển nhật ký THẬT đã soi
+  for (const f of files) {
+    const hienTai = docFile(f);
+    if (hienTai === null) continue;   // file vừa bị xoá khỏi cây làm việc
+    // Hỏi NỘI DUNG, không hỏi TÊN FILE: một sổ tay luật cũng có thể tên `…HANDOFF.md`.
+    if (!laNhatKy(hienTai)) continue;
+    nhatKy += 1;
+    /* BẢN GỐC ĐỌC HỎNG THÌ MỌI MỤC THÀNH "MỤC MỚI" — tức chặn lane này bằng chữ của lane khác.
+     * Nên hỏi trước: file có trên mốc so không? Không có (quyển vừa lập) thì bản gốc rỗng là
+     * ĐÚNG. Có mà đọc hỏng thì dùng `git` (bản ghi lỗi) để phép kiểm cuối biến nó thành ĐỎ. */
+    const coTrenMoc = originMainResolves
+      && gitLoiLaBinhThuong("ls-tree", "--name-only", MOC, "--", f).trim() !== "";
+    const goc = coTrenMoc ? git("show", `${MOC}:${f}`) : "";
+    neo += docMucTuFile(hienTai).length;
+    for (const m of vuotTran(mucMoi(hienTai, goc), tran)) {
+      beo.push(`${f} · "${m.tieuDe.replace(/^#+\s*/, "").slice(0, 48)}…" = ${m.byte} byte`);
+    }
+    if (!mine(f)) continue;           // xoay là việc của người đang giữ khoá
+    /* QUYỂN TRẮNG KHÔNG PHẢI QUYỂN CHƯA KHAI THÁNG. Mốc tháng tồn tại để biết phần nào đem đi
+     * lưu trữ; không mục nào thì không có gì để lưu, và đòi khai là bắt một repo vừa dựng chạy
+     * một lượt xoay trên một file rỗng. Đo thật 08/09: repo sinh từ bản trích ĐỎ ngay lượt chạy
+     * cổng đầu tiên, vì lý do nó không có cách nào biết trước. */
+    if (docMucTuFile(hienTai).length === 0) continue;
+    const thang = thangCua(hienTai);
+    if (thang === null) chuaKhai.push(f);
+    else if (thang !== thangHienTai()) canXoay.push(`${f} (đang khai ${thang})`);
+  }
+
+  /* ĐẾM MỎ NEO. `mucMoi` trả rỗng đọc y hệt "mọi mục đều vừa trần", nên bổ ra 0 mục phải kêu.
+   * NHƯNG so với 0 là sai: một quyển nhật ký TRẮNG (repo vừa dựng từ bản khung) cũng cho 0, và
+   * ở đó 0 là câu trả lời đúng. So với phép đếm THÔ mới tách được hai chuyện: 0 trên một file
+   * không có tiêu đề nào là bình thường, 0 trên một file có 37 tiêu đề mới là bộ đo hỏng. */
+  const demTho = (text) => {
+    const dong = String(text).split(/\r?\n/);
+    const i = dong.findIndex((d) => /^##[ \t]+Log[ \t]*$/.test(d));
+    return i < 0 ? 0 : dong.slice(i + 1).filter((d) => /^##[ \t]/.test(d)).length;
+  };
+  const thoTong = files.reduce((s, f) => { const t = docFile(f); return t === null ? s : s + demTho(t); }, 0);
+  if (nhatKy > 0 && neo === 0 && thoTong > 0) {
+    return { ok: false, msg: "HANDOFF_KHONG_KHOP: chạm HANDOFF.md nhưng không bổ được MỤC nào."
+      + " Đây là bộ đo HỎNG, không phải 'không có gì phải sửa' — kiểm dòng `## Log` của file." };
+  }
+
+  const loi = [];
+  if (beo.length) {
+    loi.push(`HANDOFF_MUC_QUA_DAI: ${beo.length} mục MỚI vượt trần ${tran} byte — ${beo.join(" · ")}. ${CAU_CHI_DUONG}`);
+  }
+  if (canXoay.length) {
+    loi.push(`HANDOFF_QUA_THANG: ${canXoay.join(", ")} còn chứa tháng cũ, nay là ${thangHienTai()}.`
+      + ` Sửa bằng một lệnh: \`node scripts/handoff.mjs --rotate <file>\` rồi khai file lưu trữ vừa sinh vào Bản đồ file.`);
+  }
+  if (chuaKhai.length) {
+    loi.push(`HANDOFF_CHUA_KHAI_THANG: ${chuaKhai.join(", ")} chưa khai tháng, nên chưa vào được lược đồ xoay.`
+      + ` Sửa: \`node scripts/handoff.mjs --rotate <file>\` (lượt đầu chỉ khai tháng, không xoay gì).`);
+  }
+  if (loi.length) return { ok: false, msg: loi.join(" ") };
+  if (nhatKy === 0) return { ok: true, msg: `${files.length} file tên HANDOFF.md nhưng không quyển nào có phần \`## Log\` — không phải nhật ký, không kiểm.` };
+  return { ok: true, msg: `${nhatKy} quyển nhật ký, ${neo} mục, mọi mục mới đều dưới trần ${tran} byte và đúng tháng.` };
+});
+
+/* KHO CHỮ KHÔNG ĐƯỢC PHÌNH — THƯỚC CÓC, không phải trần lý tưởng.
+ *
+ * Đo 08/09: `docs/` tăng **5.915 → 6.654 dòng trong một ngày**, và phần tăng phần lớn là chữ do
+ * chính AI viết ra. Trong khi luật chốt 07/09 nói *"xoá là thắng, thêm là thua"*. Không con số
+ * nào canh chỗ này, nên nó phình mà không ai thấy cho tới lúc đo thủ công.
+ *
+ * VÌ SAO LÀ THƯỚC CÓC, KHÔNG PHẢI TRẦN THẬT: đặt trần ở con số mong muốn là **đỏ ngay lập tức
+ * với mọi lane**, kể cả lane không viết một dòng docs nào — và một cổng đỏ vì việc của người
+ * khác thì bị tháo trong một ngày. Thước cóc đặt ở **đúng con số hôm nay**: nó không đòi ai dọn,
+ * nó chỉ chặn PHÌNH. Mỗi lượt xoá thì hạ con số xuống, và chỗ đã hạ không quay lại được.
+ *
+ * VÌ SAO TRỪ `docs/adr/`: ADR đã `Accepted` là **bất biến** (ADR-0000), tức thư mục đó chỉ có
+ * thể to lên. Tính nó vào thước cóc thì **mỗi quyết định mới làm cổng đỏ**, người ta sẽ nới con
+ * số cho xong việc, và sau vài lượt nới thì thước không còn nghĩa gì. Nay: ADR 910 dòng, phần
+ * tuỳ ý 5.744 — phần tuỳ ý mới là chỗ cần canh. */
+check("Kho chữ không phình", () => {
+  const tran = structure?.docs?.tran_dong_khong_ke_adr;
+  if (typeof tran !== "number") {
+    return { ok: true, msg: "Repo chưa khai `docs.tran_dong_khong_ke_adr` — không có thước thì không đo." };
+  }
+  const ds = git("ls-files", "docs").split(String.fromCharCode(10))
+    .map((d) => d.trim()).filter((d) => d && !d.startsWith("docs/adr/"));
+  if (!ds.length) return { ok: true, msg: "Không có file `docs/` nào ngoài ADR." };
+  let dong = 0;
+  for (const f of ds) {
+    try { dong += fs.readFileSync(path.join(ROOT, f), "utf8").split(String.fromCharCode(10)).length - 1; }
+    catch { /* file vừa bị xoá khỏi cây làm việc — không tính, lượt sau `git ls-files` cũng bỏ nó */ }
+  }
+  if (dong <= tran) {
+    const du = tran - dong;
+    return {
+      ok: true,
+      msg: `${dong}/${tran} dòng (${ds.length} file, không kể ADR).`
+        + (du >= 50 ? ` Đã dưới thước ${du} dòng — HẠ \`docs.tran_dong_khong_ke_adr\` xuống ${dong} để giữ phần đã dọn.` : "")
+    };
+  }
+  return {
+    ok: false,
+    msg: `KHO_CHU_PHINH: ${dong} dòng trong \`docs/\` (không kể ADR), thước cóc là ${tran} — thêm ${dong - tran}. `
+      + "Đây KHÔNG phải trần lý tưởng, nó là con số của ngày hôm qua: phiên này đang làm kho chữ to ra. "
+      + "Ba cửa ra: xoá/gộp cho về dưới thước · chuyển phần dài sang một ADR (ADR không tính vào thước) · "
+      + "nếu phần thêm là cần thiết thật thì nâng `docs.tran_dong_khong_ke_adr` VÀ nói vì sao trong nhật ký phiên."
+  };
+});
+
 /* TRẦN SỔ NỢ — một con số không có máy canh thì nó vỡ trong im lặng.
  *
  * Một repo tiêu thụ bộ khung đặt trần 15 mục và KHÔNG cưỡng chế. Kết quả đo 2026-09-07:
@@ -1091,10 +1229,15 @@ check("Mọi lệnh git đọc được", () => {
   };
 });
 
+// 2026-09-08, phiên claude-cua-kiem: 13 → 14. Thêm "Kho chữ không phình" — thước cóc cho
+// `docs/` (trừ ADR, vì ADR bất biến nên chỉ có thể to lên). Đo được: docs/ tăng 739 dòng trong
+// một ngày mà không con số nào canh. Lý lẽ ở ADR-0011.
+// 2026-09-08, phiên claude-cua-kiem: 12 → 13. Thêm "HANDOFF: mục mới trong trần, file đúng
+// tháng" — cơ chế mang từ repo tiêu thụ lên nơi phát hành (ADR-0011) để mọi repo cùng có.
 // 2026-09-08, phiên claude-cua-kiem: 11 → 12. Thêm "Sổ nợ dưới trần". Đức uỷ quyền chọn con số
 // và cách cưỡng chế; lý do ở ADR-0010. Trần khai trong `.repo-structure.json`, repo không khai
 // thì phép kiểm xanh — nên bản khung phát đi không tự đặt trần cho repo nào.
-const EXPECTED_CHECKS = 12;
+const EXPECTED_CHECKS = 14;
 if (results.length !== EXPECTED_CHECKS) {
   console.error(`\nCỔNG BỊ SỬA: đang có ${results.length} phép kiểm, phải có ${EXPECTED_CHECKS}.`);
   console.error("Ai đó đã bớt (hoặc thêm) phép kiểm mà không cập nhật EXPECTED_CHECKS. Xem lại scripts/session-check.mjs.\n");

@@ -51,6 +51,13 @@ const PORTABLE_SCRIPTS = [
   // không bị ép theo số của bộ khung.
   "can-nang.mjs",
   "don.mjs",
+  /* NHẬT KÝ: trần một mục + xoay theo tháng (bản 1.3.51). Cơ chế sinh ra ở repo TIÊU THỤ
+     `Chrome_Extension_AI_Agentic` (ADR-0011 của repo đó, 06/09) rồi mang LÊN đây 08/09 — tức nó
+     đã chạy thật ở một repo trước khi được phát đi, không phải một ý tưởng phát sống.
+     `can-nang.mjs` ngay trên đo được nhật ký vượt trần, nhưng ĐO không phải CHỮA: thứ đưa file
+     về dưới trần là lượt xoay, và không repo nào có nó. Phép ghim đi kèm: `tests/handoff-smoke.mjs`
+     ở khối VERBATIM bên dưới. */
+  "handoff.mjs",
   // BẢNG CHO NGƯỜI XEM (bản 1.3.17) — Đức chốt 06/09 sau khi mở bảng của repo Chrome Extension
   // và thấy bảng bộ khung thiếu hẳn năm tab: "đưa cách triển khai, UI, UX vào repo template".
   //
@@ -108,6 +115,7 @@ const VERBATIM = [
   // Khối E của nó tự dựng một repo git thật có hình dạng khác hẳn, nên nó chứng minh được
   // "chạy ở repo lạ" ngay tại repo vừa dựng, không cần ai đi kiểm hộ.
   ["tests/assistant-smoke.mjs", "tests/assistant-smoke.mjs"],
+  ["tests/handoff-smoke.mjs", "tests/handoff-smoke.mjs"],
   // KIỂU XUỐNG DÒNG — phải đi theo, và đây là lý do đo được, không phải sở thích. Máy Windows
   // tự đổi kiểu xuống dòng lúc lấy file ra khỏi kho, nên CÙNG MỘT COMMIT tồn tại ở hai dạng
   // byte và `git status` nói SẠCH ở cả hai. Đo ở repo nhà ngay trước khi thêm: 75 file LF, 21
@@ -686,6 +694,11 @@ const STRUCTURE_SEED = `{
     "ten": "Đơn vị",
     "_ten_doc": "Gọi một đơn vị công việc là gì — dùng cho tiêu đề bảng và tên cột. Đổi cho hợp repo bạn: Extension · Gói · Dịch vụ · Tài liệu."
   },
+  "handoff": {
+    "_doc": "Trần độ dài MỘT mục nhật ký trong HANDOFF.md, tính bằng byte UTF-8. Cổng đóng phiên chỉ chặn MỤC VỪA THÊM trong phiên này — mục cũ KHÔNG bị chặn, vì chặn cả file là mọi lane đỏ ngay vì chữ của người khác.",
+    "_vi_sao_phat_kem_con_so": "Phát công cụ mà không phát thước thì repo mới nhận một lệnh không ai gọi. 2600 là số đo được ở repo đầu tiên dùng cơ chế này: vừa trên mục ĐẦY ĐỦ MÀ GỌN nhất đang có, và nằm trong một khoảng TRỐNG của phân bố nên xê dịch ±200 byte không đổi kết quả. Repo bạn thấy chật thì đổi số ở ĐÂY, đừng sửa script.",
+    "tran_byte_moi_muc": 2600
+  },
   "areas": {
     "_doc_": "Mỗi thư mục top-level phải có một dòng ở đây, nếu không cổng kiểm đếm nó là chưa khai chủ. ownership_mode: root = một chủ duy nhất; per-package = chia chủ theo từng gói con, kèm claim_prefix.",
     "_areas_doc2": "HAI CHỦ, CỐ Ý — đừng gộp về một. Một repo một-chủ làm cả lớp phân vùng thành hình nền: mọi đường dẫn quy về cùng một khoá, nên bất biến steward↔khoá quyền, phép kiểm nhãn lane, và hàm quy chủ đều ĐẠT TẦM THƯỜNG — đúng ở cả hai chiều, không ghim được gì. Đo thật ở bản trích đầu: cả bốn đường dẫn thử đều trả _root, và một đột biến phá sạch hàm quy chủ vẫn thoát. Tách docs/ ra là ca thật rẻ nhất để lớp đó có việc mà làm.",
@@ -920,7 +933,7 @@ function packageJson(version) {
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
-      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
+      test: "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
     }
   }, null, 2) + "\n";
 }

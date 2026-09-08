@@ -37,7 +37,7 @@ import { fileURLToPath } from "node:url";
 
 import { parseStatus } from "./build-dashboard.mjs";
 import * as claimMod from "./claim.mjs";
-import { claimPrefixesFrom, readStructureFromDisk, stewardOf, unitsFrom } from "./repo-structure.mjs";
+import { claimPrefixesFrom, frozenFrom, readStructureFromDisk, stewardOf, unitsFrom } from "./repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -190,7 +190,13 @@ export const { GIO_NHAC, ageHours, ageLabel, dangNhac, mocCoGio } = claimMod;
     `stewardOf()` KHÔNG BAO GIỜ trả rỗng — nó tự lùi về `_root` bên trong. Bản đầu viết
     `stewardOf(...) || "_root"`, tức đóng cứng một tên khoá vào chỗ không bao giờ chạy tới:
     ở repo khai vùng khác, cái tên đó trỏ vào hư không mà chẳng ai phát hiện. Đã xoá. */
-export function banDoVung({ viecTheoFile, tieuDiemTheoFile = [], claims, structure, prefixes, now = new Date() }) {
+export function banDoVung({ viecTheoFile, tieuDiemTheoFile = [], claims, structure, prefixes, now = new Date(), frozen = [] }) {
+  /* GÓI ĐÃ ĐÓNG BĂNG KHÔNG PHẢI VIỆC ĐANG CHỜ AI. Cờ khai ở khối `frozen` của
+     `.repo-structure.json`. Trước 2026-09-08 bản đồ này KHÔNG đọc cờ đó trong khi cổng đóng
+     phiên có đọc — nên hai công cụ của cùng một repo nói ngược nhau, và cái nói sai lại chính
+     là cái AI đọc để CHỌN việc: nó xếp một gói đã đóng băng vào "chạy song song được ngay,
+     ưu tiên #2, 22 việc mở". Đo được ngày 08/09 ở repo tiêu thụ. */
+  const laDongBang = (khoa) => frozen.some((f) => khoa === f || khoa.startsWith(`${f}/`));
   const vungs = new Map();
   const bang = (claims && claims.claims) || {};
   const lay = (khoa) => {
@@ -201,6 +207,7 @@ export function banDoVung({ viecTheoFile, tieuDiemTheoFile = [], claims, structu
       vungs.set(khoa, {
         khoa,
         chu,
+        dongBang: laDongBang(khoa),
         // KHOA KHONG CO TRONG BANG QUYEN khac han KHOA CO MA TRONG CHU. Ca thu nhat nghia la
         // KHONG AI DANG CANH vung do — bao no la "trong chu, cu lam" la moi nguoi vao ghi cung
         // luc ma khong gi chan. Ca nay lo ra o repo khai ten vung khac han bo khung.
@@ -241,7 +248,14 @@ function xepVung(a, b) {
 
 /** Khoá TRỐNG và CÓ việc (mục nợ HOẶC tiêu điểm STATUS). Mỗi dòng một luồng song song. */
 export function songSongDuoc(vungs) {
-  return vungs.filter((v) => !v.chu && !v.khongCoTrongBang && (v.viec.length > 0 || v.tieuDiem.length > 0));
+  return vungs.filter((v) => !v.chu && !v.dongBang && !v.khongCoTrongBang
+    && (v.viec.length > 0 || v.tieuDiem.length > 0));
+}
+
+/** Vùng đã đóng băng: chỉ ĐỌC. Tách ra để không mất thông tin — ẩn hẳn thì người đọc tưởng
+    gói đó biến mất, mà nợ của nó vẫn còn nằm trong sổ. */
+export function daDongBang(vungs) {
+  return vungs.filter((v) => v.dongBang);
 }
 
 /** Khoá có chủ: việc trong đó KHÔNG được ai khác chạm (AGENTS.md mục 1). */
@@ -314,6 +328,21 @@ export function render({ vungs, ideas, now, dauNiemPhong, khaiSai = [], khongHie
   d.push("");
   d.push("  ⚠ = giữ quá " + GIO_NHAC + "h. Cũ KHÔNG có nghĩa là chết. Đây là số liệu để HỎI,");
   d.push("    không phải giấy phép để giành. Nhắn phiên đang giữ trước — rẻ hơn giành.");
+
+  /* ĐÓNG BĂNG — in RA, không ẩn đi. Ẩn hẳn thì người đọc tưởng gói đó biến mất, mà nợ của nó
+     vẫn nằm trong sổ và vẫn đếm vào mọi con số khác. Cái phải sửa là nó KHÔNG được nằm ở mục A
+     nữa, chứ không phải nó phải vô hình. */
+  const bang = daDongBang(vungs);
+  if (bang.length) {
+    d.push("");
+    d.push("B2 · ĐÃ ĐÓNG BĂNG — " + bang.length + " vùng, chỉ được ĐỌC dù KHÔNG có chủ");
+    for (const v of bang) {
+      const n = v.viec.length;
+      d.push("  ▸ " + v.khoa + (n ? "  — " + n + " việc mở, KHÔNG làm" : "  — không việc mở"));
+    }
+    d.push("    Khai ở khối `frozen` của `.repo-structure.json`. Trống chủ KHÔNG có nghĩa là mời làm:");
+    d.push("    chủ dự án đã chốt dừng các gói này. Muốn mở lại thì HỎI, đừng tự nhận khoá.");
+  }
 
   /* MỤC C ĐỌC HAI NGUỒN, và nói rõ nguồn nào kiểm được nguồn nào không.
      Trước 05/09 nó chỉ đọc sổ ý tưởng. Repo không có `IDEAS.md` thì nó in "0 mục, không ai làm
@@ -465,7 +494,7 @@ function main() {
   const ideasFile = path.join(ROOT, "IDEAS.md");
   const ideas = fs.existsSync(ideasFile) ? parseIdeas(fs.readFileSync(ideasFile, "utf8")) : [];
 
-  const vungs = banDoVung({ viecTheoFile, tieuDiemTheoFile, claims, structure, prefixes });
+  const vungs = banDoVung({ viecTheoFile, tieuDiemTheoFile, claims, structure, prefixes, frozen: frozenFrom(structure) });
   const noChoChot = viecTheoFile.flatMap((x) => x.viec);
   process.stdout.write(render({
     vungs, ideas, now: new Date(), dauNiemPhong: canhBao, khaiSai, khongHieu,

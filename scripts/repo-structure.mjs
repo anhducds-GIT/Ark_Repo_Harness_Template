@@ -669,6 +669,40 @@ export function readStructureFromDisk(root) {
  *
  *  Một câu khuyên SAI tệ hơn không có câu nào: nó làm người đọc tin là mình chỉ cần đợi, nên
  *  không ai đi hỏi người chốt, nên repo kẹt im lặng. */
+export function handoffCapFrom(parsed) {
+  const khoi = parsed?.handoff;
+  if (khoi === null || khoi === undefined) return null;
+  if (typeof khoi !== "object" || Array.isArray(khoi)) {
+    throw new Error("CAU_TRUC_HONG: `handoff` phải là một object, ví dụ { \"tran_byte_moi_muc\": 2600 }.");
+  }
+  const tran = khoi.tran_byte_moi_muc;
+  if (tran === undefined) return null;
+  if (!Number.isInteger(tran) || tran <= 0) {
+    throw new Error(`CAU_TRUC_HONG: \`handoff.tran_byte_moi_muc\` phải là số nguyên dương (byte), nhận "${tran}".`);
+  }
+  return tran;
+}
+
+export function frozenFrom(parsed) {
+  const value = parsed?.frozen;
+  if (value === undefined) return Object.freeze([]);
+  if (!Array.isArray(value)) {
+    throw new Error("FROZEN_HONG: `frozen` phải là mảng đường dẫn gói đã đóng băng (hoặc bỏ hẳn).");
+  }
+  const ra = [];
+  for (const p of value) {
+    if (typeof p !== "string" || p === "") {
+      throw new Error(`FROZEN_HONG: mỗi phần tử phải là một đường dẫn gói. Đang là: ${JSON.stringify(p)}`);
+    }
+    const chuan = p.replaceAll("\\", "/").replace(/\/+$/, "");
+    if (chuan === "" || chuan.startsWith("/") || chuan.split("/").includes("..")) {
+      throw new Error(`FROZEN_HONG: đường dẫn phải tương đối và không chứa "..". Đang là: ${JSON.stringify(p)}`);
+    }
+    ra.push(chuan);
+  }
+  return Object.freeze(ra);
+}
+
 export function loiKhuyenKhiChan(claims) {
   const daBoLai = Object.entries(claims || {})
     .filter(([, c]) => c && c.tra_khi_chua_day)

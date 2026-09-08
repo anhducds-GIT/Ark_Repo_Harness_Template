@@ -22,7 +22,7 @@ let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
-const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs"];
+const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs"];
 
 /* Kho nền: đủ để cổng chạy tới được mọi phép kiểm. Mỗi khối tự phá phần của mình. */
 function khoNen({ chuKhoa = "thu" } = {}) {
@@ -460,6 +460,60 @@ function docMuc(kho, ten, as = "thu") {
     assert.equal(m.trangThai, "XANH", `khong khai backlog.tran thi phai XANH, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("10 · trần sổ nợ: vượt trần ĐỎ · gạch mã một mục XANH lại · repo không khai trần XANH");
+}
+
+/* ---- 11. Thước cóc kho chữ ------------------------------------------------ */
+/* Ba vế, và vế ⑶ là vế cả cơ chế đứng hay đổ: ADR KHÔNG được tính. Nếu tính, mỗi quyết định mới
+   làm cổng đỏ, người ta nới con số cho xong, và sau vài lượt nới thì thước không còn nghĩa. */
+{
+  const { cha, kho, at } = khoNen();
+  try {
+    const datThuoc = (n) => {
+      const ct = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+      if (n === null) delete ct.docs; else ct.docs = { tran_dong_khong_ke_adr: n };
+      writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(ct, null, 2) + NL, "utf8");
+    };
+    const viet = (duong, soDong) => {
+      mkdirSync(join(kho, duong.split("/").slice(0, -1).join("/")), { recursive: true });
+      writeFileSync(join(kho, duong), `${"x".repeat(3)}${NL}`.repeat(soDong), "utf8");
+    };
+    const luot = (ten) => { at("add", "-A"); at("commit", "-q", "-m", ten + NL + NL + "Lane: thu"); };
+
+    // Đối chứng: 20 dòng văn xuôi, thước 100 → XANH.
+    viet("docs/mot.md", 20);
+    datThuoc(100);
+    luot("kho chu 20 dong");
+    let m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "XANH", `20 dong / thuoc 100 phai XANH, dang: ${m.chiTiet}`);
+
+    // ⑴ Vượt thước → ĐỎ.
+    viet("docs/hai.md", 200);
+    luot("them 200 dong van xuoi");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "ĐỎ", `220 dong / thuoc 100 phai DO, dang: ${m.chiTiet}`);
+    assert.ok(m.chiTiet.includes("KHO_CHU_PHINH"), `thieu ma loi KHO_CHU_PHINH: ${m.chiTiet}`);
+
+    // ⑵ Xoá cho về dưới thước → XANH lại. Cửa ra phải mở, nếu không cổng sẽ bị tháo.
+    at("rm", "-q", "-f", "docs/hai.md");
+    luot("xoa bot");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "XANH", `xoa cho ve duoi thuoc phai XANH lai, dang: ${m.chiTiet}`);
+
+    // ⑶ ADR KHÔNG tính — thêm 500 dòng ADR vẫn phải XANH.
+    viet("docs/adr/0001-mot-quyet-dinh.md", 500);
+    luot("them mot ADR dai");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "XANH",
+      `ADR la bat bien nen KHONG duoc tinh vao thuoc — neu tinh, moi quyet dinh moi lam cong do. Dang: ${m.chiTiet}`);
+
+    // ⑷ Repo không khai thước → XANH dù kho chữ lớn.
+    viet("docs/ba.md", 900);
+    datThuoc(null);
+    luot("bo khai thuoc");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "XANH", `khong khai thuoc thi phai XANH, dang: ${m.chiTiet}`);
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("11 · thước cóc kho chữ: phình ĐỎ · xoá XANH lại · ADR KHÔNG tính · không khai thước XANH");
 }
 
 

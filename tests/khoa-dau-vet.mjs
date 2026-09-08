@@ -119,7 +119,7 @@ const SAU = "2026-09-06T11:00:00Z";
 
 /* ---- 7. CỔNG: hiện ra, VÀNG, và KHÔNG đổi mã thoát --------------------- */
 {
-  const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs"];
+  const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs"];
   const cha = mkdtempSync(join(tmpdir(), "dau-vet-"));
   try {
     const kho = join(cha, "kho");

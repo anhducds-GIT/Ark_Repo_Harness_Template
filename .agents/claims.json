@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T03:44:42.510Z",
-      "task": "khai backlog.tran=25; package.json bo test:quyen; AGENTS/BACKLOG theo ADR-0010",
-      "released_at": "2026-09-08T04:21:31.919Z",
+      "claimed_at": "2026-09-08T05:12:52.805Z",
+      "task": "khai khoi handoff + xoay HANDOFF.md sang kho luu tru",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,11 +23,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-08T03:42:03.836Z",
-      "task": "xoa so quyen chua ai goi; khoa doc quyen cho claim.mjs; tran so no 25 co may dem",
-      "released_at": "2026-09-08T04:21:26.887Z",
+      "claimed_at": "2026-09-08T05:12:52.692Z",
+      "task": "mang co che xoay HANDOFF tu repo tieu thu len bo khung + cam rang",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"

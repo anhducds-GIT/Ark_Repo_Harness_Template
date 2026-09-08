@@ -16,6 +16,11 @@
     "ten": "Đơn vị",
     "_ten_doc": "Gọi một đơn vị công việc là gì — dùng cho tiêu đề bảng và tên cột. Đổi cho hợp repo bạn: Extension · Gói · Dịch vụ · Tài liệu."
   },
+  "handoff": {
+    "_doc": "Trần độ dài MỘT mục nhật ký trong HANDOFF.md, tính bằng byte UTF-8. Cổng đóng phiên chỉ chặn MỤC VỪA THÊM trong phiên này — mục cũ KHÔNG bị chặn, vì chặn cả file là mọi lane đỏ ngay vì chữ của người khác.",
+    "_vi_sao_phat_kem_con_so": "Phát công cụ mà không phát thước thì repo mới nhận một lệnh không ai gọi. 2600 là số đo được ở repo đầu tiên dùng cơ chế này: vừa trên mục ĐẦY ĐỦ MÀ GỌN nhất đang có, và nằm trong một khoảng TRỐNG của phân bố nên xê dịch ±200 byte không đổi kết quả. Repo bạn thấy chật thì đổi số ở ĐÂY, đừng sửa script.",
+    "tran_byte_moi_muc": 2600
+  },
   "areas": {
     "_doc_": "Mỗi thư mục top-level phải có một dòng ở đây, nếu không cổng kiểm đếm nó là chưa khai chủ. ownership_mode: root = một chủ duy nhất; per-package = chia chủ theo từng gói con, kèm claim_prefix.",
     "_areas_doc2": "HAI CHỦ, CỐ Ý — đừng gộp về một. Một repo một-chủ làm cả lớp phân vùng thành hình nền: mọi đường dẫn quy về cùng một khoá, nên bất biến steward↔khoá quyền, phép kiểm nhãn lane, và hàm quy chủ đều ĐẠT TẦM THƯỜNG — đúng ở cả hai chiều, không ghim được gì. Đo thật ở bản trích đầu: cả bốn đường dẫn thử đều trả _root, và một đột biến phá sạch hàm quy chủ vẫn thoát. Tách docs/ ra là ca thật rẻ nhất để lớp đó có việc mà làm.",

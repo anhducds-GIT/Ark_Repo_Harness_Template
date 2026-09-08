@@ -25,7 +25,7 @@ import {
   fetchMoi, gitChiDoc, khoaTaiRemote, render,
 } from "../scripts/state-check.mjs";
 import {
-  banDoVung, dangBiChan, locChoNguoiChot, parseBacklog, parseIdeas, songSongDuoc,
+  banDoVung, daDongBang, dangBiChan, locChoNguoiChot, parseBacklog, parseIdeas, songSongDuoc,
   tenNguoiChotTu, tieuDiemTuStatus, timSo, timTrongDonVi, render as renderBanDo,
 } from "../scripts/what-next.mjs";
 
@@ -678,6 +678,44 @@ kiem("so no: co CHO NGUOI CHOT khai tuong minh, van xuoi khong trung, khong dinh
   ].join(String.fromCharCode(10)));
   assert.equal(m2[0].choChot, true, "A-1 phai co co");
   assert.equal(m2[1].choChot, false, "co KHONG duoc dinh sang muc ke tiep");
+});
+/* ---- GÓI ĐÓNG BĂNG KHÔNG ĐƯỢC NẰM Ở MỤC "LÀM ĐƯỢC NGAY" -------------------
+ *
+ * Ca thật 2026-09-08 ở repo tiêu thụ: bảng này xếp một gói chủ dự án ĐÃ ĐÓNG BĂNG vào mục
+ * "chạy song song được ngay", hạng ưu tiên #2, 22 việc mở — vì nó không đọc khối `frozen`
+ * trong khi cổng đóng phiên có đọc. Hai công cụ của cùng một repo nói ngược nhau, và cái nói
+ * sai lại chính là cái AI đọc để CHỌN việc.
+ *
+ * Ghim CẢ BA vế, vì hai vế đầu mà thiếu vế ba thì cách "sửa" rẻ nhất là ẩn hẳn gói đi — và
+ * ẩn hẳn làm nợ của gói đó vô hình với người đọc. */
+kiem("gói đóng băng: ra khỏi mục A, vào mục riêng, và KHÔNG biến mất", () => {
+  const chung = {
+    viecTheoFile: [
+      { relPath: "goi/song/BACKLOG.md", viec: [{ ma: "X-1", tieuDe: "viec that", uuTien: "P1" }] },
+      { relPath: "goi/da-dong/BACKLOG.md", viec: [{ ma: "X-2", tieuDe: "no cu", uuTien: "P1" }] },
+    ],
+    claims: { claims: { "goi/song": { owner: null }, "goi/da-dong": { owner: null } } },
+    structure: { areas: { "goi/": { ownership_mode: "per-package", claim_prefix: "goi/" } } },
+    prefixes: ["goi/"],
+  };
+
+  // Đối chứng: KHÔNG khai đóng băng thì cả hai vùng đều nằm ở mục A. Thiếu vế này thì một hàm
+  // luôn trả rỗng cũng làm ca dưới xanh.
+  const chuaKhai = songSongDuoc(banDoVung({ ...chung, frozen: [] }));
+  assert.deepEqual(chuaKhai.map((v) => v.khoa).sort(), ["goi/da-dong", "goi/song"],
+    "chua khai dong bang thi ca hai vung deu la viec lam duoc ngay");
+
+  const vungs = banDoVung({ ...chung, frozen: ["goi/da-dong"] });
+  assert.deepEqual(songSongDuoc(vungs).map((v) => v.khoa), ["goi/song"],
+    "goi da dong bang KHONG duoc nam o muc 'lam duoc ngay', du no trong chu");
+  assert.deepEqual(daDongBang(vungs).map((v) => v.khoa), ["goi/da-dong"],
+    "no phai hien o muc rieng — an han thi no cua goi do vo hinh");
+  assert.equal(daDongBang(vungs)[0].viec.length, 1, "viec mo cua goi dong bang van phai dem duoc");
+
+  // Đóng băng một gói KHÔNG được kéo theo gói có tên bắt đầu giống nó.
+  const cungTienTo = banDoVung({ ...chung, frozen: ["goi/so"] });
+  assert.deepEqual(songSongDuoc(cungTienTo).map((v) => v.khoa).sort(), ["goi/da-dong", "goi/song"],
+    "`goi/so` KHONG duoc dong bang `goi/song` — so tien to phai theo ranh gioi thu muc");
 });
 
 console.log(`\n${so} passed, 0 failed, ${so} total`);

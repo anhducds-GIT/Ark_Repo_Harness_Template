@@ -111,7 +111,7 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     // đúng cái bẫy đã ghi ở khối 1 của suite hạt giống.
     mkdirSync(join(root, "scripts"), { recursive: true });
     mkdirSync(join(root, ".agents"), { recursive: true });
-    for (const f of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs"]) {
+    for (const f of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs"]) {
       cpSync(join(ROOT, "scripts", f), join(root, "scripts", f));
     }
     cpSync(join(ROOT, ".repo-structure.json"), join(root, ".repo-structure.json"));
