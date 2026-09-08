@@ -20,7 +20,7 @@
  */
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,6 +29,7 @@ import {
   readCoChe, readIdeas, readKhoa, readNo
 } from "../scripts/overview-doc.mjs";
 import { khoiBaCau, khoiChecklist, khoiLamMoi, NHAN_KHOA, SO_CON_SONG, soSanhTrang, tenTrang } from "../scripts/build-overview.mjs";
+import { nhomBangFrom } from "../scripts/repo-structure.mjs";
 
 let passed = 0;
 let boQua = 0;
@@ -455,11 +456,17 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
    * một vòng 9 phút chỉ để tìm ra bản này. Cùng bệnh một-luật-hai-chỗ mà repo này đã gặp:
    * `append_only_exempt` từng gõ cứng ở hai script và trả hai câu khác nhau cho cùng một file.
    *
-   * Chưa gộp về một nguồn, cố ý — gộp lúc đang đóng phiên là mở một việc mới ở chỗ dễ sai nhất.
-   * Đã ghi nợ để phiên sau nhặt. */
+   * ĐÃ GỘP 08/09 — KHUNG-46. Hợp đồng nay nằm ở khối `bang.nhom` của `.repo-structure.json`,
+   * và cả hai suite đọc từ đó. Thêm một tab vào bộ sinh làm CẢ HAI đỏ cùng lúc; đổi số nhóm
+   * là phải sửa hợp đồng có chủ ý, kèm một ADR. */
   const nhom = [...new Set([...html.matchAll(/data-tab="([a-z-]+)"/g)].map((m) => m[1]))];
-  assert.deepEqual(nhom.sort(), ["cong-viec", "he-thong", "lich-su", "migrate", "tong-quan"],
-    `bảng phải có đúng năm nhóm (ADR-0006 + ADR-0007), đang có: ${nhom.join(" ")}`);
+  const KHAI = nhomBangFrom(JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8")));
+  if (!KHAI) {
+    boQuaVi("danh sách nhóm của bảng", "repo này chưa khai khối `bang.nhom` trong .repo-structure.json");
+  } else {
+    assert.deepEqual(nhom.sort(), [...KHAI].sort(),
+      `bảng phải có đúng các nhóm khai ở bang.nhom (ADR-0006 + ADR-0007), đang có: ${nhom.join(" ")}`);
+  }
 
   // Khong lien ket chet: moi `data-goto` phai tro toi mot nhom CO THAT.
   const di = [...new Set([...html.matchAll(/data-goto="([a-z-]+)"/g)].map((m) => m[1]))];
@@ -467,6 +474,56 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   assert.deepEqual(chet, [], `liên kết trỏ tới nhóm không tồn tại: ${chet.join(" ")}`);
   ok(`một khái niệm một chỗ: ${canonical.length} khái niệm đều vẽ đúng 1 lần · 4 nhóm · 0 liên kết chết`);
   }
+}
+
+/* ---- 16. Không ai được GÕ CỨNG LẠI danh sách nhóm vào `tests/` ----------- */
+{
+  /* PHÉP GHIM CỦA CHÍNH BẢN VÁ KHUNG-46, và nó canh thứ mà bản vá không tự canh được.
+   *
+   * Gộp về một nguồn chỉ sửa được TRẠNG THÁI hôm nay. Cái đã gây ra bệnh là một THÓI QUEN:
+   * lần sau ai cần danh sách nhóm sẽ gõ lại năm chuỗi cho nhanh, và bản sao thứ hai mọc lại
+   * — lần này im lặng, vì cả hai bản đều đang đúng vào ngày nó mọc. Đo 08/09: hai bản sao
+   * sống chung nhiều ngày, chỉ lộ ra lúc chúng lệch nhau.
+   *
+   * Nên vế này không hỏi "danh sách có đúng không" mà hỏi "có ai chép nó lại không".
+   * Ngưỡng là HAI mã nhóm trên MỘT dòng: một mã là đang nói về một tab cụ thể (hợp lệ, ví dụ
+   * `id="tab-tong-quan"`); hai mã trở lên trên cùng một dòng thì đó là một bản sao của DANH
+   * SÁCH. Đọc ngưỡng này từ hợp đồng, không gõ cứng — chính là điều nó đang bắt người khác làm.
+   *
+   * KHỚP NGUYÊN MÃ, KHÔNG KHỚP CHUỖI CON — vế này bắt oan ngay lượt chạy đầu vì thế: dòng
+   * `assert.ok(!/id="so-migrate"/.test(T["cong-viec"]))` bị đếm là hai mã, do "so-migrate"
+   * chứa "migrate". Nên hai bên mã phải KHÔNG phải chữ thường hay gạch nối. */
+  const KHAI = nhomBangFrom(JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8")));
+  if (!KHAI) {
+    boQuaVi("cấm gõ cứng lại danh sách nhóm", "repo này chưa khai khối `bang.nhom`");
+  } else {
+    const thuMuc = join(ROOT, "tests");
+    const phamLuat = [];
+    for (const ten of readdirSync(thuMuc).filter((f) => f.endsWith(".mjs"))) {
+      const dong = readFileSync(join(thuMuc, ten), "utf8").split(/\r?\n/);
+      dong.forEach((d, i) => {
+        const thay = KHAI.filter((n) => new RegExp(`(?<![a-z-])${n}(?![a-z-])`).test(d));
+        if (thay.length >= 2) phamLuat.push(`${ten}:${i + 1} (${thay.join(" ")})`);
+      });
+    }
+    assert.deepEqual(phamLuat, [],
+      "danh sách nhóm chỉ được khai ở `bang.nhom` của .repo-structure.json. " +
+      `Đang có bản sao trong tests/: ${phamLuat.join(" · ")}`);
+    ok(`không bản sao nào của danh sách nhóm trong tests/ (${KHAI.length} mã, quét ${readdirSync(thuMuc).filter((f) => f.endsWith(".mjs")).length} file)`);
+  }
+
+  /* Bộ đọc hợp đồng phải FAIL-CLOSED. Hai cửa dưới đây là hai cách hợp đồng hỏng mà phép so
+   * sánh ở trên KHÔNG bắt được, vì nó so theo TẬP đã sắp xếp:
+   *   · mảng rỗng  → so với tập rỗng, đạt tầm thường với một bảng KHÔNG CÓ TAB NÀO
+   *   · mã trùng   → tập vẫn khớp trong khi hợp đồng thiếu một tab
+   * Còn `null` khi chưa khai thì KHÔNG phải lỗi: repo mới migrate chưa có khối này. */
+  assert.equal(nhomBangFrom({}), null, "chưa khai `bang` thì trả null, không ném — repo mới không được đỏ oan");
+  assert.equal(nhomBangFrom({ bang: {} }), null, "khai `bang` mà thiếu `nhom` thì cũng là chưa khai");
+  assert.throws(() => nhomBangFrom({ bang: { nhom: [] } }), /CAU_TRUC_HONG/, "mảng rỗng phải NÉM");
+  assert.throws(() => nhomBangFrom({ bang: { nhom: ["a", "a"] } }), /CAU_TRUC_HONG/, "mã trùng phải NÉM");
+  assert.throws(() => nhomBangFrom({ bang: { nhom: ["Tong Quan"] } }), /CAU_TRUC_HONG/, "mã không khớp data-tab phải NÉM");
+  assert.throws(() => nhomBangFrom({ bang: [] }), /CAU_TRUC_HONG/, "`bang` là mảng phải NÉM");
+  ok("bộ đọc hợp đồng fail-closed: 4 cửa NÉM · 2 cửa trả null có chủ ý");
 }
 
 console.log(`overview-doc-smoke: ${passed} vế xanh` + (boQua ? ` · ${boQua} vế BỎ QUA (kể tên ở trên)` : ""));

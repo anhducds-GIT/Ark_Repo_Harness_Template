@@ -683,6 +683,41 @@ export function handoffCapFrom(parsed) {
   return tran;
 }
 
+/* ---- DANH SÁCH NHÓM CỦA BẢNG — hợp đồng, đọc từ dữ liệu ------------------
+ *
+ * KHUNG-46 (đo 08/09): danh sách này từng bị `assert.deepEqual` gõ cứng ở **hai** file test.
+ * Hai bản sao của một luật thì **lệch được** — một bản nói năm nhóm, bản kia bốn, và cả hai
+ * vẫn "xanh" ở suite của riêng nó. Đúng bệnh mà `append_only_exempt` đã gây ra 02/09.
+ *
+ * Vì sao hợp đồng KHÔNG nằm trong `build-overview.mjs`: bộ sinh là bên **bị kiểm**. Hợp đồng
+ * nằm trong nó thì một lượt thêm tab sửa cả hai vế của phép so sánh cùng lúc, và phép kiểm
+ * xanh với mọi danh sách — tức nó không còn canh gì. Ở đây thì thêm tab là phải sửa HAI chỗ
+ * có chủ ý: bộ sinh, rồi hợp đồng này.
+ *
+ * Trả `null` khi chưa khai — repo mới migrate chưa có khối này, và một phép kiểm đỏ oan ở repo
+ * đích thì bị tháo trong một ngày. Suite gọi hàm này phải BỎ QUA CÓ TÊN, không bỏ qua im lặng. */
+export function nhomBangFrom(parsed) {
+  const khoi = parsed?.bang;
+  if (khoi === null || khoi === undefined) return null;
+  if (typeof khoi !== "object" || Array.isArray(khoi)) {
+    throw new Error("CAU_TRUC_HONG: `bang` phải là một object, ví dụ { \"nhom\": [\"tong-quan\"] }.");
+  }
+  const nhom = khoi.nhom;
+  if (nhom === undefined) return null;
+  if (!Array.isArray(nhom) || nhom.length === 0) {
+    throw new Error("CAU_TRUC_HONG: `bang.nhom` phải là mảng KHÔNG RỖNG các mã nhóm. Mảng rỗng làm phép kiểm đạt tầm thường với mọi bảng.");
+  }
+  for (const n of nhom) {
+    if (typeof n !== "string" || !/^[a-z][a-z-]*[a-z]$/.test(n)) {
+      throw new Error(`CAU_TRUC_HONG: mỗi mã nhóm phải là chữ thường và dấu gạch nối (khớp thuộc tính data-tab của trang). Đang là: ${JSON.stringify(n)}`);
+    }
+  }
+  if (new Set(nhom).size !== nhom.length) {
+    throw new Error(`CAU_TRUC_HONG: \`bang.nhom\` có mã trùng. Trùng thì phép so sánh theo tập vẫn đạt, nên bảng thiếu một tab mà không ai đỏ. Đang là: ${nhom.join(" ")}`);
+  }
+  return Object.freeze([...nhom]);
+}
+
 export function frozenFrom(parsed) {
   const value = parsed?.frozen;
   if (value === undefined) return Object.freeze([]);

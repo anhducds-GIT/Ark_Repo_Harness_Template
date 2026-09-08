@@ -21,6 +21,12 @@
     "_vi_sao_phat_kem_con_so": "Phát công cụ mà không phát thước thì repo mới nhận một lệnh không ai gọi. 2600 là số đo được ở repo đầu tiên dùng cơ chế này: vừa trên mục ĐẦY ĐỦ MÀ GỌN nhất đang có, và nằm trong một khoảng TRỐNG của phân bố nên xê dịch ±200 byte không đổi kết quả. Repo bạn thấy chật thì đổi số ở ĐÂY, đừng sửa script.",
     "tran_byte_moi_muc": 2600
   },
+  "bang": {
+    "_doc": "Danh sách nhóm (tab) của bảng tổng quan — HỢP ĐỒNG, khai ở ĐÚNG MỘT NƠI. Các suite đọc từ đây; không suite nào được gõ cứng lại danh sách này.",
+    "_vi_sao_o_day": "Hợp đồng nằm trong chính bộ sinh thì một lượt thêm tab sửa cả hai vế của phép so sánh cùng lúc, và phép kiểm xanh với MỌI danh sách — tức nó không còn canh gì. Khai ở file dữ liệu này thì đổi số nhóm là phải sửa hai chỗ có chủ ý.",
+    "_xuat_xu": "KHUNG-46 ở repo phát hành (đo 2026-09-08): danh sách này từng bị assert.deepEqual ở HAI file test, và một lượt sửa lệch nhau đã làm cổng đỏ thêm một vòng 9 phút.",
+    "nhom": ["tong-quan", "cong-viec", "migrate", "he-thong", "lich-su"]
+  },
   "test": {
     "_doc": "Suite nào PHẢI chạy MỘT MÌNH. Bộ chạy scripts/chay-test.mjs chạy song song những suite còn lại; suite đọc git của CÂY LÀM VIỆC CHÍNH thì hai tiến trình tranh index.lock và báo ra một lỗi NỘI DUNG trông y hệt lỗi thật.",
     "_khong_sao_neu_thieu": "Khai sót không nguy hiểm: bộ chạy tự chạy lại MỘT MÌNH mỗi suite đỏ trước khi kết luận, nên tranh chấp bị loại trừ chứ không bị báo nhầm thành lỗi.",

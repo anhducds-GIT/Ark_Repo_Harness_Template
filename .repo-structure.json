@@ -100,6 +100,18 @@
     "_do_that": "2026-09-08: docs/ tong 6.654 dong — ADR 910, phan tuy y 5.744. Lenh do lai: git ls-files docs | grep -v \"^docs/adr/\" | xargs -d \"\n\" cat | wc -l",
     "tran_dong_khong_ke_adr": 5744
   },
+  "bang": {
+    "_doc": "Danh sach nhom (tab) cua bang tong quan — HOP DONG, khai o DUNG MOT NOI. Cac suite doc tu day; khong suite nao duoc go cung lai danh sach nay.",
+    "_vi_sao_o_day_ma_khong_o_build-overview": "Neu hop dong nam trong chinh bo sinh thi mot luot them tab la sua ca hai ve cua phep so sanh cung luc, va phep kiem xanh voi moi danh sach — tu do khong con canh gi. Khai o file du lieu nay thi doi so nhom la phai sua HAI cho co chu y: bo sinh, roi hop dong.",
+    "_xuat_xu": "KHUNG-46 (do 08/09): danh sach nay tung bi assert.deepEqual o HAI file test, va mot luot sua lech nhau da lam cong do them mot vong 9 phut. Doi so nhom phai hoi Duc — ADR-0006 va ADR-0007.",
+    "nhom": [
+      "tong-quan",
+      "cong-viec",
+      "migrate",
+      "he-thong",
+      "lich-su"
+    ]
+  },
   "test": {
     "_doc": "Suite nao PHAI chay MOT MINH. Bo chay chay song song cac suite con lai; suite doc git cua CAY LAM VIEC CHINH thi hai tien trinh tranh index.lock va bao ra mot loi NOI DUNG trong y het loi that.",
     "_cach_tim": "Suite nao goi git voi cwd la goc repo (khong phai thu muc tam) thi khai vao day. Sai sot khong nguy hiem: bo chay tu chay lai mot minh moi suite do truoc khi ket luan.",

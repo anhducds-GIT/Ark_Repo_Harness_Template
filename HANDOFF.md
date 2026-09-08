@@ -1661,3 +1661,31 @@ ghim khi tôi dựng regex bằng chuỗi Python — `\b` thành ký tự thật
 mất hiệu lực**. Cả hai lần đều chỉ lộ ra vì một phép kiểm khác đếm sai một đơn vị.
 
 **Còn mở:** không có gì của phiên này ở repo này.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · KHUNG-46 đóng: hợp đồng nhóm bảng về MỘT chỗ
+
+**Trước:** danh sách năm nhóm của bảng bị `assert.deepEqual` gõ cứng ở **2 file test**
+(`overview-smoke.mjs`, `overview-doc-smoke.mjs`). Hai bản sao lệch được, và 08/09 đã lệch thật —
+sửa một bản, cổng đỏ thêm một vòng 9 phút để tìm bản kia.
+
+**Sau:** khai **1 chỗ** — khối `bang.nhom` của `.repo-structure.json`, đọc qua
+`nhomBangFrom()` trong `repo-structure.mjs`. Hai suite cùng đọc. `grep -c 'tong-quan'
+tests/*.mjs` ở **phần khẳng định danh sách: 0** (còn 2 dòng `id="tab-tong-quan"` khẳng định
+*một tab cụ thể phải còn* — sự thật khác, cố ý giữ).
+
+**Vì sao KHÔNG khai bằng hằng số export từ `build-overview.mjs`** — mục nợ gợi ý lối đó, và nó
+hỏng: bộ sinh là bên **bị kiểm**, hợp đồng nằm trong nó thì thêm một tab sửa cả hai vế của phép
+so sánh cùng lúc, nên phép kiểm xanh với **mọi** danh sách.
+
+**Ba đột biến chạy thật:** ⑴ thêm tab `gia-mao` vào bộ sinh → **cả hai suite ĐỎ** ở đúng vế danh
+sách · ⑵ chép lại danh sách vào một file `tests/` → vế cấm-chép ĐỎ, chỉ đúng file + số dòng ·
+⑶ đối chứng bỏ đột biến → xanh.
+
+**Vế cấm-chép bắt oan ngay lượt đầu** — nó khớp chuỗi con nên `"so-migrate"` bị đếm là mã
+`migrate`. Sửa thành khớp nguyên mã. Một vế mới sinh mà xanh ngay thì chưa ai biết nó có răng.
+
+**Số:** sổ nợ 22 → **21** mục mở · `overview-doc-smoke` 15 → **17** vế · suite đủ bộ
+**16/19 xanh** trước khi tăng bản (3 đỏ đều cùng một gốc: chưa tăng `version`) · bản **1.3.67**.
+
+**Còn mở:** không có gì của phiên này. Mục `KHUNG-44` (port `npm run test:backlog`) vẫn mở —
+điều kiện đóng của nó cũng là một lệnh chạy được, phiên sau nhặt được ngay.

@@ -1033,7 +1033,35 @@ Vùng: `_code`.
 **đóng khi:** có một ca dựng đúng phép thử của vai SẢN PHẨM — bản đồ giả đúng hình dạng, đường dẫn
 do bên đẩy chọn — và cửa TỪ CHỐI nó; kèm một ca đối chứng cho thấy bản đồ thật vẫn đi qua.
 
-### KHUNG-46 · Danh sách nhóm của bảng bị khẳng định ở HAI file, và tôi sửa lệch nhau
+### ~~KHUNG-46~~ · ĐÓNG 08/09 · Danh sách nhóm của bảng bị khẳng định ở HAI file, và tôi sửa lệch nhau
+
+**Đóng bằng bản vá, không bằng cách bỏ luật.** Hợp đồng nay khai ở **một chỗ** —
+khối `bang.nhom` của `.repo-structure.json` — và hai suite cùng đọc qua `nhomBangFrom()`.
+
+**Vì sao KHÔNG khai bằng hằng số export từ `build-overview.mjs`** (một trong hai lối mục này
+gợi ý): bộ sinh là bên **bị kiểm**. Hợp đồng nằm trong nó thì một lượt thêm tab sửa cả hai vế
+của phép so sánh cùng lúc, nên phép kiểm xanh với **mọi** danh sách — tức nó thôi canh gì. Đo
+được, không suy: mọi đột biến ở dưới đều dựa vào chỗ tách này.
+
+**Ba đột biến đã chạy thật:**
+
+⑴ thêm tab `gia-mao` vào bộ sinh → **CẢ HAI suite đỏ** ở đúng vế danh sách nhóm (điều kiện đóng
+của mục này đòi đúng thế) · ⑵ chép lại danh sách vào `tests/overview-smoke.mjs` → vế cấm-chép
+đỏ, chỉ tên đúng file và đúng số dòng · ⑶ đối chứng: bỏ cả hai đột biến → 17 vế xanh.
+
+**Vế cấm-chép bắt oan ngay lượt chạy đầu, và đó là số đo đáng giữ:** nó khớp CHUỖI CON nên dòng
+`assert.ok(!/id="so-migrate"/.test(T["cong-viec"]))` bị đếm là hai mã — "so-migrate" chứa
+"migrate". Sửa thành khớp nguyên mã (hai bên không phải chữ thường hay gạch nối). Một vế mới
+sinh mà xanh ngay lượt đầu thì chưa ai biết nó có răng không.
+
+**Còn lại hai chỗ có chữ `tong-quan` trong `tests/`, cố ý:** `id="tab-tong-quan"` ở hai phép
+kiểm khẳng định *một tab cụ thể phải còn* — đó là một sự thật khác với *danh sách gồm những
+gì*, và quy nó về hợp đồng là buộc thứ tự phần tử vào một phép kiểm không nói gì về thứ tự.
+Vế cấm-chép cho phép đúng một mã trên một dòng, chính vì ca này.
+
+<details><summary>Nội dung gốc của mục</summary>
+
+
 
 Đo 08/09 khi tách tab Migrate: danh sách nhóm (`tong-quan` · `cong-viec` · `migrate` · `he-thong`
 · `lich-su`) bị `assert.deepEqual` ở **hai** chỗ — `tests/overview-smoke.mjs` và
@@ -1056,3 +1084,5 @@ Vùng: `_code`.
 **đóng khi:** danh sách nhóm chỉ còn khai ở MỘT nơi — `grep -c 'tong-quan' tests/*.mjs` ra 0 ở
 phần khẳng định — và một lượt thêm tab giả làm CẢ HAI suite đỏ cùng lúc (dựng được ca hỏng, không
 chỉ chạy xanh).
+
+</details>

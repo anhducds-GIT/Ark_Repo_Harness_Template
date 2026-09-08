@@ -13,6 +13,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { gapKhoi, gomDuLieu, khoiCauTruc, khoiLienQuan, khoiMoHinh, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
+import { nhomBangFrom } from "../scripts/repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -36,9 +37,15 @@ const html = trang(dl);
    * Phép kiểm này ĐỎ khi tôi thêm tab Migrate, và nó đỏ ĐÚNG: nó sinh ra để bắt cả việc thiếu
    * nhóm lẫn việc ai đó lặng lẽ thêm nhóm thứ năm. Nên tôi sửa nó **có chủ ý và kèm một ADR**,
    * không phải sửa cho hết đỏ. Ai đọc dòng này mà không thấy ADR-0007 thì hãy nghi ngờ nó. */
-  const NAM_NHOM = ["cong-viec", "he-thong", "lich-su", "migrate", "tong-quan"];
-  assert.deepEqual([...new Set(nut)].sort(), NAM_NHOM,
-    `bang phai co dung nam nhom (ADR-0006 + ADR-0007), dang co: ${[...new Set(nut)].join(" ")}`);
+  /* DANH SÁCH ĐỌC TỪ `.repo-structure.json`, KHÔNG GÕ CỨNG Ở ĐÂY — KHUNG-46, 08/09.
+   *
+   * Trước đó danh sách bị `assert.deepEqual` ở cả file này lẫn `overview-doc-smoke.mjs`. Sửa
+   * bản này rồi tưởng xong; cổng đỏ thêm một vòng 9 phút chỉ để tìm ra bản kia. Nay hợp đồng
+   * nằm ở khối `bang.nhom` — thêm một tab vào bộ sinh làm CẢ HAI suite đỏ cùng lúc. */
+  const NHOM = nhomBangFrom(JSON.parse(fs.readFileSync(path.join(ROOT, ".repo-structure.json"), "utf8")));
+  assert.ok(NHOM, "phải khai `bang.nhom` trong .repo-structure.json — repo NHÀ là nơi phát hành hợp đồng này");
+  assert.deepEqual([...new Set(nut)].sort(), [...NHOM].sort(),
+    `bang phai co dung cac nhom khai o bang.nhom (ADR-0006 + ADR-0007), dang co: ${[...new Set(nut)].join(" ")}`);
   assert.deepEqual([...new Set(nut)].sort(), [...new Set(than)].sort(),
     "moi nut tab phai co dung mot phan than — lech la bam vao thi trang trong");
   ok(`${nut.length} nhóm đúng tên, nút nào cũng có thân`);
