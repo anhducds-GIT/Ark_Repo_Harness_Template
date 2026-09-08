@@ -1502,3 +1502,36 @@ mục và phiên sau sẽ học cách bỏ qua nó.
 tôi gộp hai chuyện theo hướng **tự bào chữa**. Đã sửa cả hai; chỗ ⓐ hoá ra làm lập luận **mạnh lên**.
 
 **Còn mở:** `KHUNG-8` · `KHUNG-7` · sổ nợ bộ khung **45 mục**, không ai đặt trần.
+
+## 2026-09-08 · claude-cua-kiem · Hai chốt treo được đóng, và một trong hai đi ngược khuyến nghị của chính tôi
+
+**Đức uỷ quyền:** *"hai chốt đó bạn chủ động chọn cho phù hợp cho tôi."* Biên bản: ADR-0010.
+
+**⓵ Sổ quyền: XOÁ, không nối.** Bản giao việc đêm trước khuyến nghị **nối**, Đức cũng nghiêng
+về nối. Đo lại trước khi gõ thì bốn số lật ngược: `quyen.mjs` **không được gọi từ đâu cả** ·
+`refs/ark/quyen` **chưa từng tồn tại trên remote** · **không có trong `template/`** · và cái nó
+định chặn thì `claim.mjs:400` **đã chặn rồi** bằng mutex `mkdir` thật.
+
+Số thứ tư là số quyết định, và tôi chỉ thấy nó vì **mở file ra đọc trước khi sửa**: tôi đã sắp
+cài một khoá độc quyền **thứ hai** vào đúng đường ghi đã có một cái chạy tốt.
+
+Xoá **1.716 dòng**. `KHUNG-45` đóng theo — **vì thứ mang lỗi đã đi, không phải vì đã vá**.
+
+**Mất, ghi thẳng:** vế cưỡng chế bằng máy của bất biến *"người sửa không tự nghiệm thu"*
+(ADR-0008) nay là **chữ**. Đổi lại: hàng rào ấy chưa từng cắm xuống đất, và nó nhận bản đồ vùng
+từ chính bên bị kiểm (`KHUNG-45`). Dựng lại khi có phiên chạy `claim.mjs` từ **máy thứ hai**.
+
+**⓶ Trần sổ nợ = 25, có máy canh.** Phép kiểm thứ **12** của cổng. Trần khai ở `backlog.tran`
+(`.repo-structure.json`); repo không khai thì **xanh** — bản khung không đặt trần hộ ai. Bộ đếm
+dùng lại `parseBacklog`, không viết bộ thứ hai. Ghim `cong-do-that.mjs` khối 10 chứng minh **ba
+chiều**; 2/2 đột biến bị bắt. Đang mở **23/25**.
+
+**Vấp, và cùng một kiểu vấp của đêm trước:** phát bản **1.3.48 → 1.3.49 → 1.3.50** vì tôi phát
+trước rồi mới chạy test. Luật một-số-một-nội-dung bắt đúng cả hai lần. Thứ tự đúng: **test xanh
+trước, phát bản một lượt sau.**
+
+**Cái giá của lượt dùng lại `parseBacklog`:** cổng nay phụ thuộc `what-next.mjs`, nên **sáu** kho
+thử phải chép thêm file đó. Vá hết trong một lượt, và ghi chú ngay trên phép kiểm.
+
+**Còn mở:** `KHUNG-7` · `KHUNG-44` · `KHUNG-46` · sổ nợ **23/25**. Repo Extension chưa khai
+`backlog.tran` nên phép kiểm mới sẽ xanh ở đó mà không canh gì — **hỏi Đức con số trước**.
