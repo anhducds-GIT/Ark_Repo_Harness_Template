@@ -403,6 +403,37 @@ details.gap[open]>summary{margin-bottom:12px;color:var(--chu)}
 .ckm .ma{font-family:var(--mono);font-size:11.8px;color:var(--mo)}
 .ckm .tv{display:block;font-family:var(--mono);font-size:11.6px;color:var(--vang);margin-top:1px}
 
+/* Một dòng sổ nợ: mức ưu tiên · mã · tiêu đề. Mã dùng font mono để mắt bắt được nó trong một
+   cột dài — người ta tra sổ nợ bằng MÃ, không bằng tiêu đề. */
+.nom{display:grid;grid-template-columns:26px 74px 1fr;gap:8px;align-items:baseline;
+  padding:5px 0;border-top:1px solid var(--vien);font-size:13.2px;line-height:1.4}
+.nom .ut{font-family:var(--mono);font-size:11px;color:var(--mo)}
+.nom .ma{font-family:var(--mono);font-size:11.8px;color:var(--chu2)}
+.nom .t{color:var(--chu)}
+.nom.chot .ma{color:var(--vang)}
+.nom em{color:var(--vang);font-style:normal;font-family:var(--mono);font-size:11.4px}
+
+/* O TIM. Dat ngay duoi thanh tab, khong dat trong header: no la cong cu dung LIEN TUC trong
+   luc doc, con header la thu doc mot lan roi thoi. */
+.tim-o{margin:0 0 10px}
+.tim-o input{width:100%;box-sizing:border-box;font-family:var(--sans);font-size:13.6px;
+  padding:9px 13px;border:1px solid var(--vien);border-radius:9px;background:var(--mat);
+  color:var(--chu)}
+.tim-o input:focus{outline:none;border-color:var(--nhan);box-shadow:0 0 0 3px var(--nhan-nen)}
+.tim-kq{border:1px solid var(--vien);border-radius:10px;background:var(--mat);
+  padding:9px;margin:0 0 14px;max-height:52vh;overflow-y:auto}
+.tim-tom{margin:0 0 7px;font-family:var(--mono);font-size:11.4px;color:var(--mo)}
+.tim-khong{margin:0;font-size:13.2px;color:var(--chu2)}
+.tim-dong{display:grid;grid-template-columns:96px 1fr;gap:9px;width:100%;text-align:left;
+  font:inherit;font-size:13.2px;line-height:1.45;color:var(--chu);background:none;border:0;
+  border-top:1px solid var(--vien);padding:6px 4px;cursor:pointer}
+.tim-dong:first-of-type{border-top:0}
+.tim-dong:hover{background:var(--mat2)}
+.tim-dong .nh{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--mo)}
+/* To sang cho vua nhay toi. Khong dung dau hai cham target vi mot phan tu bat ky khong co id. */
+.tim-sang{outline:2px solid var(--nhan);outline-offset:3px;border-radius:5px}
+
 /* DANH SÁCH DÀI CHẢY THÀNH NHIỀU CỘT.
  *
  * Đo 08/09 với tab Migrate mở hết: **10.607px chiều cao**, 207 dòng mục xếp mỗi dòng một hàng
@@ -675,6 +706,100 @@ const JS = `
       document.execCommand('copy'); document.body.removeChild(ta); xong();
     } catch (e) {}
   }
+
+  /* TÌM TRÊN CẢ TRANG — Đức nêu 09/09: *"tôi tìm khung 30, 40, 53 trong dashboard nhưng rất mơ hồ"*.
+   *
+   * Ctrl+F của trình duyệt KHÔNG đủ ở trang này, và lý do là cấu trúc chứ không phải thói quen:
+   * bốn trong năm nhóm đang "hidden", và phần lớn nội dung nằm trong "<details>" đóng. Trình
+   * duyệt không tìm thấy chữ trong nút bị ẩn — nên với người xem, thứ họ cần "không có trên
+   * trang", trong khi nó có.
+   *
+   * Nên ô này tìm trên TOÀN BỘ trang kể cả phần đang ẩn, và mỗi kết quả nói rõ **nó nằm ở nhóm
+   * nào** — bấm là nhảy đúng chỗ, mở sẵn mọi "<details>" bao quanh, và tô sáng vài giây.
+   *
+   * CHỈ TÌM TRONG TIÊU ĐỀ VÀ DÒNG NGẮN, cố ý — "h2" · "h3" · "summary" · dòng sổ nợ · dòng việc
+   * chờ chốt · dòng checklist · dòng khoá. Quét cả văn xuôi thì một chữ thường gặp trả về sáu
+   * chục đoạn dài và kết quả thành vô dụng. Người ta tra bảng này bằng MÃ VIỆC, và mã việc luôn
+   * nằm ở tiêu đề hoặc dòng ngắn. */
+  try {
+    var oTim = document.getElementById('tim');
+    var oKq = document.getElementById('tim-kq');
+    if (oTim && oKq) {
+      var tenNhom = {};
+      [].slice.call(document.querySelectorAll('nav.tabs button')).forEach(function(b){
+        tenNhom[b.dataset.tab] = b.textContent.trim();
+      });
+      var MUC_TIM = 'h2, h3, summary, .nom, .cd .c, .ckm, .kh .t, .hs .t';
+      var kho = [].slice.call(document.querySelectorAll('section.tab')).reduce(function(acc, sec){
+        var nhom = sec.id.replace(/^tab-/, '');
+        [].slice.call(sec.querySelectorAll(MUC_TIM)).forEach(function(el){
+          var chu = (el.textContent || '').replace(/\\s+/g, ' ').trim();
+          if (chu.length > 2 && chu.length < 220) acc.push({ el: el, chu: chu, thap: chu.toLowerCase(), nhom: nhom });
+        });
+        return acc;
+      }, []);
+
+      var TOI_DA = 40;
+      function nhay(m){
+        var b = document.querySelector('nav.tabs button[data-tab=' + JSON.stringify(m.nhom) + ']');
+        if (b) b.click();
+        // Mở mọi "<details>" bao quanh — không mở thì bấm xong vẫn không thấy gì, và người dùng
+        // kết luận nút hỏng. Cả ".tab2" (tab con của sổ migrate) cũng phải bật.
+        var n = m.el;
+        while (n && n !== document.body) {
+          if (n.tagName === 'DETAILS') n.open = true;
+          if (n.classList && n.classList.contains('tab2') && n.hidden) {
+            var b2 = document.querySelector('.tabs2 button[data-tab2=' + JSON.stringify(n.id) + ']');
+            if (b2) b2.click();
+          }
+          n = n.parentElement;
+        }
+        m.el.scrollIntoView({ block: 'center' });
+        m.el.classList.add('tim-sang');
+        setTimeout(function(){ m.el.classList.remove('tim-sang'); }, 2400);
+      }
+
+      function ve(){
+        var q = oTim.value.trim().toLowerCase();
+        oKq.innerHTML = '';
+        if (q.length < 2) { oKq.hidden = true; return; }
+        var hit = kho.filter(function(m){ return m.thap.indexOf(q) >= 0; });
+        oKq.hidden = false;
+        if (!hit.length) {
+          oKq.innerHTML = '<p class="tim-khong">Không có chỗ nào khớp <b></b>. '
+            + 'Bảng này chỉ nói về repo <em>NÀY</em> — thứ bạn tìm có thể nằm ở sổ nợ của repo khác.</p>';
+          oKq.querySelector('b').textContent = '"' + oTim.value.trim() + '"';
+          return;
+        }
+        var dem = {};
+        hit.forEach(function(m){ dem[m.nhom] = (dem[m.nhom] || 0) + 1; });
+        var tom = document.createElement('p');
+        tom.className = 'tim-tom';
+        tom.textContent = hit.length + ' chỗ khớp — '
+          + Object.keys(dem).map(function(k){ return (tenNhom[k] || k) + ' ' + dem[k]; }).join(' · ')
+          + (hit.length > TOI_DA ? '  (hiện ' + TOI_DA + ' chỗ đầu)' : '');
+        oKq.appendChild(tom);
+        hit.slice(0, TOI_DA).forEach(function(m){
+          var nut = document.createElement('button');
+          nut.type = 'button';
+          nut.className = 'tim-dong';
+          var n1 = document.createElement('span');
+          n1.className = 'nh';
+          n1.textContent = tenNhom[m.nhom] || m.nhom;
+          var n2 = document.createElement('span');
+          n2.textContent = m.chu.length > 130 ? m.chu.slice(0, 130) + '…' : m.chu;
+          nut.appendChild(n1);
+          nut.appendChild(n2);
+          nut.addEventListener('click', function(){ nhay(m); });
+          oKq.appendChild(nut);
+        });
+      }
+      oTim.addEventListener('input', ve);
+      oTim.addEventListener('keydown', function(e){
+        if (e.key === 'Escape') { oTim.value = ''; ve(); oTim.blur(); }
+      });
+    }
+  } catch (e) {}
 
   var nut = [].slice.call(document.querySelectorAll('nav.tabs button'));
   var mucs = [].slice.call(document.querySelectorAll('section.tab'));
@@ -1308,6 +1433,28 @@ export function khoiSucKhoeNo(so, noMo, noMuc) {
     + '<div class="the" id="so-no"><h2>Việc còn nợ — ' + noMo.length + ' mục đang mở</h2>'
     + '<div class="hs"><span class="n">' + noMo.length + '</span><span class="t">đang mở trong sổ nợ</span></div>'
     + '<div class="hs"><span class="n">' + daDong + '</span><span class="t">đã đóng, giữ lại để tra</span></div>'
+    /* DANH SÁCH, KHÔNG CHỈ CON SỐ — Đức nêu 09/09: *"tôi tìm KHUNG-30, 40, 53 trong dashboard
+     * nhưng rất mơ hồ"*. Đo lại đúng thế: `KHUNG-53` xuất hiện **0 lần** trên cả trang dù nó
+     * đang mở, `KHUNG-30` chỉ hiện như một chữ nhắc trong thân mục khác. Khối này có hai con số
+     * và một đoạn giải thích cách đếm — nhưng **không có mục nào**.
+     *
+     * Dữ liệu vốn đã có: `parseBacklog` trả về đủ `ma` · `tieuDe` · `uuTien` · `choChot` cho cả
+     * 25 mục. Bảng chỉ đếm rồi vứt đi. Đây là kiểu thiếu tệ nhất của một bảng trạng thái: nó
+     * KHẲNG ĐỊNH có 25 việc rồi không cho người đọc biết 25 việc đó là gì, nên con số thành một
+     * lời phải tin chứ không phải một thứ tra được.
+     *
+     * Chảy thành cột (`.cot`) — 25 dòng một cột là thứ Đức vừa phải cuộn ở tab Migrate. */
+    + (noMo.length
+      ? '<h3>Cả ' + noMo.length + ' mục, xếp theo mức ưu tiên</h3><div class="cot">'
+        + [...noMo].sort((a2, b2) => String(a2.uuTien).localeCompare(String(b2.uuTien))
+          || String(a2.ma).localeCompare(String(b2.ma), undefined, { numeric: true }))
+          .map((m) => '<div class="nom' + (m.choChot ? " chot" : "") + '">'
+            + '<span class="ut">' + esc(m.uuTien || "P?") + '</span>'
+            + '<span class="ma">' + esc(m.ma) + '</span>'
+            + '<span class="t">' + esc(m.ten || "(mục này không có tiêu đề)")
+            + (m.choChot ? '<em> — chờ người chốt</em>' : "") + '</span></div>').join("")
+        + '</div>'
+      : '')
     + '<details><summary>Con số này đếm thế nào, và vì sao nó thà đếm thừa hơn đếm thiếu</summary>'
     + '<p>Đếm mục trong sổ nợ, và một mục tính là đã đóng <strong>chỉ khi mã của nó bị gạch</strong>. '
     + 'Không dò từ khoá "xong" trong văn xuôi — có mục viết <em>"gỡ khoá sau khi việc kia xong"</em>, '
@@ -1767,6 +1914,13 @@ export function trang(dl) {
   <nav class="tabs" role="tablist">
     ${tabs.map(([id, ten2]) => `<button role="tab" data-tab="${id}" aria-selected="false">${esc(ten2)}</button>`).join("")}
   </nav>
+
+  <div class="tim-o">
+    <input type="search" id="tim" autocomplete="off" spellcheck="false"
+           aria-label="Tim tren ca trang"
+           placeholder="Tim ma viec, ten khoa, ten file... (vi du: KHUNG-53)">
+  </div>
+  <div class="tim-kq" id="tim-kq" hidden></div>
 
   <section class="tab" id="tab-tong-quan" hidden>
     ${khoiBaCau({ st, canDuc, khoa, so, noMo, tenNguoi })}

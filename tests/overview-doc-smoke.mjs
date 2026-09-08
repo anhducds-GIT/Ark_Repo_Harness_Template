@@ -526,4 +526,49 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   ok("bộ đọc hợp đồng fail-closed: 4 cửa NÉM · 2 cửa trả null có chủ ý");
 }
 
+/* ---- Sổ nợ: đọc được MỨC ƯU TIÊN, và mã việc không mất tiêu đề --------- */
+{
+  /* Đức nêu 09/09: *"tôi tìm khung 30, 40, 53 trong dashboard nhưng rất mơ hồ"*. Đo lại: bảng
+   * có hai CON SỐ của sổ nợ và một đoạn giải thích cách đếm, nhưng **không liệt kê mục nào** —
+   * `KHUNG-53` xuất hiện 0 lần trên cả trang dù nó đang mở. Nay bảng liệt kê, và danh sách đó
+   * cần mức ưu tiên: 25 dòng không xếp hạng thì người đọc vẫn phải mở sổ ra tra từng cái.
+   *
+   * `P?` là ca THẬT, không phải ca lý thuyết: mục nằm trước mọi tiêu đề nhóm. **Không biết**
+   * khác **không quan trọng**, nên nó phải có mã riêng chứ không được gán bừa vào P3. */
+  const so = readNo([
+    "### KHUNG-9 · truoc moi nhom",
+    "## P1",
+    "### KHUNG-1 · mot",
+    "### ~~KHUNG-2~~ · da dong",
+    "## P2",
+    "### KHUNG-3 · ba @Duc:chot",
+  ].join(NL));
+  assert.deepEqual(so.map((x) => [x.ma, x.uuTien, x.dong]), [
+    ["KHUNG-9", "P?", false],
+    ["KHUNG-1", "P1", false],
+    ["KHUNG-2", "P1", true],
+    ["KHUNG-3", "P2", false],
+  ], "moi muc phai mang muc uu tien cua nhom dung tren no");
+  assert.equal(so.find((x) => x.ma === "KHUNG-3").choChot, true, "dau @Duc: phai bat co cho chot");
+  assert.equal(so.find((x) => x.ma === "KHUNG-1").choChot, false);
+  assert.equal(so.find((x) => x.ma === "KHUNG-1").ten, "mot", "tieu de khong duoc mat");
+
+  /* BYTE ĐIỀU KHIỂN THÔ TRONG MÃ NGUỒN — vế này canh một cái bẫy đã cắn HAI LẦN ở repo này.
+   *
+   * 08/09: byte NUL lọt vào `chay-test.mjs`, git coi file là nhị phân nên bộ quét secret bỏ qua
+   * nó. 09/09: byte BACKSPACE (0x08) lọt vào chính `UU_TIEN_NO` ở đây, vì regex được dựng bằng
+   * một chuỗi Python và `\b` là escape HỢP LỆ của Python. Hậu quả: regex không khớp gì, mọi mục
+   * mang `P?`, và **không phép kiểm nào đỏ** — nó hỏng im lặng, đúng kiểu tệ nhất.
+   *
+   * Cả hai lần đều chỉ lộ ra vì một phép kiểm KHÁC đếm sai một đơn vị. Nên đây là vế đếm thẳng. */
+  const nguonDoc = readFileSync(join(ROOT, "scripts", "overview-doc.mjs"), "utf8");
+  const byteLa = [...nguonDoc].filter((c) => {
+    const m = c.charCodeAt(0);
+    return m < 32 && m !== 9 && m !== 10 && m !== 13;
+  });
+  assert.deepEqual(byteLa.map((c) => c.charCodeAt(0)), [],
+    "khong duoc co byte dieu khien tho trong ma nguon — dung tra ve: dung regex literal, dung dung chuoi Python de dung regex");
+  ok(`sổ nợ: mức ưu tiên theo nhóm · P? cho mục ngoài nhóm · cờ chờ-chốt · 0 byte điều khiển thô`);
+}
+
 console.log(`overview-doc-smoke: ${passed} vế xanh` + (boQua ? ` · ${boQua} vế BỎ QUA (kể tên ở trên)` : ""));

@@ -762,9 +762,17 @@ async function main() {
       dirty = execFileSync("git", ["status", "--porcelain", "--untracked-files=all"], { cwd: ROOT, encoding: "utf8" })
         .split(String.fromCharCode(10)).filter(Boolean)
         .map((d) => d.slice(3).replace(/^"|"$/g, ""))
-        // File bảng quyền là thứ lệnh này SẮP ghi — nó luôn "dở" trong lúc chạy, và tính nó vào
-        // là tự chặn chính mình mãi mãi.
-        .filter((f) => f !== ".agents/claims.json")
+        /* HAI NHÓM KHÔNG TÍNH LÀ "VIỆC ĐANG DỞ CỦA NGƯỜI KHÁC":
+         * · bảng quyền — lệnh này SẮP ghi nó, tính vào là tự chặn chính mình mãi mãi;
+         * · artifact MÁY SINH — khối `generated` của `.repo-structure.json` khai rõ KHÔNG AI sở
+         *   hữu chúng, vì nội dung tất định từ HEAD. Không có gì của ai trong đó để mất.
+         *
+         * Nhóm thứ hai là lỗ đo được 09/09, và là LẦN THỨ HAI cùng một hình dạng trong một ngày:
+         * `--sua` cũng từng chặn oan đúng nhóm này. Ca thật — Đức chốt chuyển `_root`, lệnh TỪ
+         * CHỐI vì `DASHBOARD-*.html` đang sửa dở, trong khi file đó là bảng do chính lệnh sinh
+         * lại mỗi lượt. Ba cửa của một cơ chế (`--soat` · `--sua` · `--take`) phải nói CÙNG một
+         * câu về cùng một file; hai cửa nói khác nhau là chỗ người ta thôi tin cả ba. */
+        .filter((f) => f !== ".agents/claims.json" && !new Set(generatedFrom(cauTruc)).has(f))
         .filter((f) => stewardOf(f, cauTruc, tienTo) === key);
     } catch (e) {
       // Không đo được thì KHÔNG ĐƯỢC coi là "vùng sạch" — đó là fail-open, và giành vùng là

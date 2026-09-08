@@ -147,13 +147,23 @@ export function quetDauDuc(text, file) {
  * "xong" ở đó là điều kiện chứ không phải trạng thái. Dò giữa câu là đóng oan một việc đang
  * mở, tức bảng báo THIẾU nợ. Lệch về phía báo thừa, cố ý. */
 const MUC_NO = /^###\s+(~~)?\s*([A-Z][A-Z0-9]*-\d+)\s*~*\s*[·:]?\s*(.*)$/;
+/* Cùng mẫu với `what-next.mjs` — hai chỗ đọc CÙNG một sổ thì phải đọc cùng một dấu. */
+const UU_TIEN_NO = /^##\s+(P[1-9])\b/;
 
 export function readNo(text) {
   const ra = [];
+  /* MỨC ƯU TIÊN đọc từ tiêu đề nhóm `## P<n>` đứng trên. Thêm 09/09 vì bảng bắt đầu LIỆT KÊ sổ
+     nợ chứ không chỉ đếm — mà một danh sách 25 mục không có mức ưu tiên thì người đọc phải tự
+     đi tra từng cái, tức danh sách chỉ dời công việc chứ không bớt. Mục nằm trước mọi tiêu đề
+     nhóm thì mang `P?`: **không biết** khác **không quan trọng**, và trộn hai thứ đó là nói dối. */
+  let uuTien = "P?";
   for (const l of donGian(text).split(NL)) {
+    const ut = UU_TIEN_NO.exec(l);
+    if (ut) { uuTien = ut[1]; continue; }
     const m = MUC_NO.exec(l);
     if (!m) continue;
-    ra.push({ ma: m[2], ten: m[3].replace(/~~/g, "").trim(), dong: Boolean(m[1]) });
+    const ten = m[3].replace(/~~/g, "").trim();
+    ra.push({ ma: m[2], ten, dong: Boolean(m[1]), uuTien, choChot: DAU_DUC.test(ten) });
   }
   return ra;
 }

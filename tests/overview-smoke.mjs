@@ -469,4 +469,32 @@ const html = trang(dl);
   ok("danh sách dài chảy thành cột · 3 khối bọc đúng · tay kéo đúng 1 chỗ có số và đường về · localStorage bọc try");
 }
 
+/* ---- Bảng phải LIỆT KÊ sổ nợ, và có ô tìm trên cả trang ---------------- */
+{
+  /* Đức 09/09: *"tôi tìm khung 30, 40, 53 trong dashboard nhưng rất mơ hồ"*. Gốc bệnh không
+   * phải thiếu tìm kiếm — là bảng **khẳng định có N mục nợ rồi không cho biết N mục đó là gì**.
+   * Đo trước khi sửa: `KHUNG-53` xuất hiện **0 lần** trên cả trang dù nó đang mở; `KHUNG-30`
+   * chỉ hiện như một chữ nhắc trong thân mục khác. Một con số không tra được là một con số
+   * phải TIN, không phải một con số dùng được.
+   *
+   * Vế này đếm THẲNG: mọi mục đang mở phải có một dòng riêng. Đếm suy từ dữ liệu, không gõ số. */
+  const soMo = dl.noMo.length;
+  const dong = [...html.matchAll(/<div class="nom( chot)?"><span class="ut">([^<]*)<\/span><span class="ma">([^<]*)<\/span>/g)];
+  assert.equal(dong.length, soMo, `bang phai liet ke DU ${soMo} muc no dang mo, dang co ${dong.length} dong`);
+  const maTrenBang = new Set(dong.map((m) => m[3]));
+  const thieu = dl.noMo.map((n) => n.ma).filter((ma) => !maTrenBang.has(ma));
+  assert.deepEqual(thieu, [], `muc no dang mo ma khong co dong nao tren bang: ${thieu.join(" ")}`);
+
+  // Mức ưu tiên phải THẬT, không phải `P?` hàng loạt — `P?` hàng loạt là dấu hiệu bộ đọc hỏng
+  // im lặng, đúng ca byte BACKSPACE 09/09.
+  assert.ok(dong.some((m) => /^P[1-9]$/.test(m[2])),
+    "khong muc nao co muc uu tien that — bo doc so no dang hong im lang");
+
+  // Ô TÌM: chỉ đòi ba thứ ĐỦ ĐỂ NÓ CHẠY, không đòi hình dáng.
+  assert.match(html, /id="tim"/, "phai co o tim");
+  assert.match(html, /id="tim-kq"/, "phai co cho in ket qua");
+  assert.match(html, /section\.tab/, "bo tim phai quet theo section.tab — no phai thay ca nhom dang AN");
+  ok(`bảng liệt kê đủ ${soMo} mục nợ (mã · mức ưu tiên · tiêu đề) · có ô tìm quét cả nhóm đang ẩn`);
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

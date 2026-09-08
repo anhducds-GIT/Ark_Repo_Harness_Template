@@ -90,8 +90,6 @@ KHUNG-1, sửa cùng lượt. Vùng: `_code`.
 
 ## P2
 
-</details>
-
 ### KHUNG-53 · Cổng đóng phiên chưa biết tới khoá mức FILE — vẫn đòi khoá VÙNG cho mọi commit
 
 **Đo 08/09, ngay lượt dùng thật đầu tiên của khoá mức file.** Phiên chạy đúng như Đức chốt — trả

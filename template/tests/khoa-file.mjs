@@ -21,10 +21,13 @@
 
 import assert from "node:assert/strict";
 
+import { readFileSync } from "node:fs";
+
 import {
   chuanDuongDan, EXIT, khoaFileQuaHan, khoaFileTrongVung, MIEN_KHOA,
   PHUT_NHAC_KHOA_FILE, quyetDinhSua, quyetDinhXong, soatDanHang,
 } from "../scripts/claim.mjs";
+import { generatedFrom } from "../scripts/repo-structure.mjs";
 
 let so = 0;
 const ok = (t) => { so += 1; console.log(`  ok  ${t}`); };
@@ -211,10 +214,51 @@ const vungCua = (d) => (d.startsWith("scripts/") || d.startsWith("tests/") ? "_c
  *  4. `khoaFileQuaHan` tự `delete` khoá quá hạn                   → vế 4 đỏ
  *  5. bỏ vế miễn artifact máy sinh khỏi `quyetDinhSua`             → vế 5b đỏ
  *  6. `quyetDinhSua` GHI một hàng cho artifact máy sinh            → vế 5b đỏ
+ *  7. bỏ vế miễn artifact máy sinh khỏi phép lọc của `--take`      → vế 5c đỏ
  *
  * Và HAI cửa chạy thật ở repo này, không phải hàm thuần:
  *  · lane khác `--take _code` khi tôi đang khoá 2 file bên trong  → TU_CHOI_NHAN_VUNG
  *  · còn treo một khoá file lúc chạy cổng                          → mục "Khoá file đã trả hết" ĐỎ
  */
+
+/* ---- 5c. BA CỬA phải nói CÙNG một câu về artifact máy sinh -------------- */
+{
+  /* Đo 09/09, hai lần trong một ngày, cùng một hình dạng:
+   *   · `--sua DASHBOARD-*.html` bị từ chối vì bảng nằm trong vùng người khác giữ  → đã vá (5b)
+   *   · `--take _root` bị từ chối vì `DASHBOARD-*.html` "đang sửa dở"              → vế này
+   *
+   * Cả hai lần đều là **chặn oan**, và cả hai lần lý do giống hệt: luật khai artifact máy sinh
+   * KHÔNG AI sở hữu (nội dung tất định từ HEAD), nhưng chỉ `--soat` biết điều đó. Ca thứ hai
+   * chặn đúng lúc Đức đã chốt chuyển vùng — tức một lớp bảo vệ đứng chắn một quyết định của
+   * người chốt, vì một file mà chính lệnh sinh lại mỗi lượt.
+   *
+   * Vế này không đo một cửa; nó đo **sự ĐỒNG Ý giữa ba cửa**. Hai cửa nói khác nhau về cùng một
+   * file là chỗ người ta thôi tin cả ba. */
+  const cauTrucGia = { generated: ["DASHBOARD.md", "llms.txt"] };
+  const maySinh = new Set([...generatedFrom(cauTrucGia), ".agents/claims.json"]);
+  const laMaySinh = (d) => maySinh.has(d);
+
+  // CỬA 1 — `--soat`: bỏ qua hẳn, không nêu tên.
+  const soat = soatDanHang({
+    daDan: ["DASHBOARD.md"], tam: {}, claims: { _root: { owner: "lane-khac" } },
+    as: "toi", mienKhoa: MIEN_KHOA, maySinh: [...maySinh], vungCua,
+  });
+  assert.deepEqual(soat.la, [], "cua --soat: artifact may sinh khong duoc bao la file la");
+
+  // CỬA 2 — `--sua`: đi qua, và KHÔNG ghi hàng nào.
+  const sua = quyetDinhSua({ claims: { _root: { owner: "lane-khac" } }, tam: {} },
+    { duongDan: "DASHBOARD.md", as: "toi", luc: LUC, vungCua, laMaySinh });
+  assert.equal(sua.code, EXIT.OK, "cua --sua: artifact may sinh khong doi khoa nao");
+  assert.deepEqual(Object.keys(sua.next), [], "va khong duoc ghi mot hang nao");
+
+  /* CỬA 3 — `--take`: phép lọc "file đang sửa dở" phải BỎ artifact máy sinh ra.
+   * Đây là hàm thuần hoá của đúng phép lọc trong `main()`, nên nó ghim được LUẬT mà không cần
+   * dựng một kho git thật. Đổi luật ở `main()` mà quên chỗ này thì vế dưới đỏ. */
+  const nguon = readFileSync(new URL("../scripts/claim.mjs", import.meta.url), "utf8");
+  assert.match(nguon, /generatedFrom\(cauTruc\)\)\.has\(f\)/,
+    "phep loc 'file dang sua do' cua --take phai bo artifact may sinh ra — neu khong, mot lenh"
+    + " sinh lai bang moi luot se tu chan chinh minh, va no da chan that mot quyet dinh cua nguoi chot");
+  ok("5c · ba cửa (--soat · --sua · --take) nói CÙNG một câu về artifact máy sinh");
+}
 
 console.log(`khoa-file: ${so} vế xanh`);

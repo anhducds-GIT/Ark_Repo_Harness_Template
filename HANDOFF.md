@@ -886,3 +886,36 @@ im lặng thì lỗi sống thêm một vòng. 3 đột biến, cả 3 bị bắ
 `khoa-file` **7 vế**.
 
 **Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-53`.
+
+## 2026-09-09 · harness-loi-01 · Bảng: liệt kê sổ nợ + ô tìm — và một byte BACKSPACE nữa
+
+**Đức nêu:** *"tôi tìm khung 30, 40, 53 trong dashboard nhưng rất mơ hồ? ta có thể thêm tính năng
+search không?"* — **gốc bệnh không phải thiếu search.** Đo trước khi gõ: `KHUNG-53` xuất hiện
+**0 lần** trên cả trang dù đang mở; `KHUNG-30` chỉ hiện như một chữ nhắc trong thân mục khác.
+Bảng có hai CON SỐ sổ nợ và một đoạn giải thích cách đếm, **không liệt kê mục nào**. Tìm kiếm
+trên một trang không chứa thứ cần tìm cũng không ra.
+
+**⑴ Bảng liệt kê đủ 25 mục** — mã · mức ưu tiên · tiêu đề · cờ chờ-chốt, chảy thành cột. Dữ liệu
+vốn đã có; bảng chỉ đếm rồi vứt đi. Đó là kiểu thiếu tệ nhất của một bảng trạng thái: nó KHẲNG
+ĐỊNH có 25 việc rồi không cho tra 25 việc đó là gì.
+
+**⑵ Ô tìm quét CẢ NHÓM ĐANG ẨN.** Ctrl+F không đủ ở trang này vì bốn trong năm nhóm đang
+`hidden` — với người xem, thứ họ cần *"không có trên trang"* trong khi nó có. Kết quả nói rõ nằm
+ở nhóm nào; bấm là nhảy, mở sẵn mọi `<details>` bao quanh.
+
+**BYTE BACKSPACE, LẦN THỨ HAI.** Regex đọc mức ưu tiên được dựng bằng chuỗi Python, và `\b` là
+escape HỢP LỆ của Python → **byte 0x08 thật** lọt vào mã nguồn. Hậu quả: regex không khớp gì, cả
+25 mục mang `P?`, và **không phép kiểm nào đỏ** — hỏng im lặng. Chỉ lộ vì tôi soi mắt con số trên
+bảng. Nay có vế đếm **byte điều khiển thô trong mã nguồn = 0**.
+
+**Và `--take` chặn OAN artifact máy sinh — LẦN THỨ HAI trong một ngày.** Đức chốt chuyển `_root`,
+lệnh TỪ CHỐI vì `DASHBOARD-*.html` "đang sửa dở" — file mà chính lệnh sinh lại mỗi lượt, và luật
+khai rõ **không ai sở hữu**. Vá + vế `5c` đo **sự ĐỒNG Ý giữa ba cửa**, không đo từng cửa.
+
+**8 đột biến, cả 8 bị bắt** — trong đó một cái nhét lại byte BACKSPACE vào regex → đỏ.
+
+**Ghi `decisions.md` 7 quyết định của Đức** (08–09/09) — trước đó chúng chỉ nằm trong nhật ký và
+ADR, không ở chỗ người ta đi tra. `KHUNG-55` (ống dẫn nuốt mã thoát của cửa từ chối) **ghép vào
+ADR-0012 thay vì mở mục mới** — Đức chốt, giữ trần sổ nợ 25.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-53` · `KHUNG-54`.

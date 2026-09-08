@@ -507,3 +507,73 @@ cuối cổng đóng phiên, chỉ **nêu tên** và **không đổi mã thoát*
 
 Việc và điều kiện đóng: [BACKLOG.md](BACKLOG.md) mục `KHUNG-54`. Việc của Vai ① — tầng máy.
 
+
+## 2026-09-08 · Lưu đồ trên bảng phải RA HÌNH, và danh sách dài phải chảy thành cột
+
+**Đức chốt:** *"dashboard tôi thấy flow chart này toàn chữ, tôi cần hình ảnh trực quan"* · *"các
+bảng bên dưới cần tự co lại thành các cột … độ rộng có thể adjustable để tôi chủ động co kéo"*.
+
+**Chốt:** vẽ SVG **lúc sinh trang**, không nạp thư viện từ mạng — luật sẵn có trong
+`build-overview.mjs` cấm phụ thuộc CDN vì trang là file tĩnh đem gửi người khác mở. Bộ vẽ
+`scripts/luu-do.mjs`, ghim `tests/luu-do-smoke.mjs`. Danh sách dài dùng `column-width` (không
+`column-count` — số cột phải suy từ màn hình), kèm thanh kéo nhớ lựa chọn.
+
+Đo: lưu đồ ra hình **0/7 → 7/7** · khối checklist **1.943 → 1.023px**.
+
+## 2026-09-08 · Ngân sách tài liệu: sửa CỔNG cho khớp LUẬT, không nới thước
+
+**Đức chốt** hai lượt trong cùng ngày — cho `docs/archive/` rồi `docs/migrations/`.
+
+**Vì sao cần chốt:** `AGENTS.md` và `can-nang.mjs` đều nói lưu trữ **không tính** vào ngân sách
+(ngân sách đo *thứ mọi phiên phải nạp*), chỉ cổng đóng phiên là còn đếm. Một luật hai chỗ, và
+chúng lệch thật: một lane chạy **đúng nhịp DỌN mà repo bắt làm** thì cổng ĐỎ vì chính việc dọn.
+
+**Chốt:** ba thư mục CHỈ-THÊM không tính — `adr/` · `archive/` · `migrations/`, khai một chỗ ở
+`THU_MUC_DOCS_KHONG_TINH`. Thước **5.744 → 4.001 → 3.248**: hai lượt miễn làm thước **chặt hơn
+gần một nửa**, nên đây là chữa mâu thuẫn chứ không phải nới lớp bảo vệ.
+
+## 2026-09-08 · Trần sổ nợ giữ 25 — đóng một mục, không nâng trần
+
+**Đức chốt:** *"Giữ trần 25, tôi đóng `KHUNG-48`"*, thay vì nâng lên 30. Trần sổ nợ sinh ra chính
+để chặn việc này (ADR-0010); nâng một lần thì lần sau dễ nâng tiếp.
+
+## 2026-09-08 · Cổng kiểm GitHub đang bị VƯỢT — ghi bằng chứng, chưa siết
+
+**Đức chốt:** *"ko phải big issue, ít gặp phải ko?"* → ghi lại, chưa đổi.
+
+**Bằng chứng:** mọi lượt `safe-push` in nguyên văn từ remote: `Bypassed rule violations for
+refs/heads/main: Required status check "cong-kiem" is expected`. Cổng **có khai**, tài khoản đang
+đẩy **đi qua được**. Tần suất CAO, tác hại THẤP — ba lớp trước nó còn răng. Ghi ở `IDEAS.md` `Y-08`.
+
+## 2026-09-08 · Khoá mức FILE: giữ ngắn, trả ngay; chỉ đọc thì không khoá
+
+**Đức chốt, nguyên văn:** *"AI Assistant chỉ giữ khóa đúng ở file mà AI đó đang sửa, các file khác
+không giữ, khóa được giữ và trả ngay trước và sau khi AI sửa … Nếu chỉ đọc ko cần giữ khóa."*
+Và giữa phiên: *"bạn tạm nhả khóa được ko? bao giờ ghi file hãy lấy lại khóa"*.
+
+**Chốt:** [ADR-0012](docs/adr/0012-khoa-muc-file.md) — sáu quyết định, số đo của CHÍNH repo này
+(620 cặp va chạm, **57% là chặn oan**, p90 **12 file** một lượt sửa), và mục **"cái này KHÔNG
+chữa"**. Ghim `tests/khoa-file.mjs`. Còn hở: `KHUNG-53`.
+
+## 2026-09-09 · Bảng phải LIỆT KÊ sổ nợ, và có ô tìm trên cả trang
+
+**Đức nêu:** *"tôi tìm các thông tin khung 30, 40, 53 trong dashboard nhưng rất mơ hồ? ta có thể
+thêm tính năng search cho dashboard không?"*
+
+**Vì sao cần chốt:** gốc bệnh **không phải** thiếu tìm kiếm. Đo được: bảng có hai CON SỐ của sổ nợ
+và một đoạn giải thích cách đếm, nhưng **không liệt kê mục nào** — `KHUNG-53` xuất hiện **0 lần**
+trên cả trang dù đang mở. Tìm kiếm trên một trang không chứa thứ cần tìm cũng không ra.
+
+**Chốt:** làm cả hai, theo thứ tự đó. ⑴ Bảng liệt kê đủ 25 mục (mã · mức ưu tiên · tiêu đề · cờ
+chờ-chốt), chảy thành cột. ⑵ Ô tìm quét **cả nhóm đang ẩn** — Ctrl+F của trình duyệt không thấy
+chữ trong tab `hidden`, nên với người xem thứ họ cần "không có trên trang" trong khi nó có.
+
+## 2026-09-09 · Giành `_root` khi bảng quyền và lời người chốt lệch nhau
+
+**Đức chốt, nguyên văn:** *"bạn hãy giành root đi, phiên kia đang ko làm gì."* — sau khi Đức nói
+*"root đã mở"* mà bảng quyền vẫn báo `harness-phat-01` giữ 24 phút.
+
+**Ghi lại vì hình dạng, không vì lượt này:** khi **lời người chốt** và **bảng quyền** nói khác
+nhau, phiên AI phải **nói ra chỗ lệch** rồi chờ chốt, không tự chọn bên nào. Bảng quyền là nguồn
+sự thật cho *máy*; người chốt là nguồn sự thật cho *quyền*. Ba đường hợp lệ để một khoá được trả
+vẫn nguyên (AGENTS.md mục 1).
