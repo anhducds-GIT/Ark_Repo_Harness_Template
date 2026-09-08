@@ -19,31 +19,13 @@ Không được báo "xong" khi cổng kiểm chưa xanh. Không được tự s
 
 ### 0b. THỨ TỰ ĐÓNG PHIÊN — sai thứ tự là tự nhân đôi thời gian
 
-```
-sửa  →  commit  →  sinh lại artifact  →  commit  →  npm test  →  cổng  →  safe-push
-```
+`sửa → commit → sinh lại artifact → commit → npm test → cổng → safe-push`
 
-**Chạy `npm test` SAU commit, không phải trước.** Bộ chạy để lại một *dấu xác nhận* buộc vào HEAD
-+ băm cây làm việc; cổng thấy dấu còn hiệu lực thì **không chạy lại chuỗi suite**. Commit sau khi
-chạy là đổi cây → dấu hết hiệu lực → cổng chạy lại từ đầu. Đo 08/09: đúng thứ tự thì cổng **22
-giây**, sai thứ tự thì **~9 phút**.
-
-**Trong lúc làm, ĐỪNG chạy đủ bộ sau mỗi bước nhỏ.** Chạy đúng suite liên quan:
-
-```bash
-node scripts/chay-test.mjs --chi <một-phần-tên-suite>    # không ghi dấu, cố ý
-```
-
-Đủ bộ chạy **một lần**, ở cuối. Đo 08/09: một ngày mất **sáu vòng đủ bộ** cho một thay đổi, và
-phần lớn là để phát hiện thứ mà một suite lẻ đã đủ để bắt.
-
-**Bộ sinh nào GHI VÀO MỘT SỔ CÓ RÀNG BUỘC thì chạy MỘT LẦN, sau khi suite xanh.** Sổ phát hành
-cưỡng chế *một số một nội dung*, nên mỗi lượt sửa nguồn sau khi đã ghi sổ là **một số bản bị
-đốt**, không lấy lại được. Đo 08/09: một thay đổi đốt **bảy số bản** vì chạy bộ sinh trước rồi
-mới chạy test.
-
-> Ba dòng trên là **luật tốc độ**, không phải lời khuyên: chúng thay cho thói quen "chạy cho chắc"
-> đã đo được là tốn **1.095 giây một vòng** thay vì **278**.
+- **`npm test` chạy SAU commit.** *Dấu xác nhận* buộc vào HEAD + băm cây làm việc, nên cổng không
+  chạy lại suite; commit sau khi chạy là đổi cây → dấu hỏng. Đo 08/09: đúng thứ tự cổng **22 giây**, sai **~9 phút**.
+- **Trong lúc làm đừng chạy đủ bộ** — `node scripts/chay-test.mjs --chi <tên-suite>`, cố ý KHÔNG
+  ghi dấu. Đủ bộ chạy **một lần**, ở cuối.
+- **Bộ sinh ghi vào sổ CÓ RÀNG BUỘC thì chạy MỘT LẦN, sau khi suite xanh** — sổ phát hành cưỡng chế *một số một nội dung*; 08/09 đốt **bảy số bản** vì làm ngược.
 
 **Push thì KHÔNG dùng `git push`** — dùng:
 
@@ -107,16 +89,6 @@ là điểm nghẽn thật, không phải lý thuyết.
 Ngoài sáu việc này, AI tự làm. Nguyên tắc phía sau: **AI tự do trong phạm vi làm repo tốt lên
 và lùi lại được. Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.**
 
-```mermaid
-flowchart TD
-    A["AI sắp làm một việc"] --> B{Việc này lùi lại được không?}
-    B -- không --> H["HỎI ĐỨC"]
-    B -- có --> C{Có chạm tới việc người khác không?}
-    C -- có --> H
-    C -- không --> D{Có gửi gì ra ngoài repo không?}
-    D -- có --> H
-    D -- không --> E["TỰ LÀM"]
-```
 
 **"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md).
 

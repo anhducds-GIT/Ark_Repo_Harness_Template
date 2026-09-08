@@ -505,8 +505,12 @@ function phanLuatChung(text) {
  *   vì làm ngược). Vân tay trước: 8a414ccaf80728686d35d0a36a5f238c731909a76d61857dc77b7e6884ebc4b1
  *   Bản đầu (0f6f62e0…) gọi thẳng tên lệnh `npm run template` trong luật CHUNG — sai, vì repo
  *   tiêu thụ không có lệnh đó, và phép kiểm "tài liệu dạy lệnh nào thì bản trích phải khai lệnh
- *   đó" bắt đúng. Bản này nói về "bộ sinh ghi vào một sổ có ràng buộc", không nêu tên lệnh. */
-const COMMON_LAW_SHA256 = "6cc563d6300679847690172d8c3dd1c91f693aca8ec31fe5c9d8b6c2f23058ff";
+ *   đó" bắt đúng. Bản này nói về "bộ sinh ghi vào một sổ có ràng buộc", không nêu tên lệnh.
+ *   MỘT LUẬT VÀO THÌ MỘT LUẬT RA, và B9 là thứ cưỡng chế: thêm mục 0b đẩy bản trích lên 228/200
+ *   dòng. Chỗ trả lại là **sơ đồ mermaid ở mục 2** — nó nói lại đúng điều bảng sáu việc và câu
+ *   nguyên tắc ngay dưới đã nói, tức bản thứ BA của một luật. Nén 0b (29→14 dòng) + bỏ sơ đồ
+ *   (10 dòng) đưa bản trích về dưới trần mà không mất một luật nào. */
+const COMMON_LAW_SHA256 = "16d502f385b1f4db7505c0a4dfbc48754db8df3ce38a28be13f87ed84eec7c8d";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
