@@ -527,14 +527,25 @@ function docMuc(kho, ten, as = "thu") {
     assert.equal(m.trangThai, "XANH",
       `doi chu sang docs/archive/ la nhip DON ma repo BAT lam — cong khong duoc DO vi no. Dang: ${m.chiTiet}`);
 
-    // ⑸ Repo không khai thước → XANH dù kho chữ lớn.
+    /* ⑸ HỒ SƠ MIGRATE cũng KHÔNG tính — Đức chốt 08/09, lượt thứ hai trong cùng một ngày.
+     *
+     * Cùng một hình dạng với ADR và lưu trữ: bản ghi một việc ĐÃ XẢY RA, chỉ đọc khi đi tra, và
+     * chỉ có thể to lên. Tính vào thì mỗi lượt migrate làm cổng đỏ — và nó đã đỏ thật hôm nay,
+     * ngay sau lượt vá cho lưu trữ. Ba thư mục, một luật, khai ở `THU_MUC_DOCS_KHONG_TINH`. */
+    viet("docs/migrations/2026-01-01-mot-luot.md", 400);
+    luot("them mot ho so migrate dai");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "XANH",
+      `ho so migrate la ban ghi chi-them, khong duoc tinh vao thuoc. Dang: ${m.chiTiet}`);
+
+    // ⑹ Repo không khai thước → XANH dù kho chữ lớn.
     viet("docs/ba.md", 900);
     datThuoc(null);
     luot("bo khai thuoc");
     m = docMuc(kho, "Kho chữ không phình");
     assert.equal(m.trangThai, "XANH", `khong khai thuoc thi phai XANH, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
-  ok("11 · thước cóc kho chữ: phình ĐỎ · xoá XANH lại · ADR KHÔNG tính · DỜI sang lưu trữ XANH lại · không khai thước XANH");
+  ok("11 · thước cóc kho chữ: phình ĐỎ · xoá XANH lại · ADR/lưu-trữ/hồ-sơ-migrate KHÔNG tính · DỜI sang lưu trữ XANH lại · không khai thước XANH");
 }
 
 

@@ -775,3 +775,30 @@ Hai mục thôi đo trùng một thứ.
 · bản **1.3.73**.
 
 **Còn mở:** `KHUNG-47` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51` · `KHUNG-52`.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Thước kho chữ: ba thư mục CHỈ-THÊM, một luật
+
+**Đỏ lần thứ HAI trong cùng một ngày, cùng một hình dạng.** Sáng vá cho `docs/archive/` (nhịp DỌN
+làm cổng đỏ); vài giờ sau lane kia commit **351 dòng hồ sơ migrate** và cổng đỏ lại — vì một lượt
+migrate cũng là việc ĐÚNG mà repo BẮT làm.
+
+**Đức chốt: miễn `docs/migrations/` như đã miễn ADR và lưu trữ.** Không phải ngoại lệ thứ ba, mà
+là **một luật nhìn ra được sau hai ca**: cả ba thư mục là **bản ghi việc ĐÃ XẢY RA** — chỉ đọc khi
+đi tra, và **chỉ có thể to lên**. Ngân sách này đo *thứ MỌI PHIÊN PHẢI NẠP*; tính chúng vào là đo
+sai thứ mình định đo, và một cổng đỏ vì việc đúng thì bị nới số cho xong.
+
+Nay khai MỘT chỗ: `THU_MUC_DOCS_KHONG_TINH` trong `repo-structure.mjs`.
+
+**Thước: 5.744 → 4.001 → 3.248.** Hai lượt "miễn" làm thước **chặt hơn gần một nửa**, không lỏng
+hơn — vì nó thôi đếm thứ nó không định đếm. Đó là cách phân biệt *chữa mâu thuẫn* với *nới lớp
+bảo vệ*: nới thì con số đi lên.
+
+**Ghim:** `cong-do-that.mjs` vế 11 nay có sáu bước — phình ĐỎ · xoá XANH lại · ADR không tính ·
+**DỜI sang lưu trữ XANH lại** · **hồ sơ migrate không tính** · không khai thước XANH. Đột biến bỏ
+`migrations` khỏi danh sách miễn → ĐỎ.
+
+**Một điều đáng ghi về ĐA PHIÊN:** cổng của tôi đỏ vì **chữ của lane khác**, hai lần. Thước cóc
+đặt ở "con số hôm nay" giả định một lane; hai lane thì ai chạy cổng sau sẽ thừa hưởng phần tăng
+của người kia và phải đi hỏi người chốt. Chưa vá — ghi ra vì nó sẽ lặp mỗi lần hai lane cùng chạy.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51` · `KHUNG-52`.

@@ -16,7 +16,7 @@ import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_LUU_TRU, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_DOCS_KHONG_TINH, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
 import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
@@ -1179,8 +1179,8 @@ check("Kho chữ không phình", () => {
   }
   const ds = git("ls-files", "docs").split(String.fromCharCode(10))
     .map((d) => d.trim())
-    .filter((d) => d && !d.startsWith("docs/adr/") && !d.startsWith(`docs/${THU_MUC_LUU_TRU}/`));
-  if (!ds.length) return { ok: true, msg: "Không có file `docs/` nào ngoài ADR và lưu trữ." };
+    .filter((d) => d && !THU_MUC_DOCS_KHONG_TINH.some((t) => d.startsWith(`docs/${t}/`)));
+  if (!ds.length) return { ok: true, msg: `Không có file \`docs/\` nào ngoài ${THU_MUC_DOCS_KHONG_TINH.join(", ")}.` };
   let dong = 0;
   for (const f of ds) {
     try { dong += fs.readFileSync(path.join(ROOT, f), "utf8").split(String.fromCharCode(10)).length - 1; }
@@ -1190,13 +1190,13 @@ check("Kho chữ không phình", () => {
     const du = tran - dong;
     return {
       ok: true,
-      msg: `${dong}/${tran} dòng (${ds.length} file, không kể ADR, không kể docs/${THU_MUC_LUU_TRU}/).`
+      msg: `${dong}/${tran} dòng (${ds.length} file, không kể ${THU_MUC_DOCS_KHONG_TINH.join("/, ")}/).`
         + (du >= 50 ? ` Đã dưới thước ${du} dòng — HẠ \`docs.tran_dong_khong_ke_adr\` xuống ${dong} để giữ phần đã dọn.` : "")
     };
   }
   return {
     ok: false,
-    msg: `KHO_CHU_PHINH: ${dong} dòng trong \`docs/\` (không kể ADR, không kể lưu trữ), thước cóc là ${tran} — thêm ${dong - tran}. `
+    msg: `KHO_CHU_PHINH: ${dong} dòng trong \`docs/\` (không kể ${THU_MUC_DOCS_KHONG_TINH.join("/, ")}/), thước cóc là ${tran} — thêm ${dong - tran}. `
       + "Đây KHÔNG phải trần lý tưởng, nó là con số của ngày hôm qua: phiên này đang làm kho chữ to ra. "
       + "Ba cửa ra: xoá/gộp cho về dưới thước · chuyển phần dài sang một ADR (ADR không tính vào thước) · "
       + "nếu phần thêm là cần thiết thật thì nâng `docs.tran_dong_khong_ke_adr` VÀ nói vì sao trong nhật ký phiên."

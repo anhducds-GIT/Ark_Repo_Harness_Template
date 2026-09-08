@@ -97,9 +97,9 @@
   "docs": {
     "_doc": "THUOC COC cho kho chu, KHONG phai tran ly tuong. Dat o dung con so cua hom nay: no khong doi ai don, no chi chan PHINH. Moi luot xoa thi HA con so nay xuong — cho da ha khong quay lai duoc.",
     "_tru_adr": "Khong ke docs/adr/: ADR da Accepted la bat bien (ADR-0000) nen thu muc do chi co the to len. Tinh no vao thuoc thi moi quyet dinh moi lam cong do, va nguoi ta se noi con so cho xong.",
-    "_do_that": "2026-09-08 (do lai sau khi bo luu tru): docs/ 28 file ngoai ADR va ngoai archive = 4.001 dong. Lenh do lai: git ls-files docs | grep -v \"^docs/adr/\" | grep -v \"^docs/archive/\" | xargs -d \"\n\" cat | wc -l",
-    "_tru_luu_tru": "Khong ke docs/archive/ nua — Duc chot 08/09. AGENTS.md va can-nang.mjs deu da noi lưu tru KHONG tinh vao ngan sach (ngan sach do thu MOI PHIEN PHAI NAP), chi cong dong phien la con dem. Mot luat hai cho, va chung da lech that: mot lane chay dung nhip DON ma repo bat lam thi cong DO vi chinh viec don. Con so moi 4.001 CHAT HON 5.744 cu, nen day la chua mau thuan chu khong phai noi thuoc.",
-    "tran_dong_khong_ke_adr": 4001
+    "_do_that": "2026-09-08 (do lai sau khi bo ca ba thu muc chi-them): docs/ 24 file = 3.248 dong. Lenh do lai: git ls-files docs | grep -vE \"^docs/(adr|archive|migrations)/\" | xargs -d \"\n\" cat | wc -l",
+    "_tru_ba_thu_muc": "Khong ke docs/adr/, docs/archive/, docs/migrations/ — Duc chot 08/09 (hai luot). Ca ba cung MOT hinh dang: ban ghi viec DA XAY RA, chi doc khi tra, va chi co the to len. Ngan sach nay do THU MOI PHIEN PHAI NAP; tinh chung vao thi moi quyet dinh moi / moi luot don / moi luot migrate deu lam cong DO, va mot cong do vi viec DUNG thi bi noi so cho xong. Ca ba deu da xay ra that trong MOT ngay. Danh sach khai o THU_MUC_DOCS_KHONG_TINH cua repo-structure.mjs.",
+    "tran_dong_khong_ke_adr": 3248
   },
   "bang": {
     "_doc": "Danh sach nhom (tab) cua bang tong quan — HOP DONG, khai o DUNG MOT NOI. Cac suite doc tu day; khong suite nao duoc go cung lai danh sach nay.",

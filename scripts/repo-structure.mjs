@@ -705,6 +705,23 @@ export function handoffCapFrom(parsed) {
  * chính việc dọn. Nên hằng số về đây, chỗ cả hai bên đều đã nạp. */
 export const THU_MUC_LUU_TRU = "archive";
 
+/* CÁC THƯ MỤC CON CỦA `docs/` KHÔNG TÍNH VÀO NGÂN SÁCH TÀI LIỆU — một danh sách, ba lý do CÙNG
+ * MỘT HÌNH DẠNG. Ngân sách đo **thứ MỌI PHIÊN PHẢI NẠP**; ba thư mục dưới đây là **bản ghi việc
+ * đã xảy ra**, chỉ đọc khi đi tra, và cả ba **chỉ có thể to lên**:
+ *
+ *   · `adr/`        quyết định đã `Accepted` là bất biến (ADR-0000)
+ *   · `archive/`    thứ nhịp DỌN dời sang, giữ nguyên từng chữ
+ *   · `migrations/` mỗi lượt migrate MỘT hồ sơ, chỉ thêm (AGENTS.md mục 6)
+ *
+ * Tính chúng vào thước thì mỗi quyết định mới / mỗi lượt dọn / mỗi lượt migrate đều làm cổng ĐỎ —
+ * và một cổng đỏ vì việc ĐÚNG thì người ta nới số cho xong, rồi sau vài lượt thước hết nghĩa.
+ * Đo được 08/09, cả ba đã xảy ra thật trong MỘT ngày: nhịp DỌN làm cổng đỏ, rồi một lượt migrate
+ * làm cổng đỏ lần nữa. Đức chốt cả hai lượt.
+ *
+ * Bỏ ba thư mục ra thì con số thật là **3.248** — CHẶT HƠN 5.744 ban đầu gần một nửa. Miễn đúng
+ * chỗ làm thước chặt hơn, không lỏng hơn: nó thôi đo thứ nó không định đo. */
+export const THU_MUC_DOCS_KHONG_TINH = Object.freeze(["adr", THU_MUC_LUU_TRU, "migrations"]);
+
 export function nhomBangFrom(parsed) {
   const khoi = parsed?.bang;
   if (khoi === null || khoi === undefined) return null;
