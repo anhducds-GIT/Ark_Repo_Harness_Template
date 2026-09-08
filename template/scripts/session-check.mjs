@@ -199,6 +199,12 @@ const CLAIMS = (() => {
   catch { return null; }
 })();
 const ownedBy = (area) => CLAIMS?.[area]?.owner ?? null;
+/* Khối `tam` — khoá mức FILE, loại giữ VÀI PHÚT. Đọc riêng vì nó có vòng đời khác hẳn `claims`:
+   khoá vùng trả SAU khi đẩy, khoá file trả NGAY sau lượt ghi. */
+const KHOA_FILE = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, ".agents", "claims.json"), "utf8")).tam || {}; }
+  catch { return null; }
+})();
 // Chạy qua shell chứ không spawn trực tiếp: từ Node 24, spawn một file `.cmd` trên Windows
 // trả `EINVAL` (siết bảo mật). Và `scripts.test` vốn là một chuỗi lệnh nhiều bước nối bằng
 // `&&` — thứ chỉ shell hiểu. Đo thật: bản đầu dùng execFileSync("npm.cmd") và chết ngay.
@@ -290,6 +296,34 @@ const rootTouched = rootAreasTouched.length > 0;
 const rootMine = rootTouched && myRootAreas.length === rootAreasTouched.length;
 const mine = (file) => myPackages.some((pkg) => file.startsWith(`${pkg}/`))
   || (areaOf(file, claimPrefixes) === "_root" && myRootAreas.includes(keyOf(file)));
+
+/* ---- 0b. Khoá mức FILE đã trả hết --------------------------------------- */
+check("Khoá file đã trả hết", () => {
+  /* MỐC LÀ *HẾT PHIÊN*, KHÔNG PHẢI *ĐÃ ĐẨY* — và đây là chỗ khác khoá vùng, đừng lẫn.
+   *
+   * Khoá vùng trả SAU khi đẩy, vì commit chưa đẩy nằm trong một vùng vô chủ để lại một mục đỏ
+   * cho phiên sau (xem `tra_khi_chua_day` trong `claim.mjs`). Khoá file KHÔNG mang trách nhiệm
+   * truy nguồn — nhãn `Lane:` trong commit mang. Nên nó chỉ cần biến mất khi bạn ngừng gõ.
+   *
+   * Vì sao cần cổng: khoá file sinh ra để giữ vài phút, và thứ duy nhất bắt nó thật sự ngắn là
+   * một chỗ ĐỎ khi bạn định báo xong. Không có cổng thì nó thoái hoá thành đúng cái khoá dài
+   * hạn mà nó thay thế — luật *"nhận ngay trước lượt ghi"* đã có sẵn từ lâu, không ai theo, và
+   * không gì đo nó. Đó là hình dạng một luật-là-chữ. */
+  if (KHOA_FILE === null) return { ok: false, msg: "Không đọc được `.agents/claims.json` — xem AGENTS.md mục 1." };
+  const cua = Object.entries(KHOA_FILE).filter(([, o]) => o?.owner === asLabel);
+  if (!cua.length) {
+    const nguoiKhac = Object.keys(KHOA_FILE).length;
+    return { ok: true, msg: nguoiKhac ? `Bạn không giữ khoá file nào (${nguoiKhac} của phiên khác — không phải việc của bạn).` : "Không khoá file nào đang treo." };
+  }
+  const NL1 = String.fromCharCode(10);
+  return {
+    ok: false,
+    msg: `KHOA_FILE_CON_TREO: bạn còn giữ ${cua.length} khoá mức FILE — ${cua.map(([d]) => d).join(" · ")}.`
+      + NL1 + "Khoá file là loại giữ VÀI PHÚT: nhận ngay TRƯỚC lượt ghi, trả ngay SAU."
+      + NL1 + "Mốc là HẾT PHIÊN, không phải ĐÃ ĐẨY — nó không mang trách nhiệm truy nguồn, nhãn `Lane:` mang."
+      + NL1 + `Trả hết: node scripts/claim.mjs --xong --het --as ${asLabel}`,
+  };
+});
 
 /* ---- 1. Chủ sở hữu ------------------------------------------------------ */
 check("Phạm vi trách nhiệm", () => {
@@ -1267,7 +1301,7 @@ check("Mọi lệnh git đọc được", () => {
 // 2026-09-08, phiên claude-cua-kiem: 11 → 12. Thêm "Sổ nợ dưới trần". Đức uỷ quyền chọn con số
 // và cách cưỡng chế; lý do ở ADR-0010. Trần khai trong `.repo-structure.json`, repo không khai
 // thì phép kiểm xanh — nên bản khung phát đi không tự đặt trần cho repo nào.
-const EXPECTED_CHECKS = 14;
+const EXPECTED_CHECKS = 15;
 if (results.length !== EXPECTED_CHECKS) {
   console.error(`\nCỔNG BỊ SỬA: đang có ${results.length} phép kiểm, phải có ${EXPECTED_CHECKS}.`);
   console.error("Ai đó đã bớt (hoặc thêm) phép kiểm mà không cập nhật EXPECTED_CHECKS. Xem lại scripts/session-check.mjs.\n");

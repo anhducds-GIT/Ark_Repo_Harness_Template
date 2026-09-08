@@ -145,6 +145,10 @@ const VERBATIM = [
    * chỉ là lưu đồ hiện dưới dạng mã nguồn. Repo đích nhận bộ vẽ mà không nhận vế "mọi khối
    * mermaid trong docs/ phải ra SVG" thì nó nhận lại đúng cái lỗ đã sống 5 tháng ở đây. */
   ["tests/luu-do-smoke.mjs", "tests/luu-do-smoke.mjs"],
+  /* Phép ghim của khoá mức FILE. `MULTIFLOW.md` mục 5 bắt mọi cơ chế đa phiên phải có đột biến
+   * kiểm; phát cơ chế mà không phát phép ghim là phát một lời hứa. Suite này dùng HÀM THUẦN,
+   * không chạm đĩa, nên nó chạy được cả ở repo vừa dựng chưa có bảng quyền. */
+  ["tests/khoa-file.mjs", "tests/khoa-file.mjs"],
   /* Cơ chế đa phiên → `MULTIFLOW.md` mục 5 bắt đột biến kiểm, và phát một cơ chế mà không phát
    * phép ghim của nó là phát một lời hứa. Suite này tự dựng kho git riêng và đọc `areas` của
    * repo đích, nên nó chạy được cả ở repo khai khối `areas` rỗng. */
@@ -519,7 +523,21 @@ function phanLuatChung(text) {
  *   dòng. Chỗ trả lại là **sơ đồ mermaid ở mục 2** — nó nói lại đúng điều bảng sáu việc và câu
  *   nguyên tắc ngay dưới đã nói, tức bản thứ BA của một luật. Nén 0b (29→14 dòng) + bỏ sơ đồ
  *   (10 dòng) đưa bản trích về dưới trần mà không mất một luật nào. */
-const COMMON_LAW_SHA256 = "16d502f385b1f4db7505c0a4dfbc48754db8df3ce38a28be13f87ed84eec7c8d";
+/* 2026-09-08 (khuya) — Đức duyệt tường minh, nguyên văn: "AI Assistant chỉ giữ khóa đúng ở file
+ *   mà AI đó đang sửa, các file khác không giữ, khóa được giữ và trả ngay trước và sau khi AI sửa
+ *   … Nếu chỉ đọc ko cần giữ khóa." Đổi gì: thêm khối "Khoá mức FILE" vào mục 1 của luật chung —
+ *   ba lệnh (`--sua` · `--xong --het` · `--soat`), luật chứa nhau hai chiều, mốc trả là HẾT PHIÊN
+ *   chứ không phải ĐÃ ĐẨY, và một dòng nói thẳng `--soat` KHÔNG phải cổng.
+ *   Vân tay trước: 16d502f385b1f4db7505c0a4dfbc48754db8df3ce38a28be13f87ed84eec7c8d
+ *   Bản đầu (1c448903…) để một dòng trỏ sang ADR-0012 NGAY TRONG luật chung — sai, vì bản trích
+ *   không mang ADR đó, và phép kiểm "luật trong khuôn trỏ tới file bản trích KHÔNG mang" bắt
+ *   đúng. Cùng hình dạng cái bẫy đã cắn hai lượt trước: luật CHUNG không được trỏ tới thứ chỉ
+ *   NƠI PHÁT HÀNH mới có. Liên kết ADR nay nằm ở bản đồ file mục 6 — chỗ mỗi repo tự viết.
+ *   Số đo dựng nên nó, đo ở CHÍNH repo này chứ không mượn của repo tiêu thụ: 620 cặp commit khác
+ *   lane trong 1 giờ cùng vùng, 57% khác file hoàn toàn — hơn nửa số lượt chặn hôm nay là chặn
+ *   OAN. Lý lẽ đầy đủ và mục "cái này KHÔNG chữa": ADR-0012.
+ *   MỘT LUẬT VÀO THÌ MỘT LUẬT RA — xem dòng B9 ngay sau lượt này. */
+const COMMON_LAW_SHA256 = "3bc47c94b718e38ebbf34eeae099dafcaed4cb019d859b54f1deb4769500b2f5";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -983,7 +1001,7 @@ function packageJson(version) {
       // Repo đích nhận cả hai, nên nó có đường nhanh ngay từ ngày đầu — và vẫn còn đường tuần tự
       // để so khi nghi ngờ tranh chấp.
       test: "node scripts/chay-test.mjs",
-      "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
+      "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-file.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
     }
   }, null, 2) + "\n";
 }

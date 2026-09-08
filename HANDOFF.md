@@ -802,3 +802,33 @@ bảo vệ*: nới thì con số đi lên.
 của người kia và phải đi hỏi người chốt. Chưa vá — ghi ra vì nó sẽ lặp mỗi lần hai lane cùng chạy.
 
 **Còn mở:** `KHUNG-47` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51` · `KHUNG-52`.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Khoá mức FILE lên nơi phát hành · bảng chảy thành cột
+
+**⑴ BẢNG: tab Migrate phải cuộn 10.607px.** Gốc bệnh KHÔNG phải danh sách một cột — là **cái ô
+chứa nó**: `.xep` là lưới thẻ `minmax(268px,1fr)`, nên bốn hồ sơ migrate thành bốn cột rộng
+**296px** giữa trang rộng **1.213px**. Vá hai vế: khung hồ sơ span trọn bề ngang · danh sách khai
+`column-width` (không `column-count` — số cột phải suy từ màn hình). Kèm **tay kéo** nhớ trong
+trình duyệt. Đo: khối checklist **1.943 → 1.023px** (3 cột). **8 đột biến, cả 8 bị bắt** — hai cái
+sống sót lượt đầu vì cửa sổ dò `try` rộng 90 ký tự nên `try` BAO NGOÀI lọt vào; siết còn 24.
+
+**⑵ KHOÁ MỨC FILE — mang từ repo tiêu thụ lên đây rồi phát lại.** Đo LẠI ở repo này: **620** cặp
+commit khác lane trong 1h cùng vùng, **57% khác file hoàn toàn** (họ: 70%), file/commit p90 **12**
+(họ: 7). Hơn nửa số lượt chặn hôm nay là **chặn oan** — và p90 12 là lý do `--sua` phải nhận cả mẻ.
+
+Khối riêng `tam` · trả thì XOÁ HÀNG · chứa nhau HAI CHIỀU · cổng ĐỎ khi còn treo (mốc là HẾT PHIÊN,
+không phải ĐÃ ĐẨY) · quá 30 phút NÊU TÊN, **không tự nhả**. Ghim 6 vế, **6+2 đột biến đều bị bắt**.
+
+**BA CHỐT AN TOÀN CHẶN TÔI, cả ba đúng:** ⓐ `EXPECTED_CHECKS` — thêm phép kiểm thứ 15 mà không
+khai là cổng DỪNG. ⓑ vân tay luật chung — đổi `AGENTS.md` thì bộ trích **từ chối phát** cho tới khi
+ghi câu duyệt của Đức vào sổ. ⓒ "luật chung trỏ tới file bản trích KHÔNG mang" — bản đầu để liên
+kết ADR ngay trong luật chung; **lần thứ ba trong ngày** cùng bẫy đó.
+
+**B9 cưỡng chế "một luật vào một luật ra":** khối mới đẩy bản trích **200 → 222 dòng**. Trả lại
+bốn chỗ, cả bốn là **gộp thật** chứ không gọt chữ (chi tiết ở ADR-0012) → **200/200 khít**.
+
+**Đức yêu cầu giữa chừng: "tạm nhả khóa, bao giờ ghi file hãy lấy lại"** — đã làm, và lượt còn
+lại của phiên chạy **đúng cơ chế vừa port**: trả cả 4 khoá vùng, rồi mỗi lượt ghi mới `--sua` đúng
+file đang sửa và `--xong --het` ngay sau. Đây là lượt chạy thật đầu tiên của nó ở repo này.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-52`.

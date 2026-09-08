@@ -12,7 +12,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { gapKhoi, gomDuLieu, khoiCauTruc, khoiLienQuan, khoiMoHinh, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
+import { gapKhoi, gomDuLieu, khoiCauTruc, khoiChecklist, khoiLienQuan, khoiMoHinh, noChuaChungMinh, tachDaXong, trang } from "../scripts/build-overview.mjs";
 import { nhomBangFrom } from "../scripts/repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -413,6 +413,60 @@ const html = trang(dl);
   assert.ok(!/const tabWorkflow =/.test(nguon), "ban ve workflow da chet phai bi xoa, khong de lai");
 
   ok("tab Migrate: hai nửa của một việc về cùng một tab, chia theo dữ liệu chứ không theo tên file");
+}
+
+/* ---- Danh sách dài phải CHẢY THÀNH CỘT, và bề rộng cột chỉnh được ------- */
+{
+  /* Đo 08/09 với tab Migrate mở hết: **10.607px** chiều cao, 207 dòng mục xếp một cột. Gốc bệnh
+   * KHÔNG phải danh sách mà là **cái ô chứa nó**: `.xep` là lưới thẻ `minmax(268px,1fr)`, nên bốn
+   * hồ sơ migrate thành bốn cột rộng **296px** giữa một trang rộng 1.213px. Đức nói đúng hiện
+   * tượng: *"bị chồng thành 1 cột, làm phải scroll dài"*.
+   *
+   * Hai vế phải cùng đúng, và vế nào thiếu thì vế kia vô nghĩa:
+   *   ⑴ khung hồ sơ span trọn bề ngang — không thì danh sách không có chỗ mà chảy;
+   *   ⑵ danh sách khai `column-width` — không thì có chỗ cũng vẫn một cột. */
+  assert.match(html, /\.xep > \.tabs2, \.xep > \.keo, \.xep > \.tab2\{grid-column:1\/-1\}/,
+    "khung ho so migrate phai span tron be ngang cua luoi .xep");
+  assert.match(html, /\.cot\{column-width:var\(--ck-cot,\s*\d+px\)/,
+    "danh sach dai phai khai column-width — dung column-count, vi so cot phai suy tu be ngang man hinh");
+  assert.match(html, /\.cot > \*\{break-inside:avoid\}/,
+    "mot dong muc bi cat doi giua hai cot thi khong doc duoc");
+
+  // BA danh sách dài của một checklist đều phải nằm trong `.cot`: mục chưa xong · khối · từng mục.
+  const ck = khoiChecklist({
+    ban: "1.0.0", ngay: "2026-01-01", xong: 1, tong: 2,
+    dem: { xong: 1, "mot-phan": 1, thieu: 0, ngoai: 0 },
+    khoi: [{ ma: "F1", ten: "khoi", xong: 1, tong: 2, muc: [
+      { ma: "F1.1", ten: "xong roi", trang: "xong", tuBan: "1.0.0", thieu: "" },
+      { ma: "F1.2", ten: "con thieu", trang: "mot-phan", tuBan: "1.0.0", thieu: "x" }] }]
+  });
+  assert.equal((ck.match(/<div class="cot">/g) || []).length, 3,
+    "ba danh sach dai (muc chua xong · khoi · tung muc) deu phai chay thanh cot");
+  assert.ok(ck.indexOf('<div class="cot">') < ck.indexOf('class="ckm'),
+    "khoi .cot phai BOC danh sach, khong phai dat canh no");
+
+  // TAY KÉO đúng MỘT chỗ trên cả trang — luật một-khái-niệm-một-chỗ của ADR-0006.
+  assert.equal((html.match(/id="ck-cot"/g) || []).length, 1,
+    "tay keo be rong cot chi duoc co MOT tren ca trang: no doi mot bien o :root nen dat nhieu cho la nhieu cho noi cung mot dieu");
+  assert.match(html, /id="ck-cot-so"/, "tay keo phai NOI RA con so — khong co so thi khong quay lai duoc cho vua y");
+  assert.match(html, /id="ck-cot-ve"/, "phai co duong ve mac dinh");
+
+  /* localStorage PHẢI nằm trong try/catch — và đây không phải lo xa: khung xem tài liệu của
+   * Claude phục vụ trang bằng `data:` URL, ở đó chính lệnh ĐỌC localStorage NÉM `SecurityError`.
+   * Một ngoại lệ ở đó giết mọi khối JS phía dưới trong cùng hàm: bấm tab không đổi, banner tuổi
+   * không hiện. Trang tĩnh thì không ai thấy lỗi mà sửa. Đã thử thật trong khung đó: trang vẫn chạy. */
+  const jsCot = html.slice(html.indexOf("var KHOA_LUU"), html.indexOf("var KHOA_LUU") + 1200);
+  for (const goi of ["localStorage.getItem", "localStorage.setItem"]) {
+    const k = jsCot.indexOf(goi);
+    assert.ok(k > 0, `phai co ${goi} — khong nho thi lan sau lai phai keo lai`);
+    /* CỬA SỔ HẸP, 24 KÝ TỰ — cố ý. Một đột biến gỡ `try` RIÊNG của lệnh đọc vẫn sống sót với cửa
+     * sổ 90 ký tự, vì cái `try` BAO NGOÀI lọt vào tầm nhìn. Mà hai cái đó khác nhau hẳn: `try`
+     * bao ngoài thì lệnh đọc ném là **nhảy qua luôn phần nối tay kéo** — tay kéo chết ở đúng chỗ
+     * nó cần sống (data: URL, cửa sổ riêng tư). Phải là `try` ôm sát lệnh đọc. */
+    assert.match(jsCot.slice(Math.max(0, k - 24), k), /try\s*\{/,
+      `${goi} phai nam trong try RIENG cua no, khong phai try bao ngoai — bao ngoai thi mot lan nem la ca tay keo chet`);
+  }
+  ok("danh sách dài chảy thành cột · 3 khối bọc đúng · tay kéo đúng 1 chỗ có số và đường về · localStorage bọc try");
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

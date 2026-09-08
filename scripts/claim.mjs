@@ -28,6 +28,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { claimPrefixesFrom, generatedFrom, readStructureFromDisk, stewardOf } from "./repo-structure.mjs";
+
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(MODULE_FILE), "..");
 export const CLAIMS_FILE = path.join(ROOT, ".agents", "claims.json");
@@ -65,6 +67,195 @@ export function readClaims(file = CLAIMS_FILE) {
     }
   }
   return parsed;
+}
+
+/* Sổ MIỄN khoá của repo này — hai file, hai lý do khác nhau (AGENTS.md mục 1).
+ * `.agents/claims.json` là thao tác hành chính; `HANDOFF.md` ở gốc là chỗ luật mục 7 bắt MỌI
+ * phiên ghi Log, và chỉ miễn khi CHỈ THÊM dòng. Phép soát nêu tên chúng chứ không chặn — chặn
+ * là chặn đúng thứ luật bắt làm. */
+export const MIEN_KHOA = Object.freeze(["HANDOFF.md"]);
+
+/* KHOÁ THẬT, KHÔNG PHẢI ĐỌC-LẠI-KIỂM.
+ *
+ * Đọc → sửa → ghi → đọc lại KHÔNG đóng được cửa sổ đua: A và B cùng đọc thấy trống, A ghi rồi
+ * đọc lại thấy A, B ghi rồi đọc lại thấy B — cả hai cùng thoát 0, cả hai cùng tin mình có
+ * quyền, và người ghi trước mất việc mà không hề biết. Đọc-lại chỉ bắt được ca A đọc SAU khi
+ * B đã ghi; nó bỏ lọt đúng ca hai bên xen kẽ khít nhau.
+ *
+ * `mkdir` là thao tác NGUYÊN TỬ trên mọi hệ điều hành: hai tiến trình cùng gọi thì đúng một
+ * cái thành công. Đó là toàn bộ mẹo ở đây — không cần thư viện khoá.
+ *
+ * TÁCH THÀNH HÀM từ bản 1.3.75, vì đường ghi khoá mức FILE cũng phải đi qua đúng cái khoá này.
+ * Hai đường ghi cùng một file mà chỉ một đường có mutex thì mutex đó không còn nghĩa gì.
+ *
+ * `ponytail: khoá cả file bảng quyền, không khoá từng vùng. Đủ cho vài phiên; tách khoá theo
+ * vùng nếu sau này có hàng chục phiên cùng lúc.`
+ *
+ * Trả về hàm NHẢ. Gọi nhiều lần vô hại. */
+export function giuBangQuyen() {
+  const KHOA = `${CLAIMS_FILE}.lock`;
+  let daKhoa = false;
+  for (let i = 0; i < 50 && !daKhoa; i += 1) {
+    try { fs.mkdirSync(KHOA); daKhoa = true; }
+    catch (e) {
+      if (e?.code !== "EEXIST") throw e;
+      // Khoá mồ côi: tiến trình giữ nó đã chết. Quá 30 giây thì dọn — không dọn thì một lần
+      // Ctrl+C khoá vĩnh viễn bảng quyền của cả repo.
+      try {
+        if (Date.now() - fs.statSync(KHOA).mtimeMs > 30000) { fs.rmSync(KHOA, { recursive: true, force: true }); continue; }
+      } catch { /* khoá vừa được nhả giữa chừng — vòng sau thử lại */ }
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
+    }
+  }
+  if (!daKhoa) {
+    console.error(`DANG_BI_KHOA: một phiên khác đang ghi bảng quyền (${KHOA}). Thử lại sau vài giây.`);
+    process.exit(EXIT.MISUSE);
+  }
+  // Nhả trên MỌI đường ra, kể cả đường thoát sớm và đường ném. Quên nhả thì lần chạy sau phải
+  // chờ hết 30 giây hạn khoá mồ côi — một cái khoá bỏ quên còn phiền hơn không có khoá.
+  const nha = () => { try { fs.rmSync(KHOA, { recursive: true, force: true }); } catch { /* đã nhả rồi */ } };
+  process.on("exit", nha);
+  return nha;
+}
+
+/* ---- KHOÁ MỨC FILE — giữ ngắn, trả ngay ----------------------------------
+ *
+ * Đức chốt 2026-09-08, nguyên văn: *"AI Assistant chỉ giữ khóa đúng ở file mà AI đó đang sửa,
+ * các file khác không giữ, khóa được giữ và trả ngay trước và sau khi AI sửa. Nếu chỉ đọc ko
+ * cần giữ khóa."*
+ *
+ * ĐO Ở CHÍNH REPO NÀY trước khi tin — số của repo tiêu thụ là số của họ. 7 ngày, 384 commit,
+ * 381 có nhãn `Lane:`, 41 lane khác nhau:
+ *
+ *   620  cặp commit KHÁC LANE, cách nhau <= 1 giờ, CÙNG VÙNG
+ *   ├ 265 (43%)  dùng chung ít nhất một FILE   → khoá file KHÔNG gỡ được
+ *   └ 355 (57%)  khác file hoàn toàn           → khoá file GỠ ĐƯỢC
+ *   file/commit: trung vị 3 · p90 12 · p99 30 · max 42
+ *
+ * Hơn một nửa lượt chặn hôm nay là **chặn oan**. Và p90 = 12 file một lượt sửa — cao hơn hẳn
+ * repo tiêu thụ (7) — nên `--sua` phải nhận cả MẺ đường dẫn trong một lệnh; không thì luật
+ * "nhận ngay trước lượt ghi" lại thành chữ, vì làm đúng quá phiền.
+ *
+ * KHỐI RIÊNG `tam`, KHÔNG nhét vào `claims`. Hàng trong `claims` là vùng sở hữu, và cổng đóng
+ * phiên có bất biến *"mỗi khoá vùng gốc phải có thư mục khai steward, và ngược lại"* — một
+ * đường dẫn file nằm đó làm bất biến ấy ĐỎ.
+ *
+ * CÁI NÀY KHÔNG CHỮA, và nó làm chỗ đó XẤU ĐI — mang theo cả vế này, đừng chỉ mang phần đẹp:
+ * khoá không giữ file, GIT giữ. Hai lane dùng chung một cây làm việc nên `git commit -a` vẫn
+ * cuốn file lane khác vừa dàn. Khoá vùng trước đây SERIAL HOÁ hai lane nên lỗi đó ít có dịp nổ;
+ * khoá file bỏ đúng sự serial hoá ấy, nên nó nổ DÀY HƠN. `--soat` là thứ mua lại, và nó chỉ là
+ * một LỆNH chứ không phải một cổng — cổng đóng phiên chạy lúc index đã rỗng, không thấy gì. */
+
+/* Khoá file sinh ra để giữ VÀI PHÚT. Quá ngưỡng này là dấu hiệu ai đó quên trả — và quên trả
+   thì nó thoái hoá thành đúng cái khoá dài hạn mà nó thay thế. NHẮC, không tự nhả: tự nhả là
+   tự động hoá đúng vụ nhả-khoá-hộ 06/09, lần này không ai kịp thấy. */
+export const PHUT_NHAC_KHOA_FILE = 30;
+
+/** Vùng bao ngoài một đường dẫn. Hỏi chính bộ quy vùng, không đoán lại luật. */
+export function vungBaoNgoai(duongDan, structure, prefixes) {
+  return stewardOf(duongDan, structure, prefixes);
+}
+
+/** Chuẩn hoá đường dẫn về dạng repo dùng: gạch xuôi, không `./`, không gạch cuối. */
+export function chuanDuongDan(d) {
+  return String(d ?? "").trim().split("\\").join("/").replace(/^\.\//, "").replace(/\/+$/, "");
+}
+
+/* QUYẾT ĐỊNH THUẦN — không chạm đĩa, nên ghim được mọi nhánh bằng chuỗi. `bang` = cả file đã
+   đọc (`{ claims, tam }`). Trả `{ code, message?, next? }`; `next` là khối `tam` MỚI. */
+export function quyetDinhSua(bang, { duongDan, as, luc, vungCua }) {
+  const d = chuanDuongDan(duongDan);
+  if (!d || d.split("/").includes("..")) {
+    return { code: EXIT.MISUSE, message: `DUONG_DAN_LA: "${duongDan}" — phải là đường dẫn tương đối từ gốc repo.` };
+  }
+  const tam = { ...(bang.tam || {}) };
+  const dangGiu = tam[d]?.owner || null;
+  if (dangGiu && dangGiu !== as) {
+    return {
+      code: EXIT.REFUSED,
+      message: `TU_CHOI_SUA: "${d}" đang do "${dangGiu}" sửa (từ ${tam[d].luc || "?"}).`
+        + "\nKhoá file là loại giữ VÀI PHÚT. Đợi một nhịp rồi chạy lại — đừng giành, đừng sửa tay.",
+    };
+  }
+  /* CHIỀU MỘT của luật chứa nhau: ai giữ cả vùng thì được ghi mọi file trong đó. */
+  const vung = vungCua(d);
+  const chuVung = bang.claims?.[vung]?.owner || null;
+  if (chuVung && chuVung !== as) {
+    return {
+      code: EXIT.REFUSED,
+      message: `TU_CHOI_SUA: "${d}" nằm trong vùng "${vung}", mà vùng đó đang do "${chuVung}" giữ.`
+        + "\nGiữ cả vùng nghĩa là được ghi mọi file trong đó — khoá file không chen vào giữa được."
+        + "\nLuật mục 1: vùng có chủ mà chủ không phải bạn thì CHỈ ĐƯỢC ĐỌC.",
+    };
+  }
+  tam[d] = { owner: as, luc };
+  return { code: EXIT.OK, already: dangGiu === as, next: tam };
+}
+
+export function quyetDinhXong(bang, { duongDan, as }) {
+  const d = chuanDuongDan(duongDan);
+  const tam = { ...(bang.tam || {}) };
+  const dangGiu = tam[d]?.owner || null;
+  if (!dangGiu) return { code: EXIT.OK, already: true, next: tam };
+  if (dangGiu !== as) {
+    return {
+      code: EXIT.REFUSED,
+      message: `TU_CHOI_XONG: "${d}" đang do "${dangGiu}" sửa — KHÔNG trả hộ người khác.`
+        + "\nTrả hộ là xoá dấu vết một phiên đang ghi dở, và họ sẽ không biết mình vừa mất quyền.",
+    };
+  }
+  /* XOÁ HÀNG, không để `owner: null`. Khoá file là tạm; giữ hàng trống thì sau một ngày bảng
+     đầy xác đường dẫn và không ai đọc nổi nó nữa. */
+  delete tam[d];
+  return { code: EXIT.OK, next: tam };
+}
+
+/** Khoá file của NGƯỜI KHÁC nằm trong một vùng — chặn lượt nhận cả vùng. CHIỀU HAI của luật
+ *  chứa nhau; thiếu nó là hai lane cùng tin mình được ghi, và không lớp nào kêu. */
+export function khoaFileTrongVung(bang, vung, as, vungCua) {
+  return Object.entries(bang.tam || {})
+    .filter(([d, o]) => o?.owner && o.owner !== as && vungCua(d) === vung)
+    .map(([d, o]) => ({ duongDan: d, owner: o.owner }));
+}
+
+/** Khoá file giữ quá lâu. NÊU TÊN, không tự nhả. */
+export function khoaFileQuaHan(bang, phut, now = Date.now()) {
+  return Object.entries(bang.tam || {}).map(([d, o]) => {
+    /* Dùng `ageHours` — hàm đọc mốc SẴN CÓ của repo — chứ không `Date.parse` trần. Repo tiêu
+       thụ vấp đúng chỗ này: mốc của họ là `2026-09-08T11:51`, THIẾU chữ Z, nên `Date.parse`
+       đọc thành giờ địa phương và một khoá vừa nhận 1 phút bị báo "420 phút — quên trả?". */
+    const gio = ageHours(o?.luc, new Date(now));
+    return { duongDan: d, owner: o?.owner ?? null, phut: gio === null ? null : Math.floor(gio * 60) };
+  }).filter((x) => x.phut !== null && x.phut > phut);
+}
+
+/* ---- SOÁT TRƯỚC KHI COMMIT — vá cái mà khoá file KHÔNG chữa được ----------
+ *
+ * Khoá không giữ file; **git giữ**. Khoá mức file làm số người ghi đồng thời TĂNG, nên lỗi
+ * "cuốn theo file của lane khác" nổ DÀY HƠN chứ không thưa đi. Bù lại nó lần đầu cho ta thứ đủ
+ * mịn để soát: trước đây "vùng tôi giữ" quá thô để nói file nào là của ai.
+ *
+ * KHÔNG chặn được từ cổng đóng phiên — cổng chạy lúc index đã rỗng nên nó không thấy gì. Đây là
+ * một LỆNH phải gọi trước `git commit`. */
+export function soatDanHang({ daDan, tam, claims, as, mienKhoa, maySinh, vungCua }) {
+  /* HAI DANH SÁCH MIỄN, và bỏ sót cái thứ hai làm phép soát BÁO OAN ngay lượt dùng thật đầu
+     tiên ở repo tiêu thụ: nó chặn ba artifact máy sinh mà luật khai rõ là KHÔNG đòi khoá nào —
+     không có gì của ai trong đó để mất, chạy lại bộ sinh là ra y hệt. Một cỗ máy dựng ra để
+     chống chặn oan mà tự chặn oan thì nó bị bỏ qua trong một ngày. */
+  const sinh = new Set(maySinh || []);
+  const mien = new Set(mienKhoa || []);
+  const la = [];
+  const soChung = [];
+  for (const f of daDan || []) {
+    const d = chuanDuongDan(f);
+    if (sinh.has(d)) continue;                                    // artifact máy sinh: bỏ qua hẳn
+    if (mien.has(d)) { soChung.push(d); continue; }               // sổ chỉ-thêm: hợp lệ, nhưng nêu tên
+    if ((tam || {})[d]?.owner === as) continue;                   // tôi đang khoá đúng file này
+    const vung = vungCua(d);
+    if ((claims || {})[vung]?.owner === as) continue;             // tôi giữ cả vùng
+    la.push({ duongDan: d, vung, chuVung: (claims || {})[vung]?.owner || null, chuFile: (tam || {})[d]?.owner || null });
+  }
+  return { la, soChung };
 }
 
 /* Quyết định THUẦN — tách khỏi việc đọc/ghi để kiểm được mọi nhánh mà không cần đĩa. */
@@ -370,6 +561,24 @@ async function main() {
       }
       console.log(`${owner ? "GIU  " : "TRỐNG"} ${key.padEnd(34)}${owner}${duoi}`);
     }
+    /* KHOÁ MỨC FILE hiện ngay dưới bảng vùng — cùng một câu hỏi *"ai đang được ghi cái gì"*,
+       nên cùng một chỗ trả lời. Để nó ở một lệnh riêng là dựng một nguồn sự thật thứ hai. */
+    const tam = Object.entries(parsed.tam || {});
+    if (tam.length) {
+      console.log("");
+      console.log(`KHOÁ MỨC FILE — ${tam.length} file, loại giữ VÀI PHÚT:`);
+      const quaHan = new Map(khoaFileQuaHan(parsed, PHUT_NHAC_KHOA_FILE).map((x) => [x.duongDan, x.phut]));
+      for (const [d, o] of tam) {
+        const gio = ageHours(o?.luc);
+        const tuoi = gio === null ? "không rõ từ khi nào" : `${Math.floor(gio * 60)} phút`;
+        const nhac = quaHan.has(d) ? `  ⚠ quá ${PHUT_NHAC_KHOA_FILE} phút — quên trả?` : "";
+        console.log(`  ${d.padEnd(44)}${o?.owner || "?"}  (${tuoi})${nhac}`);
+      }
+      if (quaHan.size) {
+        console.log("");
+        console.log("⚠ KHÔNG tự nhả hộ, kể cả khi quá hạn. Đây là số liệu để HỎI — cùng luật với khoá vùng.");
+      }
+    }
     if (coChua) {
       console.log("");
       console.log('"repo chưa thấy dấu vết" = không commit nào chạm vùng đó kể từ lúc nhận khoá,');
@@ -380,9 +589,112 @@ async function main() {
     process.exit(EXIT.OK);
   }
 
+  /* `--as` đọc SỚM: ba nhánh khoá mức file ở dưới cần nó, và chúng chạy trước khối khoá vùng.
+     Khai muộn thì `as` nằm trong vùng chết của `const` và mọi nhánh mới ném ReferenceError. */
+  const as = flag("as");
+
+  /* ---- --soat : file đã DÀN mà bạn không có quyền ghi -------------------
+   *
+   * Phải chạy TRƯỚC `git commit`, và nó không thay được cổng nào: cổng đóng phiên chạy lúc
+   * index đã rỗng nên nó mù ở đúng chỗ này. Xem khối lý lẽ ở `soatDanHang`. */
+  if (flag("soat")) {
+    if (typeof as !== "string") {
+      console.error("Dùng: node scripts/claim.mjs --soat --as <phiên>");
+      process.exit(EXIT.MISUSE);
+    }
+    let daDan = [];
+    try {
+      daDan = execFileSync("git", ["diff", "--cached", "--name-only"], { cwd: ROOT, encoding: "utf8" })
+        .split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean);
+    } catch (e) {
+      console.error(`KHONG_DO_DUOC_INDEX: ${String(e.message).split(String.fromCharCode(10))[0]}`);
+      process.exit(EXIT.REFUSED);
+    }
+    if (!daDan.length) {
+      console.log("Chưa dàn file nào (`git add`). Không có gì để soát.");
+      process.exit(EXIT.OK);
+    }
+    const cauTruc = readStructureFromDisk(ROOT);
+    const tienTo = claimPrefixesFrom(cauTruc);
+    const { la, soChung } = soatDanHang({
+      daDan,
+      tam: parsed.tam,
+      claims: parsed.claims,
+      as,
+      mienKhoa: MIEN_KHOA,
+      maySinh: [...generatedFrom(cauTruc), ".agents/claims.json"],
+      vungCua: (d) => vungBaoNgoai(d, cauTruc, tienTo),
+    });
+    console.log(`đã dàn ${daDan.length} file · ${la.length} file bạn KHÔNG có quyền ghi · ${soChung.length} sổ dùng chung`);
+    for (const x of la) {
+      console.log(`  ✗ ${x.duongDan}`);
+      console.log(`      vùng ${x.vung}${x.chuVung ? ` — do "${x.chuVung}" giữ` : " — vô chủ"}`
+        + `${x.chuFile ? ` · file do "${x.chuFile}" khoá` : ""}`);
+    }
+    for (const d of soChung) {
+      console.log(`  ~ ${d} — sổ MIỄN khoá: nhiều lane cùng ghi hợp lệ.`);
+      console.log("      Soi lại phần bạn dàn: có đúng là CHỈ THÊM Ở CUỐI không? Sửa dòng cũ thì hoặc");
+      console.log("      bạn phạm luật miễn khoá, hoặc bạn đang cuốn chữ của người khác.");
+    }
+    if (la.length) {
+      console.log("");
+      console.log("Cách xử: `git restore --staged <file>` cho những dòng ✗, hoặc nhận quyền rồi dàn lại:");
+      console.log(`  node scripts/claim.mjs --sua ${la.map((x) => x.duongDan).join(" ")} --as ${as}`);
+      process.exit(EXIT.REFUSED);
+    }
+    process.exit(EXIT.OK);
+  }
+
+  /* ---- --sua / --xong : khoá mức FILE ------------------------------------ */
+  const suaCo = argv.includes("--sua");
+  const xongCo = argv.includes("--xong");
+  if (suaCo || xongCo) {
+    if (typeof as !== "string") {
+      console.error("Dùng: node scripts/claim.mjs --sua <đường-dẫn>… --as <phiên>");
+      console.error("      node scripts/claim.mjs --xong <đường-dẫn>… --as <phiên>   (hoặc --xong --het)");
+      process.exit(EXIT.MISUSE);
+    }
+    // Cả MẺ đường dẫn trong một lệnh: p90 ở repo này là 12 file một lượt sửa, nên bắt gọi 12
+    // lệnh là bảo đảm luật "nhận ngay trước lượt ghi" quay về làm chữ.
+    const co = argv.indexOf(suaCo ? "--sua" : "--xong");
+    const ds = [];
+    for (let i = co + 1; i < argv.length && !argv[i].startsWith("--"); i += 1) ds.push(argv[i]);
+    const het = xongCo && argv.includes("--het");
+    if (het) {
+      for (const [d, o] of Object.entries(parsed.tam || {})) if (o?.owner === as) ds.push(d);
+    }
+    if (!ds.length) {
+      console.error(het ? "Bạn không giữ khoá file nào." : "THIEU_DUONG_DAN: nêu ít nhất một đường dẫn.");
+      process.exit(het ? EXIT.OK : EXIT.MISUSE);
+    }
+
+    const nhaKhoaBang = giuBangQuyen();
+    parsed = readClaims();
+    const cauTruc = readStructureFromDisk(ROOT);
+    const tienTo = claimPrefixesFrom(cauTruc);
+    const vungCua = (d) => vungBaoNgoai(d, cauTruc, tienTo);
+    const luc = new Date().toISOString();
+    let tam = parsed.tam || {};
+    for (const d of ds) {
+      const kq = suaCo
+        ? quyetDinhSua({ claims: parsed.claims, tam }, { duongDan: d, as, luc, vungCua })
+        : quyetDinhXong({ claims: parsed.claims, tam }, { duongDan: d, as });
+      if (kq.code !== EXIT.OK) { nhaKhoaBang(); console.error(kq.message); process.exit(kq.code); }
+      tam = kq.next;
+    }
+    /* KHỐI RỖNG THÌ XOÁ HẲN, không để `"tam": {}`. Bảng của repo chưa dùng khoá file phải giữ
+       nguyên từng byte — một khối rỗng thừa là mọi lane khác thấy bảng đổi mà không hiểu vì sao. */
+    if (Object.keys(tam).length) parsed.tam = tam; else delete parsed.tam;
+    fs.writeFileSync(CLAIMS_FILE, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
+    nhaKhoaBang();
+    const ten = ds.map((d) => chuanDuongDan(d)).join(" · ");
+    console.log(`${suaCo ? "đã khoá để sửa" : "đã trả"}: ${ten}${suaCo ? ` → ${as}` : ""}`);
+    if (suaCo) console.log(`Trả NGAY sau khi ghi xong: node scripts/claim.mjs --xong --het --as ${as}`);
+    process.exit(EXIT.OK);
+  }
+
   const take = flag("take");
   const release = flag("release");
-  const as = flag("as");
   const task = flag("task");
   const key = typeof take === "string" ? take : typeof release === "string" ? release : null;
   const action = typeof take === "string" ? "take" : typeof release === "string" ? "release" : null;
@@ -410,31 +722,10 @@ async function main() {
    *
    * `ponytail: khoá cả file bảng quyền, không khoá từng vùng. Đủ cho vài phiên; tách khoá theo
    * vùng nếu sau này có hàng chục phiên cùng lúc.` */
-  const KHOA = `${CLAIMS_FILE}.lock`;
-  let daKhoa = false;
-  for (let i = 0; i < 50 && !daKhoa; i += 1) {
-    try { fs.mkdirSync(KHOA); daKhoa = true; }
-    catch (e) {
-      if (e?.code !== "EEXIST") throw e;
-      // Khoá mồ côi: tiến trình giữ nó đã chết. Quá 30 giây thì dọn — không dọn thì một lần
-      // Ctrl+C khoá vĩnh viễn bảng quyền của cả repo.
-      try {
-        if (Date.now() - fs.statSync(KHOA).mtimeMs > 30000) { fs.rmSync(KHOA, { recursive: true, force: true }); continue; }
-      } catch { /* khoá vừa được nhả giữa chừng — vòng sau thử lại */ }
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
-    }
-  }
-  if (!daKhoa) {
-    console.error(`DANG_BI_KHOA: một phiên khác đang ghi bảng quyền (${KHOA}). Thử lại sau vài giây.`);
-    process.exit(EXIT.MISUSE);
-  }
+  const nhaKhoaBang = giuBangQuyen();
+  const nhaKhoa = nhaKhoaBang;
   // Đọc LẠI SAU KHI có khoá — bản đọc lúc chưa khoá có thể đã cũ.
   parsed = readClaims();
-
-  // Nhả khoá trên MỌI đường ra, kể cả đường thoát sớm và đường ném. Quên nhả thì lần chạy sau
-  // phải chờ hết 30 giây hạn khoá mồ côi — một cái khoá bỏ quên còn phiền hơn không có khoá.
-  const nhaKhoa = () => { try { fs.rmSync(KHOA, { recursive: true, force: true }); } catch { /* đã nhả rồi */ } };
-  process.on("exit", nhaKhoa);
 
   /* MỐC CÓ GIỜ, không chỉ có ngày.
    *
@@ -487,6 +778,34 @@ async function main() {
     } catch (_) {
       // Không có nhánh xa, git hỏng, repo mới clone — trả `null`, tức không chặn.
       chuaDay = null;
+    }
+  }
+
+  /* CHIỀU HAI của luật chứa nhau: bên TRONG vùng sắp nhận còn khoá file của người khác.
+   *
+   * Chiều một (vùng có chủ khác → khoá file bị từ chối) nằm trong `quyetDinhSua`. Thiếu chiều
+   * này thì lane A giữ khoá file `scripts/x.mjs`, lane B nhận cả `_code`, và **cả hai cùng tin
+   * mình được ghi** — không lớp nào kêu. Đó là đúng cái tai nạn khoá vùng sinh ra để chặn, chỉ
+   * nhỏ hơn một cấp. */
+  if (action === "take") {
+    let vuong = [];
+    try {
+      const cauTruc2 = readStructureFromDisk(ROOT);
+      const tienTo2 = claimPrefixesFrom(cauTruc2);
+      vuong = khoaFileTrongVung(parsed, key, as, (d) => vungBaoNgoai(d, cauTruc2, tienTo2));
+    } catch (e) {
+      // Không đọc được cấu trúc thì KHÔNG được coi là "trong vùng sạch" — fail-closed, vì nhận
+      // cả vùng là thứ cho phép ghi đè lên việc đang dở của người khác.
+      console.error(`KHONG_DO_DUOC_KHOA_FILE: ${String(e.message).split(String.fromCharCode(10))[0]}`);
+      console.error("Không biết trong vùng còn ai đang khoá file hay không thì không được nhận cả vùng.");
+      process.exit(EXIT.REFUSED);
+    }
+    if (vuong.length) {
+      console.error(`TU_CHOI_NHAN_VUNG: trong "${key}" còn ${vuong.length} khoá mức FILE của phiên khác.`);
+      for (const v of vuong) console.error(`  ${v.duongDan}  →  ${v.owner}`);
+      console.error("Nhận cả vùng nghĩa là được ghi mọi file trong đó — chen vào giữa một lượt sửa đang dở.");
+      console.error("Khoá file là loại giữ VÀI PHÚT. Đợi một nhịp rồi chạy lại.");
+      process.exit(EXIT.REFUSED);
     }
   }
 

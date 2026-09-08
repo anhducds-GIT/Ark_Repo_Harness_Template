@@ -40,23 +40,26 @@ nếu bạn đang cuốn theo việc người khác.
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
 Bảng chủ sở hữu là `.agents/claims.json`. **Một vùng chỉ có MỘT phiên AI được ghi tại một thời
-điểm.** Nhận và trả quyền **bằng lệnh**, đừng sửa file bằng tay:
+điểm.** Nhận và trả quyền **bằng lệnh** — sửa tay là đọc-sửa-ghi, và 02/09 một quyền đã **bị ghi
+đè im lặng** vì thế. Vùng có chủ khác thì **chỉ đọc**; muốn giành thì xem mục 2.
+
+**MẶC ĐỊNH LÀ KHOÁ MỨC FILE, khoá vùng để dành.** Đức chốt 08/09: *"chỉ giữ khóa đúng ở file mà AI
+đó đang sửa … giữ và trả ngay trước và sau khi sửa. Nếu chỉ đọc ko cần giữ khóa."* Đo: **57%** lượt
+chặn hôm nay là **chặn oan** — khác file hoàn toàn mà vẫn bị khoá vùng chặn.
 
 ```bash
-node scripts/claim.mjs --list
-node scripts/claim.mjs --take <khoá> --as <tên-phiên> --task "một câu"
-node scripts/claim.mjs --release <khoá> --as <tên-phiên>
+node scripts/claim.mjs --sua <file>… --as <phiên>   # NGAY TRƯỚC lượt ghi · nhận cả mẻ
+node scripts/claim.mjs --xong --het --as <phiên>    # NGAY SAU khi COMMIT · cổng ĐỎ nếu treo
+node scripts/claim.mjs --soat --as <phiên>          # TRƯỚC `git commit` · là LỆNH, không phải cổng
+node scripts/claim.mjs --list                       # ai đang giữ gì
+node scripts/claim.mjs --take|--release <khoá> --as <phiên> --task "một câu"   # cả VÙNG
 ```
 
-Sửa tay là đọc-sửa-ghi, và ngày 02/09 một quyền đã **bị ghi đè im lặng** vì thế: hai phiên cùng đọc
-thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
-
-- Vùng trống chủ → nhận rồi làm. Vùng có chủ khác → **chỉ đọc, tuyệt đối không sửa**.
-- Muốn giành vùng người khác đang giữ → **hỏi Đức**, không tự lấy.
-
-**Nhận khoá NGAY TRƯỚC LƯỢT GHI ĐẦU TIÊN** — đọc và đo không cần khoá — và **một lane một khoá gói**,
-cần thêm thì nhận thêm lúc cần. Đo 06/09: mọi bản giao việc mở đầu bằng *"nhận khoá trước"*, trong khi
-lane dành 5–20 phút đầu chỉ để đọc.
+**Chứa nhau hai chiều:** vùng có chủ khác → khoá file bị từ chối; trong vùng còn khoá file người
+khác → nhận cả vùng bị từ chối. **Quá 30 phút thì `--list` nêu tên, KHÔNG tự nhả.** Mốc trả khoá
+file là *hết phiên*, không phải *đã đẩy* — nó không mang trách nhiệm truy nguồn, nhãn `Lane:` mang.
+Và `--soat` tồn tại vì **khoá không giữ file, *git* giữ**: chung một cây làm việc thì `git commit -a`
+vẫn cuốn file lane khác vừa dàn, và khoá file làm chỗ đó **xấu đi** vì nó bỏ bớt sự serial hoá.
 
 **KHÔNG nhả khoá hộ lane khác vì thấy "repo chưa thấy dấu vết"** (tín hiệu ở `--list` và trên bảng).
 Nó nói repo chưa thấy gì, **không** nói lane đó rảnh — lane cẩn thận dựng nháp ngoài repo rồi mới ghi
@@ -69,8 +72,6 @@ sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khố
 **Hai file được MIỄN, lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác hành chính
 — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt MỌI phiên ghi Log
 — nhưng **chỉ miễn khi chỉ THÊM dòng**; sửa hay xoá dòng cũ là viết lại lịch sử của phiên khác).
-Không phải hình thức: 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một khoá duy nhất
-là điểm nghẽn thật, không phải lý thuyết.
 
 ## 2. Sáu việc PHẢI hỏi Đức trước
 
@@ -88,7 +89,6 @@ là điểm nghẽn thật, không phải lý thuyết.
 
 Ngoài sáu việc này, AI tự làm. Nguyên tắc phía sau: **AI tự do trong phạm vi làm repo tốt lên
 và lùi lại được. Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.**
-
 
 **"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md).
 
@@ -196,6 +196,7 @@ vùng**. AI nào không tự nạp file này thì Đức dán: *"Đọc AGENTS.m
 | **Bảy chỗ hợp đồng lõi đã từng vỡ, và phép kiểm phá cho từng chỗ** | `tests/core-contract.mjs` — bộ đo nói dối · đo được nghề khác · vòng đời một bảng · git hỏng không hoá số 0 · quy chủ theo tiền tố dài nhất · ADR xoá cũng bị bắt · khoá quyền nguyên tử |
 | **Biết cổng đóng phiên có ĐỎ THẬT được không** | [tests/cong-do-that.mjs](tests/cong-do-that.mjs) — sáu phép kiểm từng **chưa từng đỏ lần nào** qua 46 lượt chạy. Mỗi khối dựng một kho thật, phá đúng MỘT thứ, rồi đòi ĐÚNG phép kiểm ấy đỏ. Một phép kiểm chưa từng đỏ và một phép kiểm **không thể** đỏ trông giống hệt nhau trên bảng — và bảng thì luôn xanh |
 | **Sắp sửa cơ chế KHOÁ VÙNG — nhận, giữ, hay trả** | [tests/khoa-dau-vet.mjs](tests/khoa-dau-vet.mjs) — tám vế ghim tín hiệu *"repo chưa thấy dấu vết"*. Vế 7 ghim **mức nghiêm trọng**: tín hiệu này là VÀNG, nó **không** được đổi mã thoát của cổng — chặn một lane đang đọc kỹ là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ. Bốn đột biến đã chạy thật, ghi trong đầu file |
+| **Sắp sửa KHOÁ MỨC FILE, hay thắc mắc vì sao có HAI loại khoá** | [docs/adr/0012-khoa-muc-file.md](docs/adr/0012-khoa-muc-file.md) — số đo của CHÍNH repo này (620 cặp va chạm, **57% là chặn oan**, p90 **12 file** một lượt sửa), sáu quyết định, và một mục **"cái này KHÔNG chữa"** phải đọc trước khi tin: khoá không giữ file, *git* giữ, và khoá file làm chỗ đó **xấu đi** vì nó bỏ bớt sự serial hoá. Ghim ở [tests/khoa-file.mjs](tests/khoa-file.mjs) — 6 vế, 6 đột biến đã chạy |
 | **Biết một số phiên bản bộ khung ứng với nội dung nào** | [RELEASE-LEDGER.json](RELEASE-LEDGER.json) — mỗi bản ↔ dấu vân tay tầng máy, **CHỈ THÊM**. Sửa một dòng đã có là nói dối về một bản đã phát. Đổi nội dung `scripts/` hay `tests/` mà không tăng `version` thì sổ lệch, và ba chỗ cùng chặn: `npm test` · bộ sinh từ chối tự sửa · `upgrade.mjs` không phát đi được với **mọi** repo đích |
 | **Git đối xử với file thế nào — để ngoài git, hay chốt kiểu xuống dòng** | [.gitignore](.gitignore) — thứ nào **một tiến trình ghi đè liên tục** thì để ngoài git (hiện là ba file bản ra của [bang-song/](bang-song/loi.mjs)), vì commit nó là mọi phiên khác mở repo ra thấy cây làm việc bẩn. **Đừng lẫn với artifact máy sinh** (`DASHBOARD*` · `llms.txt` · `repo-map.json`) — mấy cái đó tất định từ HEAD nên **phải** commit, và cổng đối chiếu chúng mỗi phiên. · [.gitattributes](.gitattributes) — chốt kiểu xuống dòng cho CẢ repo, cả trong kho lẫn trong cây làm việc; không có nó thì máy Windows tự đổi lúc lấy file ra, một commit có hai dạng byte, và `git status` nói SẠCH ở cả hai (đo trước khi thêm: cùng một cây làm việc, 75 file LF và 21 file CRLF). Ngoại lệ duy nhất `*.cmd text eol=crlf` — đo thật bằng cách chạy CHÍNH một file `.cmd` ở hai dạng: LF thoát 1, CRLF thoát 0 |
 | **Biết cổng nào còn chạy sau khi mã rời máy** | [.github/workflows/](.github/workflows/) — `cong-kiem.yml` chạy trên GitHub: bộ phép kiểm · cấu trúc B1–B15 · artifact máy sinh còn tươi. Nó KHÔNG thay cổng đóng phiên (cổng đó hỏi những câu chỉ có nghĩa trong một phiên: bạn tên gì, giữ vùng nào, đã ghi Log chưa), mà bịt chỗ hở duy nhất còn lại: mọi lớp bảo vệ khác chạy trên máy người dùng nên `git push` trần đi qua hết |

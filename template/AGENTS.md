@@ -40,23 +40,26 @@ nếu bạn đang cuốn theo việc người khác.
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
 Bảng chủ sở hữu là `.agents/claims.json`. **Một vùng chỉ có MỘT phiên AI được ghi tại một thời
-điểm.** Nhận và trả quyền **bằng lệnh**, đừng sửa file bằng tay:
+điểm.** Nhận và trả quyền **bằng lệnh** — sửa tay là đọc-sửa-ghi, và 02/09 một quyền đã **bị ghi
+đè im lặng** vì thế. Vùng có chủ khác thì **chỉ đọc**; muốn giành thì xem mục 2.
+
+**MẶC ĐỊNH LÀ KHOÁ MỨC FILE, khoá vùng để dành.** Đức chốt 08/09: *"chỉ giữ khóa đúng ở file mà AI
+đó đang sửa … giữ và trả ngay trước và sau khi sửa. Nếu chỉ đọc ko cần giữ khóa."* Đo: **57%** lượt
+chặn hôm nay là **chặn oan** — khác file hoàn toàn mà vẫn bị khoá vùng chặn.
 
 ```bash
-node scripts/claim.mjs --list
-node scripts/claim.mjs --take <khoá> --as <tên-phiên> --task "một câu"
-node scripts/claim.mjs --release <khoá> --as <tên-phiên>
+node scripts/claim.mjs --sua <file>… --as <phiên>   # NGAY TRƯỚC lượt ghi · nhận cả mẻ
+node scripts/claim.mjs --xong --het --as <phiên>    # NGAY SAU khi COMMIT · cổng ĐỎ nếu treo
+node scripts/claim.mjs --soat --as <phiên>          # TRƯỚC `git commit` · là LỆNH, không phải cổng
+node scripts/claim.mjs --list                       # ai đang giữ gì
+node scripts/claim.mjs --take|--release <khoá> --as <phiên> --task "một câu"   # cả VÙNG
 ```
 
-Sửa tay là đọc-sửa-ghi, và ngày 02/09 một quyền đã **bị ghi đè im lặng** vì thế: hai phiên cùng đọc
-thấy "trống" rồi cùng ghi tên mình, người ghi sau thắng, người ghi trước không hề biết.
-
-- Vùng trống chủ → nhận rồi làm. Vùng có chủ khác → **chỉ đọc, tuyệt đối không sửa**.
-- Muốn giành vùng người khác đang giữ → **hỏi Đức**, không tự lấy.
-
-**Nhận khoá NGAY TRƯỚC LƯỢT GHI ĐẦU TIÊN** — đọc và đo không cần khoá — và **một lane một khoá gói**,
-cần thêm thì nhận thêm lúc cần. Đo 06/09: mọi bản giao việc mở đầu bằng *"nhận khoá trước"*, trong khi
-lane dành 5–20 phút đầu chỉ để đọc.
+**Chứa nhau hai chiều:** vùng có chủ khác → khoá file bị từ chối; trong vùng còn khoá file người
+khác → nhận cả vùng bị từ chối. **Quá 30 phút thì `--list` nêu tên, KHÔNG tự nhả.** Mốc trả khoá
+file là *hết phiên*, không phải *đã đẩy* — nó không mang trách nhiệm truy nguồn, nhãn `Lane:` mang.
+Và `--soat` tồn tại vì **khoá không giữ file, *git* giữ**: chung một cây làm việc thì `git commit -a`
+vẫn cuốn file lane khác vừa dàn, và khoá file làm chỗ đó **xấu đi** vì nó bỏ bớt sự serial hoá.
 
 **KHÔNG nhả khoá hộ lane khác vì thấy "repo chưa thấy dấu vết"** (tín hiệu ở `--list` và trên bảng).
 Nó nói repo chưa thấy gì, **không** nói lane đó rảnh — lane cẩn thận dựng nháp ngoài repo rồi mới ghi
@@ -69,8 +72,6 @@ sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khố
 **Hai file được MIỄN, lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác hành chính
 — không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt MỌI phiên ghi Log
 — nhưng **chỉ miễn khi chỉ THÊM dòng**; sửa hay xoá dòng cũ là viết lại lịch sử của phiên khác).
-Không phải hình thức: 02/09 đo được **98 trong 127 commit (77%) chạm gốc repo** — một khoá duy nhất
-là điểm nghẽn thật, không phải lý thuyết.
 
 ## 2. Sáu việc PHẢI hỏi Đức trước
 
@@ -88,7 +89,6 @@ là điểm nghẽn thật, không phải lý thuyết.
 
 Ngoài sáu việc này, AI tự làm. Nguyên tắc phía sau: **AI tự do trong phạm vi làm repo tốt lên
 và lùi lại được. Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.**
-
 
 **"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md).
 

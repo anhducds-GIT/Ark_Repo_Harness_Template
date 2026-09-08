@@ -403,6 +403,33 @@ details.gap[open]>summary{margin-bottom:12px;color:var(--chu)}
 .ckm .ma{font-family:var(--mono);font-size:11.8px;color:var(--mo)}
 .ckm .tv{display:block;font-family:var(--mono);font-size:11.6px;color:var(--vang);margin-top:1px}
 
+/* DANH SÁCH DÀI CHẢY THÀNH NHIỀU CỘT.
+ *
+ * Đo 08/09 với tab Migrate mở hết: **10.607px chiều cao**, 207 dòng mục xếp mỗi dòng một hàng
+ * trên một cột duy nhất — Đức phải cuộn rất dài để đọc một checklist. Bề ngang thì bỏ trống.
+ *
+ * Dùng "column-width" chứ KHÔNG dùng "column-count": khai bề rộng thì trình duyệt tự tính được
+ * bao nhiêu cột vừa màn hình, nên cùng một trang đọc được trên laptop hẹp lẫn màn rộng mà không
+ * cần điểm ngắt nào. Khai số cột thì màn hẹp bị ép nhồi và chữ vỡ.
+ *
+ * "--ck-cot" là biến NGƯỜI XEM chỉnh được (tay kéo ở đầu tab Migrate), nhớ trong trình duyệt của
+ * họ. Đức nêu 08/09: *"độ rộng có thể adjustable để tôi chủ động co kéo phù hợp khi xem"*. */
+.cot{column-width:var(--ck-cot,360px);column-gap:20px}
+.cot > *{break-inside:avoid}
+/* Viền trên của dòng đầu MỖI CỘT phải bỏ, không chỉ dòng đầu danh sách — nếu không, đầu cột hai
+   trở đi có một gạch cụt trông như lỗi vẽ. */
+.cot > *:first-child{border-top:0}
+
+/* Tay kéo bề rộng cột. Một thanh, kéo ngang, và NÓI RA con số — một tay kéo không có số thì
+   người dùng không biết mình đang ở đâu và không quay lại được chỗ vừa ý. */
+.keo{display:flex;align-items:center;gap:10px;margin:0 0 10px;flex-wrap:wrap}
+.keo label{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mo)}
+.keo input[type=range]{flex:1;min-width:150px;max-width:340px;accent-color:var(--nhan);cursor:ew-resize}
+.keo output{font-family:var(--mono);font-size:11.6px;color:var(--chu2);min-width:66px}
+.keo button{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--vien);
+  border-radius:6px;background:var(--mat);color:var(--chu2);cursor:pointer}
+.keo button:hover{border-color:var(--nhan);color:var(--nhan)}
+
 /* Ô LÀM MỚI — hai file, hai câu trả lời cho cùng một cú F5. Chúng phải nằm cạnh nhau,
    vì cái sai duy nhất ở đây là tưởng chúng giống nhau. */
 .lm{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:9px;margin:8px 0 0}
@@ -552,6 +579,16 @@ section.tab{padding-top:9px}
 .xep > .the{margin:0}
 /* Khối đang MỞ chiếm cả hàng — nội dung bên trong (bảng, mã, sơ đồ ba khối) cần chiều ngang. */
 .xep > details.the[open]{grid-column:1/-1}
+/* SỔ MIGRATE CHIẾM TRỌN BỀ NGANG, không nằm trong ô thẻ hẹp.
+ *
+ * Đo 08/09: ".xep" là lưới thẻ "auto-fit, minmax(268px, 1fr)" — hợp cho những thẻ NGẮN đứng cạnh
+ * nhau, nhưng bốn hồ sơ migrate rơi vào đó thành bốn cột **rộng 296px** giữa một trang rộng
+ * 1.213px, mỗi cột cao hàng chục nghìn pixel. Đức nói đúng hiện tượng: "bị chồng thành 1 cột,
+ * làm phải scroll dài". Gốc bệnh không phải danh sách, mà là cái ô chứa nó.
+ *
+ * Thanh tab con, tay kéo, và mỗi khung hồ sơ đều là thứ đọc TRỌN BỀ NGANG — cho chúng span hết,
+ * rồi các danh sách bên trong mới có chỗ mà chảy thành cột. */
+.xep > .tabs2, .xep > .keo, .xep > .tab2{grid-column:1/-1}
 /* Thanh khi GẬP chỉ cần cao bằng một dòng: bỏ đệm đứng, bỏ cả bóng cho nhẹ mắt. */
 .xep > details.the:not([open]){padding:9px clamp(10px,1.2vw,13px);box-shadow:none}
 .xep > details.the:not([open]) > summary{font-size:14.6px;line-height:1.35;margin:0}
@@ -586,6 +623,36 @@ ${CSS_LUU_DO}`;
 
 const JS = `
 (function(){
+  /* BỀ RỘNG CỘT — người xem tự co kéo, và trang NHỚ lấy.
+   *
+   * Đức nêu 08/09: *"độ rộng có thể adjustable để tôi chủ động co kéo phù hợp khi xem"*. Nhớ
+   * bằng localStorage nên mở lại vẫn đúng chỗ vừa ý — một tay kéo quên ngay lượt sau thì lần nào
+   * cũng phải kéo lại, và người ta thôi dùng nó.
+   *
+   * BỌC TRY/CATCH TOÀN BỘ: cửa sổ riêng tư hoặc trình duyệt chặn lưu trữ thì chính lệnh ĐỌC ném,
+   * và một ngoại lệ ở đây làm chết mọi khối JS phía dưới trong cùng hàm — tab bấm không đổi,
+   * banner tuổi không hiện. Trang tĩnh thì không ai thấy lỗi để mà sửa. */
+  var MAC_DINH = 360;
+  var KHOA_LUU = 'ark-ck-cot';
+  function datCot(px, ghiNho){
+    var n = Math.max(200, Math.min(900, Number(px) || MAC_DINH));
+    document.documentElement.style.setProperty('--ck-cot', n + 'px');
+    var thanh = document.getElementById('ck-cot');
+    var so = document.getElementById('ck-cot-so');
+    if (thanh) thanh.value = String(n);
+    if (so) so.textContent = n + 'px';
+    if (ghiNho) { try { localStorage.setItem(KHOA_LUU, String(n)); } catch (e) {} }
+  }
+  try {
+    var luu = null;
+    try { luu = localStorage.getItem(KHOA_LUU); } catch (e) { luu = null; }
+    datCot(luu === null ? MAC_DINH : luu, false);
+    var thanh2 = document.getElementById('ck-cot');
+    if (thanh2) thanh2.addEventListener('input', function(){ datCot(thanh2.value, true); });
+    var ve = document.getElementById('ck-cot-ve');
+    if (ve) ve.addEventListener('click', function(){ datCot(MAC_DINH, true); });
+  } catch (e) {}
+
   // Trang là file tĩnh đem publish — nó phải tự biết mình bao nhiêu tuổi ở lúc XEM, không phải
   // lúc sinh. Bảy ngày là mốc: quá đó thì mọi con số ở đây đáng ngờ, và người xem phải biết
   // điều đó TRƯỚC khi đọc, không phải sau.
@@ -1439,7 +1506,7 @@ export function khoiChecklist(ck) {
     + '<div class="ckt">' + o + '</div>'
     + (chuaXong.length
       ? '<h3>Còn ' + chuaXong.length + ' mục chưa xong — xử <code>~</code> trước <code>✗</code></h3>'
-        + chuaXong.map(dongMuc).join("")
+        + '<div class="cot">' + chuaXong.map(dongMuc).join("") + '</div>'
         + '<p class="ghi"><strong><code>~</code> MỘT PHẦN nguy hiểm hơn <code>✗</code> THIẾU.</strong> '
         + 'Mục một phần trông như đang chạy nhưng hỏng ở chỗ không ai nhìn — ca thật đo được: có '
         + '<code>session-check.mjs</code> mà thiếu <code>npm run gate</code>, nên cổng có mặt mà không '
@@ -1447,7 +1514,9 @@ export function khoiChecklist(ck) {
       : '<h3>Không mục nào chưa xong</h3><p>Mọi tính năng trong phạm vi repo này đều đủ ở lần đo trên.</p>')
     + '<details class="gap" style="background:none;border:0;box-shadow:none;padding:0;margin:9px 0 0">'
     + '<summary>Cả ' + ck.khoi.length + ' khối tính năng, và ' + tatCa.length + ' mục</summary>'
-    + hangKhoi + '<h4>Từng mục</h4>' + tatCa.map(dongMuc).join("") + '</details></div>';
+    + '<div class="cot">' + hangKhoi + '</div>'
+    + '<h4>Từng mục</h4><div class="cot">' + tatCa.map(dongMuc).join("") + '</div>'
+    + '</details></div>';
 }
 
 export function khoiMigrate(hoSo) {
@@ -1536,6 +1605,16 @@ export function khoiMigrate(hoSo) {
     + '<details class="the gap"><summary>Toàn văn hồ sơ — chỗ vấp, cách chữa, số đo từng bước</summary>'
     + md(h.body) + '</details></div>').join("");
 
+  /* TAY KÉO ĐẶT MỘT LẦN, ăn cho cả tab. Nó đổi một biến ở `:root` nên mọi khối `.cot` bên dưới
+   * theo cùng — bốn hồ sơ migrate mỗi cái một checklist, đặt bốn tay kéo là bốn chỗ nói cùng một
+   * điều, đúng cái luật một-khái-niệm-một-chỗ của ADR-0006 cấm. */
+  const tayKeo = '<div class="keo">'
+    + '<label for="ck-cot">Bề rộng cột</label>'
+    + '<input type="range" id="ck-cot" min="200" max="900" step="20" value="360">'
+    + '<output id="ck-cot-so">360px</output>'
+    + '<button type="button" id="ck-cot-ve">về mặc định</button>'
+    + '</div>';
+
   return '<div class="the"><h2>Sổ migrate — ' + hoSo.length + ' lượt · ba mốc mỗi lượt</h2>'
     + '<div class="tw"><table class="mgt"><thead><tr><th>Repo</th>'
     + MOC_MIGRATE.map((m) => '<th class="so" title="' + esc(m.y) + '">' + esc(m.nhan) + '</th>').join("")
@@ -1556,6 +1635,7 @@ export function khoiMigrate(hoSo) {
     + 'đó là chỗ bộ khung lớn lên.</p></div>'
     + khoiKe
     + '<nav class="tabs2" role="tablist">' + nut + '</nav>'
+    + tayKeo
     + khung;
 }
 
