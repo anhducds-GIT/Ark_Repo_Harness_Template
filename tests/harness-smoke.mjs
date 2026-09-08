@@ -48,7 +48,10 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(temp, "scripts"), { recursive: true });
     mkdirSync(join(temp, ".agents"), { recursive: true });
-    for (const name of ["safe-push.mjs", "repo-structure.mjs"]) {
+    /* `chay-test.mjs` PHAI di theo tu ban 1.3.79: safe-push doc dau xac nhan suite de quyet
+       * dinh co tu dong cuon theo commit lane khac hay khong. Them mot import la them mot rang
+       * buoc "nhung file nay di cung nhau" — ba fixture do ngay luot dau vi thieu no. */
+    for (const name of ["safe-push.mjs", "repo-structure.mjs", "chay-test.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
@@ -504,7 +507,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(kho, "scripts"), { recursive: true });
     mkdirSync(join(kho, ".agents"), { recursive: true });
-    for (const name of ["safe-push.mjs", "repo-structure.mjs"]) {
+    for (const name of ["safe-push.mjs", "repo-structure.mjs", "chay-test.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
@@ -708,7 +711,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(kho, "scripts"), { recursive: true });
     mkdirSync(join(kho, ".agents"), { recursive: true });
-    for (const name of ["safe-push.mjs", "repo-structure.mjs"]) {
+    for (const name of ["safe-push.mjs", "repo-structure.mjs", "chay-test.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
