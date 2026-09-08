@@ -37,14 +37,42 @@
 //   DỰA VÀO TUÂN THỦ:     đẩy `main` mà KHÔNG ghi sự kiện tích hợp. File này không thấy được.
 //                         Muốn chặn cả chỗ đó thì cần MỘT BÊN THỨ BA đọc sổ quyền — và bên thứ
 //                         ba phải không phải bên đang bị kiểm. Chưa làm, cố ý.
-//   CHƯA LÀM, ĐÃ BIẾT:    `--as` là TÊN TỰ KHAI, không phải danh tính. Vế "bên xác nhận không
-//                         được là bên bị kiểm" so hai chuỗi tên, nên cùng một Assistant gọi lại
-//                         bằng một cái tên khác là đi qua được. Muốn thật thì danh tính phải đến
-//                         từ nguồn được xác thực (token workflow chạy trên máy GitHub) — chưa nối.
+// ── AI NÓI ĐIỀU NÀY? — bảng kiểm lòng tin, đọc trước khi tin bất kỳ vế nào bên dưới ───────────
 //
-// Tên vùng thì ĐÃ KIỂM từ 08/09: `--ban-do` + `--con-lai` buộc mọi đường dẫn trong khoảng
-// `coSo..sha` quy về đúng vùng đã khai (`kiemDuongDan`). Trước đó phiên Codex khai `wrong-area`
-// cho một thay đổi ở `product.txt` và đi qua được.
+// Vai SẢN PHẨM chấm chéo 08/09 và chỉ ra một lớp lỗ mà **đột biến không bao giờ tìm được**: nó
+// không phải một dòng bảo vệ bị gỡ — mã chạy ĐÚNG THIẾT KẾ — mà là một **giả định về lòng tin**.
+// Không có dòng nào để gỡ, nên 97 ca xanh và 27/27 đột biến bị bắt vẫn không chạm tới nó.
+// Thứ bắt được lớp này là câu hỏi **"ai nói điều này?"**, nên bảng dưới trả lời đúng câu đó.
+//
+//   Tham số     | Ai cấp        | Kiểm được bằng gì
+//   ------------|---------------|--------------------------------------------------------------
+//   --sha       | bên bị kiểm   | GIT: `cat-file -e` — commit phải có thật ở đây
+//   --co-so     | bên bị kiểm   | GIT: phải là tổ tiên của `--sha`, và phải chứa lượt tích hợp cuối
+//   --the-he    | bên bị kiểm   | SỔ: so với thế hệ đang hiệu lực trong sổ quyền
+//   --as        | bên bị kiểm   | KHÔNG KIỂM ĐƯỢC — chuỗi tự khai
+//   --ban-do    | bên bị kiểm   | KHÔNG KIỂM ĐƯỢC — đường dẫn tự chọn
+//   --con-lai   | bên bị kiểm   | KHÔNG KIỂM ĐƯỢC — chuỗi tự khai
+//
+//   CHƯA LÀM, ĐÃ BIẾT — ba dòng cuối bảng trên, và cả ba cùng MỘT họ: một tham số tự khai đứng
+//   ở chỗ đáng lẽ phải là một sự thật kiểm được.
+//
+//     ⓐ `--as` là TÊN, không phải danh tính. Vế "bên xác nhận không được là bên bị kiểm" so hai
+//        chuỗi, nên cùng một Assistant gọi lại bằng tên khác là đi qua.
+//     ⓑ `--ban-do` là ĐƯỜNG DẪN DO BÊN ĐẨY CHỌN. Vai SẢN PHẨM chứng minh bằng cách chạy thật:
+//        viết một bản đồ giả đúng hình dạng khai `vung-b/` thuộc `goi-a`, đưa vào bằng
+//        `--ban-do ban-do-gia.json` → **mã 0**; cùng commit đó với bản đồ thật → `AREA_MISMATCH`.
+//        Nên phép kiểm cưỡng chế "khớp với MỘT bản đồ nào đó", KHÔNG phải "khớp với bản đồ CỦA
+//        REPO". Nó chặn được **nhầm lẫn**; nó không chặn được **cố ý**.
+//
+//   Cả hai đóng được bằng cùng một thứ: dữ liệu đến từ nguồn được xác thực, không từ tham số —
+//   danh tính từ token workflow, bản đồ đọc từ commit đang được kiểm chứ không từ đĩa của bên đẩy.
+//
+// Tên vùng: từ 08/09 `kiemDuongDan` buộc mọi đường dẫn trong khoảng `coSo..sha` quy về đúng vùng
+// đã khai — **theo bản đồ bên đẩy đưa vào**. Đọc hẹp đúng câu đó. Lỗ cũ (phiên Codex khai
+// `wrong-area` cho một thay đổi ở `product.txt`) thì đã bịt thật.
+//
+// Bản đầu của khối này viết *"Tên vùng thì ĐÃ KIỂM từ 08/09"* — **rộng hơn bằng chứng**, và vai
+// SẢN PHẨM bác đúng. Cùng hình dạng lỗi với câu *"đóng lỗ TOCTOU"* tôi đã tự bắt một lần trước đó.
 //
 // Fail-closed: không tới được remote thì KHÔNG cấp quyền. Một quyền cấp bằng phỏng đoán tệ hơn
 // không có quyền.

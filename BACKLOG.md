@@ -1001,3 +1001,29 @@ Vùng: `_code` + `_root`.
 **đóng khi:** `npm run test:backlog` tồn tại ở repo này VÀ chặn thật một mục MỚI thiếu `đóng khi:`
 (dựng được ca hỏng, không chỉ chạy xanh), VÀ mục cũ không bị đỏ oan — đo bằng một lượt chạy trên
 chính sổ này.
+
+### KHUNG-45 · Bản đồ vùng đến từ BÊN BỊ KIỂM — chặn được nhầm lẫn, không chặn được cố ý
+
+Vai SẢN PHẨM chấm chéo 08/09 và **chứng minh bằng cách chạy thật**, không bằng lập luận: viết một
+bản đồ giả đúng hình dạng khai `vung-b/` thuộc `goi-a`, đưa vào bằng `--ban-do ban-do-gia.json` →
+**mã 0**. Cùng commit đó với bản đồ thật → `AREA_MISMATCH`.
+
+Nên `kiemDuongDan` cưỡng chế *"kết quả khớp với MỘT bản đồ nào đó"*, không phải *"khớp với bản đồ
+CỦA REPO"*.
+
+**Vì sao 97 ca xanh và 27/27 đột biến vẫn không thấy nó** — và đây là phần đáng đọc nhất: lỗ này
+**không phải một dòng bảo vệ bị gỡ**. Mã chạy đúng thiết kế. Nó là một **giả định về lòng tin**,
+nên **không có dòng nào để đột biến gỡ ra**. Thêm bao nhiêu con đột biến cũng không chạm tới.
+
+Cùng họ với `--as`: một tham số tự khai đứng ở chỗ cần một sự thật kiểm được. Đã liệt kê cả họ đó
+thành **bảng "AI NÓI ĐIỀU NÀY?"** ở đầu `scripts/quyen.mjs` — đó là thứ duy nhất bắt được lớp lỗi
+này, vì nó hỏi *ai nói*, không hỏi *dòng nào bị gỡ*.
+
+Lối đóng: đọc bản đồ **từ chính commit đang được kiểm** (`git show <sha>:.repo-structure.json`)
+thay vì từ đĩa của bên đẩy. Lúc đó bản đồ là dữ liệu **trong phạm vi đang bị kiểm**, không phải
+tham số. Chưa làm — lõi quyền chưa nối vào gì nên chưa gấp.
+
+Vùng: `_code`.
+
+**đóng khi:** có một ca dựng đúng phép thử của vai SẢN PHẨM — bản đồ giả đúng hình dạng, đường dẫn
+do bên đẩy chọn — và cửa TỪ CHỐI nó; kèm một ca đối chứng cho thấy bản đồ thật vẫn đi qua.
