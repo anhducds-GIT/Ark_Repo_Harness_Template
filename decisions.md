@@ -577,3 +577,25 @@ chữ trong tab `hidden`, nên với người xem thứ họ cần "không có t
 nhau, phiên AI phải **nói ra chỗ lệch** rồi chờ chốt, không tự chọn bên nào. Bảng quyền là nguồn
 sự thật cho *máy*; người chốt là nguồn sự thật cho *quyền*. Ba đường hợp lệ để một khoá được trả
 vẫn nguyên (AGENTS.md mục 1).
+
+## 2026-09-09 · `--carry` được tự làm khi cổng đã XANH TOÀN BỘ
+
+**Đức chốt:** *"Đẩy đi, và từ nay khỏi hỏi nếu cổng đã xanh."*
+
+**Vì sao cần chốt:** trong hai ngày, **ba lượt** phải dừng hỏi Đức cho **cùng một hình dạng** —
+commit của lane khác nằm dưới commit của mình, và git xếp theo thứ tự nên đẩy cái trên là buộc
+đẩy cái dưới. Cả ba lượt Đức đều duyệt. Một cửa mà lần nào cũng mở thì nó không còn là cửa, nó là
+một bước thủ tục — và thủ tục lặp lại sẽ bị bỏ qua trước khi nó bị gỡ.
+
+**Chốt:** `AGENTS.md` mục 2 hàng 2 thôi cấm `--carry` nói chung. Nay chỉ cấm khi **cổng CHƯA xanh
+toàn bộ**, hoặc có commit **không quy thuộc được** (thiếu nhãn `Lane:`).
+
+**ĐÂY LÀ NỚI MỘT LỚP BẢO VỆ**, khác hẳn hai lượt miễn thước kho chữ hôm 08/09 — những lượt đó
+làm thước **chặt hơn** vì chúng sửa phép đo cho khớp luật. Lượt này đổi chính luật.
+
+**Cái mất, nói thẳng:** Đức thôi được báo từng lượt việc của lane khác được công bố lên GitHub.
+Đổi lại: commit chưa push là **vô hình** với vòng audit chéo của GPT, nên đẩy sớm là được soi sớm.
+
+**Ghi ở đâu:** vân tay luật chung + lý do trong sổ đổi vân tay của `build-template.mjs`; luật ở
+`AGENTS.md` mục 2. Một luật vào một luật ra — bản trích giữ **200/200 dòng** bằng cách gộp đoạn
+*"commit và push tự làm"* với đoạn mới, vì sau lượt này hai đoạn nói cùng một điều.

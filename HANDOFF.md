@@ -920,3 +920,26 @@ không ở chỗ người ta đi tra.
 `Accepted` là **BẤT BIẾN**. Lối đúng: **ADR-0013 bổ sung**, tiền lệ ADR-0009. Trần sổ nợ vẫn 25.
 
 **Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-53` · `KHUNG-54`.
+
+## 2026-09-09 · harness-loi-01 · `--carry` thôi phải hỏi khi cổng đã xanh — nới có ghi giá
+
+**Ba lượt trong hai ngày, cùng một hình dạng, Đức duyệt cả ba:** commit của lane khác nằm dưới
+commit của mình; git xếp theo thứ tự nên đẩy cái trên là buộc đẩy cái dưới. **Một cửa mà lần nào
+cũng mở thì nó không còn là cửa** — nó là thủ tục, và thủ tục lặp lại bị bỏ qua trước khi bị gỡ.
+
+**Đức chốt:** *"Đẩy đi, và từ nay khỏi hỏi nếu cổng đã xanh."* `AGENTS.md` mục 2 hàng 2 nay chỉ
+cấm `--carry` khi **cổng CHƯA xanh toàn bộ** hoặc có commit **không quy thuộc được**.
+
+**GHI RÕ ĐÂY LÀ NỚI, không phải chữa mâu thuẫn.** Hai lượt miễn thước kho chữ hôm qua làm thước
+**chặt hơn** (chúng sửa phép đo cho khớp luật đã có). Lượt này đổi **chính luật**, và cái mất có
+thật: Đức thôi được báo từng lượt việc của lane khác lên GitHub. Đổi lại, commit chưa push là
+**vô hình** với vòng audit chéo — đẩy sớm là được soi sớm.
+
+**B9 lại cưỡng chế "một luật vào một luật ra":** bản trích 200 → 204 dòng. Trả lại bằng cách
+**gộp** đoạn *"commit và push tự làm"* (26/08) với đoạn mới — sau lượt này hai đoạn nói cùng một
+điều về cùng một câu hỏi *"khi nào AI được tự công bố"*. Về **200/200 khít**.
+
+**Đã ghi ba chỗ:** vân tay luật chung + lý do trong sổ đổi vân tay · `decisions.md` · luật ở
+`AGENTS.md`. Đổi luật an toàn mà chỉ nhớ miệng thì lượt sau không ai biết vì sao nó khác.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-53` · `KHUNG-54`.

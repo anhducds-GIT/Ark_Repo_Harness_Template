@@ -537,7 +537,16 @@ function phanLuatChung(text) {
  *   lane trong 1 giờ cùng vùng, 57% khác file hoàn toàn — hơn nửa số lượt chặn hôm nay là chặn
  *   OAN. Lý lẽ đầy đủ và mục "cái này KHÔNG chữa": ADR-0012.
  *   MỘT LUẬT VÀO THÌ MỘT LUẬT RA — xem dòng B9 ngay sau lượt này. */
-const COMMON_LAW_SHA256 = "3bc47c94b718e38ebbf34eeae099dafcaed4cb019d859b54f1deb4769500b2f5";
+/* 2026-09-09 — Đức duyệt tường minh: chọn "Đẩy đi, và từ nay khỏi hỏi nếu cổng đã xanh", sau
+ *   BA lượt phải dừng hỏi trong hai ngày cho cùng một hình dạng (commit của lane khác nằm dưới
+ *   commit của mình, đẩy cái trên là buộc đẩy cái dưới).
+ *   Đổi gì: mục 2 hàng 2 thôi cấm `--carry` nói chung; nay chỉ cấm khi cổng CHƯA xanh toàn bộ
+ *   hoặc có commit không quy thuộc được. Thêm một đoạn nêu ĐIỀU KIỆN và nêu CÁI MẤT: Đức thôi
+ *   được báo từng lượt việc của lane khác lên GitHub.
+ *   Vân tay trước: 3bc47c94b718e38ebbf34eeae099dafcaed4cb019d859b54f1deb4769500b2f5
+ *   ĐÂY LÀ NỚI MỘT LỚP BẢO VỆ, không phải chữa mâu thuẫn — khác hẳn hai lượt miễn thước kho chữ
+ *   hôm qua (những lượt đó làm thước CHẶT hơn). Ghi rõ để lượt sau đọc không lẫn hai loại. */
+const COMMON_LAW_SHA256 = "51d31f3eda172dea51e5c5a7d259657cb050c535517efb289a975c7dfaaac7e4";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

@@ -81,7 +81,7 @@ sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khố
 | # | Việc | Vì sao không lùi lại được |
 |---|---|---|
 | 1 | Xoá file, hoặc sửa dữ liệu gốc | Mất là mất, không dựng lại được |
-| 2 | Đẩy kèm commit của phiên khác (`--carry`) | Công bố việc chưa ai duyệt |
+| 2 | `--carry` khi cổng CHƯA xanh toàn bộ, hoặc có commit không quy thuộc được | Công bố việc chưa ai duyệt |
 | 3 | Giành vùng một phiên khác đang giữ | Người kia mất việc mà không biết |
 | 4 | Gửi bất cứ gì ra ngoài (mail, tin nhắn, đăng công khai) | Ra rồi thì không rút về được |
 | 5 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
@@ -90,17 +90,17 @@ sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khố
 Ngoài sáu việc này, AI tự làm. Nguyên tắc phía sau: **AI tự do trong phạm vi làm repo tốt lên
 và lùi lại được. Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.**
 
-**"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md).
+**"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md). Repo có phụ lục
+nghề (`docs/ANNEX-*.md`) thì việc phụ lục liệt kê cũng phải hỏi — phụ lục chỉ được **thêm** vào
+sáu việc trên, không được bớt.
 
-Repo có phụ lục nghề (`docs/ANNEX-*.md`) thì việc phụ lục liệt kê cũng phải hỏi — phụ lục chỉ
-được **thêm** vào sáu việc trên, không được bớt.
+**Commit và push tự làm** — Đức chốt 26/08 — khi đủ ba: (1) việc hoàn tất trọn vẹn; (2) cổng XANH
+TOÀN BỘ, code thì đã qua audit độc lập; (3) đẩy bằng `safe-push.mjs`. **Đủ ba điều đó thì `--carry`
+cũng tự làm**, miễn mọi commit mang nhãn `Lane:` quy thuộc được — Đức chốt 09/09, sau ba lượt phải
+dừng hỏi trong hai ngày. Lý do: commit chưa push là **vô hình** với vòng kiểm tra chéo. Cái mất:
+Đức thôi được báo từng lượt việc của lane khác lên GitHub.
 
-**Commit và push được tự làm** — Đức chốt 2026-08-26, áp cho MỌI AI — nhưng chỉ khi đủ cả ba:
-(1) việc đã hoàn tất trọn vẹn; (2) cổng kiểm XANH TOÀN BỘ, và với code thì đã qua audit độc lập;
-(3) đẩy bằng `safe-push.mjs`. Lý do đổi luật: Đức không đọc code trên máy, GPT audit qua GitHub —
-nên commit chưa push là **vô hình** với vòng kiểm tra chéo. Push sớm = được audit sớm.
-
-Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và mục 2 hàng 2 ở trên.
+Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main`.
 
 ## 3. Năm luật vàng
 
