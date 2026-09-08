@@ -84,5 +84,9 @@
       "B10",
       "B12"
     ]
+  },
+  "backlog": {
+    "_doc": "Tran so no ha tang cua repo nay. Cong dong phien DO khi so muc MO vuot tran. Khong khai khoi nay = khong co tran, cong xanh. Doi con so nay phai hoi Duc (ADR-0010).",
+    "tran": 25
   }
 }

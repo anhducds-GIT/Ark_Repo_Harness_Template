@@ -1002,7 +1002,12 @@ Vùng: `_code` + `_root`.
 (dựng được ca hỏng, không chỉ chạy xanh), VÀ mục cũ không bị đỏ oan — đo bằng một lượt chạy trên
 chính sổ này.
 
-### KHUNG-45 · Bản đồ vùng đến từ BÊN BỊ KIỂM — chặn được nhầm lẫn, không chặn được cố ý
+### ~~KHUNG-45~~ · Bản đồ vùng đến từ BÊN BỊ KIỂM — chặn được nhầm lẫn, không chặn được cố ý
+
+**ĐÓNG 2026-09-08 vì thứ mang lỗi đã bị XOÁ, không phải vì đã vá.** `scripts/quyen.mjs` và
+`tests/quyen-sau-ca.mjs` không còn trong repo — lý lẽ ở [ADR-0010](docs/adr/0010-xoa-so-quyen-va-tran-so-no.md).
+Lỗ hổng dưới đây có thật và bài chấm chứng minh nó bằng cách chạy thật; nó chỉ hết là mối lo vì
+không còn mã nào đọc `--ban-do`. **Dựng lại sổ quyền thì mở lại mục này TRƯỚC KHI viết dòng đầu.**
 
 Vai SẢN PHẨM chấm chéo 08/09 và **chứng minh bằng cách chạy thật**, không bằng lập luận: viết một
 bản đồ giả đúng hình dạng khai `vung-b/` thuộc `goi-a`, đưa vào bằng `--ban-do ban-do-gia.json` →

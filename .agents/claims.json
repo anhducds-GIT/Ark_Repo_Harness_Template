@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-07T19:39:30.134Z",
-      "task": "tang ban 1.3.40",
-      "released_at": "2026-09-08T03:29:53.998Z",
+      "claimed_at": "2026-09-08T03:44:42.510Z",
+      "task": "khai backlog.tran=25; package.json bo test:quyen; AGENTS/BACKLOG theo ADR-0010",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_docs": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-07T19:16:57.744Z",
-      "task": "ADR bo sung ADR-0006: bang co NAM nhom",
-      "released_at": "2026-09-08T03:29:51.099Z",
+      "claimed_at": "2026-09-08T03:44:42.571Z",
+      "task": "ADR-0010: chon tran so no va xoa so quyen chua ai goi",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-07T19:16:57.662Z",
-      "task": "tach tab migrate rieng + khai hai vai thanh luat",
-      "released_at": "2026-09-08T03:29:50.958Z",
+      "claimed_at": "2026-09-08T03:42:03.836Z",
+      "task": "xoa so quyen chua ai goi; khoa doc quyen cho claim.mjs; tran so no 25 co may dem",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "claude-cua-kiem",
       "ai": null,
-      "claimed_at": "2026-09-07T19:39:30.038Z",
-      "task": "phat ban 1.3.40",
-      "released_at": "2026-09-08T03:29:54.125Z"
+      "claimed_at": "2026-09-08T03:52:21.340Z",
+      "task": "phat ban 1.3.48: cong them phep kiem tran so no",
+      "released_at": null
     }
   }
 }

@@ -22,7 +22,7 @@ let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
-const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs"];
+const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs"];
 
 /* Kho nền: đủ để cổng chạy tới được mọi phép kiểm. Mỗi khối tự phá phần của mình. */
 function khoNen({ chuKhoa = "thu" } = {}) {
@@ -409,6 +409,57 @@ function docMuc(kho, ten, as = "thu") {
       `xoa HAN mot dong (khong con trong file, khong co trong kho) VAN phai DO, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("9 · dời nhật ký sang kho lưu trữ: khớp byte XANH · lệch một ký tự ĐỎ · sửa dòng cũ ĐỎ · dịch chỗ KHÔNG bắt oan");
+}
+
+/* ---- 10. Trần sổ nợ ------------------------------------------------------- */
+/* Phép kiểm này sinh ra ĐÚNG VÌ một trần không có máy canh đã vỡ trong im lặng ở repo kia.
+   Nên nó phải chứng minh cả hai chiều, không chỉ chiều đỏ:
+   ⑴ vượt trần thì ĐỎ · ⑵ đóng một mục ĐÚNG QUY ƯỚC (gạch mã) thì XANH lại · ⑶ repo KHÔNG khai
+   trần thì XANH kể cả khi sổ dài. Vế ⑵ là vế dễ hỏng nhất: nếu bộ đếm không hiểu quy ước đóng
+   thì cổng đỏ vĩnh viễn và người ta sẽ tháo nó ra. */
+{
+  const { cha, kho, at } = khoNen();
+  try {
+    const soNo = (dongMuc) => [
+      "# BACKLOG", "", "## P1", "",
+      ...dongMuc.flatMap((d) => [d, "", "than muc", ""])
+    ].join(NL);
+    const datTran = (n) => {
+      const ct = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+      if (n === null) delete ct.backlog; else ct.backlog = { tran: n };
+      writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(ct, null, 2) + NL, "utf8");
+    };
+    const luot = (ten) => { at("add", "-A"); at("commit", "-q", "-m", ten + NL + NL + "Lane: thu"); };
+
+    // Đối chứng: ba mục mở, trần 5 → XANH. Chưa xanh ở đây thì mọi khẳng định dưới là vô nghĩa.
+    writeFileSync(join(kho, "BACKLOG.md"), soNo(["### KHUNG-1 · a", "### KHUNG-2 · b", "### KHUNG-3 · c"]), "utf8");
+    datTran(5);
+    luot("so no ba muc");
+    let m = docMuc(kho, "Sổ nợ dưới trần");
+    assert.equal(m.trangThai, "XANH", `3 muc / tran 5 phai XANH, dang: ${m.chiTiet}`);
+
+    // ⑴ Hạ trần xuống 2 → ĐỎ. Phá đúng một thứ: con số, không đụng sổ.
+    datTran(2);
+    luot("ha tran xuong 2");
+    m = docMuc(kho, "Sổ nợ dưới trần");
+    assert.equal(m.trangThai, "ĐỎ", `3 muc / tran 2 phai DO, dang: ${m.chiTiet}`);
+    assert.ok(m.chiTiet.includes("SO_NO_VUOT_TRAN"), `thieu ma loi SO_NO_VUOT_TRAN: ${m.chiTiet}`);
+
+    // ⑵ Đóng một mục đúng quy ước sổ (gạch mã) → XANH lại, KHÔNG phải nâng trần.
+    writeFileSync(join(kho, "BACKLOG.md"), soNo(["### ~~KHUNG-1~~ · a", "### KHUNG-2 · b", "### KHUNG-3 · c"]), "utf8");
+    luot("dong KHUNG-1 dung quy uoc");
+    m = docMuc(kho, "Sổ nợ dưới trần");
+    assert.equal(m.trangThai, "XANH",
+      `dong mot muc bang cach GACH MA phai lam cong xanh lai — neu khong, cua ra bi bit va nguoi ta se thao cong. Dang: ${m.chiTiet}`);
+
+    // ⑶ Repo không khai trần → XANH dù sổ vượt. Bản khung phát đi không được tự đặt trần hộ ai.
+    writeFileSync(join(kho, "BACKLOG.md"), soNo(["### KHUNG-1 · a", "### KHUNG-2 · b", "### KHUNG-3 · c"]), "utf8");
+    datTran(null);
+    luot("bo khai tran");
+    m = docMuc(kho, "Sổ nợ dưới trần");
+    assert.equal(m.trangThai, "XANH", `khong khai backlog.tran thi phai XANH, dang: ${m.chiTiet}`);
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+  ok("10 · trần sổ nợ: vượt trần ĐỎ · gạch mã một mục XANH lại · repo không khai trần XANH");
 }
 
 
