@@ -2,7 +2,7 @@
   "_doc": "DANH MỤC TÍNH NĂNG — nguồn sự thật duy nhất cho câu 'bộ khung này làm được gì', và cho checklist migrate. MỖI MỤC PHẢI CÓ PHÉP ĐO: khối `can` khai file và lệnh phải tồn tại, nên `scripts/features.mjs` chạy được ở BẤT KỲ repo nào và trả lời được 'tính năng này ở đây có sống không'. Một danh mục không đo được thì nó là quảng cáo, không phải checklist.",
   "_doc2": "pham_vi có ba giá trị, và phân biệt được ba giá trị đó là toàn bộ giá trị của file này lúc migrate: 'ca-hai' = repo nào cũng cần · 'chi-repo-nha' = chỉ nơi PHÁT HÀNH bộ khung mới cần (repo đích không thiếu nó, và đòi nó ở repo đích là báo thiếu sai) · 'chi-repo-dich' = chỉ repo tiêu thụ.",
   "_doc3": "tu_ban = bản bộ khung mà mục đó bắt đầu có. Đây là chỗ một phiên AI ở repo đích đối chiếu để biết mình đang thiếu tính năng nào so với bản mới — cùng với .ark/harness.lock.json.",
-  "version": "1.3.66",
+  "version": "1.3.71",
   "blocks": [
     {
       "ma": "F1",
@@ -11,20 +11,21 @@
       "muc": [
         {
           "ma": "F1.1",
-          "ten": "Bảng chính HTML, sinh hoàn toàn từ HEAD",
+          "ten": "Bảng chính HTML, sinh hoàn toàn từ HEAD — kèm lưu đồ vẽ thành SVG",
           "tu_ban": "1.3.18",
           "pham_vi": "ca-hai",
           "can": {
             "file": [
               "scripts/build-overview.mjs",
               "scripts/overview-doc.mjs",
-              "scripts/md-mini.mjs"
+              "scripts/md-mini.mjs",
+              "scripts/luu-do.mjs"
             ],
             "lenh": [
               "overview"
             ]
           },
-          "khong_co_thi": "Không có bảng cho người xem. Mọi câu 'đang có gì' phải hỏi AI, và câu trả lời trôi mất trong chat."
+          "khong_co_thi": "Không có bảng cho người xem. Mọi câu 'đang có gì' phải hỏi AI, và câu trả lời trôi mất trong chat. Và thiếu scripts/luu-do.mjs thi md-mini.mjs NAP KHONG NOI, tuc ca trang chet; truoc ban 1.3.68 file nay khong ton tai va bay luu do hien ra duoi dang MA NGUON suot 5 thang ma khong phep kiem nao do."
         },
         {
           "ma": "F1.2",
@@ -82,15 +83,16 @@
       "muc": [
         {
           "ma": "F2.1",
-          "ten": "Repo tự khai hình dạng của mình",
+          "ten": "Repo tự khai hình dạng của mình — và MỘT bộ đọc duy nhất cho nó",
           "tu_ban": "0.3.0",
           "pham_vi": "ca-hai",
           "can": {
             "file": [
-              ".repo-structure.json"
+              ".repo-structure.json",
+              "scripts/repo-structure.mjs"
             ]
           },
-          "khong_co_thi": "Mọi công cụ phải đoán repo có hình dạng gì, và đoán sai thì hỏng im lặng."
+          "khong_co_thi": "Mọi công cụ phải đoán repo có hình dạng gì, và đoán sai thì hỏng im lặng. Va khai file cau hinh ma khong khai BO DOC cua no la khai mot nua: scripts/repo-structure.mjs la noi duy nhat suy ra hinh dang repo, fail-closed. Thieu no thi moi script tu doan lay, dung cai benh K1 sinh ra de chua."
         },
         {
           "ma": "F2.2",
@@ -378,15 +380,20 @@
       "muc": [
         {
           "ma": "F6.1",
-          "ten": "Nhật ký bàn giao — phiên sau đọc phần cuối là biết phiên trước làm tới đâu",
+          "ten": "Nhật ký bàn giao — kèm TRẦN mỗi mục và nhịp xoay theo tháng, có máy canh",
           "tu_ban": "0.3.0",
           "pham_vi": "ca-hai",
           "can": {
             "file": [
-              "HANDOFF.md"
+              "HANDOFF.md",
+              "scripts/handoff.mjs",
+              "tests/handoff-smoke.mjs"
+            ],
+            "lenh": [
+              "handoff"
             ]
           },
-          "khong_co_thi": "Mỗi phiên bắt đầu lại từ số 0, và vấp đúng chỗ phiên trước đã vấp."
+          "khong_co_thi": "Mỗi phiên bắt đầu lại từ số 0, và vấp đúng chỗ phiên trước đã vấp. Va mot quyen nhat ky KHONG CO TRAN thi chi co mot chieu la phinh: luat cam sua/xoa dong cu, nen no lon len mai. scripts/handoff.mjs la thuoc do va la nhip xoay; thieu no thi luat co ma rang khong."
         },
         {
           "ma": "F6.2",
@@ -584,6 +591,23 @@
             ]
           },
           "khong_co_thi": "Cùng một commit tồn tại ở hai dạng byte và `git status` nói SẠCH ở cả hai. Một phép kiểm xanh trên máy vừa ghi file và ĐỎ với người vừa clone."
+        },
+        {
+          "ma": "F8.5",
+          "ten": "Chạy suite song song + dấu xác nhận — cổng thôi chạy lại một chuỗi vừa xanh",
+          "tu_ban": "1.3.60",
+          "pham_vi": "ca-hai",
+          "can": {
+            "file": [
+              "scripts/chay-test.mjs",
+              "tests/dau-suite-smoke.mjs"
+            ],
+            "chuoi": [
+              "chay-test.mjs"
+            ]
+          },
+          "vi_sao": "Do 2026-09-08 o noi phat hanh: chuoi suite 535s va cong dong phien chay LAI dung chuoi do, nen mot vong lam viec ton 18 phut ma nua sau khong kiem them duoc gi. Chay song song 535->256s, dau xac nhan 560->22s, ca vong 1.095->278s (nhanh 75%).",
+          "khong_co_thi": "Mot vong lam viec ton gap doi thoi gian can thiet, va cai gia do roi vao MOI phien. Den luc do phien AI se bo qua cong — do chinh la luc lop bao ve chet."
         }
       ]
     },

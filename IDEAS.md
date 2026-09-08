@@ -121,13 +121,33 @@
 ## Y-08 · Biết chắc cổng kiểm trên GitHub có chặn thật hay không
 
 - **bậc:** ý tưởng
-- **việc kế:** Đức mở Settings → Branches của repo trên GitHub và ghi lại luật branch protection đang bật
+- **việc kế:** Đức quyết có bật `Do not allow bypassing` ở Settings → Branches không — đã ĐO được 08/09 là cổng đang bị vượt ở mọi lượt đẩy
 - **chủ:** chưa ai nhận
 - **phạm vi:** `_root` — không đụng code
 
 **nguồn** — `HANDOFF.md`, phát hiện của audit độc lập 05/09: `AGENTS.md` gọi CI là chỗ *"bịt lỗ hở duy nhất"* trong khi sổ phát hành nói CI chưa chặn merge.
 
 **vì sao** — Repo này đã đếm được **sáu lần** cùng một hình dạng lỗi: một luật trỏ tới thứ không tồn tại hoặc không chạy như luật giả định. Nếu CI thật sự không chặn merge thì câu *"bịt lỗ hở duy nhất"* là lần thứ bảy — và là lần nguy hiểm nhất, vì nó khiến người đọc yên tâm sai chỗ.
+
+**ĐO ĐƯỢC 2026-09-08 — câu hỏi đã có MỘT NỬA câu trả lời, không còn phải đoán.** Lượt đẩy của
+lane `harness-loi-01` in ra nguyên văn từ remote:
+
+```
+remote: Bypassed rule violations for refs/heads/main:
+remote: - Required status check "cong-kiem" is expected.
+```
+
+Nghĩa là: branch protection **CÓ khai** `cong-kiem` là phép kiểm bắt buộc, **và tài khoản đang đẩy
+đi qua được nó**. Nên câu *"bịt lỗ hở duy nhất"* trong `AGENTS.md` đúng về ý định, sai về hiệu lực
+— với tài khoản này nó không chặn gì.
+
+**Đức chốt 08/09: chưa đổi gì, ghi bằng chứng lại đã.** Lý do: ba lớp trước nó (cổng đóng phiên ·
+`safe-push` · nhãn lane) đều còn răng và đều chạy trên máy Đức. Cổng GitHub chỉ thành vấn đề nếu
+có phiên dùng `git push` trần — mà luật đã cấm và `safe-push` cưỡng chế. Nên đây là **tần suất
+cao, tác hại thấp**: nó bị vượt ở MỌI lượt đẩy, nhưng chưa lượt nào để lọt việc chưa qua cổng.
+
+**Việc kế đổi theo:** không còn là *"đi xem có gì"* mà là *"Đức quyết có bật `Do not allow
+bypassing` hay không"* — bật thì cổng chặn thật, kể cả chặn chính Đức lúc cần đẩy gấp.
 
 **vì sao chưa làm ngay** — Không phiên AI nào đọc được cấu hình branch protection trên GitHub; nó nằm ngoài đĩa. Chỉ người có quyền quản trị repo mở trang đó ra xem được, chừng năm phút.
 

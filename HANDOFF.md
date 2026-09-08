@@ -637,8 +637,7 @@ chụp ĐÃ HỎNG**, sổ mất hẳn dòng `1.2.10`. Trước đó commit `c38
 Chỉ lộ vì `git status` báo sổ *"sửa dở"* — mà nội dung "sửa dở" chính là bản ĐÚNG. Nhìn ngược.
 
 **Vá:** `test.serial` khai thêm ba suite, kèm `_ghi_de_file_that` nói rõ tiêu chí thứ hai để khai
-vào đó — **suite GHI ĐÈ một file đã commit ở gốc repo**, không chỉ suite đọc git. Ghim ở
-`tests/dau-suite-smoke.mjs`: quét NGUỒN mọi file trong `tests/`, ai chạm sổ mà quên khai thì ĐỎ.
+vào đó — **suite GHI ĐÈ một file đã commit ở gốc repo**, không chỉ suite đọc git. Ghim `tests/dau-suite-smoke.mjs`: quét NGUỒN mọi file `tests/`, ai chạm sổ mà quên khai thì ĐỎ.
 
 **Phép ghim ĐỎ OAN ngay lượt đầu — đúng cái bẫy nhật ký hôm nay vừa ghi.** Bản đầu gõ thẳng tên
 `build-template.mjs`, mà đó là công cụ của NƠI PHÁT HÀNH; repo tiêu thụ không có nó nên
@@ -649,7 +648,7 @@ trong chuỗi có đọc sổ. **Hai lần trong một ngày cùng một bài h�
 `core-contract.mjs` gọi `upgrade.mjs --apply`, và lệnh đó mới đọc sổ — gỡ nó khỏi `test.serial`
 thì vế VẪN XANH (đã thử, sống sót). Nó nằm trong danh sách vì đo được nó đỏ oan, không vì vế bắt.
 
-**Còn mở:** `KHUNG-47` — vá này chỉ đóng ca trong MỘT lượt chạy. Hai LANE cùng chạy `npm test`
+**Còn mở:** `KHUNG-51` — vá này chỉ đóng ca trong MỘT lượt chạy. Hai LANE cùng chạy `npm test`
 trên chung một cây làm việc thì vẫn hỏng như cũ.
 ## 2026-09-08 (khuya) · harness-phat-01 · BÀN GIAO cho lane ① — hai mục đỏ của cổng là việc của ①
 
@@ -682,3 +681,36 @@ bản. Gộp vào **cùng 1.3.68** thì tiết kiệm một số — sổ cưỡ
 đã đốt bảy số vì làm ngược thứ tự.
 
 **Đã trả `_root` + `_docs`.**
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Ba chốt của Đức: thước docs · KHUNG-48 · Y-08
+
+**⑴ Thước kho chữ đếm SAI thứ nó định đo — và nó phạt đúng người làm đúng.** `AGENTS.md` viết rõ
+*"lưu trữ KHÔNG tính vào ngân sách tài liệu"*, `can-nang.mjs` đã miễn `docs/archive/` từ 06/09 vì
+đúng lý do đó — **chỉ cổng đóng phiên là còn đếm**. Một luật hai chỗ, và hôm nay chúng lệch THẬT:
+lane kia chạy **đúng nhịp DỌN mà repo BẮT làm**, dời 1.135 dòng sang lưu trữ, và cổng ĐỎ vì chính
+việc dọn. Cùng họ `KHUNG-25`.
+
+**Đức chốt: sửa CỔNG cho khớp LUẬT.** Hằng số `THU_MUC_LUU_TRU` về `repo-structure.mjs` — một chỗ
+khai, hai chỗ đọc. Thước **5.744 → 4.001**, tức **CHẶT HƠN**: chữa mâu thuẫn, không phải nới.
+Ghim `cong-do-that.mjs` vế 11: `git mv` file đang vượt thước sang `docs/archive/`, không xoá chữ
+nào, cổng phải XANH lại. Đột biến bỏ lại phép loại → ĐỎ.
+
+**⑵ `KHUNG-48` đóng** (Đức đã chốt 08/09). `F8.5` đo cơ chế suite song song; và vế **`5b` chiều
+ngược**: mọi script trong `PORTABLE_SCRIPTS` phải nằm trong một **phép ĐO** của danh mục.
+
+**Vế ngược bắt BA chỗ ngay lượt đầu** — ngoài `chay-test.mjs` còn `repo-structure.mjs` và
+`handoff.mjs`, phát đi đã lâu mà danh mục chưa từng đo. Danh mục không trôi một mục, nó trôi ba.
+
+**Thêm phép đo thứ ba `chuoi` — đo DÂY NỐI**, vì tên alias khác nhau ở mỗi repo (`test` ở đây,
+`test:song-song` ở repo tiêu thụ). **Hỏi tên là hỏi chi tiết triển khai** — lần thứ BA trong ngày.
+
+**4 đột biến, cả 4 bị bắt, HAI cái sống sót lượt đầu:** vế ngược quét cả JSON nên **văn xuôi
+được tính là "đã khai"** (nay chỉ đọc khối `can`); và phép đo `chuoi` LUÔN ĐẠT vẫn xanh vì chưa
+vế nào đòi nó biết ĐỎ.
+
+**⑶ `Y-08` — hết đoán, có bằng chứng.** Lượt đẩy hôm nay in nguyên văn từ remote:
+`Bypassed rule violations for refs/heads/main: Required status check "cong-kiem" is expected`.
+Tức cổng GitHub **có khai** mà tài khoản đang đẩy **đi qua được**. Tần suất CAO (mọi lượt đẩy),
+tác hại THẤP (ba lớp trước nó còn răng). Đức chốt: ghi bằng chứng, chưa đổi gì.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-49` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51`.

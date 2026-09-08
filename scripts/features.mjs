@@ -86,6 +86,13 @@ export function xetMuc(muc, repo, laRepoNha, lenh, co = coTrenDia) {
 
   const canFile = muc.can?.file ?? [];
   const canLenh = muc.can?.lenh ?? [];
+  /* `chuoi` đo DÂY NỐI, không đo file. Vì sao cần một kiểu đo thứ ba: một cơ chế có thể có đủ
+   * file mà KHÔNG ai gọi được nó — đúng ca `[~]` mà chính danh mục cảnh báo, và đã xảy ra thật
+   * (`session-check.mjs` có mặt nhưng thiếu `npm run gate`). Đo bằng `lenh` thì không xong, vì
+   * TÊN alias khác nhau ở mỗi repo: ở đây bộ chạy song song nằm dưới `test`, ở repo tiêu thụ nó
+   * là `test:song-song` — hỏi tên là hỏi chi tiết triển khai. Nên hỏi HÀNH VI: có alias nào TRỎ
+   * VÀO nó không. */
+  const canChuoi = muc.can?.chuoi ?? [];
   const coFile = canFile.filter((f) => co(repo, f));
   const thieuFile = canFile.filter((f) => !co(repo, f));
 
@@ -94,16 +101,21 @@ export function xetMuc(muc, repo, laRepoNha, lenh, co = coTrenDia) {
   const coLenh = lenh === null ? canLenh : canLenh.filter((l) => Object.hasOwn(lenh, l));
   const thieuLenh = lenh === null ? [] : canLenh.filter((l) => !Object.hasOwn(lenh, l));
 
-  const tongCan = canFile.length + (lenh === null ? canLenh.length : canLenh.length);
-  const tongCo = coFile.length + coLenh.length;
+  // Cùng luật với `lenh`: không đọc được `package.json` thì BỎ QUA vế này, không tính là thiếu.
+  const giaTri = lenh === null ? [] : Object.values(lenh).map((v) => String(v));
+  const coChuoi = lenh === null ? canChuoi : canChuoi.filter((c) => giaTri.some((v) => v.includes(c)));
+  const thieuChuoi = lenh === null ? [] : canChuoi.filter((c) => !giaTri.some((v) => v.includes(c)));
+
+  const tongCan = canFile.length + canLenh.length + canChuoi.length;
+  const tongCo = coFile.length + coLenh.length + coChuoi.length;
   const trangThai = tongCo === 0 && tongCan > 0 ? TRANG_THAI.THIEU
     : tongCo === tongCan ? TRANG_THAI.XONG
       : TRANG_THAI.MOT_PHAN;
 
   return {
     trangThai,
-    co: [...coFile, ...coLenh.map((l) => `npm run ${l}`)],
-    thieu: [...thieuFile, ...thieuLenh.map((l) => `npm run ${l}`)]
+    co: [...coFile, ...coLenh.map((l) => `npm run ${l}`), ...coChuoi.map((c) => `một alias npm gọi ${c}`)],
+    thieu: [...thieuFile, ...thieuLenh.map((l) => `npm run ${l}`), ...thieuChuoi.map((c) => `một alias npm gọi ${c}`)]
   };
 }
 

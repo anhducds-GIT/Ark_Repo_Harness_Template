@@ -18,7 +18,11 @@
 
 ## P1
 
-### KHUNG-47 · Suite ĐỘT BIẾN ghi thẳng vào file ĐÃ COMMIT của cây làm việc chính
+### KHUNG-51 · Suite ĐỘT BIẾN ghi thẳng vào file ĐÃ COMMIT của cây làm việc chính
+
+> **Mục này viết ra với số `KHUNG-47` — TRÙNG với một mục lane `harness-phat-01` vừa thêm cùng
+> lúc.** Đổi sang 51 ngay trong cùng phiên. Đây là ca thật của việc hai lane cùng cấp mã trong
+> một cây làm việc mà không ai thấy mã của người kia; ghi lại vì nó sẽ lặp.
 
 **Không phải giả định — đã làm hỏng một commit thật hôm nay (08/09).** `tests/upgrade-smoke.mjs`
 khối 14 ghi `"1".repeat(16)` đè lên một dòng của `RELEASE-LEDGER.json` **THẬT ở gốc repo**, chạy
@@ -1158,7 +1162,34 @@ repo đích thiếu dòng đó rồi đòi `--plan` **nói ra**; ⑶ `--apply` t
 gọi tên một npm script cố định cho bước chạy suite.
 
 
-### KHUNG-48 · `features.json` không có mục nào cho cơ chế suite song song — danh mục đo được một chiều
+### ~~KHUNG-48~~ · ĐÓNG 08/09 · `features.json` không có mục nào cho cơ chế suite song song — danh mục đo được một chiều
+
+**Đóng đủ cả hai vế của điều kiện.**
+
+⑴ **`F8.5`** đo cơ chế: `scripts/chay-test.mjs` · `tests/dau-suite-smoke.mjs` · và **dây nối**,
+kèm `tu_ban: "1.3.60"`.
+
+⑵ **`tests/features-smoke.mjs` vế `5b`** — chiều ngược: mọi script trong `PORTABLE_SCRIPTS` phải
+nằm trong ít nhất một **phép ĐO** của danh mục.
+
+**Và vế ngược bắt được BA chỗ ngay lượt chạy đầu, không phải một:** ngoài `chay-test.mjs` còn
+`repo-structure.mjs` (bộ đọc hình dạng repo — khai file cấu hình mà không khai bộ đọc là khai một
+nửa) và `handoff.mjs` (thước trần nhật ký). Cả ba đã phát đi từ lâu mà danh mục chưa từng đo.
+Đó là số đo của việc *"danh mục trôi tự do theo hướng nói THIẾU"* — nó không trôi một mục, nó
+trôi ba.
+
+**Phép đo thứ BA — `chuoi` — và vì sao phải thêm nó:** điều kiện đóng đòi đo cả *"một alias npm
+trỏ vào bộ chạy"*. Đo bằng `lenh` thì hỏng: TÊN alias khác nhau ở mỗi repo — ở đây bộ chạy nằm
+dưới `test`, ở repo tiêu thụ nó là `test:song-song`. **Hỏi tên là hỏi chi tiết triển khai.** Nên
+`chuoi` hỏi *"có alias nào TRỎ VÀO nó không"*, tên gì cũng được.
+
+**Bốn đột biến đã chạy, cả bốn bị bắt** — và **hai cái SỐNG SÓT lượt đầu**: ⑵ gỡ `luu-do.mjs`
+khỏi `can.file` của `F1.1` vẫn xanh, vì vế ngược quét cả JSON nên **văn xuôi `khong_co_thi` được
+tính là "đã khai"** — trong khi văn xuôi không đo được gì; nay chỉ đọc khối `can`. ⑶ làm phép đo
+`chuoi` LUÔN ĐẠT vẫn xanh, vì chưa vế nào đòi nó biết ĐỎ.
+
+<details><summary>Nội dung gốc của mục</summary>
+
 
 > **Đức chốt 2026-09-08:** *"Nếu chưa coi đó là 1 feature, thì ta cần pack nó lại trong feature list để có check list đầy đủ trong tab Migrate."*
 > Nên mục này **đã được duyệt để làm**, không còn chờ ai quyết. Việc thuộc Vai ① — sửa `features.json` là sửa **tầng máy**
@@ -1191,6 +1222,8 @@ Vùng: `_root` (`features.json`) + `_code` (phép ghim).
 `tu_ban: "1.3.60"`; **và** ⑵ `tests/features-smoke.mjs` có một vế NGƯỢC: mọi tên trong
 `PORTABLE_SCRIPTS` của `build-template.mjs` phải xuất hiện trong ít nhất một phép đo của danh mục,
 và vế đó ĐỎ khi xoá thử mục vừa thêm.
+
+</details>
 
 ### KHUNG-49 · `F4.7` XANH GIẢ ở mọi repo đã migrate — phép đo chỉ hỏi file có tồn tại
 

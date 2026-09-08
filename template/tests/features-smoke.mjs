@@ -32,7 +32,7 @@
  *   5. `demTheoTrangThai` đếm "một phần" vào "xong"        → vế 2 ĐỎ
  */
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -43,6 +43,11 @@ import {
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
+/* BỎ QUA CÓ TÊN, không bỏ qua im lặng — suite này đi theo bản trích nên nó chạy ở repo người
+   khác, và có vế chỉ có nghĩa ở NƠI PHÁT HÀNH. Một vế bỏ qua im lặng trông giống hệt một vế đã
+   chạy và xanh. */
+let boQua = 0;
+const boQuaVi = (ten, vi) => { boQua += 1; console.log(`  --  ${ten} — BỎ QUA: ${vi}`); };
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const danhMuc = docDanhMuc(ROOT);
@@ -89,6 +94,28 @@ const danhMuc = docDanhMuc(ROOT);
 
   const r = xetMuc(muc, "/r", false, { x: "..." }, co);
   assert.deepEqual(r.thieu, ["b"], "phai KE TEN dung thu con thieu, khong chi noi 'thieu'");
+
+  /* PHÉP ĐO THỨ BA — `chuoi`, đo DÂY NỐI chứ không đo file hay tên alias.
+   *
+   * Vì sao không đo bằng `lenh`: TÊN alias khác nhau ở mỗi repo. Bộ chạy song song nằm dưới
+   * `test` ở nơi phát hành, nhưng ở repo tiêu thụ nó mang tên `test:song-song` — hỏi tên là hỏi
+   * chi tiết triển khai, và một phép ghim hỏi chi tiết triển khai thì nó là bản sao chứ không
+   * phải hợp đồng (bài học 08/09, lần thứ ba trong ngày).
+   *
+   * Vế này phải có, vì thiếu nó thì một đột biến làm `chuoi` LUÔN ĐẠT vẫn sống sót — đã thử. */
+  const mucDay = { ma: "T.2", pham_vi: "ca-hai", can: { chuoi: ["chay-test.mjs"] } };
+  assert.equal(xetMuc(mucDay, "/r", false, { test: "node scripts/chay-test.mjs" }, () => false).trangThai,
+    TRANG_THAI.XONG, "alias TEN GI cung duoc, mien la no TRO VAO dung thu can do");
+  assert.equal(xetMuc(mucDay, "/r", false, { "test:song-song": "node scripts/chay-test.mjs" }, () => false).trangThai,
+    TRANG_THAI.XONG, "ten alias khac o repo tieu thu — van phai XONG");
+  assert.equal(xetMuc(mucDay, "/r", false, { test: "node tests/khac.mjs" }, () => false).trangThai,
+    TRANG_THAI.THIEU, "co alias nhung KHONG tro vao thu can do thi la THIEU");
+  assert.deepEqual(xetMuc(mucDay, "/r", false, { test: "node tests/khac.mjs" }, () => false).thieu,
+    ["một alias npm gọi chay-test.mjs"], "phai KE TEN thu day noi con thieu");
+  // Không đọc được `package.json` (repo khác nghề) thì BỎ QUA vế dây nối, không tính là thiếu —
+  // cùng luật với `lenh`. Báo THIẾU ở đó là bảo một repo Python rằng nó thiếu một alias npm.
+  assert.equal(xetMuc(mucDay, "/r", false, null, () => false).trangThai, TRANG_THAI.XONG,
+    "khong doc duoc package.json thi BO QUA ve day noi, khong tinh la thieu");
 
   // Và bộ đếm không được nuốt MỘT PHẦN vào XONG.
   const dem = demTheoTrangThai([{ ma: "T", muc: [{ ket: { trangThai: TRANG_THAI.MOT_PHAN } }, { ket: { trangThai: TRANG_THAI.XONG } }] }]);
@@ -159,6 +186,37 @@ const danhMuc = docDanhMuc(ROOT);
       `repo nay co muc MOT PHAN:${loc(TRANG_THAI.MOT_PHAN).map((h) => `\n    ${h}`).join("")}\n  → mot phan o repo vua dung nghia la ban trich phat ra MOT NUA. Thieu thi con doi duoc; mot nua thi hong im lang.`);
   }
   ok(`5 · danh mục khớp repo thật (${demTheoTrangThai(kq).xong} mục xong · ${laNha ? "nơi phát hành: cấm THIẾU và MỘT PHẦN" : "repo đã lắp: cấm MỘT PHẦN"})`);
+}
+
+/* ---- 5b. CHIỀU NGƯỢC — thứ PHÁT ĐI ĐƯỢC thì phải được KHAI ------------- */
+{
+  /* Vế 5 một chiều, và đó là lỗ đã đo được (KHUNG-48, 08/09): nó đòi *"mọi thứ danh mục khai
+   * phải CÓ THẬT"*, nên danh mục không bao giờ nói THỪA — nhưng nó trôi tự do theo hướng nói
+   * THIẾU. Cơ chế đầu bảng của 1.3.60 (chạy suite song song + dấu xác nhận) **không có mục nào**
+   * trong danh mục suốt từ lúc phát; hậu quả đo được: đo một repo vừa nhận cơ chế đó hôm trước,
+   * bảng in ra `20 xong · 3 một phần · 12 thiếu` mà **không một dòng nào** nói tới nó.
+   *
+   * Vế này bịt chiều đó: mọi script bộ khung PHÁT ĐI được thì phải xuất hiện trong ít nhất một
+   * phép đo. Không đòi mỗi script một mục — nhiều script thuộc cùng một cơ chế. Chỉ đòi: không
+   * script nào phát đi mà danh mục **chưa từng nhắc tới**. */
+  const nguon = readFileSync(join(ROOT, "scripts", "build-template.mjs"), "utf8");
+  const khoi = /const PORTABLE_SCRIPTS = \[([\s\S]*?)\];/.exec(nguon);
+  if (!khoi) {
+    boQuaVi("chiều ngược: script phát đi phải được khai", "repo này không có build-template.mjs (không phải nơi phát hành)");
+  } else {
+    const phatDi = [...khoi[1].matchAll(/"([\w.-]+\.mjs)"/g)].map((m) => m[1]);
+    assert.ok(phatDi.length >= 5, `doc duoc qua it script phat di (${phatDi.length}) — regex hong chu khong phai repo hong`);
+    /* CHỈ đọc khối `can`, KHÔNG đọc cả JSON. Bản đầu `JSON.stringify` toàn danh mục, và một đột
+     * biến gỡ `scripts/luu-do.mjs` khỏi `can.file` của F1.1 vẫn SỐNG SÓT — vì tên file đó còn
+     * nằm trong văn xuôi `khong_co_thi` của chính mục ấy. Tức vế nhận NHẮC TỚI là đủ, trong khi
+     * điều cần đòi là ĐƯỢC ĐO. Văn xuôi không đo được gì. */
+    const daDo = JSON.stringify(danhMuc.blocks.flatMap((b) => b.muc.map((m) => m.can ?? {})));
+    const chuaKhai = phatDi.filter((f) => !daDo.includes(f));
+    assert.deepEqual(chuaKhai, [],
+      `script bộ khung PHÁT ĐI được mà không PHÉP ĐO nào của danh mục chạm tới: ${chuaKhai.join(" · ")}`
+      + " → thêm nó vào một mục của features.json. Danh mục nói THIẾU thì mọi báo cáo migrate dựng trên nó thiếu theo.");
+    ok(`5b · chiều ngược: ${phatDi.length}/${phatDi.length} script phát đi đều nằm trong một phép ĐO (không tính văn xuôi)`);
+  }
 }
 
 /* ---- 6. Khối markdown dán vào hồ sơ migrate ----------------------------- */

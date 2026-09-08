@@ -696,6 +696,15 @@ export function handoffCapFrom(parsed) {
  *
  * Trả `null` khi chưa khai — repo mới migrate chưa có khối này, và một phép kiểm đỏ oan ở repo
  * đích thì bị tháo trong một ngày. Suite gọi hàm này phải BỎ QUA CÓ TÊN, không bỏ qua im lặng. */
+/* TÊN THƯ MỤC LƯU TRỮ — khai MỘT chỗ, hai chỗ đọc.
+ *
+ * `can-nang.mjs` miễn `docs/archive/` khỏi ngân sách tài liệu từ 06/09, và ghi rõ vì sao: ngân
+ * sách đo THỨ MỌI PHIÊN PHẢI NẠP, mà lưu trữ theo định nghĩa là thứ không nạp mỗi lần. `AGENTS.md`
+ * nói y hệt. Nhưng `session-check.mjs` thì KHÔNG miễn — hai bản của một luật, và 08/09 chúng lệch
+ * thật: một lane chạy đúng nhịp DỌN mà repo bắt làm, dời 1.135 dòng sang lưu trữ, và cổng ĐỎ vì
+ * chính việc dọn. Nên hằng số về đây, chỗ cả hai bên đều đã nạp. */
+export const THU_MUC_LUU_TRU = "archive";
+
 export function nhomBangFrom(parsed) {
   const khoi = parsed?.bang;
   if (khoi === null || khoi === undefined) return null;

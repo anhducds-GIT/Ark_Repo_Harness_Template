@@ -16,7 +16,7 @@ import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_LUU_TRU, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
 import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
@@ -1160,16 +1160,27 @@ check("HANDOFF: mục mới trong trần, file đúng tháng", () => {
  *
  * VÌ SAO TRỪ `docs/adr/`: ADR đã `Accepted` là **bất biến** (ADR-0000), tức thư mục đó chỉ có
  * thể to lên. Tính nó vào thước cóc thì **mỗi quyết định mới làm cổng đỏ**, người ta sẽ nới con
- * số cho xong việc, và sau vài lượt nới thì thước không còn nghĩa gì. Nay: ADR 910 dòng, phần
- * tuỳ ý 5.744 — phần tuỳ ý mới là chỗ cần canh. */
+ * số cho xong việc, và sau vài lượt nới thì thước không còn nghĩa gì.
+ *
+ * VÌ SAO TRỪ `docs/archive/` — vá 08/09, Đức chốt, và nó là chữa MÂU THUẪN chứ không phải nới:
+ * `AGENTS.md` viết rõ *"Thư mục này KHÔNG tính vào ngân sách tài liệu: ngân sách đo thứ MỌI phiên
+ * phải nạp, mà lưu trữ theo định nghĩa là thứ không nạp mỗi lần"*, và `can-nang.mjs` đã miễn nó
+ * từ 06/09 vì đúng lý do đó. Chỉ CỔNG NÀY là còn đếm. Một luật hai chỗ, và chúng đã lệch thật:
+ * hôm nay một lane chạy đúng nhịp DỌN mà repo bắt làm — dời 1.135 dòng sang `docs/archive/` — và
+ * cổng ĐỎ vì chính việc dọn đó. Cùng họ `KHUNG-25`: sổ tay bảo DỌN, cổng CẤM.
+ *
+ * Và nó KHÔNG làm yếu lớp bảo vệ: bỏ lưu trữ ra thì con số thật là **4.001**, tức thước mới
+ * CHẶT HƠN 5.744 cũ. Tên khoá giữ nguyên `tran_dong_khong_ke_adr` — đổi tên là repo đã lắp mất
+ * thước trong im lặng, tệ hơn một cái tên kể thiếu. Câu in ra thì nói đủ cả hai chỗ trừ. */
 check("Kho chữ không phình", () => {
   const tran = structure?.docs?.tran_dong_khong_ke_adr;
   if (typeof tran !== "number") {
     return { ok: true, msg: "Repo chưa khai `docs.tran_dong_khong_ke_adr` — không có thước thì không đo." };
   }
   const ds = git("ls-files", "docs").split(String.fromCharCode(10))
-    .map((d) => d.trim()).filter((d) => d && !d.startsWith("docs/adr/"));
-  if (!ds.length) return { ok: true, msg: "Không có file `docs/` nào ngoài ADR." };
+    .map((d) => d.trim())
+    .filter((d) => d && !d.startsWith("docs/adr/") && !d.startsWith(`docs/${THU_MUC_LUU_TRU}/`));
+  if (!ds.length) return { ok: true, msg: "Không có file `docs/` nào ngoài ADR và lưu trữ." };
   let dong = 0;
   for (const f of ds) {
     try { dong += fs.readFileSync(path.join(ROOT, f), "utf8").split(String.fromCharCode(10)).length - 1; }
@@ -1179,13 +1190,13 @@ check("Kho chữ không phình", () => {
     const du = tran - dong;
     return {
       ok: true,
-      msg: `${dong}/${tran} dòng (${ds.length} file, không kể ADR).`
+      msg: `${dong}/${tran} dòng (${ds.length} file, không kể ADR, không kể docs/${THU_MUC_LUU_TRU}/).`
         + (du >= 50 ? ` Đã dưới thước ${du} dòng — HẠ \`docs.tran_dong_khong_ke_adr\` xuống ${dong} để giữ phần đã dọn.` : "")
     };
   }
   return {
     ok: false,
-    msg: `KHO_CHU_PHINH: ${dong} dòng trong \`docs/\` (không kể ADR), thước cóc là ${tran} — thêm ${dong - tran}. `
+    msg: `KHO_CHU_PHINH: ${dong} dòng trong \`docs/\` (không kể ADR, không kể lưu trữ), thước cóc là ${tran} — thêm ${dong - tran}. `
       + "Đây KHÔNG phải trần lý tưởng, nó là con số của ngày hôm qua: phiên này đang làm kho chữ to ra. "
       + "Ba cửa ra: xoá/gộp cho về dưới thước · chuyển phần dài sang một ADR (ADR không tính vào thước) · "
       + "nếu phần thêm là cần thiết thật thì nâng `docs.tran_dong_khong_ke_adr` VÀ nói vì sao trong nhật ký phiên."

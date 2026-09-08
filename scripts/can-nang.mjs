@@ -26,7 +26,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { readStructureFromDisk } from "./repo-structure.mjs";
+import { readStructureFromDisk, THU_MUC_LUU_TRU } from "./repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
@@ -103,7 +103,7 @@ function docSoNo() {
    Vì sao miễn là đúng chứ không phải nới lỏng: ngân sách này đo THỨ MỌI PHIÊN PHẢI NẠP.
    Lưu trữ theo định nghĩa là thứ không nạp mỗi lần — cất gọn để tra khi cần. Đếm nó là đo
    sai thứ mình định đo. Chữ vẫn còn nguyên trong repo, luật "chỉ thêm dòng" không bị vi phạm. */
-const THU_MUC_LUU_TRU = "archive";
+// Tên thư mục lưu trữ khai ở `repo-structure.mjs` — cổng đóng phiên cũng đọc đúng hằng số đó.
 
 const liet = (thuMuc) => {
   const ra = [];

@@ -506,14 +506,35 @@ function docMuc(kho, ten, as = "thu") {
     assert.equal(m.trangThai, "XANH",
       `ADR la bat bien nen KHONG duoc tinh vao thuoc — neu tinh, moi quyet dinh moi lam cong do. Dang: ${m.chiTiet}`);
 
-    // ⑷ Repo không khai thước → XANH dù kho chữ lớn.
+    /* ⑷ LƯU TRỮ KHÔNG TÍNH — và vế này dựng lại đúng ca đã xảy ra 08/09.
+     *
+     * `AGENTS.md` và `can-nang.mjs` đều nói `docs/archive/` không tính vào ngân sách; chỉ cổng
+     * đóng phiên là còn đếm. Hậu quả THẬT: một lane chạy đúng nhịp DỌN mà repo BẮT làm — dời
+     * 1.135 dòng nhật ký sang lưu trữ — và cổng ĐỎ vì chính việc dọn đó. Cùng họ `KHUNG-25`.
+     *
+     * Ca dựng ở đây là phép thử "DỜI CHỖ": lấy đúng file đang vượt thước, `git mv` nó vào
+     * `docs/archive/`, không xoá một chữ nào. Trước vá thì bước này XANH→ĐỎ→vẫn ĐỎ; sau vá thì
+     * dời xong là XANH lại, vì chữ đã rời khỏi thứ mọi phiên phải nạp. */
+    viet("docs/dai.md", 300);
+    datThuoc(100);
+    luot("them 300 dong lam vuot thuoc");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "ĐỎ", `320 dong / thuoc 100 phai DO truoc khi doi, dang: ${m.chiTiet}`);
+    mkdirSync(join(kho, "docs", "archive"), { recursive: true });
+    at("mv", "docs/dai.md", "docs/archive/dai.md");
+    luot("DON: doi sang luu tru, khong xoa mot chu nao");
+    m = docMuc(kho, "Kho chữ không phình");
+    assert.equal(m.trangThai, "XANH",
+      `doi chu sang docs/archive/ la nhip DON ma repo BAT lam — cong khong duoc DO vi no. Dang: ${m.chiTiet}`);
+
+    // ⑸ Repo không khai thước → XANH dù kho chữ lớn.
     viet("docs/ba.md", 900);
     datThuoc(null);
     luot("bo khai thuoc");
     m = docMuc(kho, "Kho chữ không phình");
     assert.equal(m.trangThai, "XANH", `khong khai thuoc thi phai XANH, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
-  ok("11 · thước cóc kho chữ: phình ĐỎ · xoá XANH lại · ADR KHÔNG tính · không khai thước XANH");
+  ok("11 · thước cóc kho chữ: phình ĐỎ · xoá XANH lại · ADR KHÔNG tính · DỜI sang lưu trữ XANH lại · không khai thước XANH");
 }
 
 
