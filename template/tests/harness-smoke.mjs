@@ -291,7 +291,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(fx, "scripts"), { recursive: true });
     mkdirSync(join(fx, ".agents"), { recursive: true });
-    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs"]) {
+    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs", "what-next.mjs"]) {
       copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
@@ -359,7 +359,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(fx, "scripts"), { recursive: true });
     mkdirSync(join(fx, ".agents"), { recursive: true });
-    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs"]) {
+    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs", "what-next.mjs"]) {
       copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
@@ -427,7 +427,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(temp, "scripts"), { recursive: true });
     mkdirSync(join(temp, ".agents"), { recursive: true });
-    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs"]) {
+    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "build-dashboard.mjs", "what-next.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
@@ -584,7 +584,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(kho, "scripts"), { recursive: true });
     mkdirSync(join(kho, ".agents"), { recursive: true });
-    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs"]) {
+    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
@@ -647,7 +647,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(kho, "scripts"), { recursive: true });
     mkdirSync(join(kho, ".agents"), { recursive: true });
-    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs"]) {
+    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));

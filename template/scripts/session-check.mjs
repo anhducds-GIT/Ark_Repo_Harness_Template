@@ -17,6 +17,7 @@ import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, readStructureFromDisk, stewardOf, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { parseBacklog } from "./what-next.mjs";
 
 // fileURLToPath, không phải url.pathname: đường dẫn của Đức có dấu cách
 // ("C:\WORKING ZONE\...") và pathname trả về %20, khiến mọi lệnh git im lặng
@@ -1034,6 +1035,43 @@ check("Nhãn lane trong commit", () => {
   return { ok: true, msg: `${shas.length} commit chưa push đều quy thuộc được: ${ke.join(" · ")}.` };
 });
 
+/* TRẦN SỔ NỢ — một con số không có máy canh thì nó vỡ trong im lặng.
+ *
+ * Một repo tiêu thụ bộ khung đặt trần 15 mục và KHÔNG cưỡng chế. Kết quả đo 2026-09-07:
+ * mục thứ 11 vào sổ mà không gì đỏ lên, và trần phải nâng lên 15 sau khi đã vỡ — tức con số
+ * ấy chưa bao giờ là trần, nó là một lời khuyên. Đây là chỗ vá đúng: cổng đóng phiên là thứ
+ * MỌI phiên đều chạy, còn `backlog-check` là thứ chỉ người nhớ ra mới chạy.
+ *
+ * Trần khai ở `backlog.tran` của `.repo-structure.json`, KHÔNG viết cứng ở đây — repo khác
+ * nợ khác nhau. Repo không khai thì phép kiểm XANH và nói rõ là chưa có trần: một repo có
+ * quyền không đặt trần, và chặn nó vì thiếu một khoá tuỳ chọn là cổng tự bịa ra luật.
+ *
+ * Bộ đọc sổ dùng lại `parseBacklog` của `what-next.mjs`. Cố ý không viết bộ đếm thứ hai:
+ * quy ước đóng mục (gạch mã `~~KHUNG-1~~`) nằm trong đó, và hai bản sao của một quy ước đã
+ * trả hai câu khác nhau cho cùng một file — đúng cái bẫy `KHUNG-46` ghi.
+ *
+ * CÁI GIÁ của lượt dùng lại đó, ghi ra để phiên sau không mất thì giờ: cổng nay PHỤ THUỘC
+ * `what-next.mjs`. Mọi kho thử dựng sẵn (`tests/harness-smoke.mjs`, `tests/cong-do-that.mjs`)
+ * chép một DANH SÁCH script cố định sang thư mục tạm — thiếu file này thì cổng ném lúc nạp
+ * module, và test báo một câu trỏ sai chỗ ("không thấy phép kiểm HANDOFF"). Thêm kho thử mới
+ * mà chép `session-check.mjs` thì chép cả `what-next.mjs`. */
+check("Sổ nợ dưới trần", () => {
+  const tran = structure?.backlog?.tran;
+  if (typeof tran !== "number") {
+    return { ok: true, msg: "Repo chưa khai `backlog.tran` trong .repo-structure.json — không có trần thì không có gì để canh." };
+  }
+  const so = path.join(ROOT, "BACKLOG.md");
+  if (!fs.existsSync(so)) return { ok: true, msg: `Chưa có BACKLOG.md ở gốc repo (trần khai là ${tran}).` };
+  const { mo } = parseBacklog(fs.readFileSync(so, "utf8"));
+  if (mo.length <= tran) return { ok: true, msg: `${mo.length}/${tran} mục nợ đang mở.` };
+  return {
+    ok: false,
+    msg: `SO_NO_VUOT_TRAN — ${mo.length} mục đang mở, trần là ${tran}. `
+      + `ĐÓNG một mục (gạch mã: \`### ~~MÃ~~ · …\`) là cổng xanh lại; đừng nâng trần để đi tiếp. `
+      + `Thấy trần thật sự quá chặt thì HỎI ĐỨC, và sửa \`backlog.tran\` trong .repo-structure.json, không sửa script.`
+  };
+});
+
 /* ---- chống tự tháo cổng ------------------------------------------------- */
 // Cách dễ nhất để "làm cho cổng xanh" là lặng lẽ xoá bớt một phép kiểm.
 // Con số này chặn đúng việc đó: thêm phép kiểm thật thì tăng nó lên và ghi
@@ -1053,7 +1091,10 @@ check("Mọi lệnh git đọc được", () => {
   };
 });
 
-const EXPECTED_CHECKS = 11;
+// 2026-09-08, phiên claude-cua-kiem: 11 → 12. Thêm "Sổ nợ dưới trần". Đức uỷ quyền chọn con số
+// và cách cưỡng chế; lý do ở ADR-0010. Trần khai trong `.repo-structure.json`, repo không khai
+// thì phép kiểm xanh — nên bản khung phát đi không tự đặt trần cho repo nào.
+const EXPECTED_CHECKS = 12;
 if (results.length !== EXPECTED_CHECKS) {
   console.error(`\nCỔNG BỊ SỬA: đang có ${results.length} phép kiểm, phải có ${EXPECTED_CHECKS}.`);
   console.error("Ai đó đã bớt (hoặc thêm) phép kiểm mà không cập nhật EXPECTED_CHECKS. Xem lại scripts/session-check.mjs.\n");

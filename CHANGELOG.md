@@ -3,6 +3,48 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.3.50 — 2026-09-08 — Xoá 1.716 dòng sổ quyền chưa ai gọi, và trần sổ nợ lần đầu có máy canh
+
+Đức uỷ quyền chốt hai câu treo lại từ đêm trước. Cả hai chốt **ngược với dự đoán** ghi trong bản
+giao việc, và lý do là số đo chứ không phải đổi ý — [ADR-0010](docs/adr/0010-xoa-so-quyen-va-tran-so-no.md).
+
+### Xoá sổ quyền — vì cái nó định chặn thì đã có chỗ chặn rồi
+
+Bản giao việc hỏi *"nối sổ quyền vào đường ghi khoá, hay xoá?"* và nghiêng về **nối**. Đo trước
+khi gõ:
+
+- `scripts/quyen.mjs` **không được gọi từ đâu cả** — chỉ chính nó và test của nó.
+- `refs/ark/quyen` **chưa từng tồn tại trên remote**: sổ chưa ghi một dòng nào trong đời.
+- Nó **không nằm trong `template/`**, nên không repo nào khác nhận được.
+- Và `claim.mjs:400` **đã có mutex thật** bằng `mkdir` (nguyên tử trên mọi hệ điều hành), dọn khoá
+  mồ côi 30 giây, đọc lại bảng sau khi có khoá, nhả trên mọi đường ra.
+
+Số cuối là số quyết định. Tôi chỉ thấy nó vì **mở file ra đọc trước khi sửa** — nếu không thì đã
+cài một khoá độc quyền **thứ hai** vào cùng một đường ghi, đúng thứ giới hạn ② cấm.
+
+Xoá `scripts/quyen.mjs` (787 dòng) + `tests/quyen-sau-ca.mjs` (929 dòng), gỡ khỏi `npm test`.
+`KHUNG-45` đóng theo — **đóng vì thứ mang lỗi đã đi, không phải vì đã vá.**
+
+**Mất gì, nói thẳng:** mất phân xử giữa **nhiều máy** (mutex chỉ chặn trong một cây làm việc — đủ
+cho hôm nay, không đủ ngày có máy thứ hai), và mất vế cưỡng chế bằng máy của bất biến *"người sửa
+không tự nghiệm thu bản sửa của mình"* (ADR-0008) — từ nay nó là **chữ**.
+
+### Trần sổ nợ 25, và lần này cổng canh
+
+Repo kia đặt trần 15 **không cưỡng chế**: mục thứ 11 vào sổ, không gì đỏ lên, trần phải nâng sau
+khi đã vỡ. Một con số không có máy canh không phải trần, nó là lời khuyên.
+
+Phép kiểm thứ **12** của cổng đóng phiên: *"Sổ nợ dưới trần"*. Trần khai ở `backlog.tran` của
+`.repo-structure.json` (repo này: **25**, đang mở **23**). Bộ đếm **dùng lại** `parseBacklog` của
+`what-next.mjs` — không viết bộ thứ hai, vì quy ước đóng mục nằm trong đó và hai bản sao của một
+quy ước đã trả hai câu khác nhau một lần rồi (`KHUNG-46`).
+
+**Repo không khai `backlog.tran` thì phép kiểm XANH.** Bản khung phát đi không đặt trần hộ ai.
+
+Ghim ở `tests/cong-do-that.mjs` khối 10, chứng minh **cả ba chiều**: vượt trần ĐỎ · gạch mã một
+mục XANH lại · không khai trần XANH. Vế giữa là vế dễ hỏng nhất — bộ đếm không hiểu quy ước đóng
+thì cổng đỏ vĩnh viễn và người ta sẽ tháo nó ra. Hai đột biến đều bị bắt.
+
 ## 1.3.37 — 2026-09-07 — Bảng: 10 tab → BỐN nhóm, Tổng quan còn ba câu, và nhật ký thôi sinh ra việc
 
 Audit UX 07/09 nói bảng **fragment** và **tự mâu thuẫn**. Cả hai đều đo được, và cả hai đều có
