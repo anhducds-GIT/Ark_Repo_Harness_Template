@@ -1610,21 +1610,43 @@ export function trang(dl) {
   const tabs = [
     ["tong-quan", "Tổng quan"],
     ["cong-viec", "Công việc"],
+    ["migrate", "Migrate"],
     ["he-thong", "Hệ thống"],
     ["lich-su", "Lịch sử"]
   ];
 
   const oSo = so.map((s) => `<div class="o ${s.mau || ""}"><b>${esc(s.so)}</b><span>${s.nhan}</span></div>`).join("");
 
-  const tabWorkflow = workflows.map((w) => `
-      <div class="the" id="wf-${slug(w.file)}">
-        <h2>${esc(w.tieuDe)}</h2>
-        <div class="nhan-hang">
-          ${w.fm.ai_chay ? `<span class="chip">ai chạy: ${esc(w.fm.ai_chay)}</span>` : ""}
-          ${w.fm.mat ? `<span class="chip">mất: ${esc(w.fm.mat)}</span>` : ""}
-        </div>
-        ${md(w.than.split(NL).filter((l) => !l.startsWith("# ")).join(NL))}
-      </div>`).join("");
+  /* WORKFLOW CHIA THEO NHÓM, KHAI TRONG DỮ LIỆU — không lọc theo tên file.
+   *
+   * Đức nêu 08/09: nội dung migrate bị trộn vào các tab khác nên khó làm việc. Đo lại đúng thế:
+   * chữ "migrate" xuất hiện 59 lần ở tab Công việc, 53 lần ở Hệ thống, 41 lần ở Lịch sử — sổ
+   * migrate nằm tab này, quy trình migrate nằm tab kia.
+   *
+   * Cách chia: workflow nào khai `nhom: migrate` trong frontmatter thì về tab Migrate. Lọc theo
+   * TÊN FILE thì đổi tên file một lần là tab rỗng mà không ai đỏ; khai vào dữ liệu thì chính
+   * file đó nói nó thuộc nhóm nào — cùng nguyên tắc "suy từ dữ liệu, không gõ tay" của cả trang. */
+  /* MỘT bộ vẽ workflow, dùng cho cả hai tab.
+   *
+   * Trước 08/09 có HAI bộ vẽ: một hàm `tabWorkflow` và một khối lồng thẳng trong tab Hệ thống.
+   * Hàm kia **chưa bao giờ được gọi** — kiểm ở bản đã commit: chuỗi `tabWorkflow` xuất hiện đúng
+   * MỘT lần, tức chỉ có định nghĩa. Nên nó là mã chết, và nó là loại mã chết tệ nhất: một bản sao
+   * trông y như bản thật, nên lượt sau sửa nhầm vào đó rồi tưởng đã sửa. Đã xoá. */
+  const veWorkflow = (w, mo = false) => {
+    const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
+    const iMer = than2.findIndex((l) => l.trim().startsWith("```mermaid"));
+    const jMer = iMer >= 0 ? than2.findIndex((l, k) => k > iMer && l.trim().startsWith("```")) : -1;
+    const luuDo = iMer >= 0 ? than2.slice(iMer, jMer + 1).join(NL) : "";
+    const conLai = iMer >= 0 ? [...than2.slice(0, iMer), ...than2.slice(jMer + 1)].join(NL) : than2.join(NL);
+    return `<details class="the gap" id="wf-${slug(w.file)}"${mo ? " open" : ""}>
+        <summary>${esc(w.fm.ten || w.tieuDe)}${w.fm.mat ? ` <span class="tt">mất ${esc(w.fm.mat)}</span>` : ""}</summary>
+        ${md(luuDo)}
+        <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
+      </details>`;
+  };
+  const laMigrate = (w) => String(w.fm.nhom || "").trim() === "migrate";
+  const tabWorkflowKhac = workflows.filter((w) => !laMigrate(w)).map(veWorkflow).join("");
+  const tabWorkflowMigrate = workflows.filter(laMigrate).map((w) => veWorkflow(w, true)).join("");
 
   const tabProtocol = `
       ${protocols.length ? `<div class="the"><h2>Protocol</h2>
@@ -1679,7 +1701,18 @@ export function trang(dl) {
       <p>Đây <strong>không phải</strong> sổ nợ. Sổ nợ ghi thứ đang <em>hỏng</em>; sổ này ghi
       <em>hướng đi</em>. Trộn hai thứ là mọi hướng đi trông như một lỗi cần vá gấp.</p></div>
     ${khoiYTuongDay(ideas)}` : ""}
-    ${hoSo.length ? khoiMigrate(hoSo) : ""}
+  </section>
+
+  <!-- TAB MIGRATE — tách riêng 08/09 theo Đức. Ba thứ vốn nằm ba tab khác nhau nay về một chỗ:
+       sổ migrate (trước ở Công việc) · quy trình migrate (trước ở Hệ thống) · và bảng đối chiếu
+       tính năng, vốn đã nằm trong sổ migrate. Xem ADR-0007. -->
+  <section class="tab" id="tab-migrate" hidden>
+    <div class="xep">${gapKhoi(`
+    ${tabWorkflowMigrate}
+    ${hoSo.length ? khoiMigrate(hoSo) : `<div class="the"><h2>Chưa lượt migrate nào</h2>
+      <p>Repo này chưa đưa repo nào lên chuẩn. Hồ sơ từng lượt sẽ nằm ở
+      <code>docs/migrations/</code>, và tab này đọc từ đó — không gõ tay.</p></div>`}
+    `)}</div>
   </section>
 
   <section class="tab" id="tab-he-thong" hidden>
@@ -1728,18 +1761,7 @@ cd "&lt;REPO ĐÍCH&gt;" &amp;&amp; codex exec -s workspace-write - &lt; de-bai.
       ${lenh.map(([k, v]) => `<tr><td><code>npm run ${esc(k)}</code></td><td><code>${esc(v)}</code></td></tr>`).join("")}
       </tbody></table></div>
     </details>
-    ${workflows.map((w) => {
-      const than2 = w.than.split(NL).filter((l) => !l.startsWith("# "));
-      const iMer = than2.findIndex((l) => l.trim().startsWith("```mermaid"));
-      const jMer = iMer >= 0 ? than2.findIndex((l, k) => k > iMer && l.trim().startsWith("```")) : -1;
-      const luuDo = iMer >= 0 ? than2.slice(iMer, jMer + 1).join(NL) : "";
-      const conLai = iMer >= 0 ? [...than2.slice(0, iMer), ...than2.slice(jMer + 1)].join(NL) : than2.join(NL);
-      return `<details class="the gap" id="wf-${slug(w.file)}">
-        <summary>${esc(w.fm.ten || w.tieuDe)}${w.fm.mat ? ` <span class="tt">mất ${esc(w.fm.mat)}</span>` : ""}</summary>
-        ${md(luuDo)}
-        <details><summary>Chi tiết từng bước và các chỗ dễ sai</summary>${md(conLai)}</details>
-      </details>`;
-    }).join("")}
+    ${tabWorkflowKhac}
     ${huongDan ? `<details class="the gap" id="huong-dan"><summary>Hướng dẫn cho người mới vào — hai phần: cho người, và cho phiên AI</summary>${md(huongDan)}</details>` : ""}
     ${dl.soTay ? `<details class="the gap"><summary>Sổ tay AI Agent — danh sách kiểm cho việc lặp lại</summary>${md(dl.soTay)}</details>` : ""}
     ${dl.baoTri ? `<details class="the gap"><summary>Bảo trì định kỳ — ba nhịp giữ repo đúng, một nhịp giữ repo rẻ</summary>${md(dl.baoTri)}</details>` : ""}

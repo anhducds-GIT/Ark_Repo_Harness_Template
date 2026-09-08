@@ -465,7 +465,16 @@ function phanLuatChung(text) {
    là bản đồ địa phương của từng repo. Khác regex từ vựng hữu hạn, phép so này bắt MỌI thay đổi:
    thêm một luật nghề dùng từ chưa từng biết, đổi lời một luật cũ, hoặc làm mất một luật chung.
    Khi Đức duyệt đổi luật chung thật, người sửa phải cập nhật dấu vân tay cùng fixture tương ứng. */
-const COMMON_LAW_SHA256 = "a69e334f455b2056d7d3338f6924c70bde1088ed914dbd4d986a9db04decfe55";
+/* SỔ ĐỔI DẤU VÂN TAY — mỗi lượt đổi phải để lại một dòng ở đây, kèm AI DUYỆT và ĐỔI GÌ.
+ * Không có sổ này thì một hằng số 64 ký tự đổi lặng lẽ trông y hệt một lượt đổi được duyệt, và
+ * đó đúng là kiểu "restamp cho xong việc" mà bảng quyền đã phải học một lần rồi.
+ *
+ *   2026-09-08 · Đức duyệt · mục 5 "Vai từng AI" đổi từ chia-theo-hãng sang HAI VAI chia theo
+ *   việc (① giữ lõi · ② phát & thu). Lý do đo được: 14 ngày / 306 commit — Antigravity 0,
+ *   Codex 1 (0,33%), và lane lớn nhất 112 commit có tên không nói hãng nào. Đức chốt cho lan
+ *   sang mọi repo tiêu thụ, nguyên văn: "Template repo AI sẽ đồng bộ đến các Repo khác".
+ *   Vân tay cũ: a69e334f455b2056d7d3338f6924c70bde1088ed914dbd4d986a9db04decfe55 */
+const COMMON_LAW_SHA256 = "c35949d49d31d27fe99e75054e853eed90f961d7814431bd1e99a87841824802";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
