@@ -83,35 +83,6 @@ quên gọi thì không gì nhắc.
 Repo này chưa gặp ca đó (chưa có hook `commit-msg`); repo tiêu thụ đã gặp hai lần và đang vá bằng
 một hook. Nếu ca đó nổ ở đây, **mở lại ADR này** thay vì vá điểm.
 
-### Và cửa TỪ CHỐI chỉ có tác dụng nếu người gọi THẤY được mã thoát
-
-**Đã xảy ra thật 08/09, ngay trong phiên viết ADR này.** Lệnh chạy:
-
-```bash
-node scripts/claim.mjs --sua decisions.md --as <phiên> | head -1 && cat >> decisions.md <<EOF
-```
-
-`--sua` **TỪ CHỐI** (mã thoát 3 — vùng do lane khác giữ). Nhưng trong một ống dẫn, mã thoát của
-cả cụm là mã của lệnh CUỐI (`head`), và nó bằng 0. Nên `&&` cho qua, và **67 dòng đã ghi vào file
-của vùng lane khác đang giữ**. Hoàn nguyên sạch, không mất gì của ai.
-
-**Cùng họ với `--soat`, và đó là lý do nó nằm ở mục này chứ không thành một mục sổ nợ riêng**
-(Đức chốt 09/09): cả hai là *lớp bảo vệ CÓ MẶT mà tín hiệu bị mất trên đường*. `--soat` mất tín
-hiệu vì nó chạy sau lúc index đã rỗng; cửa từ chối mất tín hiệu vì cách người gọi nối lệnh. Không
-lớp nào trong cơ chế này chặn được cả hai — **git giữ file, khoá thì không**.
-
-**Cách gọi ĐÚNG, và luật nên dạy đúng một cách:**
-
-```bash
-node scripts/claim.mjs --sua <file>… --as <phiên>    # KHÔNG nối ống dẫn
-node scripts/claim.mjs --sua <file>… --as <phiên> && <lệnh ghi>
-```
-
-Ba lối vá đã cân nhắc, chưa chọn cái nào: ⑴ `--sua` in thêm một dòng ra **stderr** nhắc kiểm `$?`
-— rẻ nhất, không chặn được ai; ⑵ `--sua` ghi một dấu vào thư mục tạm và `--soat` đối chiếu;
-⑶ `AGENTS.md` dạy đúng một cách gọi, kèm một phép ghim soi tài liệu. Mở lại ADR này nếu ca đó nổ
-lần thứ hai.
-
 ## Hệ quả
 
 - `scripts/claim.mjs` thêm ba nhánh CLI và bảy hàm thuần. Mutex `mkdir` tách thành `giuBangQuyen()`
