@@ -107,4 +107,35 @@ const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, moi_truong
   ok("danh sách chạy-riêng khai ở cấu hình, không gõ cứng trong script");
 }
 
+/* ---- Suite nào GHI ĐÈ file đã commit ở gốc repo thì PHẢI khai chạy-riêng --- */
+{
+  /* HỎNG DỮ LIỆU THẬT, 08/09 — không phải lo xa. `tests/upgrade-smoke.mjs` đột biến kiểm bằng
+   * cách ghi đè một dòng của `RELEASE-LEDGER.json` **thật ở gốc repo**, rồi khôi phục trong
+   * `finally`. Ở một repo một-lane thì đúng. Chạy song song thì:
+   *   · `build-template.mjs --check` đọc sổ ĐÚNG LÚC nó đang hỏng → ba lệnh đỏ oan;
+   *   · hai lượt chạy chồng nhau thì lớp khôi phục ghi đè một ảnh chụp ĐÃ HỎNG → sổ mất hẳn
+   *     một dòng, và sổ này là sổ CHỈ THÊM.
+   * Một commit đã mang theo dòng hỏng vì đúng cửa sổ đó — xem `KHUNG-47` trong sổ nợ.
+   *
+   * Nên: file test nào chạm sổ phát hành ở GỐC repo thì phải nằm trong `test.serial`. Vế này quét
+   * NGUỒN chứ không quét danh sách — thêm một suite đột biến mới mà quên khai là đỏ ngay. */
+  const rieng = danhSachTuanTu(ROOT);
+  const soPhatHanh = "RELEASE-LEDGER.json";
+  const thieu = [];
+  for (const ten of fs.readdirSync(path.join(ROOT, "tests")).filter((f) => f.endsWith(".mjs"))) {
+    const nguon = fs.readFileSync(path.join(ROOT, "tests", ten), "utf8");
+    const chamSoThat = nguon.includes(`join(ROOT, "${soPhatHanh}")`);
+    if (chamSoThat && !rieng.some((r) => ten.includes(r))) thieu.push(ten);
+  }
+  assert.deepEqual(thieu, [],
+    `suite chạm ${soPhatHanh} ở gốc repo phải khai vào test.serial của .repo-structure.json. Đang thiếu: ${thieu.join(" · ")}`);
+
+  // Và bên ĐỌC nó cũng phải chạy riêng — đỏ oan cũng là một cách làm người ta thôi tin cổng.
+  for (const can of ["build-template.mjs", "upgrade-smoke.mjs"]) {
+    assert.ok(rieng.some((r) => can.includes(r) || r.includes(can)),
+      `${can} đọc/ghi ${soPhatHanh} ở gốc repo nên phải khai chạy-riêng`);
+  }
+  ok(`không suite nào chạm ${soPhatHanh} thật mà quên khai chạy-riêng (${rieng.length} suite khai riêng)`);
+}
+
 console.log(`\n${so} passed, 0 failed, ${so} total`);

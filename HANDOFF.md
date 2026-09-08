@@ -619,3 +619,37 @@ Nó **không treo** — nó vẽ lưu đồ NGƯỢC, nút đầu rơi xuống �
 `build-template --check` ĐỎ cho **cả hai**. Nhắn lane kia không hồi đáp; **Đức chốt chuyển `_root`**.
 
 **Còn mở:** Đức sẽ trả lời 7 mục đang chờ chốt — đó là việc kế của phiên sau.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Suite đột biến làm HỎNG một commit thật
+
+**Bắt được trong lúc đóng phiên trên, và nó không phải lo xa — nó đã xảy ra.**
+`tests/upgrade-smoke.mjs` khối 14 kiểm luật *"sổ phát hành chỉ được THÊM"* bằng cách ghi đè một
+dòng của `RELEASE-LEDGER.json` **thật ở gốc repo**, chạy ba lệnh để đòi chúng DỪNG, rồi khôi phục
+trong `finally`. Ở repo một lane thì đúng.
+
+**Hai kiểu hỏng, cả hai đo được hôm nay:**
+
+⑴ **Đỏ oan.** `build-template.mjs --check` chạy song song, đọc sổ ĐÚNG LÚC nó đang hỏng → ba lệnh
+đỏ với một thông báo trông y hệt lỗi thật (`SO_PHAT_HANH_SUA_LICH_SU`).
+
+⑵ **Hỏng dữ liệu, nặng hơn.** Hai lượt chạy chồng nhau thì lớp `finally` khôi phục **một ảnh chụp
+ĐÃ HỎNG**, và sổ mất hẳn dòng `1.2.10`. Trước đó commit `c385f4c` của tôi đã mang theo
+`"1.2.10": "1111111111111111"` — đúng thứ chính khối 14 sinh ra để chặn, lọt vào lịch sử qua cửa
+sau. Đã trả lại giá trị đúng `946065fa2778e0e4` ở commit sau.
+
+**Vì sao im lặng:** `finally` khôi phục kịp trong ca thường, nên cây làm việc sạch lại và mọi phép
+kiểm sau đó xanh. Chỉ lộ vì lượt sau `git status` báo sổ *"sửa dở"* — mà nội dung "sửa dở" chính
+là bản ĐÚNG. Phải nhìn ngược mới thấy.
+
+**Vá:** `test.serial` nay khai thêm `build-template.mjs` · `upgrade-smoke.mjs` · `core-contract.mjs`,
+kèm một dòng `_ghi_de_file_that` nói rõ tiêu chí thứ hai để khai vào đó: **suite nào GHI ĐÈ một
+file đã commit ở gốc repo**, không chỉ suite đọc git.
+
+**Ghim:** `tests/dau-suite-smoke.mjs` thêm vế quét **NGUỒN** của mọi file trong `tests/` — file nào
+nhắc `join(ROOT, "RELEASE-LEDGER.json")` mà không khai chạy-riêng thì ĐỎ. Quét nguồn chứ không
+quét danh sách, nên thêm suite đột biến mới mà quên khai là bắt được ngay. **2 đột biến đã chạy,
+cả hai bị bắt** (bỏ `upgrade-smoke` · bỏ `build-template` khỏi danh sách).
+
+**Còn mở:** `KHUNG-47` — vá này chỉ đóng ca **trong MỘT lượt chạy**. Hai LANE cùng chạy `npm test`
+trên chung một cây làm việc thì vẫn hỏng như cũ, vì `test.serial` chỉ điều phối trong một tiến
+trình. Điều kiện đóng của mục đó là một lệnh chạy được.

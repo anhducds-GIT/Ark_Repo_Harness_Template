@@ -115,11 +115,15 @@
   "test": {
     "_doc": "Suite nao PHAI chay MOT MINH. Bo chay chay song song cac suite con lai; suite doc git cua CAY LAM VIEC CHINH thi hai tien trinh tranh index.lock va bao ra mot loi NOI DUNG trong y het loi that.",
     "_cach_tim": "Suite nao goi git voi cwd la goc repo (khong phai thu muc tam) thi khai vao day. Sai sot khong nguy hiem: bo chay tu chay lai mot minh moi suite do truoc khi ket luan.",
+    "_ghi_de_file_that": "VA suite nao GHI DE mot file DA COMMIT o goc repo cung phai khai vao day — dot bien kiem cua no dung o cay lam viec THAT, khong o thu muc tam. Do 08/09: build-template.mjs --check doc RELEASE-LEDGER.json trong khi upgrade-smoke.mjs dang doi mot dong cua no, ca ba lenh do; roi hai lan chay chong nhau lam lop khoi phuc ghi de mot anh chup DA HONG, va so mat han mot dong. Sai sot o day NGUY HIEM hon o dong tren: khong phai bao nham, ma la hong du lieu.",
     "serial": [
       "bang-song.mjs",
       "khoa-dau-vet.mjs",
       "features-smoke.mjs",
-      "overview-doc-smoke.mjs"
+      "overview-doc-smoke.mjs",
+      "build-template.mjs",
+      "upgrade-smoke.mjs",
+      "core-contract.mjs"
     ]
   }
 }
