@@ -208,15 +208,19 @@ nhận được khoá và làm trọn một việc nhỏ tới lúc cổng xanh,
 
 Hai lượt 03/09 (`nav_platform_main`, `Project 3 AI Agent Unify`) đều **dừng ở mức cổng xanh** —
 tức theo định nghĩa mới thì **cả hai chưa xong việc thứ ba**. Ba phép thử đã viết trong quy trình
-migrate; chưa lượt nào chạy chúng. Gắn với KHUNG-3 (đo lại hai pilot ở bản hiện tại): làm cùng
-lượt thì rẻ hơn hai lượt. Vùng: *(chạy ở repo đích, không đòi khoá của bộ khung)*.
+migrate; chưa lượt nào chạy chúng. Vùng: *(chạy ở repo đích, không đòi khoá của bộ khung)*.
 
-### KHUNG-3 · Hai pilot migrate chưa đo lại ở bản khung hiện tại
+**NHẬN THÊM KHUNG-3 (gộp 09/09) — nửa ĐO của cùng lượt mở máy.** Hai repo trên migrate 03/09 ở
+bản **0.3.0**; nay là **1.3.x**, không ai biết chúng đã trôi bao xa. Đo rẻ, **chỉ đọc, không đòi
+khoá nào**: `npm run assess -- <đường-dẫn-repo>` cho từng repo, rồi so với `muc_sau` ghi trong hồ
+sơ `docs/migrations/`. Làm phép đo này TRƯỚC phép thử onboard: nếu repo đã trôi xa thì phiên AI ở
+đó vấp vì bộ khung cũ, không phải vì đề bài onboard dở — và ta sẽ đọc sai nguyên nhân.
 
-`nav_platform_main` và `Project 3 AI Agent Unify` migrate ngày 03/09 ở bản **0.3.0**; nay là
-**1.3.0**. Không ai biết chúng còn khớp không, và không ai biết bao nhiêu thứ đã trôi. Đo rẻ:
-`npm run assess -- <đường-dẫn-repo>` cho từng repo, rồi so với `muc_sau` ghi trong hồ sơ
-`docs/migrations/`. **Chỉ đọc, không đòi khoá nào.**
+### ~~KHUNG-3~~ · GỘP 09/09 vào KHUNG-14 · Hai pilot migrate chưa đo lại ở bản khung hiện tại
+
+**Gộp theo chốt của Đức 09/09.** Chính KHUNG-14 đã tự khai: *"Gắn với KHUNG-3 … làm cùng lượt
+thì rẻ hơn hai lượt."* Hai mục cùng một lượt mở máy, cùng hai repo đích, cùng một người. Lệnh đo
+đã dời sang KHUNG-14.
 
 ## P3
 
@@ -246,6 +250,13 @@ chữ ký, tức một hạng mục khác hẳn. Việc đáng làm trước m�
 vào `MULTIFLOW.md`**, để không ai đọc bốn cơ chế kia như một lớp bảo mật. Vùng: `_docs`
 (nếu chỉ ghi giới hạn) hoặc `_code` (nếu muốn siết thật).
 
+**NHẬN THÊM KHUNG-31 (gộp 09/09):** lớp thứ tư cùng hình dạng — **báo cáo năm dòng** của phiên
+nhận việc (`REPO / VIỆC / MÁY / CỔNG / CÒN MỞ`) cũng là lời tự khai, không ai đo lại.
+Ca thật 05/09: một phiên audit khai ba lệnh thoát mã `2/1/1`; đo lại **cả ba exit 0**. Đây là ca
+hỏng ĐÃ XẢY RA duy nhất trong cả mục này — ba lớp kia mới chỉ là lỗ hổng suy ra được, chưa ai
+lợi dụng. Lối đi nếu Đức chọn (b): một lệnh `nghiem-thu` chạy ở repo nhà, trỏ vào repo đích, tự
+đo lại đúng năm con số rồi in bảng `KHAI / ĐO ĐƯỢC / KHỚP?`.
+
 ### ~~KHUNG-7~~ · ĐÓNG 06/09 · Luật đóng phiên bắt ghi vào `decisions.md` — file không tồn tại
 
 > **ĐÓNG 06/09 — đo lại thì không còn đúng.** `decisions.md` đã có ở repo này từ 05/09 và đang được ghi đều; bản trích cũng mang nó. Mục này để mở thêm một ngày sau khi đã được vá — **sổ nợ cũng mục được**, và đó là lý do `npm run what-next` phải được đọc cùng số đo chứ không đọc một mình.
@@ -259,11 +270,16 @@ và Bản đồ file cũng không khai nó. Nên khi Đức chốt một việc 
 trỏ tới thứ không tồn tại. Đáng cân nhắc một phép kiểm máy quét chính điều này, thay vì chờ lần
 thứ tư. Vùng: `_root` + `_code`.
 
-### KHUNG-8 · Luật bắt ghi vào "bảng lỗi của sổ tay" — không chỉ ra bảng nào
+### ~~KHUNG-8~~ · ĐÓNG 09/09 · Luật bắt ghi vào "bảng lỗi của sổ tay" — không chỉ ra bảng nào
 
-`AGENTS.md` mục 7 bước 3 bắt thêm một dòng vào *"bảng lỗi của sổ tay"* khi gặp lỗi mới ở hệ thống
-bên ngoài. Repo không có bảng nào được đặt tên là bảng lỗi. Mỗi phiên sẽ ghi vào một chỗ khác,
-hoặc bỏ qua. Cùng họ với KHUNG-7. Vùng: `_root`.
+`AGENTS.md` mục 7 bước 3 bắt thêm một dòng vào *"bảng lỗi của sổ tay"*. Repo không có bảng nào tên
+là bảng lỗi, nên mỗi phiên ghi một chỗ, hoặc bỏ qua.
+
+**Đóng bằng cách bỏ hẳn cái tên không tồn tại, không phải bằng cách đặt tên cho nó.** Mục 7 bước 3
+nay trỏ sang **mục 8 câu 4** — bảng phân nhóm vừa thêm cùng lượt — nên câu trả lời là một LUẬT
+chung ("lỗi sẽ gặp lại → sổ tay agent · thứ đang hỏng → `BACKLOG.md`"), không phải một tên file mà
+repo tiêu thụ có thể không có. Đây đúng là hình dạng KHUNG-7 và bốn ca trước nó: **luật chung gọi
+tên thứ chỉ nơi phát hành mới có**.
 
 ### KHUNG-9 · `can-nang.mjs` xác nhận "đã có ca hỏng" bằng cách TÌM CHUỖI
 
@@ -274,7 +290,17 @@ hỏng", dù không assertion nào chứng minh nó đỏ được.
 Mỉa mai đúng chỗ: đây là công cụ sinh ra để phát hiện *luật chưa từng chặn được gì*, và bản thân
 nó đang dùng một phép đo không phân biệt được hai nhánh — chính luật vàng số 2. Vùng: `_code`.
 
-### KHUNG-10 · `cong-do-that.mjs` dựng ca đỏ cho 6 trong 11 mục cổng, nhưng bảng tra nói như thể cả cổng
+### ~~KHUNG-10~~ · ĐÓNG 09/09 · `cong-do-that.mjs` dựng ca đỏ cho 6 trong 11 mục cổng, nhưng bảng tra nói như thể cả cổng
+
+**Đóng bằng cách rẻ nhất mà chính mục này đề xuất: sửa câu trong bảng tra cho khớp bằng chứng.**
+Đo lại 09/09 — cổng nay có **15** mục (không phải 11), và `cong-do-that.mjs` dựng ca đỏ cho **11**
+trong số đó. Bảng tra mục 6 nay ghi đúng số **11/15** và **nêu tên bốn mục chưa có ca đỏ**: *Khoá
+file đã trả hết* · *Sự thật máy sinh còn tươi* · *Cổng kiểm cấu trúc B1–B14* · *HANDOFF: mục mới
+trong trần*. Bốn mục đó vẫn có phép ghim ở suite khác; điều bảng tra thôi khẳng định là *"file này
+phủ cả cổng"*.
+
+**Số đo, không phải lời hứa** — câu trong bảng tra nói rõ: sửa cổng thì cập nhật lại con số. Con số
+cũ (6/11) sống được bốn ngày vì không ai buộc nó phải đúng.
 
 Bảng tra `AGENTS.md` mục 6 giới thiệu file này là chỗ *"biết cổng đóng phiên có ĐỎ THẬT được
 không"*. Thực tế nó dựng ca hỏng cho **sáu** mục; cổng có **mười một**. Bốn mục chưa có ca kho
@@ -716,31 +742,24 @@ và bộ luật của chủ nhà thắng — đúng như phải thế. Cái đá
 đọc trạng thái nhánh xa đều phải `git fetch` **trước** rồi mới giao. Ghi vào đề bài.
 
 
-### KHUNG-31 · Báo cáo năm dòng của phiên nhận việc là LỜI TỰ KHAI, không ai kiểm
+### ~~KHUNG-31~~ · GỘP 09/09 vào KHUNG-6 · Báo cáo năm dòng của phiên nhận việc là LỜI TỰ KHAI
 
-**Hình dạng:** cùng hình dạng với KHUNG-6 (danh tính phiên là thứ tự khai).
+**Gộp theo chốt của Đức 09/09.** Chính mục này tự khai ngay dòng đầu: *"cùng hình dạng với
+KHUNG-6"*. Hai mục hỏi **một câu**: *repo có gì kiểm được lời một phiên tự khai không?* Giữ hai
+mục cho một câu là hai người cùng đọc, cùng nghĩ, và mỗi người sửa một nửa. Bằng chứng và lối đi
+đã dời sang KHUNG-6.
 
-`npm run giao-viec` nay đo repo đích rất kỹ **trước** khi giao. Nhưng sau khi giao thì không có
-gì cả: phiên nhận việc trả về năm dòng `REPO / VIỆC / MÁY / CỔNG / CÒN MỞ`, và **cả năm dòng
-đều là lời phiên đó tự khai**. Trial 05/09 đã cho thấy chuyện này không lý thuyết — một phiên
-audit báo ba lệnh thoát mã `2/1/1`, đo lại thì cả ba exit 0.
+### ~~KHUNG-24~~ · XOÁ 09/09 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
 
-Luật vàng số 4 bảo phải tự kiểm chứng lại. Nhưng "phải tự kiểm chứng" là một câu chữ, và câu
-chữ thì lần thứ ba có người bỏ qua — đúng lý do `giao-viec.mjs` được viết ra.
+**Xoá theo luật mục 8 câu 1 — Đức chốt 09/09.** Chính mục này tự khai *"chưa đau ở repo nhà …
+**sẽ** đau ở repo dùng `units.root_dir`"*, tức nó ghi một chuyện **chưa xảy ra**. Đo 09/09:
+`units.root_dir = null` ở repo này → **không có đơn vị con nào**, nên ca hỏng **không dựng nổi**,
+nên luật vàng số 2 không cho viết phép ghim cho nó. Mục nợ chưa dựng nổi ca hỏng là **dự đoán**,
+không phải nợ — và sổ nợ giữ dự đoán thì trần 25 mục bị chiếm bởi thứ không ai đóng được.
 
-**Lối đi có thể:** một lệnh `nghiem-thu` chạy ở repo nhà, trỏ vào repo đích, tự đo lại đúng năm
-con số ấy rồi in bảng `KHAI / ĐO ĐƯỢC / KHỚP?`. Nó đọc được `git log` của repo đích để biết
-phiên kia đã commit gì, chạy lại `npm test` và cổng, và so với những gì phiên kia khai.
+Gặp lại thật ở một repo có `units.root_dir` thì mở mục mới, kèm số đo của repo đó.
 
-**Chưa làm vì:** mới có đúng MỘT lượt giao thật. Luật mục 8 bảo chưa có chuyện xảy ra thật thì
-đừng thêm — mà chuyện *đã* xảy ra một lần (mã thoát khai sai) là ở lượt **audit**, không phải
-lượt giao qua đề bài mới này. Đợi thêm hai ba lượt nữa rồi hẵng quyết hình dạng của lệnh.
-
-### KHUNG-24 · Bảng có tab "Đã xong", nhưng chỉ đọc sổ nợ của repo NHÀ
-
-Tab mới (05/09) chiếu mục nợ đã gạch mã — 7 việc. Nhưng nó chỉ đọc `BACKLOG.md` ở gốc; repo có
-đơn vị con, mỗi đơn vị một sổ nợ, thì các mục đã đóng ở đơn vị con **không hiện**. Chưa đau ở
-repo nhà (không có đơn vị con), sẽ đau ở repo dùng `units.root_dir`. Vùng: `_code`.
+*(Nội dung cũ: tab "Đã xong" chỉ đọc `BACKLOG.md` ở gốc, nên mục đã đóng ở đơn vị con không hiện.)*
 
 ### ~~KHUNG-32~~ · ĐÓNG 06/09 · Bảng quyền không thấy được "khoá đang giữ mà repo chưa thấy dấu vết"
 

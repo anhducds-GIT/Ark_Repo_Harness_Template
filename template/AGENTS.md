@@ -56,22 +56,25 @@ node scripts/claim.mjs --take|--release <khoá> --as <phiên> --task "một câu
 ```
 
 **Chứa nhau hai chiều:** vùng có chủ khác → khoá file bị từ chối; trong vùng còn khoá file người
-khác → nhận cả vùng bị từ chối. **Quá 30 phút thì `--list` nêu tên, KHÔNG tự nhả.** Mốc trả khoá
-file là *hết phiên*, không phải *đã đẩy* — nó không mang trách nhiệm truy nguồn, nhãn `Lane:` mang.
-Và `--soat` tồn tại vì **khoá không giữ file, *git* giữ**: chung một cây làm việc thì `git commit -a`
-vẫn cuốn file lane khác vừa dàn, và khoá file làm chỗ đó **xấu đi** vì nó bỏ bớt sự serial hoá.
+khác → nhận cả vùng bị từ chối. Và `--soat` tồn tại vì **khoá không giữ file, *git* giữ**: chung một
+cây làm việc thì `git commit -a` vẫn cuốn file lane khác vừa dàn, và khoá file làm chỗ đó **xấu đi**
+vì nó bỏ bớt sự serial hoá.
 
-**KHÔNG nhả khoá hộ lane khác vì thấy "repo chưa thấy dấu vết"** (tín hiệu ở `--list` và trên bảng).
-Nó nói repo chưa thấy gì, **không** nói lane đó rảnh — lane cẩn thận dựng nháp ngoài repo rồi mới ghi
-vào; 06/09 nhả hộ một lần, lane kia mất phần đã xong. Thấy thì **HỎI**. Ba đường hợp lệ để khoá được
-trả: chính lane đó trả · lane đó đã kết thúc · Đức chốt chuyển khoá.
+**MỘT mốc trả, không có mốc thứ hai:** khoá **file** trả NGAY SAU commit chứa lượt ghi · khoá **vùng**
+trả sau khi ĐÃ ĐẨY. Cổng ĐỎ khi khoá file còn treo là **lưới đỡ**, không phải hạn chót được phép xài.
+Khoá file không mang trách nhiệm truy nguồn — nhãn `Lane:` mang.
+
+**KHÔNG nhả khoá của LANE KHÁC**, kể cả khi `--list` báo *"repo chưa thấy dấu vết"*. Tín hiệu đó nói
+repo chưa thấy gì, **không** nói lane kia rảnh — lane cẩn thận dựng nháp ngoài repo rồi mới ghi vào;
+06/09 nhả hộ một lần, lane kia mất phần đã xong. Thấy thì **HỎI**. **MÁY cũng không tự nhả:** quá 30
+phút `--list` chỉ NÊU TÊN lane đang giữ — hết hạn KHÔNG phải một đường trả khoá. Ba đường hợp lệ:
+chính lane đó trả · lane đó đã kết thúc · Đức chốt chuyển khoá.
 
 **Gốc repo chia làm NHIỀU khoá.** Nhận đúng vùng mình đụng, không nhận cả gốc repo. Cổng đóng phiên
 sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khối `areas` của `.repo-structure.json`.
 
-**Hai file được MIỄN, lý do khác nhau:** `.agents/claims.json` (nhận/trả quyền là thao tác hành chính
-— không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc (luật mục 7 bắt MỌI phiên ghi Log
-— nhưng **chỉ miễn khi chỉ THÊM dòng**; sửa hay xoá dòng cũ là viết lại lịch sử của phiên khác).
+**Hai file được MIỄN:** `.agents/claims.json` (không miễn thì không ai trả lại được quyền) và `HANDOFF.md` ở gốc
+(luật mục 7 bắt MỌI phiên ghi Log) — nhưng **chỉ miễn khi chỉ THÊM dòng**; sửa hay xoá dòng cũ là viết lại lịch sử phiên khác.
 
 ## 2. Sáu việc PHẢI hỏi Đức trước
 
@@ -87,12 +90,10 @@ sẽ nói tên khoá còn thiếu. Ai chia vùng thì khai `steward` trong khố
 | 5 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
 | 6 | Đổi luật an toàn của repo | Đổi luật là đổi thứ đang canh mọi thứ khác |
 
-Ngoài sáu việc này, AI tự làm. Nguyên tắc phía sau: **AI tự do trong phạm vi làm repo tốt lên
-và lùi lại được. Cái gì không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.**
-
-**"Luật an toàn" ở hàng 6 là năm thứ nào** — xem [docs/LEGEND.md](docs/LEGEND.md). Repo có phụ lục
-nghề (`docs/ANNEX-*.md`) thì việc phụ lục liệt kê cũng phải hỏi — phụ lục chỉ được **thêm** vào
-sáu việc trên, không được bớt.
+Ngoài sáu việc này, AI tự làm. **AI tự do trong phạm vi làm repo tốt lên và lùi lại được; cái gì
+không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.** *"Luật an toàn"* ở hàng 6 là năm thứ
+nào — xem [docs/LEGEND.md](docs/LEGEND.md). Phụ lục nghề (`docs/ANNEX-*.md`) chỉ được **thêm** việc
+phải hỏi, không được bớt.
 
 **Commit và push tự làm** — Đức chốt 26/08 — khi đủ ba: (1) việc hoàn tất trọn vẹn; (2) cổng XANH
 TOÀN BỘ, code thì đã qua audit độc lập; (3) đẩy bằng `safe-push.mjs`. **Đủ ba điều đó thì `--carry`
@@ -116,8 +117,7 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main`.
 
 ## 4. Vùng cấm sửa
 
-- Thư mục bằng chứng — khai `"mutability": "append-only"` trong `.repo-structure.json`.
-  **Chỉ được THÊM mới**, không sửa, không xoá, không tạo lại. Tên thư mục là việc của repo bạn.
+- Thư mục bằng chứng — khai `"mutability": "append-only"` trong `.repo-structure.json`. **Chỉ được THÊM mới**, không sửa, không xoá, không tạo lại. Tên thư mục là việc của repo bạn.
 - Không bao giờ để token / mật khẩu / file pairing vào repo.
 - Những điều cấm riêng của nghề repo bạn — xem `docs/ANNEX-*.md`. Chưa có phụ lục thì bỏ dòng này.
 
@@ -131,10 +131,9 @@ Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một
 | **① Giữ lõi** | luật · bộ máy · trạng thái. Mỗi bản vá kèm **một phép kiểm ghim** | nới lớp bảo vệ cho cổng xanh · **tự ký nghiệm thu việc của mình** |
 | **② Phát & thu** | cửa duy nhất ra ngoài. **Mang chỗ vấp về** thành mục sổ nợ | sửa lõi để bên ngoài chạy được · báo ĐẠT khi chưa chạy thật |
 
-**Bất biến: người SỬA không tự NGHIỆM THU bản sửa của mình.** Vai nào cũng được tìm lỗi ở bất kỳ
-đâu — tách "ai tìm" khỏi "ai sửa" là cấm Vai ① soi chính lõi nó giữ. Bàn giao qua sổ, không qua
-tin nhắn: ② ghi `BACKLOG.md` kèm `đóng khi:`, ① đóng bằng bản vá cộng một phép ghim. Hai vai cùng lúc được, nhưng **khác
-vùng**. AI nào không tự nạp file này thì Đức dán: *"Đọc AGENTS.md ở gốc repo trước khi làm gì."*
+**Bất biến: người SỬA không tự NGHIỆM THU bản sửa của mình.** Vai nào cũng được tìm lỗi ở bất kỳ đâu
+— tách "ai tìm" khỏi "ai sửa" là cấm Vai ① soi chính lõi nó giữ. Bàn giao qua sổ, không qua tin nhắn:
+② ghi `BACKLOG.md` kèm `đóng khi:`, ① đóng bằng bản vá cộng một phép ghim. Hai vai chạy cùng lúc được, nhưng **khác vùng**.
 
 ## 6. Sổ tay mở khi cần — Tầng 2
 
@@ -165,36 +164,37 @@ Luật chung ở các mục trên; chi tiết kỹ thuật ở các file bảng 
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống · [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) — phép ghim của hai lệnh trên, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó. Chạy cả hai bằng `npm test` |
 | Biết luật riêng của NGHỀ repo bạn (không phải luật chung) | phụ lục nghề: [docs/ANNEX-tu-dong-hoa-trinh-duyet.md](docs/ANNEX-tu-dong-hoa-trinh-duyet.md) là bản mẫu có thật · viết cái của bạn theo [docs/_TEMPLATE-annex.md](docs/_TEMPLATE-annex.md) |
 
-**Vì sao phải là liên kết chứ không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
-liên kết từ cổng vào máy đọc. File không ai trỏ tới thì máy coi là không tới được — và một bản
-mẫu không ai tới được thì đúng là sẽ không ai dùng. Đo thật lúc dựng bộ khung này: để bảng rỗng
-thì **4 file** rơi ra ngoài bản đồ, kể cả chính `README.md`.
-
-**Luật vàng số 4 áp ở đây:** thêm file hoặc thư mục mới thì phải khai một dòng vào bảng này.
-Không khai = không tồn tại. Cổng đóng phiên có phép kiểm này.
+**Phải là liên kết bấm được, không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
+liên kết từ cổng vào máy đọc, nên file không ai trỏ tới thì máy coi là không tới được. Đo thật lúc
+dựng bộ khung: để bảng rỗng thì **4 file** rơi ra ngoài bản đồ, kể cả chính `README.md`. **Thêm
+file hay thư mục mới thì khai một dòng vào đây** — không khai = không tồn tại, và cổng đóng phiên bắt.
 ## 7. Đóng phiên — ghi lại 3 thứ
 
 1. Một dòng Log vào `HANDOFF.md` của package: làm gì, kết quả số, còn gì mở.
 2. Quyết định mới của Đức → `decisions.md`.
-3. Gặp lỗi mới ở một hệ thống bên ngoài → thêm 1 dòng vào bảng lỗi của sổ tay, **và** cân
-   nhắc thêm 1 phép kiểm vào `scripts/session-check.mjs`.
+3. Gặp lỗi mới ở một hệ thống bên ngoài → xếp nhà theo **mục 8 câu 4** (lỗi sẽ gặp lại → sổ tay
+   agent · thứ đang hỏng → `BACKLOG.md`), **và** cân nhắc thêm 1 phép kiểm vào cổng đóng phiên.
 
 > Luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua. Đó là lý do có cổng kiểm.
 
 ## 8. Thêm một luật thì phải bớt một luật
 
 Mỗi luật ở đây đều hợp lý **lúc thêm vào**. Cộng lại thì không: AI mất nửa phiên chỉ để đọc luật,
-luật bắt đầu mâu thuẫn nhau, đóng phiên lâu tới mức người ta bỏ qua cổng. Bộ khung chết vì phình
-chứ hiếm khi chết vì thiếu.
-
-Nên trước khi thêm một luật, một phép kiểm hay một tài liệu, trả lời đủ ba câu:
+luật mâu thuẫn nhau, đóng phiên lâu tới mức người ta bỏ qua cổng. Bộ khung chết vì phình, hiếm
+khi chết vì thiếu. Nên trước khi thêm một luật, một phép kiểm hay một tài liệu, trả lời đủ năm câu:
 
 1. **Đã có chuyện gì xảy ra thật chưa?** Chưa thì đừng thêm — viết vào `BACKLOG` và chờ.
 2. **Nó thay chỗ cái nào?** Không thay được cái nào thì nói rõ vì sao đáng thêm hẳn.
 3. **Dựng nổi ca hỏng cho nó không?** Không dựng nổi thì nó là chữ, không phải luật.
+4. **Nó thuộc NHÓM nào?** Mỗi luật có ĐÚNG MỘT nhà, chỗ khác chỉ trỏ sang: luật áp cho mọi repo →
+   file này · Đức vừa chốt → `decisions.md`, một dòng · lý lẽ dài, có số đo, có **cái MẤT** →
+   `docs/adr/`, bất biến, sửa thì viết ADR mới · thứ đang HỎNG → `BACKLOG.md` kèm `đóng khi:` ·
+   việc lặp lại, hay hướng đi chưa hỏng → sổ riêng, khai vào bảng mục 6. Chọn không nổi = chưa đủ rõ.
+5. **Nó có CHỦ NGỮ không, và nó phủ luật nào?** Luật mới phủ luật cũ thì **XOÁ luật cũ ngay lượt đó** — Đức chốt 09/09.
+   Hai bản cạnh nhau là hai câu trả lời cho một câu hỏi, và phiên sau bốc trúng câu sai; lịch sử ở
+   `git log` và ADR, không ở chỗ đang cưỡng chế. Ca thật: *"quá 30 phút thì nêu tên, KHÔNG tự nhả"* thiếu chủ ngữ → một phiên đọc thành "đừng trả khoá của mình".
 
 Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu".
-Bộ khung KHÔNG mang theo công cụ đo, vì ngân sách là con số của RIÊNG repo bạn: chốt lấy vài
-ngưỡng (số luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá ngưỡng thì
-phải BỚT trước khi nghĩ tới nới.
+Bộ khung KHÔNG mang công cụ đo, vì ngân sách là con số RIÊNG của repo bạn: chốt vài ngưỡng (số
+luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá thì BỚT, đừng nới.
 

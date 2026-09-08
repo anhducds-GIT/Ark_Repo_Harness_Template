@@ -546,7 +546,46 @@ function phanLuatChung(text) {
  *   Vân tay trước: 3bc47c94b718e38ebbf34eeae099dafcaed4cb019d859b54f1deb4769500b2f5
  *   ĐÂY LÀ NỚI MỘT LỚP BẢO VỆ, không phải chữa mâu thuẫn — khác hẳn hai lượt miễn thước kho chữ
  *   hôm qua (những lượt đó làm thước CHẶT hơn). Ghi rõ để lượt sau đọc không lẫn hai loại. */
-const COMMON_LAW_SHA256 = "51d31f3eda172dea51e5c5a7d259657cb050c535517efb289a975c7dfaaac7e4";
+/* 2026-09-09 (lượt 2) — Đức duyệt tường minh, nguyên văn: "tôi đồng ý, gộp, xóa, sử dụng decision
+ *   mới nhất, bỏ các cái cũ đã bị obsolete để ko gây confuse."
+ *   ĐÂY LÀ XOÁ MÂU THUẪN, KHÔNG PHẢI NỚI BẢO VỆ — không luật nào mất, một luật CHẾT được gỡ.
+ *
+ *   Ca thật Đức bắt được: một phiên nhớ luật *"quá 30 phút thì nêu tên, tuyệt đối không tự nhả"*
+ *   rồi áp nó cho khoá của CHÍNH NÓ — nên nó giữ khoá suốt phiên, ngược hẳn luật mới nhất. Đọc
+ *   lại thì câu đó **không có chủ ngữ**: "KHÔNG tự nhả" ai? Ý gốc là MÁY không được tự hết hạn
+ *   khoá của lane khác. Câu thiếu chủ ngữ nằm cạnh khối khoá file, nên đọc thành "đừng trả khoá
+ *   của mình".
+ *
+ *   Và chỗ hỏng nặng hơn nằm ngay trong SỔ NÀY: ghi chú 08/09 (dòng trên) chép nguyên văn lời Đức
+ *   *"trả ngay trước và sau khi AI sửa"* rồi ngay câu sau tự viết *"mốc trả là HẾT PHIÊN"*. Một
+ *   đoạn văn nói hai mốc khác nhau. Mục 1 của luật chung khi đó có BA mốc trả cùng lúc: "trả ngay
+ *   sau khi sửa" · "NGAY SAU khi COMMIT" (khối lệnh) · "hết phiên". Ba câu, một câu hỏi.
+ *
+ *   Đổi gì: mục 1 nay nói MỘT mốc mỗi loại khoá — file trả ngay sau commit chứa lượt ghi, vùng
+ *   trả sau khi đã đẩy — và nói rõ cổng ĐỎ chỉ là LƯỚI ĐỠ chứ không phải hạn chót được phép xài.
+ *   Câu "30 phút" nhận chủ ngữ (MÁY) và dời xuống cạnh luật "KHÔNG nhả khoá của LANE KHÁC", là
+ *   chỗ nó vốn thuộc về.
+ *
+ *   CÙNG LƯỢT, Đức bổ sung: "hãy phân nhóm cho chúng, giữ luật bằng tiếng việt để tôi cùng đọc
+ *   bản cuối." → ⑴ mục 8 nhận câu hỏi thứ TƯ ("nó thuộc NHÓM nào?") kèm bảng sáu nhà, để một luật
+ *   mới có ĐÚNG MỘT chỗ đứng thay vì được nối thêm vào chỗ gần nhất; ⑵ ghi thành luật cái vừa xảy
+ *   ra — luật mới phủ luật cũ thì XOÁ luật cũ ngay lượt đó, và mỗi luật phải có CHỦ NGỮ; ⑶ mục 6
+ *   thôi nói "sáu phép kiểm" (số của 05/09, khi cổng có 11 mục) — nay ghi số đo 09/09 là **11/15**
+ *   và NÊU TÊN bốn mục chưa có ca đỏ, đóng KHUNG-10.
+ *   NGÔN NGỮ: tiếng Việt, Đức chốt — bỏ hẳn hướng dịch luật sang tiếng Anh để tiết kiệm token.
+ *   Lý do Đức nêu: anh phải đọc được bản cuối. Luật anh không đọc được thì anh không chốt được.
+ *
+ *   MỘT LUẬT VÀO THÌ MỘT LUẬT RA — B9 cưỡng chế, và lượt này trả đúng giá. Bản chữ đầu đẩy bản
+ *   trích lên **220/200 dòng**. Không một luật nào bị bỏ; **20 dòng gọt là chữ, không phải luật**:
+ *   bảng sáu-nhà (9 dòng) nén thành một câu liệt kê 4 dòng · mở đầu mục 8 và đuôi "cân nặng" mỗi
+ *   chỗ bớt một dòng · mục 2 gộp hai đoạn nguyên tắc · mục 5 bỏ câu dặn operator (*"AI nào không
+ *   tự nạp file này thì Đức dán…"* — lời nhắc, không phải luật) · mục 4 và mục 1 gộp dòng gãy.
+ *   BẪY BẮT ĐƯỢC TRƯỚC KHI PHÁT, lần thứ năm cùng hình dạng: bản chữ đầu của câu 4 trỏ tên
+ *   `docs/SO-TAY-AGENT.md` và `IDEAS.md` — **bản trích KHÔNG mang hai file đó**. Sửa thành mô tả
+ *   VAI TRÒ ("sổ riêng, khai vào bảng mục 6"), đúng bài học cũ: luật chung tả HÀNH VI, không gọi
+ *   tên thứ chỉ nơi phát hành mới có.
+ *   Vân tay trước: 51d31f3eda172dea51e5c5a7d259657cb050c535517efb289a975c7dfaaac7e4 */
+const COMMON_LAW_SHA256 = "d93d642ccf6ec6acbbb4d245aec5f35a9a193f5f8f8f45b80a10927affcbbd0a";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -681,13 +720,10 @@ Luật chung ở các mục trên; chi tiết kỹ thuật ở các file bảng 
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống · [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) — phép ghim của hai lệnh trên, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó. Chạy cả hai bằng \`npm test\` |
 | Biết luật riêng của NGHỀ repo bạn (không phải luật chung) | phụ lục nghề: [docs/ANNEX-tu-dong-hoa-trinh-duyet.md](docs/ANNEX-tu-dong-hoa-trinh-duyet.md) là bản mẫu có thật · viết cái của bạn theo [docs/_TEMPLATE-annex.md](docs/_TEMPLATE-annex.md) |
 
-**Vì sao phải là liên kết chứ không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
-liên kết từ cổng vào máy đọc. File không ai trỏ tới thì máy coi là không tới được — và một bản
-mẫu không ai tới được thì đúng là sẽ không ai dùng. Đo thật lúc dựng bộ khung này: để bảng rỗng
-thì **4 file** rơi ra ngoài bản đồ, kể cả chính \`README.md\`.
-
-**Luật vàng số 4 áp ở đây:** thêm file hoặc thư mục mới thì phải khai một dòng vào bảng này.
-Không khai = không tồn tại. Cổng đóng phiên có phép kiểm này.
+**Phải là liên kết bấm được, không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
+liên kết từ cổng vào máy đọc, nên file không ai trỏ tới thì máy coi là không tới được. Đo thật lúc
+dựng bộ khung: để bảng rỗng thì **4 file** rơi ra ngoài bản đồ, kể cả chính \`README.md\`. **Thêm
+file hay thư mục mới thì khai một dòng vào đây** — không khai = không tồn tại, và cổng đóng phiên bắt.
 `;
   // Mục 8 dạy đo cân nặng bằng một lệnh của repo NHÀ, mà công cụ đó Ở LẠI đây (ADR-0002).
   // Để nguyên thì bản trích phát đi một luật trỏ tới lệnh KHÔNG TỒN TẠI — cùng bệnh đã bắt được
@@ -707,9 +743,8 @@ Không khai = không tồn tại. Cổng đóng phiên có phép kiểm này.
   ].join(XUONG_DONG);
   const CAN_NANG_MOI = [
     'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu".',
-    "Bộ khung KHÔNG mang theo công cụ đo, vì ngân sách là con số của RIÊNG repo bạn: chốt lấy vài",
-    "ngưỡng (số luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá ngưỡng thì",
-    "phải BỚT trước khi nghĩ tới nới.",
+    "Bộ khung KHÔNG mang công cụ đo, vì ngân sách là con số RIÊNG của repo bạn: chốt vài ngưỡng (số",
+    "luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá thì BỚT, đừng nới.",
     ""
   ].join(XUONG_DONG);
   const daThay = text.slice(0, start) + replacement + text.slice(end);

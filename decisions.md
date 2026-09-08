@@ -599,3 +599,42 @@ làm thước **chặt hơn** vì chúng sửa phép đo cho khớp luật. Lư�
 **Ghi ở đâu:** vân tay luật chung + lý do trong sổ đổi vân tay của `build-template.mjs`; luật ở
 `AGENTS.md` mục 2. Một luật vào một luật ra — bản trích giữ **200/200 dòng** bằng cách gộp đoạn
 *"commit và push tự làm"* với đoạn mới, vì sau lượt này hai đoạn nói cùng một điều.
+
+## 2026-09-09 · Luật mới phủ luật cũ thì XOÁ luật cũ, và mỗi luật phải có CHỦ NGỮ
+
+**Đức chốt:** *"rà soát thủ công và elimiate các decision, luật trùng nhau, nhiều quyết định sau
+cover hoặc reverse cái cũ -> sẽ sinh noise … chỉ giữ trạng thái cuối cùng thôi."* Và sau đó:
+*"tôi đồng ý, gộp, xóa, sử dụng decision mới nhất, bỏ các cái cũ đã bị obsolete để ko gây confuse."*
+
+**Ca thật Đức bắt được:** luật mới nhất là *khoá file, trả ngay sau khi sửa xong*. Nhưng một phiên
+lại nhớ sang luật khác — *"quá 30 phút thì nêu tên, tuyệt đối không tự nhả"* — rồi áp nó cho khoá
+của **chính nó**, nên giữ khoá suốt phiên. Đọc lại thì câu đó **không có chủ ngữ**: "KHÔNG tự nhả"
+ai? Ý gốc là **MÁY** không được tự hết hạn khoá của **lane khác**.
+
+**Chỗ hỏng nặng hơn, đo được 09/09:** mục 1 của luật chung lúc đó có **BA mốc trả khoá** cùng lúc —
+*"trả ngay sau khi sửa"* · *"NGAY SAU khi COMMIT"* (khối lệnh) · *"hết phiên"*. Và sổ đổi vân tay
+ngày 08/09 chép nguyên văn lời Đức *"trả ngay trước và sau khi AI sửa"* rồi câu kế tự viết *"mốc
+trả là HẾT PHIÊN"*. Một đoạn văn nói hai điều ngược nhau.
+
+**Chốt:** mục 1 nay nói **MỘT mốc mỗi loại khoá** — khoá file trả ngay sau commit chứa lượt ghi,
+khoá vùng trả sau khi đã đẩy; cổng ĐỎ chỉ là **lưới đỡ**, không phải hạn chót được phép xài. Và
+mục 8 nhận **câu hỏi thứ 5**: luật mới phủ luật cũ thì xoá luật cũ ngay lượt đó, luật nào cũng
+phải có chủ ngữ. Lịch sử nằm ở `git log` và ADR, không nằm ở chỗ đang cưỡng chế.
+
+## 2026-09-09 · Luật viết bằng TIẾNG VIỆT, và mỗi luật có ĐÚNG MỘT nhà
+
+**Đức chốt:** *"hãy phân nhóm cho chúng, giữ luật bằng tiếng việt để tôi cùng đọc bản cuối."*
+
+**Vì sao cần chốt:** trước đó có hướng dịch luật sang tiếng Anh cho AI đọc rẻ hơn. Đức bác: anh
+phải đọc được bản cuối. **Luật Đức không đọc được thì Đức không chốt được** — mà mục 5 luật vàng
+đã nói *"Đức đọc không hiểu = lỗi hệ thống"*. Hướng dịch sang tiếng Anh **đóng lại**, không đo
+token nữa.
+
+**Chốt phần phân nhóm:** `AGENTS.md` mục 8 câu 4 — mỗi luật có ĐÚNG MỘT nhà, chỗ khác chỉ trỏ
+sang: luật áp cho mọi repo → `AGENTS.md` · Đức vừa chốt → `decisions.md` một dòng · lý lẽ dài có
+số đo và có **cái MẤT** → `docs/adr/` (bất biến) · thứ đang HỎNG → `BACKLOG.md` kèm `đóng khi:` ·
+việc lặp lại hay hướng đi chưa hỏng → sổ riêng, khai vào bảng mục 6. **Chọn không nổi nhà = luật
+đó chưa đủ rõ để thêm.**
+
+**Cái mất:** thêm một luật nay tốn thêm một bước (chọn nhà). Đổi lại: hết cảnh nối luật mới vào
+chỗ gần nhất, rồi hai chỗ nói hai kiểu.

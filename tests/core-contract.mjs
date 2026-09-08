@@ -431,7 +431,61 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     assert.ok(files.get(f).length > 400,
       `${f}: phai la HAT GIONG co quy uoc so, khong phai file rong cho du mat`);
   }
-  ok("F12 - luat trong khuon khong tro toi file ban trich khong mang");
+  /* VE THU BA - LO CUA CHINH F12, va no can luot thu NAM ngay 09/09.
+   *
+   * F12 (hai ve tren) chi doc link markdown `](...)`. Nhung luat con goi ten file bang DAU NHAY
+   * NGUOC, va dang do khong phai link. Ca that: ban chu dau cua muc 8 cau 4 viet `docs/SO-TAY-
+   * AGENT.md` va `IDEAS.md` - ban trich KHONG mang ca hai. F12 XANH suot, va toi phai bat bang
+   * tay bang `ls template/docs/`. Mot phep kiem chan dung mot NUA hinh dang thi nua kia van phat
+   * di duoc, va lan nay suyt phat that.
+   *
+   * KHONG CO BANG MIEN TRU, va do la ket qua cua mot dot bien chu khong phai mot lua chon: ban
+   * dau ve nay co `TAO_LUC_CHAY` khai `.agents/claims.json` va `.repo-structure.json` la "repo tu
+   * tao luc chay". Do lai: ban trich MANG CA HAI. Bang mien tru chua tung chan duoc gi, va dot
+   * bien go no di van XANH - dung dinh nghia do trang tri. Go han. Ngay nao co ten that su tao
+   * luc chay thi them lai KEM LY DO va kem mot dot bien chung minh no can thiet. */
+  const tenTrongNhayNguoc = (text) => [...new Set(
+    [...text.matchAll(/`([^`]+)`/g)].map((m) => m[1])
+      .flatMap((s) => s.split(/\s+/))                      // `node scripts/x.mjs --chi <suite>`
+      .filter((t) => /^[\w./-]+\.(md|json|mjs)$/.test(t))  // bo glob kieu `docs/ANNEX-*.md`
+      .map((t) => t.replace(/^\.\//, ""))
+  )];
+  const nhacTen = tenTrongNhayNguoc(luat);
+  // Phai con doi tuong de do. Doi ten bien / doi cach viet luat ma ve nay ve 0 ten thi no thanh
+  // do trang tri - dung hinh dang luat vang so 2 cam.
+  for (const bat_buoc of ["BACKLOG.md", "HANDOFF.md"]) {
+    assert.ok(nhacTen.includes(bat_buoc),
+      `ve nay MAT DOI TUONG DO: luat khong con goi ten \`${bat_buoc}\` trong dau nhay nguoc. Doi cach viet luat thi sua ve nay cho dung, dung de no xanh rong`);
+  }
+  const treo = nhacTen.filter((t) => !files.has(t));
+  assert.deepEqual(treo, [],
+    `luat trong khuon goi ten file ma ban trich KHONG mang: ${treo.join(", ")}`);
+  /* DOT BIEN CHAY THAT, khong suy ra: dua CHINH van ban da tung suyt phat di (ban chu dau cua muc
+   * 8 cau 4, 09/09) qua DUNG phep loc tren, va doi no NEU RA hai ten treo. Khong co ve nay thi
+   * khong ai biet ve tren co phan biet noi hai nhanh - va no da tung khong phan biet noi.
+   *
+   * KHONG noi them vao `luat` roi loc: ban luat co khoi ```bash nen so dau nhay nguoc LE, noi
+   * them la lech cap va phep loc doc ra rong. Da vap that o luot viet ve nay - va cai vap do
+   * chinh la ly do ve nay dung mot doan doc lap chu khong dung van ban that.
+   *
+   * BON DOT BIEN DA CHAY 09/09, va HAI CAI DAU SONG SOT - ghi lai vi chung day dung mot bai:
+   *   ⑴ go `.repo-structure.json` khoi bang mien tru -> XANH. Vi ban trich MANG file do; bang
+   *      mien tru chua tung chan gi. Da go han bang do (xem ghi chu tren).
+   *   ⑵ thay `const treo = ...` bang `const treo = []` -> XANH. Ve do KHONG THE do o repo sach,
+   *      vi luat hien khong goi ten file treo nao. Do la ly do phai co doan gia lap ngay duoi.
+   *   ⑶ phep loc tra `false` -> CHET o ve "MAT DOI TUONG DO".
+   *   ⑷ `!files.has(t)` thanh `!true` -> CHET o ve gia lap nay. */
+  {
+    const banChuDauSuytPhat =
+      "4. Nó thuộc NHÓM nào? việc lặp lại → `docs/SO-TAY-AGENT.md` · hướng đi → `IDEAS.md` ·\n"
+      + "   thứ đang HỎNG → `BACKLOG.md` kèm `đóng khi:`\n";
+    const doc = tenTrongNhayNguoc(banChuDauSuytPhat);
+    assert.deepEqual(doc.filter((t) => !files.has(t)).sort(), ["IDEAS.md", "docs/SO-TAY-AGENT.md"],
+      "phep loc KHONG neu ra duoc hai ten treo - ve tren la do trang tri, sua phep loc chu dung sua ky vong nay");
+    assert.ok(!doc.filter((t) => !files.has(t)).includes("BACKLOG.md"),
+      "phep loc bao ca ten ban trich CO mang - do la bao dong gia, se day nguoi ta go ve nay di");
+  }
+  ok(`F12 - luat trong khuon khong tro toi file ban trich khong mang (${links.length} link + ${nhacTen.length} ten trong nhay nguoc)`);
 }
 
 /* ---- F13. HAI trong BA loi do pilot migrate loi ra (05/09) ----------------
