@@ -478,3 +478,17 @@ Chi tiết và **phần MẤT**: [docs/adr/0006](docs/adr/0006-bang-mot-khai-nie
 **Hai chỗ Đức còn phải chốt** (đã ghi `BACKLOG.md` `KHUNG-40`): trần số dòng cho file luật là bao
 nhiêu, và có đưa trần đó vào **cổng đóng phiên** hay không. Hiện `can-nang` cố ý nằm ngoài cổng,
 nên mọi trần **chưa từng chặn được gì** — kể cả cái đang vượt 3,9 lần.
+
+## 2026-09-08 · Cơ chế suite song song phải thành MỘT MỤC trong danh mục tính năng
+
+**Đức chốt:** *"Nếu chưa coi đó là 1 feature, thì ta cần pack nó lại trong feature list để có
+check list đầy đủ trong tab Migrate."*
+
+**Vì sao cần chốt:** đo 08/09, `features.json` có 42 mục mà **không mục nào** đo cơ chế chạy suite
+song song + dấu xác nhận (bản 1.3.60) — tính năng cắt một vòng làm việc từ 145s xuống 60s, đo thật
+tại `n8n-orchestrator` cùng ngày. Nên `node scripts/features.mjs <repo>` **không trả lời được**
+câu *"repo này đã nhận cơ chế đó chưa"*, và cột **Tính năng** của tab Migrate thiếu đúng dòng
+quan trọng nhất.
+
+Chi tiết việc và điều kiện đóng: [BACKLOG.md](BACKLOG.md) mục `KHUNG-48`. Việc của Vai ① — đây là
+tầng máy nên đòi tăng `version` và sinh lại bản trích.

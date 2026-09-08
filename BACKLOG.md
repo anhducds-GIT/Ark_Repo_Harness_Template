@@ -1086,3 +1086,112 @@ phần khẳng định — và một lượt thêm tab giả làm CẢ HAI suite
 chỉ chạy xanh).
 
 </details>
+
+### KHUNG-47 · Ba phép ghim của bộ khung KHOÁ VÀO chi tiết triển khai của repo nhà — đo 3 ca thật trong một lượt phát
+
+**Cùng một bài học, lần thứ tư trong hai ngày.** 1.3.66 đã vá một ca (`runRootSuite()` → hỏi
+HÀNH VI). Lượt phát 1.3.67 sang `n8n-orchestrator` hôm nay lộ ra **ba ca nữa**, cả ba đỏ **ngay
+lúc file vừa tới**, trước khi ai kịp làm gì sai:
+
+| Ca | Bộ khung đòi | Repo đích thật ra thế nào | Ai đúng |
+|---|---|---|---|
+| `handoff-smoke` | mọi file `…HANDOFF.md` phải có dòng **đúng chữ** `## Log` (`RE_MO_LOG` trong `handoff.mjs:33`) | n8n giữ nhật ký ở `log/YYYY-MM.md` (luật của nó, mục *Kết mỗi phiên* 3); `HANDOFF.md` ở đó là **tài liệu trạng thái**, không phải nhật ký | **repo đích** — nó CỐ Ý khác |
+| `bang-song` vế 8 | 3 dòng `.gitignore` cho `bang-song/BANG.html` · `trang-thai.json` · `DUNG.txt` | không có dòng nào — `.gitignore` **không thuộc tầng nào** (KHUNG-39) | bộ khung thiếu đường phát |
+| `dau-suite-smoke` vế 6 | dòng `.gitignore` cho `.ark-suite-stamp.json` | không có — cùng gốc bệnh | bộ khung thiếu đường phát |
+
+**Và một chỗ thứ tư, không đỏ nên nguy hơn cả ba cái đỏ.** `--apply` thêm 4 tên lệnh, trong đó có
+`test:tuan-tu`, **nhưng KHÔNG thêm tên nào trỏ vào `scripts/chay-test.mjs`**:
+
+```
+co alias chay-test?  []          ← đo sau khi --apply chay xong
+```
+
+Nên cơ chế nhanh nhất của bộ khung **tới rồi mà nằm không**: cổng gọi `npm test`, `npm test` là
+chuỗi riêng của repo đích, không ghi dấu, và cổng chạy lại trọn chuỗi. Đúng ca `[~] MỘT PHẦN` mà
+chính bộ khung cảnh báo, **và không phép kiểm nào đỏ**. Vá tay ở n8n: thêm `test:song-song`.
+
+Luật mục 0b cũng góp phần: nó gọi tên `npm test` như thể đó là đường nhanh. Ở nơi phát hành thì
+đúng; ở repo đích `npm test` là đường **chậm** — và lớp bảo vệ *"tài liệu dạy lệnh nào thì bản
+trích phải khai lệnh đó"* chỉ hỏi lệnh **có tồn tại**, không hỏi nó **trỏ vào đâu**.
+
+> Một phép ghim viết ở nơi phát hành mà soi **chi tiết triển khai** thì nó không phải hợp đồng,
+> nó là bản sao. Hợp đồng phải nói về **hành vi**. — nguyên văn bài học 1.3.66, chưa được áp
+> cho ba chỗ trên.
+
+Vùng: `_code` (ba phép ghim) + `_root` (mục 0b) + `_template`.
+
+**đóng khi:** ⑴ `handoff.mjs` cho repo đích **khai** dấu mở nhật ký (ví dụ `handoff.dau_mo_log`
+trong `.repo-structure.json`), hoặc `handoff-smoke` chỉ đòi điều đó ở repo CÓ khai — và
+`node tests/handoff-smoke.mjs` xanh ở n8n **mà không cần đổi `HANDOFF.md` của nó**; ⑵ `--plan`
+kể tên mọi dòng `.gitignore` mà file máy nó sắp phát cần (bốn dòng đã biết), và một phép ghim dựng
+repo đích thiếu dòng đó rồi đòi `--plan` **nói ra**; ⑶ `--apply` thêm một tên lệnh trỏ vào
+`chay-test.mjs`, và một phép ghim đòi ĐỎ khi không tên lệnh nào trỏ vào nó; ⑷ mục 0b không còn
+gọi tên một npm script cố định cho bước chạy suite.
+
+
+### KHUNG-48 · `features.json` không có mục nào cho cơ chế suite song song — danh mục đo được một chiều
+
+> **Đức chốt 2026-09-08:** *"Nếu chưa coi đó là 1 feature, thì ta cần pack nó lại trong feature list để có check list đầy đủ trong tab Migrate."*
+> Nên mục này **đã được duyệt để làm**, không còn chờ ai quyết. Việc thuộc Vai ① — sửa `features.json` là sửa **tầng máy**
+> (`TEP_MAY_THEM`), nên nó đòi tăng `version` + sinh lại bản trích, không phải một lượt sửa JSON.
+
+**Đo 08/09.** Danh mục khai `1.3.66`, **9 khối · 42 mục**, và `grep -i "chay-test\|dấu xác
+nhận\|song song"` trong `features.json` ra **0 kết quả ở phần mục**. Cơ chế đầu bảng của 1.3.60
+(chạy suite song song + dấu xác nhận, cộng phép ghim `dau-suite-smoke.mjs` với 11 cửa từ chối)
+**không có mục nào trong danh mục.**
+
+**Hậu quả đo được ngay hôm nay.** Chạy `node scripts/features.mjs "…/Chrome_Extension_AI_Agentic"`
+in ra `20 xong · 3 một phần · 12 thiếu · 7 ngoài phạm vi` — **không một dòng nào** nói repo đó đã
+nhận hay chưa nhận cơ chế 1.3.65, dù nó vừa nhận xong hôm qua. Tức câu hỏi *"repo đích đã nhận đủ
+tính năng chưa"* — đúng câu danh mục sinh ra để trả lời — nay trả lời **thiếu** cho tính năng mới
+nhất, và trả lời thiếu trong **im lặng**.
+
+**Vì sao phép ghim không bắt:** `tests/features-smoke.mjs` vế 5 đòi *"mọi thứ danh mục khai phải
+CÓ THẬT ở repo phát hành"* — **một chiều**. Chiều ngược lại (*mọi thứ có thật và phát đi được thì
+phải được khai*) không ai canh. Nên danh mục **không trôi khỏi thực tế** theo hướng nói thừa, mà
+trôi tự do theo hướng **nói thiếu**. Mỗi tính năng thêm sau này lặng lẽ nới khoảng lệch đó thêm
+một mục.
+
+Và mục này phải đo cả **dây nối**, không chỉ file: đúng ca `[~]` mà chính danh mục cảnh báo —
+`chay-test.mjs` có mặt mà không alias nào gọi được nó thì cơ chế có mặt mà không ai chạy.
+
+Vùng: `_root` (`features.json`) + `_code` (phép ghim).
+
+**đóng khi:** ⑴ `features.json` có một mục dưới F8 (hoặc F3) đo cơ chế này — cả `scripts/chay-test.mjs`,
+`tests/dau-suite-smoke.mjs`, dòng `.gitignore` của dấu, **và** một alias npm trỏ vào bộ chạy — kèm
+`tu_ban: "1.3.60"`; **và** ⑵ `tests/features-smoke.mjs` có một vế NGƯỢC: mọi tên trong
+`PORTABLE_SCRIPTS` của `build-template.mjs` phải xuất hiện trong ít nhất một phép đo của danh mục,
+và vế đó ĐỎ khi xoá thử mục vừa thêm.
+
+### KHUNG-49 · `F4.7` XANH GIẢ ở mọi repo đã migrate — phép đo chỉ hỏi file có tồn tại
+
+**Đo 08/09, bốn repo đã migrate cộng repo tiêu thụ.** `F4.7` khai phép đo là
+`can.file = ["AGENTS.md", "BACKLOG.md"]` — **chỉ hỏi hai file có tồn tại**. Cả hai có ở mọi repo
+đã lắp từ lâu, nên mục đó báo `[x]` **ở khắp nơi**. Đo lại bằng cách tìm câu chữ của chính luật:
+
+```
+grep -cE "giữ lõi|phát & thu|không tự nghiệm thu" <repo>/AGENTS.md
+ALL_SKILL_MANAGEMENT 0 · nav_platform_main 0 · n8n-orchestrator 0 · Project 3 AI Agent Unify 0
+Chrome_Extension_AI_Agentic 1   ← và repo này nhận bằng TAY, không qua upgrade
+```
+
+**0 trong 4 repo đã migrate có luật hai vai**, trong khi danh mục nói 2 trong 4 là `[x]` và 1 là
+`[~]` *(và `[~]` đó đỏ vì thiếu `BACKLOG.md`, tức vẫn không phải vì thiếu luật)*. Đây là tính năng
+Đức gọi là **quan trọng nhất để đưa AI assistant vào việc**, và bộ đo của bộ khung đang **báo
+ĐẠT cho nó ở nơi nó không tồn tại**.
+
+Gốc bệnh chung với `[~]`: phép đo `can.file` hỏi **sự có mặt**, mà mục này là một **đoạn luật nằm
+TRONG một file repo đích tự sở hữu**. `upgrade.mjs` không bao giờ ghi `AGENTS.md` của repo đích —
+đúng, vì đó là file của họ — nên với loại mục này *"file có tồn tại"* và *"nội dung đã tới"* là
+hai câu hỏi khác nhau, và danh mục chỉ hỏi câu dễ.
+
+Đã vá tay ở `ALL_SKILL_MANAGEMENT` 08/09 (mục B6). Đó là **vá điểm**, không phải cơ chế — ba repo
+còn lại vấp y hệt, và repo thứ năm nhận migrate cũng sẽ vấp.
+
+Vùng: `_root` (`features.json`) + `_code` (`features.mjs` nếu cần kiểu đo mới).
+
+**đóng khi:** ⑴ `features.json` có kiểu đo *"nội dung phải có mặt trong file"* (ví dụ `can.trong_file`:
+file + chuỗi/regex phải khớp), và `F4.7` dùng kiểu đó thay cho `can.file`; ⑵ chạy
+`node scripts/features.mjs <một repo chưa nhận luật>` báo `F4.7` là `[ ]` hoặc `[~]` chứ không phải
+`[x]` — dựng nổi ca hỏng; **và** ⑶ một vế trong `tests/features-smoke.mjs` đòi mọi mục có
+`pham_vi: "ca-hai"` mà đích là một file repo-đích-tự-sở-hữu thì **không được** chỉ đo bằng `can.file`.
