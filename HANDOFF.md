@@ -1570,3 +1570,36 @@ của phép ghim chỉ đúng với repo ĐÃ CHẠY LÂU** (đòi mọi quyển
 **phép đếm thô**: `0 == 0` là đúng, `0` trên file có 37 tiêu đề mới là hỏng.
 
 **Còn mở:** xoá thật trong `docs/` — cần chủ dự án duyệt.
+
+## 2026-09-08 (tối) · claude-cua-kiem · Một vòng làm việc: 18 phút → dưới 5
+
+**Đức yêu cầu tăng tốc ≥50%.** Đo trước khi sửa, không đoán: chuỗi suite bộ khung **535s/19
+bước** (5 bước đầu chiếm **84%**), repo kia **242s/16 bước**. Và cổng đóng phiên **chạy lại toàn
+bộ chuỗi đó** — nên một vòng bình thường tốn **535+535 ≈ 18 phút**, mà nửa sau không kiểm thêm
+được gì.
+
+**⑴ Chạy song song** (`scripts/chay-test.mjs`). Suite nặng nào cũng tự dựng repo riêng trong thư
+mục tạm nên chúng độc lập; chạy tuần tự là tự nguyện xếp hàng. **535s → 256s.** Suite đọc git của
+cây làm việc CHÍNH khai ở `test.serial`. Khai sót không nguy hiểm: suite nào đỏ thì bộ chạy **tự
+chạy lại MỘT MÌNH** trước khi kết luận — tranh chấp thôi bị báo nhầm thành lỗi thật.
+
+**⑵ Dấu xác nhận** — cổng thôi chạy lại một chuỗi vừa chạy xong. **560s → 22s.**
+
+**Không phải cửa sau**, và chỗ này đáng đọc kỹ: dấu buộc vào **HEAD** + **băm
+`git status --porcelain -uall`** + **danh sách suite** + **hạn 30 phút**. Sửa một byte ở bất kỳ
+file nào, kể cả file chưa track, là dấu hết hiệu lực. Suite đỏ thì **xoá dấu**, không ghi dấu đỏ.
+Dấu nằm trong `.gitignore` nên không mượn được của máy khác. Cổng vẫn giữ nguyên đường chạy đầy đủ.
+
+Ghim `tests/dau-suite-smoke.mjs`: **1 vế NHẬN + 9 cửa TỪ CHỐI** (chưa có · rỗng · đỏ · đổi HEAD ·
+đổi cây · đổi danh sách · quá hạn · mốc rác · mốc tương lai) + soi rằng cổng **thật sự gọi** và
+rẽ nhánh theo kết quả.
+
+**Đo lại cả vòng: 1.095s → 278s, nhanh 75%.**
+
+**Thứ tự mới, và nó là điều kiện để dấu có tác dụng:** sửa → **commit** → sinh lại artifact →
+commit → **chạy suite** → **chạy cổng** → đẩy. Chạy suite trước khi commit thì lượt commit làm
+đổi cây và dấu hết hiệu lực ngay.
+
+**Lỗi cũ lặp lần thứ 5:** `chay-test.mjs` sinh ra có **một byte NUL** trong mã nguồn, nên git coi
+nó là nhị phân và bộ quét secret bỏ qua nó. Bắt được vì một phép ghim đếm "bỏ qua 2 file nhị
+phân" thay vì 1. Sửa bằng `String.fromCharCode(31)`.
