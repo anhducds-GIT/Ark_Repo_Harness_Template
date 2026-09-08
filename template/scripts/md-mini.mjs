@@ -9,6 +9,8 @@
  * nó in ra như văn bản thường chứ không vỡ trang.
  */
 
+import { veLuuDo } from "./luu-do.mjs";
+
 const NL = String.fromCharCode(10);
 // Khai NGAY ĐÂY, trên mọi chỗ dùng. Để dưới thì vô hại vì chỉ đọc trong thân hàm — nhưng đó
 // đúng kiểu viết đã làm session gate chết ngay khi nạp (03/09), và một lần là đủ.
@@ -52,16 +54,27 @@ export function md(text) {
   while (i < dong.length) {
     const l = dong[i];
 
-    // khối mã — mermaid được giữ nguyên để trang tự vẽ, không cần thư viện
+    /* Khối mã. Mermaid được VẼ THÀNH SVG ngay ở đây.
+     *
+     * Chú thích cũ ở dòng này nói "giữ nguyên để trang tự vẽ, không cần thư viện" — và trang
+     * KHÔNG BAO GIỜ vẽ, vì chẳng có thư viện nào được nạp. Bảy lưu đồ hiện ra là mã nguồn, suốt
+     * từ v0.3.0 tới 08/09. Xem `scripts/luu-do.mjs`.
+     *
+     * Vẽ không được thì lùi về mã nguồn nhưng KÈM MỘT DÒNG NÓI RÕ. Lùi im lặng chính là cách lỗi
+     * cũ sống lâu tới thế: trang trông vẫn bình thường, nên không ai biết nó đang thiếu hình. */
     if (/^```/.test(l)) {
       const ngonNgu = l.slice(3).trim();
       const than = [];
       i += 1;
       while (i < dong.length && !/^```/.test(dong[i])) { than.push(dong[i]); i += 1; }
       i += 1;
-      ra.push(ngonNgu === "mermaid"
-        ? `<pre class="mermaid">${esc(than.join(NL))}</pre>`
-        : `<pre class="code"><code>${esc(than.join(NL))}</code></pre>`);
+      if (ngonNgu === "mermaid") {
+        const svg = veLuuDo(than.join(NL));
+        ra.push(svg || `<pre class="mermaid">${esc(than.join(NL))}</pre>`
+          + `<p class="luu-do-hong">SƠ ĐỒ CHƯA VẼ ĐƯỢC — cú pháp nằm ngoài tập con mà scripts/luu-do.mjs đỡ. Đang in mã nguồn thay hình.</p>`);
+        continue;
+      }
+      ra.push(`<pre class="code"><code>${esc(than.join(NL))}</code></pre>`);
       continue;
     }
 

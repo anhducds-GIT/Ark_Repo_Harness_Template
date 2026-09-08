@@ -588,3 +588,34 @@ Việc của Vai ①, vì `features.json` là tầng máy nên đòi tăng `vers
 **Còn mở — ba repo, cả ba chặn vì người khác giữ khoá hoặc chờ Đức:** `nav_platform_main`
 (`claude-bang-gon` giữ 1 ngày, quá hạn) · `Chrome_Extension_AI_Agentic` (`claude-ext-cum5` giữ ba
 khoá; repo đó **chưa có sổ ghim**) · `Project 3` (KHUNG-30, luật 8A của chính nó; F4 **2/7**).
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Lưu đồ trên bảng: 0/7 ra hình → 7/7
+
+**Đức nhìn bảng và nói: *"flow chart này toàn chữ, tôi cần hình ảnh trực quan."* Đúng.** Bảng in
+`<pre class="mermaid">` từ **v0.3.0**, kèm chú thích trong `md-mini.mjs` nói *"để trang tự vẽ"* —
+mà không thư viện nào được nạp. Bảy lưu đồ hiện ra là **mã nguồn**, cả `<br/>` lẫn `&lt;repo&gt;`.
+
+**Vì sao 5 tháng không ai đỏ:** không phép kiểm nào hỏi *"cái này có ra HÌNH không"* — chúng chỉ
+hỏi trang sinh ra được không. Trang sinh được, nên bảng luôn xanh.
+
+**Không nạp mermaid từ CDN** — luật đã có sẵn ngay trong `build-overview.mjs`: *"trang này là file
+tĩnh đem gửi cho người khác mở, nên nó không được phụ thuộc vào một CDN còn sống hay không."* Nên
+`scripts/luu-do.mjs` vẽ **SVG nội tuyến lúc sinh trang**. Tập con hẹp, cố ý; ngoài tập con thì trả
+`null` và in lại mã nguồn **kèm một dòng báo** — lùi im lặng chính là cách lỗi cũ sống lâu thế.
+
+**Số đo:** lưu đồ ra hình **0/7 → 7/7** · chữ tràn ra ngoài hộp **1 → 0** · cặp nhãn đè nhau
+**1 chùm 4 nhãn → 0**. Ba con số sau đo trong trình duyệt thật, không suy.
+
+**8 đột biến, và BA CÁI SỐNG SÓT lượt đầu — phần đáng đọc nhất.** Bộ vẽ có ba cơ chế giữ nhãn khỏi
+đè nhau (nới khe · neo-ở-nguồn · dồn chỗ) và chúng **che cho nhau**: gỡ một cái thì hai cái kia đỡ
+lấy, nên vế *"không cặp nào đè nhau"* vẫn xanh trong khi lưu đồ đã xấu đi thật. Phải thêm vế 7b,
+7c và nửa sau của vế 4 mới bịt. Bài học mang đi: **một vế đo KẾT QUẢ CHUNG của nhiều cơ chế thì
+không ghim được cơ chế nào** — mỗi cơ chế cần một ca mà chỉ nó cứu được.
+
+**Một giả thuyết của tôi SAI:** tưởng gỡ lớp nhận diện cạnh quay lại thì bộ xếp đệ quy vô hạn.
+Nó **không treo** — nó vẽ lưu đồ NGƯỢC, nút đầu rơi xuống đáy. Hỏng im lặng, tệ hơn treo.
+
+**Đa phiên, ca thật:** hai lane chung một cây làm việc, nên bản vá nằm dở của tôi làm
+`build-template --check` ĐỎ cho **cả hai**. Nhắn lane kia không hồi đáp; **Đức chốt chuyển `_root`**.
+
+**Còn mở:** Đức sẽ trả lời 7 mục đang chờ chốt — đó là việc kế của phiên sau.

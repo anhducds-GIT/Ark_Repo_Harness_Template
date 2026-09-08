@@ -75,7 +75,12 @@ const PORTABLE_SCRIPTS = [
   // (phần kiểm được bằng phép kiểm thuần), `md-mini` đổi markdown sang HTML. Thiếu một là hai
   // file kia nạp không nổi. Suite ghim đi kèm là `tests/overview-doc-smoke.mjs` ở khối VERBATIM —
   // phát một lệnh mà không phát phép ghim của nó là phát một lời hứa.
+  //
+  // BỐN, từ bản 1.3.68: `luu-do.mjs` vẽ khối mermaid thành SVG. `md-mini` GỌI THẲNG nó, nên
+  // thiếu file này thì `md-mini` nạp không nổi và cả trang chết. Nó cũng là lý do bộ vẽ ở đây
+  // chứ không ở `build-overview`: chỗ cần vẽ là chỗ đọc markdown.
   "md-mini.mjs",
+  "luu-do.mjs",
   "overview-doc.mjs",
   "build-overview.mjs"
 ];
@@ -136,6 +141,10 @@ const VERBATIM = [
   // Phép ghim của bộ đọc bảng. Phát ba file máy mà không phát suite ghim của chúng là phát một
   // lời hứa: repo đích sẽ có bảng, và sẽ không có gì bắt được lúc bảng đọc sai.
   ["tests/overview-doc-smoke.mjs", "tests/overview-doc-smoke.mjs"],
+  /* Phép ghim của bộ vẽ lưu đồ. Đi theo vì lỗi nó vá là lỗi KHÔNG AI ĐỎ được: trang vẫn sinh ra,
+   * chỉ là lưu đồ hiện dưới dạng mã nguồn. Repo đích nhận bộ vẽ mà không nhận vế "mọi khối
+   * mermaid trong docs/ phải ra SVG" thì nó nhận lại đúng cái lỗ đã sống 5 tháng ở đây. */
+  ["tests/luu-do-smoke.mjs", "tests/luu-do-smoke.mjs"],
   /* Cơ chế đa phiên → `MULTIFLOW.md` mục 5 bắt đột biến kiểm, và phát một cơ chế mà không phát
    * phép ghim của nó là phát một lời hứa. Suite này tự dựng kho git riêng và đọc `areas` của
    * repo đích, nên nó chạy được cả ở repo khai khối `areas` rỗng. */
@@ -968,7 +977,7 @@ function packageJson(version) {
       // Repo đích nhận cả hai, nên nó có đường nhanh ngay từ ngày đầu — và vẫn còn đường tuần tự
       // để so khi nghi ngờ tranh chấp.
       test: "node scripts/chay-test.mjs",
-      "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
+      "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
     }
   }, null, 2) + "\n";
 }

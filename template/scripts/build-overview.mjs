@@ -30,6 +30,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { esc, md, tachFrontmatter } from "./md-mini.mjs";
+import { CSS_LUU_DO } from "./luu-do.mjs";
 
 /* CHỈ NHẬP TỪ BA FILE, và cả ba ĐỀU ĐI THEO BẢN TRÍCH.
  *
@@ -486,8 +487,6 @@ code{font-family:var(--mono);font-size:.87em;background:var(--mat2);padding:.1em
 pre.code{background:var(--mat2);border:1px solid var(--vien);border-radius:8px;padding:13px 15px;
   overflow-x:auto;margin:11px 0}
 pre.code code{background:none;padding:0;font-size:12.8px;color:var(--chu)}
-pre.mermaid{background:var(--mat);border:1px solid var(--vien);border-radius:10px;padding:16px;
-  overflow-x:auto;margin:14px 0;text-align:center}
 blockquote{border-left:3px solid var(--nhan);background:var(--nhan-nen);margin:12px 0;
   padding:11px 15px;border-radius:0 8px 8px 0;color:var(--chu2)}
 blockquote code{background:rgba(0,0,0,.06)}
@@ -583,7 +582,7 @@ footer{border-top:1px solid var(--vien);margin-top:34px;padding-top:15px;
 @media (max-width:640px){ nav.tabs{position:static} }
 @media (prefers-reduced-motion:no-preference){ section.tab{animation:hien .18s ease-out} }
 @keyframes hien{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-`;
+${CSS_LUU_DO}`;
 
 const JS = `
 (function(){
