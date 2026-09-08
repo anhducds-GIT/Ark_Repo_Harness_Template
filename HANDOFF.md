@@ -653,3 +653,35 @@ cả hai bị bắt** (bỏ `upgrade-smoke` · bỏ `build-template` khỏi danh
 **Còn mở:** `KHUNG-47` — vá này chỉ đóng ca **trong MỘT lượt chạy**. Hai LANE cùng chạy `npm test`
 trên chung một cây làm việc thì vẫn hỏng như cũ, vì `test.serial` chỉ điều phối trong một tiến
 trình. Điều kiện đóng của mục đó là một lệnh chạy được.
+
+## 2026-09-08 (khuya) · harness-phat-01 · BÀN GIAO cho lane ① — hai mục đỏ của cổng là việc của ①
+
+SendMessage tắt ở phiên tôi, nên bàn giao **qua sổ** — đúng luật mục 5. Đức approve ① lấy `_root`.
+
+**Tôi KHÔNG chạm `package.json`, KHÔNG chạm `AGENTS.md`.** Bốn commit của tôi chỉ ở `HANDOFF.md` ·
+`BACKLOG.md` · `decisions.md` · `CHANGELOG.md` · `docs/archive/*` · `docs/migrations/*`. Ba chỗ ①
+cần ở `_root` đều trống đường.
+
+**`DASHBOARD-Ark-Repo-Harness.html` tôi CỐ Ý không commit — ① phải sinh lại.** Tôi sinh một lượt
+thì nó hút theo việc chưa phát hành của ①: `git diff` ra **25 dấu vết** `luu-do`/mermaid/svg và
+**xoá 441 dòng**. Commit nó là tôi công bố việc chưa ai duyệt của lane khác, dưới tên lane tôi —
+nên đã `git checkout --` trả lại. Hệ quả: artifact đã commit **cũ so với HEAD** vì 4 commit của
+tôi. ① sinh lại **một lượt** là phủ cả hai phần.
+
+**Cổng của tôi còn 3 đỏ, và 2 trong 3 là việc của ①:** `Test xanh` đỏ 1/20 suite
+(`SO_PHAT_HANH_SUA_LICH_SU` — đọc trúng lúc bộ trích đang ghi sổ, xem `KHUNG-50`) · `Sự thật máy
+sinh còn tươi` đỏ (đúng cái artifact ở trên). Mục thứ ba `Kho chữ không phình` là của tôi, chưa xử.
+
+**Nên 4 commit của tôi CHƯA ĐẨY, cố ý.** Đẩy khi cổng đỏ là làm đúng điều luật cấm. Chúng chỉ là
+chữ, không chạm tầng máy, nên ① cắt bản không cần đợi tôi. Tôi đẩy sau khi ① xong.
+
+**Bốn mục chờ ① trong `BACKLOG.md`, một mục có câu chốt của Đức:** `KHUNG-48` (Đức chốt 08/09:
+pack cơ chế suite song song vào `features.json`) · `KHUNG-47` (bốn chỗ bản trích không mang được;
+ca dính ① nhất là `handoff-smoke` đòi dòng đúng chữ `## Log`) · `KHUNG-49` (`F4.7` xanh giả) ·
+`KHUNG-50` (bộ trích băm cây làm việc → chặn cả đường phát; và ledger ghi không nguyên tử).
+
+**Gợi ý về số bản, tuỳ ①:** `features.json` nằm trong `TEP_MAY_THEM` nên `KHUNG-48` cũng đòi tăng
+bản. Gộp vào **cùng 1.3.68** thì tiết kiệm một số — sổ cưỡng chế *một số một nội dung*, và 08/09
+đã đốt bảy số vì làm ngược thứ tự.
+
+**Đã trả `_root` + `_docs`.**
