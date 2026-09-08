@@ -497,7 +497,13 @@ function phanLuatChung(text) {
  *   Nén hai lượt: bản chữ đầu c35949d4… (218 dòng, B9 đỏ) → bản nén 4f87d44f… (210, vẫn đỏ) →
  *   bản này, sau khi CHUYỂN số đo và lý lẽ sang ADR-0008. Chỗ của lý lẽ là ADR, không phải hiến
  *   pháp — tôi đặt sai chỗ ở hai lượt đầu, và B9 là thứ bắt được. */
-const COMMON_LAW_SHA256 = "8a414ccaf80728686d35d0a36a5f238c731909a76d61857dc77b7e6884ebc4b1";
+/* 2026-09-08 — Đức duyệt tường minh: "tìm được điểm improve ta cần ghi vào rules & protocol để
+ *   tối ưu tốc độ xử lý task của toàn bộ hệ thống", kèm chỉ thị chạy không dừng, không hỏi lại.
+ *   Đổi gì: thêm mục 0b "THỨ TỰ ĐÓNG PHIÊN" vào luật chung — ba luật tốc độ, mỗi luật có số đo
+ *   đứng sau: chạy `npm test` SAU commit (đúng thứ tự cổng 22s, sai ~9 phút) · trong lúc làm dùng
+ *   `--chi <suite>` thay vì đủ bộ · phát bản trích MỘT LẦN sau khi suite xanh (08/09 đốt 7 số bản
+ *   vì làm ngược). Vân tay trước: 8a414ccaf80728686d35d0a36a5f238c731909a76d61857dc77b7e6884ebc4b1 */
+const COMMON_LAW_SHA256 = "0f6f62e08d379abb2faa27f7dbd570667af5892a3f3192abee7154d473f0c7eb";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

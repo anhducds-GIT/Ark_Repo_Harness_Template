@@ -62,15 +62,31 @@ export function dauCay(root = ROOT) {
   return { head, bam: crypto.createHash("sha256").update(ban).digest("hex").slice(0, 32) };
 }
 
+/** Môi trường chạy. Đổi bản Node là suite chưa từng chạy trên bản đó. */
+export function moiTruongNay() {
+  return `${process.version} ${process.platform} ${process.arch}`;
+}
+
 /** Chuỗi lệnh đang khai — đổi danh sách suite là dấu cũ hết hiệu lực. */
 export function bamLenh(danhSach) {
   return crypto.createHash("sha256").update(danhSach.join(String.fromCharCode(31))).digest("hex").slice(0, 32);
 }
 
 /** Dấu còn dùng được không. Trả `{ dung, vi_sao }` — luôn nói VÌ SAO, kể cả khi được. */
-export function xetDau(dau, { head, bam }, lenh, { phut = HAN_MAC_DINH_PHUT, now = Date.now() } = {}) {
+export function xetDau(dau, { head, bam }, lenh, { phut = HAN_MAC_DINH_PHUT, now = Date.now(), moiTruong = moiTruongNay() } = {}) {
   if (!dau || typeof dau !== "object") return { dung: false, vi_sao: "chưa có dấu nào" };
   if (dau.ok !== true) return { dung: false, vi_sao: "dấu ghi lượt chạy KHÔNG xanh" };
+  /* MÔI TRƯỜNG, không chỉ mã nguồn. Chỗ này do phiên Codex bắt được khi chấm chéo 08/09, và nó
+     đúng: *"đừng tin một cache chỉ dựa vào HEAD — HEAD bỏ sót file bẩn, phụ thuộc, môi trường."*
+     File bẩn thì `git status --porcelain -uall` đã che. Môi trường thì KHÔNG: đổi phiên bản Node
+     rồi chạy cổng là suite chưa từng chạy trên bản Node đó, mà dấu vẫn hợp lệ.
+     Còn một khe CỐ Ý để ngỏ, ghi ra để không ai tưởng nó kín: thư mục bị `.gitignore`
+     (`node_modules/`) không nằm trong băm. Khai báo phụ thuộc thì có — `package-lock.json` là
+     file được track nên HEAD ghim nội dung nó và porcelain bắt mọi sai lệch. Chỉ lượt SỬA TAY
+     trong `node_modules` là lọt, và hạn 30 phút là thứ chặn nó. */
+  if (dau.moi_truong !== moiTruong) {
+    return { dung: false, vi_sao: `dấu chạy trên môi trường "${dau.moi_truong ?? "không ghi"}", nay là "${moiTruong}"` };
+  }
   if (dau.head !== head) return { dung: false, vi_sao: `dấu thuộc HEAD ${String(dau.head).slice(0, 8)}, nay là ${head.slice(0, 8)}` };
   if (dau.bam !== bam) return { dung: false, vi_sao: "cây làm việc đã đổi kể từ lượt chạy đó" };
   if (dau.lenh !== lenh) return { dung: false, vi_sao: "danh sách suite đã đổi kể từ lượt chạy đó" };
@@ -197,7 +213,7 @@ async function main(argv) {
     return 0;
   }
   const { head, bam } = dauCay(root);
-  ghiDau(root, { ok: true, head, bam, lenh: lenhBam, luc: new Date().toISOString(), giay: +giay, so_suite: ds.length });
+  ghiDau(root, { ok: true, head, bam, lenh: lenhBam, moi_truong: moiTruongNay(), luc: new Date().toISOString(), giay: +giay, so_suite: ds.length });
   console.log(`Đã ghi ${TEN_DAU}: cổng đóng phiên sẽ dùng lại kết quả này nếu cây làm việc không đổi.`);
   return 0;
 }

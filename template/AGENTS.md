@@ -17,6 +17,33 @@ node scripts/session-check.mjs --as <tên-phiên-của-bạn>
 
 Không được báo "xong" khi cổng kiểm chưa xanh. Không được tự sửa cổng kiểm cho nó xanh.
 
+### 0b. THỨ TỰ ĐÓNG PHIÊN — sai thứ tự là tự nhân đôi thời gian
+
+```
+sửa  →  commit  →  sinh lại artifact  →  commit  →  npm test  →  cổng  →  safe-push
+```
+
+**Chạy `npm test` SAU commit, không phải trước.** Bộ chạy để lại một *dấu xác nhận* buộc vào HEAD
++ băm cây làm việc; cổng thấy dấu còn hiệu lực thì **không chạy lại chuỗi suite**. Commit sau khi
+chạy là đổi cây → dấu hết hiệu lực → cổng chạy lại từ đầu. Đo 08/09: đúng thứ tự thì cổng **22
+giây**, sai thứ tự thì **~9 phút**.
+
+**Trong lúc làm, ĐỪNG chạy đủ bộ sau mỗi bước nhỏ.** Chạy đúng suite liên quan:
+
+```bash
+node scripts/chay-test.mjs --chi <một-phần-tên-suite>    # không ghi dấu, cố ý
+```
+
+Đủ bộ chạy **một lần**, ở cuối. Đo 08/09: một ngày mất **sáu vòng đủ bộ** cho một thay đổi, và
+phần lớn là để phát hiện thứ mà một suite lẻ đã đủ để bắt.
+
+**Phát bản trích (`npm run template`) MỘT LẦN, sau khi suite xanh.** Sổ phát hành cưỡng chế
+*một số một nội dung*, nên mỗi lượt sửa nguồn sau khi phát là **một số bản bị đốt**. Đo 08/09:
+một thay đổi đốt **bảy số bản** vì phát trước rồi mới chạy test.
+
+> Ba dòng trên là **luật tốc độ**, không phải lời khuyên: chúng thay cho thói quen "chạy cho chắc"
+> đã đo được là tốn **1.095 giây một vòng** thay vì **278**.
+
 **Push thì KHÔNG dùng `git push`** — dùng:
 
 ```bash
