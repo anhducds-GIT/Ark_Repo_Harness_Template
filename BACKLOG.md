@@ -1224,3 +1224,47 @@ file + chuỗi/regex phải khớp), và `F4.7` dùng kiểu đó thay cho `can.
 `node scripts/features.mjs <một repo chưa nhận luật>` báo `F4.7` là `[ ]` hoặc `[~]` chứ không phải
 `[x]` — dựng nổi ca hỏng; **và** ⑶ một vế trong `tests/features-smoke.mjs` đòi mọi mục có
 `pham_vi: "ca-hai"` mà đích là một file repo-đích-tự-sở-hữu thì **không được** chỉ đo bằng `can.file`.
+
+### KHUNG-50 · Bộ trích băm CÂY LÀM VIỆC, nên một lane sửa dở là CHẶN toàn bộ đường phát — và ledger bị đọc lúc đang ghi
+
+**Đo 08/09, hai lane chạy song song đúng luật, khác vùng, mà vẫn đụng nhau.** Tôi giữ `_root` +
+`_docs`, lane ① giữ `_code` + `_template`. Hai vùng rời nhau, không file nào chung. Vậy mà:
+
+**⑴ Không phát được sang repo nào, ba lượt liên tiếp.** `upgrade.mjs --plan` từ chối:
+
+```
+SO_PHAT_HANH_LECH: bản 1.3.67 đã ghi dấu vân tay 1633c1812bb87973,
+                   nội dung tầng máy hiện tại là b5823f889730c00f
+```
+
+Vì `bamBanTrich()` băm **cây làm việc**, không băm HEAD. Nên **bất kỳ** lane nào sửa dở một file
+`.mjs` là Vai ② mất cửa ra ngoài. Cái giá đo được: `nav_platform_main` **không nhận được** cơ chế
+suite song song trong lượt 08/09 — phải hoãn thành `NAV-1` ở repo đó.
+
+**Đối chiếu đáng chú ý, trong CÙNG repo này:** bộ sinh bảng **cố ý suy hoàn toàn từ HEAD**, và lý
+lẽ ghi ngay trong Bản đồ file — *"bộ sinh nhìn đồng hồ thì sang ngày là mọi phiên bị chặn đẩy dù
+không dữ liệu nào đổi"*. Cùng một loại vấn đề, hai lựa chọn trái nhau. Bộ trích chưa hưởng bài học đó.
+
+**⑵ `RELEASE-LEDGER.json` bị đọc lúc đang ghi — HAI lần, cách nhau ~30 phút, hai triệu chứng:**
+
+| Lượt | Thông báo | Sự thật trên đĩa sau đó |
+|---|---|---|
+| ~17:20 | `1.3.9: c985e395… → ffffffffffffffff` | `c985e395…`, nguyên |
+| ~17:55 | `1.2.10: 946065fa… → (đã bị xoá)` | có mặt, 87 bản, khớp HEAD |
+
+Cả hai lần file **hoàn toàn lành** khi tôi đọc lại. Nguyên nhân: bộ trích ghi lại **cả file**
+(`writeFileSync` một cục), nên lane khác đọc trúng khoảng giữa thấy một sổ **thiếu dòng**.
+
+**Đây là ca nguy hiểm nhất trong hai ca, vì thông báo nó phát ra là thông báo ĐÁNG SỢ NHẤT của bộ
+khung:** `SO_PHAT_HANH_SUA_LICH_SU` — *"nói dối về một bản đã đi ra ngoài"*. Một lane đọc trúng
+lúc đó có mọi lý do để tin sổ đã bị phá, và **cách chữa hiển nhiên là sửa sổ** — tức phá một sổ
+đang lành. Lớp fail-closed đúng, nhưng nó đang đổ lỗi cho người vô can.
+
+Vùng: `_code` (`build-template.mjs`) + `_template`.
+
+**đóng khi:** ⑴ `bamBanTrich()` (và đường `--plan`/`--apply` gọi nó) băm nội dung tại **HEAD** chứ
+không phải cây làm việc — hoặc `--plan` nói rõ *"cây làm việc đang bẩn, đây là số của cây bẩn"* thay
+vì kết luận sổ lệch; kèm một phép ghim dựng repo có file `.mjs` sửa dở rồi đòi `--plan` **vẫn phát
+được** (hoặc từ chối với đúng lý do); **và** ⑵ lượt ghi sổ phát hành là **nguyên tử** (ghi file tạm
+rồi `renameSync`), kèm một phép ghim đọc sổ giữa hai bước và đòi **không bao giờ** thấy trạng thái
+thiếu dòng.
