@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:12:07.734Z",
-      "task": "don luat trung, so no 25->20",
-      "released_at": "2026-09-08T20:19:21.666Z",
+      "claimed_at": "2026-09-08T20:46:53.620Z",
+      "task": "gop luat khoa, rang cho so quyet dinh",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:12:07.817Z",
-      "task": "don luat trung, so no 25->20",
-      "released_at": "2026-09-08T20:19:21.777Z",
+      "claimed_at": "2026-09-08T20:46:53.689Z",
+      "task": "gop luat khoa, rang cho so quyet dinh",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:12:07.914Z",
-      "task": "don luat trung, so no 25->20",
-      "released_at": "2026-09-08T20:19:21.914Z",
+      "claimed_at": "2026-09-08T20:46:53.765Z",
+      "task": "gop luat khoa, rang cho so quyet dinh",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:12:08.003Z",
-      "task": "don luat trung, so no 25->20",
-      "released_at": "2026-09-08T20:19:22.034Z"
+      "claimed_at": "2026-09-08T20:46:53.838Z",
+      "task": "gop luat khoa, rang cho so quyet dinh",
+      "released_at": null
     }
   }
 }
