@@ -123,7 +123,7 @@ Vẫn phải hỏi: force-push, sửa lịch sử, merge vào `main` — và m�
 
 ## 5. Vai từng AI — chia theo VIỆC, không chia theo hãng
 
-Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một vai**. Số đo và lý lẽ: [ADR-0008](docs/adr/0008-hai-vai-assistant.md) + [0009](docs/adr/0009-sua-ba-khang-dinh-cua-adr-0008.md).
+Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một vai**. Lý lẽ và số đo: ADR — mục 6.
 
 | Vai | Việc chính | KHÔNG được |
 |---|---|---|
