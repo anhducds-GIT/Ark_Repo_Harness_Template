@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T14:20:07.018Z",
-      "task": "xep Duc Scouter vao so y tuong (Y-11)",
-      "released_at": "2026-09-07T14:22:33.472Z",
+      "claimed_at": "2026-09-07T19:39:30.134Z",
+      "task": "tang ban 1.3.40",
+      "released_at": "2026-09-08T03:29:53.998Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -15,9 +15,9 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T07:55:12.956Z",
-      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
-      "released_at": "2026-09-07T10:52:20.883Z",
+      "claimed_at": "2026-09-07T19:16:57.744Z",
+      "task": "ADR bo sung ADR-0006: bang co NAM nhom",
+      "released_at": "2026-09-08T03:29:51.099Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T13:01:58.595Z",
-      "task": "va ba loi P1 Codex tim duoc o quyen.mjs",
-      "released_at": "2026-09-07T14:02:23.889Z",
+      "claimed_at": "2026-09-07T19:16:57.662Z",
+      "task": "tach tab migrate rieng + khai hai vai thanh luat",
+      "released_at": "2026-09-08T03:29:50.958Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-07T07:55:13.119Z",
-      "task": "gon bang + checklist tinh nang vao tab Migrate + Y-09 phat bang sang repo dich",
-      "released_at": "2026-09-07T10:52:21.241Z"
+      "claimed_at": "2026-09-07T19:39:30.038Z",
+      "task": "phat ban 1.3.40",
+      "released_at": "2026-09-08T03:29:54.125Z"
     }
   }
 }
