@@ -36,6 +36,13 @@ const PORTABLE_SCRIPTS = [
   "repo-structure.mjs",
   "build-dashboard.mjs",
   "check-bootstrap.mjs",
+  /* `rule-compiler.mjs` PHẢI đi theo vì `check-bootstrap.mjs` (ngay trên) `import` nó cho B16 —
+     thiếu nó thì cổng kiểm cấu trúc của MỌI repo tiêu thụ chết ngay lúc nạp, không phải đỏ mà là
+     `MODULE_NOT_FOUND`. Đây là lần thứ hai trong ngày một `import` mới suýt đi một mình: nay có
+     phép ghim `tests/template-null-repo.mjs` chạy thật cổng cấu trúc trong bản trích, nên chuyện
+     này đỏ thay vì lọt. Và nó đáng phát đi vì lý do riêng: bộ khung phát đi LUẬT, nên nó phải
+     phát cả cái giữ cho luật khỏi phình. */
+  "rule-compiler.mjs",
   "session-check.mjs",
   "safe-push.mjs",
   // GÓI ASSISTANT (bản 1.3.0) — hai lệnh của vai ĐIỀU PHỐI. Chúng CHỈ ĐỌC, không đòi khoá nào,
@@ -186,9 +193,15 @@ const VERBATIM = [
    sửa. Đúng hơn về mặt khái niệm: ADR-0000 của mỗi repo là *quyết định của chính repo đó* về
    việc áp dụng ADR, không phải bản sao quyết định của người khác. Nên template mang một hạt
    giống: giữ nguyên bốn luật, thay phần bối cảnh bằng bối cảnh của một repo mới. */
+/* HẠT GIỐNG ADR mang sẵn `chu_de` và `dau_moi` — không phải để cho phép kiểm B16 xanh, mà vì
+   repo mới học bằng cách CHÉP cái nó thấy. Hạt giống không khai chỗ đứng thì ADR thứ hai, thứ ba
+   cũng sẽ không khai, và tới lúc có mười cái thì không ai đi khai ngược lại nữa. Khai từ cái đầu
+   tiên là rẻ nhất. Kèm theo: `.repo-structure.json` của bản trích khai sẵn `luat.chu_de`. */
 const ADR_SEED = `---
 status: Proposed
 adr: 0000
+chu_de: ghi-quyet-dinh
+dau_moi: true
 date: YYYY-MM-DD
 deciders: <ai chốt>
 ---
@@ -585,7 +598,7 @@ function phanLuatChung(text) {
  *   VAI TRÒ ("sổ riêng, khai vào bảng mục 6"), đúng bài học cũ: luật chung tả HÀNH VI, không gọi
  *   tên thứ chỉ nơi phát hành mới có.
  *   Vân tay trước: 51d31f3eda172dea51e5c5a7d259657cb050c535517efb289a975c7dfaaac7e4 */
-const COMMON_LAW_SHA256 = "d93d642ccf6ec6acbbb4d245aec5f35a9a193f5f8f8f45b80a10927affcbbd0a";
+const COMMON_LAW_SHA256 = "b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -718,6 +731,7 @@ Luật chung ở các mục trên; chi tiết kỹ thuật ở các file bảng 
 | **Là phiên ĐIỀU PHỐI: người chốt hỏi "đang có gì · làm gì tiếp · việc nào chạy song song được"** | [docs/protocols/ORCHESTRATOR.md](docs/protocols/ORCHESTRATOR.md) — sổ tay vai điều phối: luật mở phiên, **hàng rào vai cứng** (vai này KHÔNG code, KHÔNG debug, KHÔNG đề xuất bản vá), luật nạp báo cáo năm mục, lối ra bàn giao cho executor. **Đọc khối cảnh báo ở đầu file trước** |
 | **Một phép kiểm tự nhiên đỏ với người vừa clone mà xanh trên máy bạn** | [.gitattributes](.gitattributes) — chốt kiểu xuống dòng cho CẢ repo, cả trong kho lẫn trong cây làm việc. Không có nó thì máy Windows tự đổi lúc lấy file ra, một commit có hai dạng byte, và \`git status\` nói SẠCH ở cả hai. Chốt một nửa — chỉ \`text=auto\` — thì kho sạch mà cây làm việc vẫn CRLF, tức bệnh còn nguyên |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống · [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) — phép ghim của hai lệnh trên, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó. Chạy cả hai bằng \`npm test\` |
+| **Sắp THÊM một luật, hay muốn biết luật nào đang hiệu lực về một chủ đề** | \`npm run luat\` — bộ biên dịch luật. Ba tầng: **sổ cái** (\`docs/adr/\` · \`decisions.md\` · kho lưu trữ — chỉ thêm, là LỊCH SỬ) → **bộ biên dịch** → **luật hiệu lực** (thứ một phiên thật sự đọc). Mỗi ADR khai \`chu_de\`, mỗi chủ đề đúng một \`dau_moi\`, nên mở một khối là ra câu trả lời chứ không phải đọc bốn file rồi tự đoán. \`--de-xuat\` NÊU chỗ đáng gộp. **AI được đề xuất, KHÔNG tự sửa hay xoá luật** — chỉ khai báo tường minh mới làm đổi bộ luật. Cưỡng chế ở B16 |
 | Biết luật riêng của NGHỀ repo bạn (không phải luật chung) | phụ lục nghề: [docs/ANNEX-tu-dong-hoa-trinh-duyet.md](docs/ANNEX-tu-dong-hoa-trinh-duyet.md) là bản mẫu có thật · viết cái của bạn theo [docs/_TEMPLATE-annex.md](docs/_TEMPLATE-annex.md) |
 
 **Phải là liên kết bấm được, không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
@@ -821,6 +835,13 @@ const STRUCTURE_SEED = `{
   "bootstrap": {
     "_doc": "Phép kiểm nào ĐÓNG CỔNG khi đỏ. Repo mới nên bắt đầu với danh sách RỖNG, chạy vài phiên cho sạch, rồi mới bật dần. Bật chặn khi đang đỏ là tự khoá repo.",
     "blocking": []
+  },
+  "luat": {
+    "_doc": "Chủ đề của bộ luật. MỖI ADR khai đúng một \`chu_de\` ở đây, và mỗi chủ đề có đúng một ADR khai \`dau_moi: true\`. Nhờ vậy muốn biết luật về một chuyện thì mở ĐÚNG MỘT khối, không phải đọc bốn file rồi tự đoán cái nào thắng. Xem: npm run luat. Cưỡng chế: B16.",
+    "_doc2": "THÊM chủ đề khi thật sự có một chuyện KHÁC HẲN cần luật riêng — đừng thêm cho mỗi ADR một chủ đề, làm thế là quay lại đúng chỗ cũ với thêm một lớp thủ tục. Chủ đề chưa khai mà ADR trỏ tới thì B16 ĐỎ, cố ý: một lỗi gõ không được lặng lẽ đẻ ra một nhóm mới.",
+    "chu_de": {
+      "ghi-quyet-dinh": "Cách ghi một quyết định"
+    }
   }
 }
 `;
@@ -953,7 +974,7 @@ Nguyên tắc số một: **thứ gì máy đếm được thì máy đếm** �
 | \`.repo-structure.json\` | LAW | Hình dạng repo: đơn vị nằm đâu, thư mục nào có chủ nào, phép kiểm nào chặn |
 | \`scripts/repo-structure.mjs\` | máy | Nguồn sự thật duy nhất về hình dạng repo — bốn script kia đều đọc nó |
 | \`scripts/build-dashboard.mjs\` | máy | Sinh bảng điều hành + cổng vào máy đọc, **hoàn toàn từ HEAD** |
-| \`scripts/check-bootstrap.mjs\` | máy | Cổng kiểm cấu trúc B1–B14 |
+| \`scripts/check-bootstrap.mjs\` | máy | Cổng kiểm cấu trúc (dãy B) |
 | \`scripts/session-check.mjs\` | máy | Cổng đóng phiên — đỏ thì chưa xong |
 | \`scripts/safe-push.mjs\` | máy | Đẩy mà không cuốn theo commit của phiên khác |
 | \`tests/harness-smoke.mjs\` | máy | **Lưới đỡ của chính bộ khung** — bốn chỗ đã hỏng thật ở repo sinh ra nó. Thêm test của bạn vào cùng thư mục, đừng xoá bốn khối này |
@@ -1021,6 +1042,10 @@ function packageJson(version) {
       "what-next": "node scripts/what-next.mjs",
     "can-nang": "node scripts/can-nang.mjs",
     "don": "node scripts/don.mjs",
+      // BỘ BIÊN DỊCH LUẬT. Phải khai, không chỉ để file nằm trong `scripts/`: mục 8 của luật
+      // chung bảo "máy canh câu này", và một luật trỏ tới lệnh không gọi được thì nó là chữ.
+      // Phép ghim `template-null-repo` bắt đúng chỗ này ngay lượt đầu.
+      luat: "node scripts/rule-compiler.mjs",
       // BẢNG CHO NGƯỜI XEM. Không khai lệnh thì file nằm đó mà không ai chạy — và bảng là thứ
       // người chốt mở, không phải AI. Trang ghi ra `DASHBOARD-<tên-repo>.html` ở gốc repo, suy
       // từ `repo.name`; muốn tên khác thì khai `generated_names.overview`.

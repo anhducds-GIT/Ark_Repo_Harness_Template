@@ -1,6 +1,8 @@
 ---
 status: Proposed
 adr: 0000
+chu_de: ghi-quyet-dinh
+dau_moi: true
 date: YYYY-MM-DD
 deciders: <ai chốt>
 ---

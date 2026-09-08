@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0010
+chu_de: tran-ngan-sach
+dau_moi: true
 date: 2026-09-08
 deciders: Đức uỷ quyền tường minh — "hai chốt đó bạn chủ động chọn cho phù hợp cho tôi"
 ---

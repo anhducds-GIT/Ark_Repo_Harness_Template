@@ -162,6 +162,7 @@ Luật chung ở các mục trên; chi tiết kỹ thuật ở các file bảng 
 | **Là phiên ĐIỀU PHỐI: người chốt hỏi "đang có gì · làm gì tiếp · việc nào chạy song song được"** | [docs/protocols/ORCHESTRATOR.md](docs/protocols/ORCHESTRATOR.md) — sổ tay vai điều phối: luật mở phiên, **hàng rào vai cứng** (vai này KHÔNG code, KHÔNG debug, KHÔNG đề xuất bản vá), luật nạp báo cáo năm mục, lối ra bàn giao cho executor. **Đọc khối cảnh báo ở đầu file trước** |
 | **Một phép kiểm tự nhiên đỏ với người vừa clone mà xanh trên máy bạn** | [.gitattributes](.gitattributes) — chốt kiểu xuống dòng cho CẢ repo, cả trong kho lẫn trong cây làm việc. Không có nó thì máy Windows tự đổi lúc lấy file ra, một commit có hai dạng byte, và `git status` nói SẠCH ở cả hai. Chốt một nửa — chỉ `text=auto` — thì kho sạch mà cây làm việc vẫn CRLF, tức bệnh còn nguyên |
 | Hiểu bộ khung tự kiểm mình bằng gì, hoặc thêm test của repo bạn | [tests/harness-smoke.mjs](tests/harness-smoke.mjs) — bốn khối hạt giống · [tests/assistant-smoke.mjs](tests/assistant-smoke.mjs) — phép ghim của hai lệnh trên, khối cuối tự dựng một repo hình dạng khác hẳn rồi chạy thật trong đó. Chạy cả hai bằng `npm test` |
+| **Sắp THÊM một luật, hay muốn biết luật nào đang hiệu lực về một chủ đề** | `npm run luat` — bộ biên dịch luật. Ba tầng: **sổ cái** (`docs/adr/` · `decisions.md` · kho lưu trữ — chỉ thêm, là LỊCH SỬ) → **bộ biên dịch** → **luật hiệu lực** (thứ một phiên thật sự đọc). Mỗi ADR khai `chu_de`, mỗi chủ đề đúng một `dau_moi`, nên mở một khối là ra câu trả lời chứ không phải đọc bốn file rồi tự đoán. `--de-xuat` NÊU chỗ đáng gộp. **AI được đề xuất, KHÔNG tự sửa hay xoá luật** — chỉ khai báo tường minh mới làm đổi bộ luật. Cưỡng chế ở B16 |
 | Biết luật riêng của NGHỀ repo bạn (không phải luật chung) | phụ lục nghề: [docs/ANNEX-tu-dong-hoa-trinh-duyet.md](docs/ANNEX-tu-dong-hoa-trinh-duyet.md) là bản mẫu có thật · viết cái của bạn theo [docs/_TEMPLATE-annex.md](docs/_TEMPLATE-annex.md) |
 
 **Phải là liên kết bấm được, không phải chữ thường:** phép kiểm độ sâu điều hướng (B6) đi theo
@@ -186,10 +187,9 @@ khi chết vì thiếu. Nên trước khi thêm một luật, một phép kiểm
 1. **Đã có chuyện gì xảy ra thật chưa?** Chưa thì đừng thêm — viết vào `BACKLOG` và chờ.
 2. **Nó thay chỗ cái nào?** Không thay được cái nào thì nói rõ vì sao đáng thêm hẳn.
 3. **Dựng nổi ca hỏng cho nó không?** Không dựng nổi thì nó là chữ, không phải luật.
-4. **Nó thuộc NHÓM nào?** Mỗi luật có ĐÚNG MỘT nhà, chỗ khác chỉ trỏ sang: luật áp cho mọi repo →
-   file này · Đức vừa chốt → `decisions.md`, một dòng · lý lẽ dài, có số đo, có **cái MẤT** →
-   `docs/adr/`, bất biến, sửa thì viết ADR mới · thứ đang HỎNG → `BACKLOG.md` kèm `đóng khi:` ·
-   việc lặp lại, hay hướng đi chưa hỏng → sổ riêng, khai vào bảng mục 6. Chọn không nổi = chưa đủ rõ.
+4. **Nó thuộc NHÓM nào?** Mỗi luật có ĐÚNG MỘT nhà, chỗ khác chỉ trỏ sang: luật áp cho mọi repo → file này ·
+   Đức vừa chốt → `decisions.md`, một dòng · lý lẽ dài, có số đo, có **cái MẤT** → `docs/adr/`, bất biến ·
+   thứ đang HỎNG → `BACKLOG.md` kèm `đóng khi:` · việc lặp lại hay hướng đi → sổ riêng. **Máy canh câu này** — mục 6.
 5. **Nó có CHỦ NGỮ không, và nó phủ luật nào?** Luật mới phủ luật cũ thì **XOÁ luật cũ ngay lượt đó** — Đức chốt 09/09.
    Hai bản cạnh nhau là hai câu trả lời cho một câu hỏi, và phiên sau bốc trúng câu sai; lịch sử ở
    `git log` và ADR, không ở chỗ đang cưỡng chế. Ca thật: *"quá 30 phút thì nêu tên, KHÔNG tự nhả"* thiếu chủ ngữ → một phiên đọc thành "đừng trả khoá của mình".

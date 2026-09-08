@@ -52,5 +52,12 @@
   "bootstrap": {
     "_doc": "Phép kiểm nào ĐÓNG CỔNG khi đỏ. Repo mới nên bắt đầu với danh sách RỖNG, chạy vài phiên cho sạch, rồi mới bật dần. Bật chặn khi đang đỏ là tự khoá repo.",
     "blocking": []
+  },
+  "luat": {
+    "_doc": "Chủ đề của bộ luật. MỖI ADR khai đúng một `chu_de` ở đây, và mỗi chủ đề có đúng một ADR khai `dau_moi: true`. Nhờ vậy muốn biết luật về một chuyện thì mở ĐÚNG MỘT khối, không phải đọc bốn file rồi tự đoán cái nào thắng. Xem: npm run luat. Cưỡng chế: B16.",
+    "_doc2": "THÊM chủ đề khi thật sự có một chuyện KHÁC HẲN cần luật riêng — đừng thêm cho mỗi ADR một chủ đề, làm thế là quay lại đúng chỗ cũ với thêm một lớp thủ tục. Chủ đề chưa khai mà ADR trỏ tới thì B16 ĐỎ, cố ý: một lỗi gõ không được lặng lẽ đẻ ra một nhóm mới.",
+    "chu_de": {
+      "ghi-quyet-dinh": "Cách ghi một quyết định"
+    }
   }
 }

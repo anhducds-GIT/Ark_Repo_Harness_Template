@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0001
+chu_de: ranh-gioi
+dau_moi: true
 date: 2026-09-02
 deciders: Đức
 ---

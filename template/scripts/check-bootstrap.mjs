@@ -1,4 +1,4 @@
-/* Cổng kiểm CẤU TRÚC — 15 phép kiểm B1…B15, phiên S4.
+/* Cổng kiểm CẤU TRÚC — dãy B, số phép kiểm ĐẾM ĐƯỢC ở `collectChecks` (đừng gõ số vào đây).
 
    Mục tiêu: nợ điều hướng hiện ra BẰNG SỐ CÓ TÊN. Mỗi phép kiểm chặn đứng một câu hỏi mà
    một phiên AI mới sẽ phải đi hỏi Đức. Không trả lời được bằng repo = một khoản nợ.
@@ -24,6 +24,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { collectModel, createHeadDeps, parseStatus } from "./build-dashboard.mjs";
+import { chuDeKhaiTu, docAdr, soatLuat } from "./rule-compiler.mjs";
+import { readStructureFromDisk } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -643,8 +645,60 @@ export function checkB15(model) {
     `đã soi ${model.rows.length} đơn vị × ${OPERATOR_FIELDS.length} trường`);
 }
 
+/* ---- B16 · Bộ luật có biên dịch được không --------------------------------
+ *
+ * RĂNG CHỐNG PHÌNH LUẬT — Đức chốt 09/09. Luật chỉ có một chiều là TĂNG, và mỗi luật đều hợp lý
+ * lúc thêm vào. Cái vỡ không phải độ dài mà là **hai câu trả lời cho một câu hỏi**: đo 09/09,
+ * hiến pháp có BA mốc trả khoá cùng lúc, và một phiên đã đọc đúng một trong ba rồi làm ngược
+ * hai cái kia.
+ *
+ * B16 đòi mỗi ADR khai `chu_de` (mỗi luật ĐÚNG MỘT nhà) và mỗi chủ đề có đúng một `dau_moi`
+ * (mở một file là ra câu trả lời, không phải đọc bốn file rồi tự đoán cái nào thắng). Đây là
+ * kiểm KHAI BÁO, không phải kiểm ngữ nghĩa: máy không đoán hai luật có cùng nghĩa hay không —
+ * nó chỉ đòi con người nói ra chỗ đứng. `rule-compiler.mjs --de-xuat` mới là chỗ NÊU nghi vấn.
+ *
+ * CHẶN, không phải cảnh báo: thêm một ADR mà không trả lời nổi "nó thuộc nhóm nào" thì luật đó
+ * chưa đủ rõ để thêm — và nếu chỉ cảnh báo thì đúng bốn ngày nữa là không ai đọc dòng vàng nữa.
+ * Repo chưa khai `luat.chu_de` mà có từ 2 ADR trở lên cũng ĐỎ: cho qua chỗ đó là mở đúng cái
+ * cửa mà cả phép kiểm này sinh ra để đóng. */
+export function checkB16(deps) {
+  const title = "Bộ luật biên dịch được (mỗi luật một nhà, mỗi chủ đề một đầu mối)";
+  const goc = deps.root ?? ROOT;
+  let dsAdr;
+  try { dsAdr = docAdr(goc); } catch { dsAdr = null; }
+  if (!dsAdr || !dsAdr.length) {
+    return skip("B16", RED, title, `KHÔNG ÁP DỤNG — repo chưa có ADR nào trong \`${ADR_DIR}\``);
+  }
+  let chuDeKhai = null;
+  try { chuDeKhai = chuDeKhaiTu(readStructureFromDisk(goc)); } catch { chuDeKhai = null; }
+  if (!chuDeKhai && dsAdr.length >= 2) {
+    return report("B16", RED, title, [{
+      tag: "LUAT-KHONG-KHAI-CHU-DE",
+      where: ".repo-structure.json",
+      why: `repo có ${dsAdr.length} ADR mà chưa khai \`luat.chu_de\` — mọi luật đều không có nhà`,
+      fix: [
+        'khai khối `"luat": { "chu_de": { "<mã>": "<tên hiển thị>" } }` vào `.repo-structure.json`',
+        "rồi thêm `chu_de:` vào frontmatter từng ADR — B12 CHO PHÉP sửa frontmatter",
+        "xem đề xuất nhóm: node scripts/rule-compiler.mjs --de-xuat"
+      ]
+    }], `${dsAdr.length} ADR`);
+  }
+  const findings = soatLuat(dsAdr, chuDeKhai).map((v) => ({
+    tag: v.ma,
+    where: ADR_DIR,
+    why: v.vi,
+    fix: [
+      "sửa frontmatter của ADR liên quan (`chu_de:` · `dau_moi: true` · `thuoc:`/`sua:`/`bo_sung:`)",
+      "hoặc khai chủ đề mới vào `.repo-structure.json` → `luat.chu_de`",
+      "xem toàn cảnh: node scripts/rule-compiler.mjs"
+    ]
+  }));
+  const soChuDe = new Set(dsAdr.filter((a) => a.chuDe).map((a) => a.chuDe)).size;
+  return report("B16", RED, title, findings, `${dsAdr.length} ADR trong ${soChuDe} chủ đề`);
+}
+
 /* ---------------------------------------------------------------------------
-   Chạy cả 14 phép kiểm.
+   Chạy cả 16 phép kiểm.
 --------------------------------------------------------------------------- */
 export function collectChecks(deps) {
   // tolerant: STATUS sai luật KHÔNG được giết cổng kiểm — nó sinh ra để chỉ tên cái sai.
@@ -666,7 +720,8 @@ export function collectChecks(deps) {
     checkB12(deps),
     checkGeneratedFreshness(deps, { code: "B13", file: "llms.txt", times }),
     checkB14(deps, model, times),
-    checkB15(model)
+    checkB15(model),
+    checkB16(deps)
   ];
   // Gắn mức chặn từ cấu hình. Làm ở ĐÂY, một chỗ duy nhất, để không có đường nào dựng ra một
   // danh sách phép kiểm mà quên gắn — quên gắn nghĩa là `blocking` undefined, và undefined thì
@@ -759,7 +814,11 @@ export function renderChecks(checks, { showLimit = DEFAULT_SHOW, extras = null }
   const chiCanhBao = checks.filter((check) => !check.blocking).map((check) => check.code);
   const lines = [
     "",
-    "CỔNG KIỂM CẤU TRÚC — 15 phép kiểm B1…B15",
+    /* ĐẾM, ĐỪNG GÕ CỨNG. Dòng này từng ghi "15 phép kiểm B1…B15" bằng chữ, và nó sai ngay lượt
+       thêm B16 — cùng đúng cái bệnh mà 09/09 đã bắt được ở ba chỗ khác (bảng tra nói "6 trên 11"
+       khi cổng đã có 15 mục; cổng phiên gọi bộ này là "B1–B14" khi nó có 15). Số gõ tay mô tả
+       một tập hợp thì nó chỉ đúng tới lần sửa kế tiếp. */
+    `CỔNG KIỂM CẤU TRÚC — ${checks.length} phép kiểm ${checks.length ? `${checks[0].code}…${checks[checks.length - 1].code}` : ""}`.trim(),
     `CHẶN (đỏ là không được báo xong): ${dangChan.join(" · ") || "không có"}`,
     `CHỈ CẢNH BÁO (đỏ vẫn đóng phiên được): ${chiCanhBao.join(" · ") || "không có"}`,
     "Danh sách chặn khai ở `bootstrap.blocking` trong .repo-structure.json, không viết cứng trong code.",

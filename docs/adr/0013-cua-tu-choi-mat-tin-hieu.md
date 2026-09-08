@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0013
+chu_de: khoa
+bo_sung: 0012
 date: 2026-09-09
 deciders: Đức
 ---

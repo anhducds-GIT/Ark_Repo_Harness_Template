@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0011
+chu_de: tran-ngan-sach
+thuoc: 0010
 date: 2026-09-08
 deciders: Đức — "Bạn hay quy về các roadmap & big task ấy nhé", rồi "Tôi Ok" cho kế hoạch bốn bước
 ---

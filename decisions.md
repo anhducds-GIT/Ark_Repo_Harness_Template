@@ -626,3 +626,24 @@ chỉ đổi chỗ, đã đối chiếu bằng `git diff` (37 dòng cắt, 37 d�
 
 **Còn hở:** `KHUNG-53` — cổng buộc mục *"Test xanh"* vào khoá VÙNG, nên trả hết khoá file là mục đó
 thành BỎ. Đã cắn **hai lượt**.
+
+## 2026-09-09 · BỘ BIÊN DỊCH LUẬT — sổ cái chỉ thêm, luật hiệu lực được biên dịch ra
+
+**Đức chốt, nguyên văn:** *"mọi rule mới được append vào ledger, nhưng KHÔNG append trực tiếp vào
+active rules. Active rules luôn là một bản compiled nhỏ được tái tạo từ ledger."* Và:
+*"append → merge → supersede → trim → compile."* Kèm ràng buộc: *"Tôi không khuyến nghị AI tự tiện
+sửa/xóa rules. AI có thể propose → compare → recommend."*
+
+**Vì sao cần:** đo 09/09 ở chính repo này — mục 1 hiến pháp có **BA mốc trả khoá** cùng hiệu lực,
+và một phiên đã đọc đúng một trong ba rồi làm ngược hai cái kia. Thêm bốn con số gõ tay mô tả tập
+hợp đều đã sai. Bệnh chung: luật chỉ có một chiều là TĂNG.
+
+**Chốt:** [ADR-0014](docs/adr/0014-bo-bien-dich-luat.md). Lệnh: `npm run luat`. Cưỡng chế: **B16**
+(nhóm CHẶN). **Không gộp file ADR** — ADR `Accepted` bất biến theo B12; ta gộp **câu trả lời** bằng
+`chu_de` + `dau_moi` trong frontmatter (B12 cho phép sửa frontmatter). 14 ADR → **6 chủ đề**.
+
+**Bất biến:** AI được ĐỀ XUẤT (`--de-xuat`), **không được tự sửa hay xoá luật**. Chỉ khai báo tường
+minh mới làm đổi bộ luật hiệu lực.
+
+**Cái mất:** thêm một ADR nay tốn thêm một bước (chọn chủ đề); và bộ biên dịch **không hiểu nghĩa**
+— nó cưỡng chế khai báo, không phát hiện được hai luật mâu thuẫn cùng khai đúng chỗ.

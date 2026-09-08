@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0007
+chu_de: bang
+thuoc: 0006
 date: 2026-09-08
 deciders: Đức (chốt 08/09 — "việc compact không làm cho dễ làm việc hơn mà còn trộn nội dung, gây khó làm việc & triển khai")
 ---

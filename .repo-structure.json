@@ -82,7 +82,8 @@
       "B5",
       "B7",
       "B10",
-      "B12"
+      "B12",
+      "B16"
     ]
   },
   "backlog": {
@@ -126,5 +127,15 @@
       "upgrade-smoke.mjs",
       "core-contract.mjs"
     ]
+  },
+  "luat": {
+    "chu_de": {
+      "ghi-quyet-dinh": "Cách ghi một quyết định",
+      "ranh-gioi": "Ranh giới bộ khung — cái gì ở đâu, phát đi từ đâu",
+      "bang": "Bảng trạng thái",
+      "vai-phien": "Vai của một phiên AI",
+      "tran-ngan-sach": "Trần và ngân sách",
+      "khoa": "Khoá: vùng và file"
+    }
   }
 }

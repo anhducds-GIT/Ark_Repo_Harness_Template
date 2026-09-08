@@ -1,6 +1,8 @@
 ---
 status: Accepted — ba khẳng định bên trong bị ADR-0009 sửa; quyết định gốc vẫn hiệu lực
 adr: 0008
+chu_de: vai-phien
+dau_moi: true
 date: 2026-09-08
 deciders: Đức (chốt 08/09 — "apply hệ thống assistant này ở 2 repo ta đang làm chính thức, sau đó Template repo AI sẽ đồng bộ đến các Repo khác")
 ---

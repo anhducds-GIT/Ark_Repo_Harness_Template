@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0003
+chu_de: ranh-gioi
+thuoc: 0001
 date: 2026-09-04
 deciders: Đức (chốt 04/09 — "làm tiếp P4 đi", sau khi audit độc lập đồng ý đóng gói)
 ---

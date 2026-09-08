@@ -1,6 +1,7 @@
 ---
 status: Accepted
 adr: 0009
+chu_de: vai-phien
 sua: 0008
 date: 2026-09-08
 deciders: Đức giao chấm chéo bằng Codex; ba khẳng định dưới đây do phiên Codex bác, và bác đúng

@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0006
+chu_de: bang
+dau_moi: true
 date: 2026-09-07
 deciders: Đức (chốt 07/09 sau audit UX — "dashboard đang fragment và có dữ liệu tự mâu thuẫn")
 ---

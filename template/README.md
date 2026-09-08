@@ -1,4 +1,4 @@
-# Bộ khung repo — bản 1.3.81
+# Bộ khung repo — bản 1.3.82
 
 Bộ khung để một **phiên AI lạ** vào bất kỳ repo nào cũng hiểu ngay chuyện gì đang xảy ra, không
 phải quét cả cây thư mục và không phải hỏi chủ repo câu nào.
@@ -40,7 +40,7 @@ Nguyên tắc số một: **thứ gì máy đếm được thì máy đếm** �
 | `.repo-structure.json` | LAW | Hình dạng repo: đơn vị nằm đâu, thư mục nào có chủ nào, phép kiểm nào chặn |
 | `scripts/repo-structure.mjs` | máy | Nguồn sự thật duy nhất về hình dạng repo — bốn script kia đều đọc nó |
 | `scripts/build-dashboard.mjs` | máy | Sinh bảng điều hành + cổng vào máy đọc, **hoàn toàn từ HEAD** |
-| `scripts/check-bootstrap.mjs` | máy | Cổng kiểm cấu trúc B1–B14 |
+| `scripts/check-bootstrap.mjs` | máy | Cổng kiểm cấu trúc (dãy B) |
 | `scripts/session-check.mjs` | máy | Cổng đóng phiên — đỏ thì chưa xong |
 | `scripts/safe-push.mjs` | máy | Đẩy mà không cuốn theo commit của phiên khác |
 | `tests/harness-smoke.mjs` | máy | **Lưới đỡ của chính bộ khung** — bốn chỗ đã hỏng thật ở repo sinh ra nó. Thêm test của bạn vào cùng thư mục, đừng xoá bốn khối này |

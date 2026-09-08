@@ -39,5 +39,143 @@
       "task": "gop luat khoa, rang cho so quyet dinh",
       "released_at": "2026-09-08T20:53:29.866Z"
     }
+  },
+  "tam": {
+    "scripts/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0000-ghi-nhan-quyet-dinh-kien-truc.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0001-template-o-repo-doc-lap-project-3ai-nghi.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0002-cong-cu-va-quy-trinh-o-repo-nha.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0003-dong-bang-stable-baseline.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0004-repo-bo-khung-cong-khai.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0005-goi-assistant-phat-hanh-tu-bo-khung.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0006-bang-mot-khai-niem-mot-cho.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0007-tab-migrate-tach-rieng.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0008-hai-vai-assistant.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0009-sua-ba-khang-dinh-cua-adr-0008.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0010-xoa-so-quyen-va-tran-so-no.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0011-cam-rang-cho-ba-tran-kho-chu.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0012-khoa-muc-file.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0013-cua-tu-choi-mat-tin-hieu.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "scripts/check-bootstrap.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "AGENTS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "scripts/build-template.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "docs/adr/0014-bo-bien-dich-luat.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "decisions.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/.repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/AGENTS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/docs/adr/0000-ghi-nhan-quyet-dinh-kien-truc.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/scripts/check-bootstrap.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "template/scripts/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    },
+    "tests/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:16:41.803Z"
+    }
   }
 }

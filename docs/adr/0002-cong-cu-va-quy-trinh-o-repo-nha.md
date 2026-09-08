@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0002
+chu_de: ranh-gioi
+thuoc: 0001
 date: 2026-09-03
 deciders: Đức (uỷ quyền cho phiên hoàn thiện bộ khung)
 ---

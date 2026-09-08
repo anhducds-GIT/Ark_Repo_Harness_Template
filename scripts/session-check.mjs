@@ -1051,7 +1051,10 @@ check("Sự thật máy sinh còn tươi", () => {
 //
 // Nhóm nào bị chặn thì khai ở `bootstrap.blocking` trong `.repo-structure.json`, KHÔNG viết
 // cứng ở đây — S8 sẽ mở thêm B6/B9 sau khi trả nợ, và lúc đó không ai phải sửa script.
-check("Cổng kiểm cấu trúc B1–B14", () => {
+/* TÊN MỤC KHÔNG GÕ SỐ. Bản cũ ghi "B1–B14" trong khi bộ kiểm đã có 15 rồi 16 phép — người đọc
+   cổng tin con số đó và nghĩ hai phép kiểm cuối không tồn tại. Cùng bệnh với "6 trên 11" ở bảng
+   tra: một con số gõ tay mô tả tập hợp thì chỉ đúng tới lần sửa kế tiếp. */
+check("Cổng kiểm cấu trúc (dãy B)", () => {
   const tomTat = (text) => {
     const summary = String(text).split("\n")
       .filter((line) => /^(TỔNG|CHAN|BỎ QUA|NGOÀI 14|MIỄN TRỪ)/.test(line.trim()))

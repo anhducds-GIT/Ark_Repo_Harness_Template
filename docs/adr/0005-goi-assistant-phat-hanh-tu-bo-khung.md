@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0005
+chu_de: ranh-gioi
+thuoc: 0001
 date: 2026-09-05
 deciders: Đức (chốt 05/09 mở chặng B của đề bài đưa gói Assistant vào bộ khung)
 ---

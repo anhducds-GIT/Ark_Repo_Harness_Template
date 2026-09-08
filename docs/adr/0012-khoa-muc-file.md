@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0012
+chu_de: khoa
+dau_moi: true
 date: 2026-09-08
 deciders: Đức
 ---

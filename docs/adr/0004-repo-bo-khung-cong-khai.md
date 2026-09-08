@@ -1,6 +1,8 @@
 ---
 status: Accepted
 adr: 0004
+chu_de: ranh-gioi
+thuoc: 0001
 date: 2026-09-04
 deciders: Đức (chuyển repo sang public 04/09, sau khi cân ba đường: nâng Pro · để public · chấp nhận)
 ---
