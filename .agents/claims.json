@@ -39,5 +39,35 @@
       "task": "gop luat khoa, rang cho so quyet dinh",
       "released_at": "2026-09-08T20:53:29.866Z"
     }
+  },
+  "tam": {
+    "tests/core-contract.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    },
+    "features.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    },
+    "template/features.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T21:31:36.583Z"
+    }
   }
 }

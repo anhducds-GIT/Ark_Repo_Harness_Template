@@ -390,6 +390,31 @@
           },
           "khong_co_thi": "Luật riêng của một nghề lẫn vào luật chung là ép một repo tài liệu tuân luật về selector DOM.",
           "tuy_chon": true
+        },
+        {
+          "ma": "F5.5",
+          "ten": "Bộ biên dịch luật — sổ cái chỉ thêm, luật hiệu lực được biên dịch ra",
+          "tu_ban": "1.3.82",
+          "pham_vi": "ca-hai",
+          "can": {
+            "trong_file": [
+              {
+                "file": "scripts/check-bootstrap.mjs",
+                "chuoi": [
+                  "rule-compiler.mjs",
+                  "checkB16"
+                ]
+              },
+              {
+                "file": "package.json",
+                "chuoi": [
+                  "scripts/rule-compiler.mjs"
+                ]
+              }
+            ]
+          },
+          "khong_co_thi": "Luật chỉ có một chiều là TĂNG. Không có bộ biên dịch thì mỗi luật mới được nối vào chỗ gần nhất, và tới lúc hai luật nói ngược nhau thì phiên AI bốc trúng câu nào theo câu đó. Đo 09/09 ở repo phát hành: mục 1 hiến pháp có BA mốc trả khoá cùng hiệu lực, một phiên đã làm ngược hai cái.",
+          "vi_sao": "Do bang NOI DUNG chu khong bang su ton tai cua file. Mot repo chep `rule-compiler.mjs` vao `scripts/` ma khong noi B16 vao cong thi bo bien dich co mat nhung khong canh gi — dung hinh dang `[~] MOT PHAN` nguy hiem hon `[ ] THIEU`, va da do duoc that o F4.7 hoi 08/09. Nen phep do hoi HAI dieu: cong cau truc co GOI no khong, va repo co khai lenh chay duoc khong."
         }
       ]
     },
