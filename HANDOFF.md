@@ -899,14 +899,13 @@ trên một trang không chứa thứ cần tìm cũng không ra.
 vốn đã có; bảng chỉ đếm rồi vứt đi. Đó là kiểu thiếu tệ nhất của một bảng trạng thái: nó KHẲNG
 ĐỊNH có 25 việc rồi không cho tra 25 việc đó là gì.
 
-**⑵ Ô tìm quét CẢ NHÓM ĐANG ẨN.** Ctrl+F không đủ ở trang này vì bốn trong năm nhóm đang
-`hidden` — với người xem, thứ họ cần *"không có trên trang"* trong khi nó có. Kết quả nói rõ nằm
-ở nhóm nào; bấm là nhảy, mở sẵn mọi `<details>` bao quanh.
+**⑵ Ô tìm quét CẢ NHÓM ĐANG ẨN.** Ctrl+F không đủ vì bốn trong năm nhóm đang `hidden` — thứ người
+xem cần *"không có trên trang"* trong khi nó có. Kết quả nói rõ nhóm nào; bấm là nhảy.
 
-**BYTE BACKSPACE, LẦN THỨ HAI.** Regex đọc mức ưu tiên được dựng bằng chuỗi Python, và `\b` là
-escape HỢP LỆ của Python → **byte 0x08 thật** lọt vào mã nguồn. Hậu quả: regex không khớp gì, cả
-25 mục mang `P?`, và **không phép kiểm nào đỏ** — hỏng im lặng. Chỉ lộ vì tôi soi mắt con số trên
-bảng. Nay có vế đếm **byte điều khiển thô trong mã nguồn = 0**.
+**BYTE BACKSPACE, LẦN THỨ HAI** (rồi lần thứ BA ngay trong lượt viết nhật ký này). Regex dựng
+bằng chuỗi Python, mà `\b` là escape HỢP LỆ của Python → **byte 0x08 thật** lọt vào mã nguồn:
+regex không khớp gì, cả 25 mục mang `P?`, **không phép kiểm nào đỏ**. Nay có vế đếm **byte điều
+khiển thô = 0**.
 
 **Và `--take` chặn OAN artifact máy sinh — LẦN THỨ HAI trong một ngày.** Đức chốt chuyển `_root`,
 lệnh TỪ CHỐI vì `DASHBOARD-*.html` "đang sửa dở" — file mà chính lệnh sinh lại mỗi lượt, và luật
@@ -914,8 +913,10 @@ khai rõ **không ai sở hữu**. Vá + vế `5c` đo **sự ĐỒNG Ý giữa 
 
 **8 đột biến, cả 8 bị bắt** — trong đó một cái nhét lại byte BACKSPACE vào regex → đỏ.
 
-**Ghi `decisions.md` 7 quyết định của Đức** (08–09/09) — trước đó chúng chỉ nằm trong nhật ký và
-ADR, không ở chỗ người ta đi tra. `KHUNG-55` (ống dẫn nuốt mã thoát của cửa từ chối) **ghép vào
-ADR-0012 thay vì mở mục mới** — Đức chốt, giữ trần sổ nợ 25.
+**Ghi `decisions.md` 7 quyết định của Đức** (08–09/09) — trước đó chỉ nằm trong nhật ký và ADR,
+không ở chỗ người ta đi tra.
+
+**B12 chặn tôi, và đúng:** Đức chốt *"ghép `KHUNG-55` vào ADR-0012"*; tôi làm đúng thế và ADR đã
+`Accepted` là **BẤT BIẾN**. Lối đúng: **ADR-0013 bổ sung**, tiền lệ ADR-0009. Trần sổ nợ vẫn 25.
 
 **Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-53` · `KHUNG-54`.
