@@ -3,71 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:46:53.620Z",
-      "task": "gop luat khoa, rang cho so quyet dinh",
-      "released_at": "2026-09-08T20:53:29.545Z",
+      "claimed_at": "2026-09-08T21:37:12.313Z",
+      "task": "bo bien dich luat",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:46:53.689Z",
-      "task": "gop luat khoa, rang cho so quyet dinh",
-      "released_at": "2026-09-08T20:53:29.660Z",
+      "claimed_at": "2026-09-08T21:37:12.369Z",
+      "task": "bo bien dich luat",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:46:53.765Z",
-      "task": "gop luat khoa, rang cho so quyet dinh",
-      "released_at": "2026-09-08T20:53:29.759Z",
+      "claimed_at": "2026-09-08T21:37:12.437Z",
+      "task": "bo bien dich luat",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T20:46:53.838Z",
-      "task": "gop luat khoa, rang cho so quyet dinh",
-      "released_at": "2026-09-08T20:53:29.866Z"
-    }
-  },
-  "tam": {
-    "tests/core-contract.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
-    },
-    "features.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
-    },
-    "template/features.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-08T21:31:36.583Z"
+      "claimed_at": "2026-09-08T21:37:12.495Z",
+      "task": "bo bien dich luat",
+      "released_at": null
     }
   }
 }
