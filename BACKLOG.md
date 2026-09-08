@@ -958,6 +958,36 @@ này sẽ nói sai ở đúng repo phát hành ra nó.
 
 ### KHUNG-42 · Khoá hết hạn khi CÓ NGƯỜI CHỜ, và vai điều phối không thể bị chặn @Đức:chốt
 
+> **08/09 — MỤC NÀY GẦN NHƯ ĐÃ BỊ VƯỢT QUA, đọc trước khi làm.** `harness-phat-01` đối chiếu với
+> **ADR-0012 (Accepted 08/09, người chốt Đức)** — khoá mức FILE: giữ ngắn, trả ngay, chỉ đọc thì
+> không khoá. ADR đó chữa **gốc** của cùng vấn đề, và số đo của nó: 7 ngày · 384 commit · 41 lane
+> · **620 cặp** commit khác lane ≤1 giờ cùng vùng, trong đó **355 (57%) khác file hoàn toàn** —
+> hơn một nửa số lượt chặn là **chặn oan**.
+>
+> **Và ADR-0012 ⑸ nói NGƯỢC đề xuất ②a dưới đây:** *"Quá 30 phút thì NÊU TÊN, tuyệt đối không tự
+> nhả"* — lý do: tự nhả là tự động hoá đúng vụ nhả-khoá-hộ 06/09, lần đó một người làm và một lane
+> mất phần đã xong; nếu máy làm thì không ai kịp thấy. **Thi hành ②a là phá một ADR đã Accepted.**
+>
+> | Vế của mục này | Trạng thái sau ADR-0012 |
+> |---|---|
+> | ②a — bảng ba dòng hết hạn khoá | **bị ⑸ bác**; nửa "nêu tên" thì ⑸ đã làm |
+> | ②b — vai điều phối không bị chặn | **giải phần lớn**: khoá mức file thì tạo file mới không đụng ai |
+> | dòng **VÀNG** ở cuối cổng (đề xuất 08/09) | **còn sống và tương thích** — nó chỉ nêu tên, không nhả |
+>
+> **Chỗ hở còn lại, đo được 08/09:** khoá **VÙNG** của một phiên ĐÃ CHẾT. Ca thật: `claude-bang-gon`
+> giữ hai khoá ở `nav_platform_main` **một ngày** sau khi phiên tắt. ADR-0012 ⑷ cho cổng ĐỎ khi còn
+> treo khoá **file**, nhưng phiên đã chết thì **không bao giờ chạy cổng** — nên không lớp nào bắt.
+> Và ⑸ cấm tự nhả. Nên nó phải là quyết định của người; **chi phí thật đo được: một câu hỏi cho Đức,
+> một lượt trả lời.** Đổi lấy rủi ro máy cướp khoá của lane đang dựng nháp ngoài repo — không đáng.
+>
+> **ĐỀ NGHỊ:** ĐÓNG mục này vì đã bị ADR-0012 vượt qua, **giữ lại đúng một việc**: thêm dòng VÀNG ở
+> cuối cổng đóng phiên — *"bạn còn giữ N khoá vùng, cây sạch, mọi commit đã đẩy — cân nhắc trả khoá"*.
+> Ba dữ kiện đó cổng đã biết cả ba, chỉ chưa nói thành một câu. Đây là **bớt một cơ chế, không thêm**.
+>
+> **CHỜ ĐỨC:** đồng ý đóng, hay vẫn muốn cơ chế hết hạn tự động? Nếu muốn thì **phải sửa hoặc thay
+> ADR-0012 ⑸ trước** — hai luật ngược nhau về cùng một khoá thì lane nào cũng có cớ làm theo bên có
+> lợi cho mình. Đức đã nói *"chốt đi, làm luôn"* 08/09, nhưng lúc đó chưa biết ADR-0012 tồn tại.
+
 > **CHỜ NGƯỜI CHỐT:** đây là đổi một trong bốn cơ chế đa phiên. `MULTIFLOW.md` mục 5 bắt đổi cơ
 > chế phải có **đột biến kiểm bắt buộc**, và `AGENTS.md` mục 2 hàng 6 bắt hỏi Đức.
 

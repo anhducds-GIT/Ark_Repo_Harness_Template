@@ -3,10 +3,10 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": "harness-phat-01",
       "ai": null,
-      "claimed_at": "2026-09-08T15:19:25.842Z",
-      "task": "AGENTS muc 1 khoa file + ban moi",
+      "claimed_at": "2026-09-08T16:24:56.334Z",
+      "task": "Ghi phan tich KHUNG-42 vs ADR-0012 vao so, truoc khi compact",
       "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
@@ -15,29 +15,29 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T10:30:03.354Z",
-      "task": "Nhip DON: nhan phan cu vao docs/archive",
-      "released_at": "2026-09-08T15:19:51.535Z",
+      "claimed_at": "2026-09-08T15:21:00.680Z",
+      "task": "ADR cho khoa muc FILE",
+      "released_at": "2026-09-08T15:58:55.594Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T15:19:25.762Z",
-      "task": "cot co gian cho checklist migrate + port khoa muc FILE",
-      "released_at": null,
+      "claimed_at": "2026-09-08T15:36:29.570Z",
+      "task": "cot co gian + port khoa file",
+      "released_at": "2026-09-08T15:58:55.327Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-08T15:19:25.915Z",
       "task": "phat khoa file sang ban trich",
-      "released_at": null
+      "released_at": "2026-09-08T15:58:55.738Z"
     }
   }
 }
