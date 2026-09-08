@@ -18,6 +18,35 @@
 
 ## P1
 
+### KHUNG-47 · Suite ĐỘT BIẾN ghi thẳng vào file ĐÃ COMMIT của cây làm việc chính
+
+**Không phải giả định — đã làm hỏng một commit thật hôm nay (08/09).** `tests/upgrade-smoke.mjs`
+khối 14 ghi `"1".repeat(16)` đè lên một dòng của `RELEASE-LEDGER.json` **THẬT ở gốc repo**, chạy
+ba lệnh để đòi chúng DỪNG, rồi khôi phục trong `finally`. Đúng thiết kế, và đó là một phép ghim
+tốt — ở một repo MỘT lane.
+
+Repo này có nhiều lane dùng **chung một cây làm việc**. Trong đúng cửa sổ vài giây đó, lane
+`harness-loi-01` chạy `git add RELEASE-LEDGER.json` và **commit c385f4c mang theo dòng hỏng**:
+`"1.2.10": "1111111111111111"` thay cho `946065fa2778e0e4`. Sổ phát hành là sổ **CHỈ THÊM** — một
+dòng đã phát bị đổi là **nói dối về một bản đã phát**, đúng thứ chính khối 14 sinh ra để chặn.
+
+**Vì sao không ai đỏ:** `finally` khôi phục kịp, nên cây làm việc sạch lại ngay và mọi phép kiểm
+sau đó xanh. Chỉ lộ ra vì lượt sau `git status` báo `RELEASE-LEDGER.json` sửa dở — mà nội dung
+"sửa dở" chính là bản ĐÚNG. Nhìn ngược.
+
+**Cùng họ với ba file `.gitignore` của `bang-song/`**: thứ nào một tiến trình ghi đè liên tục thì
+không được nằm ở chỗ lane khác đang `git add`. Khác ở chỗ đây là file **phải** commit.
+
+Ứng viên rẻ nhất: khối 14 chép cả repo sang thư mục tạm rồi phá bản chép (đắt), hoặc `build-template.mjs`
+và `upgrade.mjs` nhận cờ trỏ sang một sổ khác để đột biến không cần đụng file thật.
+
+Vùng: `_code`.
+
+**đóng khi:** chạy `node tests/upgrade-smoke.mjs` trong khi một tiến trình khác đọc
+`RELEASE-LEDGER.json` mỗi 50ms, và tiến trình đó **không lần nào** đọc được giá trị `1111111111111111`
+— đo bằng một ca dựng sẵn, không suy ra.
+
+
 ### ~~KHUNG-1~~ · Mục đỏ "Sự thật máy sinh còn tươi" — MỘT bug, không phải hai
 
 **ĐÃ VÁ 05/09, bản 1.3.1.** Khối `generated_files` trong `.repo-structure.json` + bộ đếm đọc nó.
