@@ -3,41 +3,91 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T21:37:12.313Z",
-      "task": "bo bien dich luat",
-      "released_at": "2026-09-08T21:56:26.664Z",
+      "claimed_at": "2026-09-08T22:12:41.952Z",
+      "task": "ra soat luat",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T21:37:12.369Z",
-      "task": "bo bien dich luat",
-      "released_at": "2026-09-08T21:56:26.766Z",
+      "claimed_at": "2026-09-08T22:12:42.019Z",
+      "task": "ra soat luat",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T21:37:12.437Z",
-      "task": "bo bien dich luat",
-      "released_at": "2026-09-08T21:56:26.881Z",
+      "claimed_at": "2026-09-08T22:12:42.089Z",
+      "task": "ra soat luat",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-08T21:37:12.495Z",
-      "task": "bo bien dich luat",
-      "released_at": "2026-09-08T21:56:27.004Z"
+      "claimed_at": "2026-09-08T22:12:42.149Z",
+      "task": "ra soat luat",
+      "released_at": null
+    }
+  },
+  "tam": {
+    "docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "docs/briefs/GIAO-VIEC-CHUNG.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "docs/SO-TAY-AGENT.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "docs/ROADMAP-V2.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "docs/archive/ROADMAP-V2-dot-0-den-5.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "template/docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-08T22:24:10.230Z"
     }
   }
 }

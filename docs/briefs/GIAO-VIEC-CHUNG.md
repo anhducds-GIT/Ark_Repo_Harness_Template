@@ -90,10 +90,8 @@ node scripts/claim.mjs --sua <file>… --as <tên-phiên>   # NGAY TRƯỚC lư�
 node scripts/claim.mjs --xong --het --as <tên-phiên>    # NGAY SAU khi commit
 ```
 
-- **Chỉ ĐỌC thì KHÔNG cần khoá.** Đọc, đo, hiểu việc — không giữ gì cả. Đo được: **57%** lượt
-  chặn là **chặn oan**, khác file hoàn toàn mà vẫn bị khoá vùng chặn.
-- **Mặc định là khoá mức FILE.** Khoá cả **vùng** (`--take` / `--release <khoá> --task "…"`) để
-  dành cho việc đụng cả một vùng, và nó trả **sau khi đã đẩy** — khác mốc của khoá file.
+- **Chỉ ĐỌC thì KHÔNG cần khoá** — đo được **57%** lượt chặn là **chặn oan**. Mặc định là khoá
+  mức FILE; khoá cả **vùng** (`--take`/`--release`) để dành, và trả **sau khi đã đẩy**.
 - Vùng, hoặc file, **có chủ khác** → **DỪNG**, hỏi người chốt. Không tự giành.
 - **Đừng sửa `.agents/claims.json` bằng tay.** Sửa tay là đọc-sửa-ghi, và hai phiên cùng đọc
   thấy "trống" rồi cùng ghi thì người ghi sau đè im lặng lên người ghi trước. Đã xảy ra thật.

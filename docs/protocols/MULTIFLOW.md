@@ -63,10 +63,8 @@ node scripts/session-check.mjs --as <phiên>                      # 6. cổng đ
 node scripts/safe-push.mjs --as <phiên>                          # 7. đẩy
 ```
 
-**Bước 3 là khoá mức FILE, không phải khoá vùng** — mặc định đổi 08/09, đo được **57%** lượt chặn
-là chặn oan. Khoá **vùng** (`--take`/`--release`) để dành cho việc đụng cả một vùng, và nó trả
-**sau khi đã đẩy**, khác mốc của khoá file. Luật đầy đủ ở `AGENTS.md` mục 1 — **bản duy nhất**,
-đừng chép sang đây; sổ này chỉ nói NHỊP, không nói luật.
+**Bước 3 là khoá mức FILE** — mặc định đổi 08/09, đo được **57%** lượt chặn là chặn oan. Khoá
+**vùng** (`--take`/`--release`) để dành, và trả **sau khi đã đẩy**. Luật đầy đủ: `AGENTS.md` mục 1.
 
 **Bước 2 tách khỏi bước 3 là cố ý.** Trước 06/09 hai bước này gộp làm một, và đo được: mọi bản
 giao việc hôm đó mở đầu bằng *"nhận khoá trước"*, trong khi lane dành 5–20 phút đầu chỉ để đọc.
