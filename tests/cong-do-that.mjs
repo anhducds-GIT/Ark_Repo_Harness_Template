@@ -549,4 +549,40 @@ function docMuc(kho, ten, as = "thu") {
 }
 
 
+/* ---- 12. Cổng phải nêu ĐÚNG TÊN suite đỏ, không nêu suite CHẬM ---------- */
+{
+  /* `KHUNG-52`, đo 08/09 và cái giá đã tính được. Bản cũ lấy `.slice(-3)` của bản ghi bộ chạy làm
+   * phần giải thích — mà ba dòng cuối là **bảng xếp hạng thời gian**, không phải danh sách đỏ.
+   * Cổng in ra ba cái tên có thật, có số giây thật, và KHÔNG cái nào là suite đỏ. Mất **bốn lượt
+   * đo** mới tìm ra suite đỏ thật, cái chưa lần nào xuất hiện trên màn hình.
+   *
+   * Ca dựng ở đây tách hai thứ mà bản cũ trộn lẫn: một suite ĐỎ và một suite CHẬM, **khác nhau**.
+   * Nếu cổng nêu tên suite chậm thì vế này đỏ; nêu tên suite đỏ thì xanh. */
+  const { cha, kho, at } = khoNen();
+  try {
+    const viet = (ten, than) => writeFileSync(join(kho, "tests", ten), than, "utf8");
+    // Suite CHẬM nhưng XANH — nó sẽ đứng đầu bảng xếp hạng thời gian, tức đứng ở 3 dòng cuối.
+    viet("cham-nhung-xanh.mjs", `const t = Date.now(); while (Date.now() - t < 1200) {}${NL}console.log("1 passed, 0 failed, 1 total");${NL}`);
+    // Suite ĐỎ nhưng NHANH — nó không lọt vào bảng xếp hạng.
+    viet("nhanh-nhung-do.mjs", `console.error("co loi that");${NL}process.exit(1);${NL}`);
+    writeFileSync(join(kho, "package.json"), JSON.stringify({
+      name: "thu", version: "0.0.1", type: "module",
+      scripts: {
+        test: "node scripts/chay-test.mjs",
+        "test:tuan-tu": "node tests/cham-nhung-xanh.mjs && node tests/nhanh-nhung-do.mjs",
+      },
+    }, null, 2) + NL, "utf8");
+    writeFileSync(join(kho, "STATUS.md"), "---" + NL + "ten: thu" + NL + "---" + NL + "# thu" + NL, "utf8");
+    at("add", "-A"); at("commit", "-q", "-m", "hai suite" + NL + NL + "Lane: thu");
+
+    const m = docMuc(kho, "Test xanh");
+    assert.equal(m.trangThai, "ĐỎ", `mot suite do thi muc Test xanh phai DO, dang: ${m.chiTiet}`);
+    assert.match(m.chiTiet, /nhanh-nhung-do\.mjs/,
+      `cong phai NEU DUNG TEN suite DO. Dang noi: ${m.chiTiet}`);
+    assert.doesNotMatch(m.chiTiet, /cham-nhung-xanh\.mjs/,
+      `cong KHONG duoc neu ten suite CHAM ma XANH — do la loi cu: no noi sai mot cach tu tin. Dang noi: ${m.chiTiet}`);
+    ok("12 · cổng nêu ĐÚNG tên suite đỏ, và KHÔNG nêu tên suite chỉ chậm — KHUNG-52");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+}
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

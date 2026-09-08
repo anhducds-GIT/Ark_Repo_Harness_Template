@@ -154,6 +154,39 @@ const vungCua = (d) => (d.startsWith("scripts/") || d.startsWith("tests/") ? "_c
   ok("5 · soát: file lạ NÊU · sổ miễn khoá nêu-không-chặn · artifact máy sinh im · giữ cả vùng thì im");
 }
 
+/* ---- 5b. Artifact MÁY SINH không đòi khoá nào -------------------------- */
+{
+  /* LỖ ĐO ĐƯỢC NGAY LƯỢT DÙNG THẬT ĐẦU TIÊN, 08/09, hai lane cùng chạy: lane kia giữ `_root`, và
+   * `--sua DASHBOARD-*.html` của tôi bị từ chối vì bảng đó nằm trong `_root` — trong khi chính
+   * luật của repo khai nó ở khối `generated` với câu *"nội dung tất định từ HEAD nên không ai sở
+   * hữu chúng theo nghĩa nào"*.
+   *
+   * Đó là **chặn oan**, đúng thứ khoá mức file sinh ra để bỏ. Và nó lộ ra một hình dạng lỗi đáng
+   * ghim hơn bản thân ca này: `--soat` miễn nhóm máy sinh từ đầu, `--sua` thì quên — **hai cửa
+   * của cùng một cơ chế nói hai điều khác nhau**. Vế này giữ hai cửa nói cùng một câu. */
+  const vungCoChu = { claims: { _root: { owner: "lane-khac" } }, tam: {} };
+  const laMaySinh = (d) => d === "DASHBOARD.md";
+
+  // Không khai `laMaySinh` → vẫn bị vùng chặn. Đây là hành vi ĐÚNG cho file thường.
+  assert.equal(quyetDinhSua(vungCoChu, { duongDan: "DASHBOARD.md", as: "toi", luc: LUC, vungCua }).code,
+    EXIT.REFUSED, "file thuong trong vung nguoi khac giu thi van phai bi tu choi");
+
+  // Khai rồi → đi qua, và KHÔNG ghi một hàng nào vào bảng.
+  const r = quyetDinhSua(vungCoChu, { duongDan: "DASHBOARD.md", as: "toi", luc: LUC, vungCua, laMaySinh });
+  assert.equal(r.code, EXIT.OK);
+  assert.equal(r.maySinh, true, "phai NOI RA rang no duoc bo qua vi la artifact may sinh");
+  assert.deepEqual(Object.keys(r.next), [],
+    "khong duoc ghi hang nao — no khong phai khoa, va mot hang khong ai tra la rac vinh vien");
+
+  // Và `--soat` phải nói y hệt: cùng một file, cùng một câu trả lời.
+  const soat = soatDanHang({
+    daDan: ["DASHBOARD.md"], tam: {}, claims: { _root: { owner: "lane-khac" } },
+    as: "toi", mienKhoa: MIEN_KHOA, maySinh: ["DASHBOARD.md"], vungCua,
+  });
+  assert.deepEqual(soat.la, [], "hai cua cua mot co che phai noi cung mot dieu ve cung mot file");
+  ok("5b · artifact máy sinh: `--sua` bỏ qua không ghi hàng · `--soat` cũng im · hai cửa nói cùng một câu");
+}
+
 /* ---- 6. Chuẩn hoá đường dẫn và cửa từ chối đường dẫn lạ ----------------- */
 {
   assert.equal(chuanDuongDan("./scripts/x.mjs"), "scripts/x.mjs");
@@ -176,6 +209,8 @@ const vungCua = (d) => (d.startsWith("scripts/") || d.startsWith("tests/") ? "_c
  *  2. bỏ chiều MỘT (không xét chủ vùng trong `quyetDinhSua`)      → vế 3 đỏ
  *  3. bỏ chiều HAI (`khoaFileTrongVung` luôn trả `[]`)            → vế 3 đỏ
  *  4. `khoaFileQuaHan` tự `delete` khoá quá hạn                   → vế 4 đỏ
+ *  5. bỏ vế miễn artifact máy sinh khỏi `quyetDinhSua`             → vế 5b đỏ
+ *  6. `quyetDinhSua` GHI một hàng cho artifact máy sinh            → vế 5b đỏ
  *
  * Và HAI cửa chạy thật ở repo này, không phải hàm thuần:
  *  · lane khác `--take _code` khi tôi đang khoá 2 file bên trong  → TU_CHOI_NHAN_VUNG

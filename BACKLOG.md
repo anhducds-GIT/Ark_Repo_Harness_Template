@@ -90,7 +90,59 @@ KHUNG-1, sửa cùng lượt. Vùng: `_code`.
 
 ## P2
 
-### KHUNG-52 · Cổng báo "suite ĐỎ" rồi in ra tên ba suite CHẬM NHẤT, không phải suite đỏ
+</details>
+
+### KHUNG-53 · Cổng đóng phiên chưa biết tới khoá mức FILE — vẫn đòi khoá VÙNG cho mọi commit
+
+**Đo 08/09, ngay lượt dùng thật đầu tiên của khoá mức file.** Phiên chạy đúng như Đức chốt — trả
+hết khoá vùng, chỉ `--sua` đúng file lúc ghi, `--xong --het` ngay sau — rồi commit. Cổng đóng
+phiên ĐỎ ở mục *"Phạm vi trách nhiệm"*:
+
+```
+Vùng gốc repo bị sửa nhưng chưa ai đứng tên: _code, _docs, _template.
+```
+
+**Nên cơ chế mới chỉ dùng được TRONG LÚC LÀM, không dùng được để ĐÓNG PHIÊN.** Muốn cổng xanh thì
+vẫn phải nhận lại đủ khoá vùng — tức phần lớn cái lợi (giữ vài phút thay vì hàng tiếng) bị trả lại
+ở bước cuối, và luật mới mâu thuẫn với cổng cũ.
+
+**Vì sao hai bên không tự khớp:** cổng hỏi *"ai chịu trách nhiệm cho những commit này"* và nó tìm
+câu trả lời trong bảng khoá VÙNG. Nhưng khoá file **cố ý không mang trách nhiệm truy nguồn** —
+`ADR-0012` mục ⑷ nói rõ nhãn `Lane:` mới mang. Vậy cổng đang hỏi bảng khoá một câu mà bảng khoá
+không còn là chỗ trả lời.
+
+**Đừng vá bằng cách nới cổng.** Mục *"Phạm vi trách nhiệm"* là thứ chặn việc mồ côi, và gỡ nó là
+gỡ một lớp bảo vệ. Hai lối đáng cân nhắc, cả hai phải đo trước: ⑴ cổng chấp nhận **khoá file đã
+trả trong phiên này** như bằng chứng đứng tên (đòi bảng giữ lại lịch sử, mà khoá file lại XOÁ HÀNG
+khi trả — mâu thuẫn phải giải trước); ⑵ cổng suy trách nhiệm từ **nhãn `Lane:` của chính commit**,
+đúng như ADR-0012 nói — lúc đó bảng khoá thôi phải trả lời câu này.
+
+Vùng: `_code`.
+
+**đóng khi:** dựng một repo, chạy trọn một vòng CHỈ dùng khoá file (không nhận khoá vùng nào), rồi
+đòi cổng đóng phiên XANH ở mục "Phạm vi trách nhiệm" — kèm đối chứng NGƯỢC: một commit KHÔNG có
+nhãn `Lane:` và không khoá nào thì mục đó vẫn phải ĐỎ.
+
+
+### ~~KHUNG-52~~ · ĐÓNG 08/09 · Cổng báo "suite ĐỎ" rồi in ra tên ba suite CHẬM NHẤT
+
+**Vá:** cổng bắt theo mẫu `── <lệnh> (mã N) ──` mà bộ chạy in cho từng suite đỏ, thay cho
+`.slice(-3)`. Đọc **cả hai luồng** — bảng thời gian ra `stdout`, khối "SUITE ĐỎ" ra `stderr`; đọc
+mỗi `stdout` là bỏ đúng thứ cần. Không bắt được tên nào thì **nói thẳng là không đọc được**, kèm
+đuôi bản ghi — không đưa ra một câu trả lời trông giống thật.
+
+**Ca hỏng dựng được** (`cong-do-that.mjs` vế 12): một repo có **một suite ĐỎ nhưng NHANH** và
+**một suite XANH nhưng CHẬM**. Bản cũ nêu tên cái chậm; bản mới nêu tên cái đỏ, và vế đòi cả hai
+chiều — có tên đỏ, KHÔNG có tên chậm.
+
+**Và nhánh thành thật tự chứng minh mình có ích ngay trong lượt vá:** bản đầu chỉ đọc `stdout` nên
+không bắt được tên nào — nó in *"không đọc được TÊN suite đỏ"* thay vì lùi về đuôi trong im lặng,
+và chính câu đó chỉ ra rằng tên nằm ở `stderr`. Lùi im lặng thì lỗi sống thêm một vòng nữa.
+
+**3 đột biến, cả 3 bị bắt:** quay về `.slice(-3)` · chỉ đọc `stdout` · đối chứng.
+
+<details><summary>Nội dung gốc của mục</summary>
+
 
 **Đo 08/09, và giá phải trả đã tính được.** Khi chuỗi suite đỏ, `session-check.mjs:838` lấy
 `String(error.stdout).split(NL).slice(-3)` làm phần giải thích. Ba dòng cuối của

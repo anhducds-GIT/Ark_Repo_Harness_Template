@@ -869,8 +869,30 @@ check("Test xanh", () => {
       const totals = out.split(NEWLINE).filter((line) => /[0-9]+ passed, [0-9]+ failed/.test(line));
       lines.push(`suite gốc repo: ${totals.length ? totals.join(" · ") : "chạy xong"}`);
     } catch (error) {
-      const tail = String(error.stdout || error.message).trim().split(String.fromCharCode(10)).slice(-3).join(" | ");
-      return { ok: false, msg: `suite gốc repo ĐỎ → ${tail}` };
+      /* NÊU ĐÚNG TÊN SUITE ĐỎ — `KHUNG-52`, và cái giá của bản cũ đã đo được.
+       *
+       * Bản trước lấy `.slice(-3)` của stdout làm phần giải thích. Ba dòng cuối của bộ chạy là
+       * **bảng xếp hạng THỜI GIAN** (top-5 chậm nhất), không phải danh sách đỏ. Nên cổng in ra ba
+       * cái tên có thật, có số giây thật — và **không cái nào là suite đỏ**. Kiểu hỏng tệ nhất
+       * của một cổng: nó không im lặng, nó nói sai một cách tự tin, nên người đọc tin và đi sai
+       * hướng. Đo 08/09: **bốn lượt** đuổi theo ba cái tên sai (chạy riêng từng suite · dựng repo
+       * mới · dựng worktree ở bản trước · rồi mới phải chép suite ra bản gỡ lỗi) trước khi thấy
+       * suite đỏ thật, cái chưa lần nào xuất hiện trên màn hình.
+       *
+       * Bộ chạy in mỗi suite đỏ thành một dòng `── node <suite> (mã N) ──`. Bắt theo mẫu đó, và
+       * chỉ lùi về đuôi khi KHÔNG bắt được cái nào — không đo được thì nói không đo được, đừng
+       * đưa ra một câu trả lời trông giống thật. */
+      /* ĐỌC CẢ HAI LUỒNG. Bộ chạy in bảng thời gian ra `stdout` nhưng khối "SUITE ĐỎ" kèm tên
+         từng suite ra `stderr` — đọc mỗi `stdout` là bỏ đúng thứ cần. Bắt được vì nhánh thành
+         thật ở dưới nói "không đọc được TÊN" thay vì nói bừa; nếu nó lùi về đuôi trong im lặng
+         thì lỗi này sống tiếp một vòng nữa. */
+      const raw = `${String(error.stdout || "")}${String(error.stderr || "")}` || String(error.message);
+      const NL2 = String.fromCharCode(10);
+      const ten = [...raw.matchAll(/──\s*(.+?)\s*\(mã\s*\d+\)\s*──/g)].map((m) => m[1].trim());
+      const moTa = ten.length
+        ? `${ten.length} suite ĐỎ: ${ten.join(" · ")}`
+        : `không đọc được TÊN suite đỏ từ bản ghi — đuôi: ${raw.trim().split(NL2).slice(-3).join(" | ")}`;
+      return { ok: false, msg: `suite gốc repo ĐỎ → ${moTa}` };
     }
   }
   for (const suite of suites) {

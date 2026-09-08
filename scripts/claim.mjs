@@ -163,10 +163,21 @@ export function chuanDuongDan(d) {
 
 /* QUYẾT ĐỊNH THUẦN — không chạm đĩa, nên ghim được mọi nhánh bằng chuỗi. `bang` = cả file đã
    đọc (`{ claims, tam }`). Trả `{ code, message?, next? }`; `next` là khối `tam` MỚI. */
-export function quyetDinhSua(bang, { duongDan, as, luc, vungCua }) {
+export function quyetDinhSua(bang, { duongDan, as, luc, vungCua, laMaySinh = () => false }) {
   const d = chuanDuongDan(duongDan);
   if (!d || d.split("/").includes("..")) {
     return { code: EXIT.MISUSE, message: `DUONG_DAN_LA: "${duongDan}" — phải là đường dẫn tương đối từ gốc repo.` };
+  }
+  /* ARTIFACT MÁY SINH KHÔNG ĐÒI KHOÁ NÀO — luật đã khai thế ở khối `generated` của
+   * `.repo-structure.json`: *"nội dung tất định từ HEAD nên không ai sở hữu chúng theo nghĩa
+   * nào"*. Bỏ vế này ra là **chặn oan**, đúng thứ khoá mức file sinh ra để bỏ.
+   *
+   * ĐO ĐƯỢC NGAY LƯỢT DÙNG THẬT ĐẦU TIÊN (08/09, hai lane cùng chạy): lane kia giữ `_root`, và
+   * `--sua DASHBOARD-*.html` của tôi bị từ chối vì bảng đó nằm trong `_root` — trong khi chính
+   * luật của repo nói không ai sở hữu nó. Bộ soát `--soat` đã miễn nhóm này từ đầu; đường `--sua`
+   * thì quên, nên hai cửa của cùng một cơ chế nói hai điều khác nhau. */
+  if (laMaySinh(d)) {
+    return { code: EXIT.OK, maySinh: true, next: { ...(bang.tam || {}) } };
   }
   const tam = { ...(bang.tam || {}) };
   const dangGiu = tam[d]?.owner || null;
@@ -673,11 +684,13 @@ async function main() {
     const cauTruc = readStructureFromDisk(ROOT);
     const tienTo = claimPrefixesFrom(cauTruc);
     const vungCua = (d) => vungBaoNgoai(d, cauTruc, tienTo);
+    const maySinh = new Set([...generatedFrom(cauTruc), ".agents/claims.json"]);
+    const laMaySinh = (d) => maySinh.has(d);
     const luc = new Date().toISOString();
     let tam = parsed.tam || {};
     for (const d of ds) {
       const kq = suaCo
-        ? quyetDinhSua({ claims: parsed.claims, tam }, { duongDan: d, as, luc, vungCua })
+        ? quyetDinhSua({ claims: parsed.claims, tam }, { duongDan: d, as, luc, vungCua, laMaySinh })
         : quyetDinhXong({ claims: parsed.claims, tam }, { duongDan: d, as });
       if (kq.code !== EXIT.OK) { nhaKhoaBang(); console.error(kq.message); process.exit(kq.code); }
       tam = kq.next;
@@ -687,8 +700,10 @@ async function main() {
     if (Object.keys(tam).length) parsed.tam = tam; else delete parsed.tam;
     fs.writeFileSync(CLAIMS_FILE, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
     nhaKhoaBang();
-    const ten = ds.map((d) => chuanDuongDan(d)).join(" · ");
-    console.log(`${suaCo ? "đã khoá để sửa" : "đã trả"}: ${ten}${suaCo ? ` → ${as}` : ""}`);
+    const boQua = suaCo ? ds.map(chuanDuongDan).filter(laMaySinh) : [];
+    const ten = ds.map((d) => chuanDuongDan(d)).filter((d) => !boQua.includes(d)).join(" · ");
+    if (boQua.length) console.log(`bỏ qua (artifact máy sinh, không đòi khoá nào): ${boQua.join(" · ")}`);
+    if (ten) console.log(`${suaCo ? "đã khoá để sửa" : "đã trả"}: ${ten}${suaCo ? ` → ${as}` : ""}`);
     if (suaCo) console.log(`Trả NGAY sau khi ghi xong: node scripts/claim.mjs --xong --het --as ${as}`);
     process.exit(EXIT.OK);
   }

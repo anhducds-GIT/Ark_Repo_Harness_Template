@@ -856,3 +856,33 @@ Toi da khoi phuc file tu HEAD (ban sao dot bien luu o scratchpad truoc khi khoi 
 
 **Con mo:** `KHUNG-54` (chua ghi vao so) · 3 commit chua day, trong do `b399d2a` la cua toi nam
 TREN hai commit cua ①, nen day rieng se phai `--carry` — de ① day cung luot 1.3.76 thi khong can.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Chạy thật khoá file → lộ hai lỗ, vá cả hai
+
+**Đức yêu cầu giữa chừng: *"tạm nhả khóa, bao giờ ghi file hãy lấy lại"*.** Làm ngay, và phần còn
+lại của phiên chạy **đúng cơ chế vừa port**. Lượt dùng thật đầu tiên lộ ra hai chỗ:
+
+**⑴ `--sua` chặn OAN artifact máy sinh — chính thứ nó sinh ra để bỏ.** Lane kia giữ `_root`, và
+`--sua DASHBOARD-*.html` bị từ chối vì bảng nằm trong `_root` — trong khi luật của repo khai nó ở
+khối `generated` với câu *"nội dung tất định từ HEAD nên không ai sở hữu chúng theo nghĩa nào"*.
+`--soat` miễn nhóm đó từ đầu, `--sua` thì quên: **hai cửa của một cơ chế nói hai điều khác nhau**.
+Vá + vế 5b + 2 đột biến. Tổng khoá file: **7 vế · 8 đột biến, tất cả bị bắt**.
+
+**⑵ Cổng đóng phiên CHƯA BIẾT tới khoá file** — vẫn đòi khoá VÙNG cho mọi commit, nên cơ chế mới
+chỉ dùng được TRONG LÚC LÀM, không dùng được để ĐÓNG PHIÊN. Đây là mâu thuẫn thật giữa luật mới và
+cổng cũ: cổng hỏi *"ai chịu trách nhiệm"* và tìm câu trả lời trong bảng khoá vùng, trong khi
+ADR-0012 nói rõ khoá file **không mang** trách nhiệm truy nguồn — nhãn `Lane:` mang. **KHÔNG vá
+bằng cách nới cổng.** Ghi `KHUNG-53`, hai lối đề xuất, điều kiện đóng là một lệnh chạy được.
+
+**⑶ Nhân đó đóng `KHUNG-52`** (cổng in tên ba suite CHẬM thay vì suite ĐỎ — sáng nay nó tốn của
+tôi bốn lượt đo). Ca hỏng: repo có một suite ĐỎ-nhưng-NHANH và một suite XANH-nhưng-CHẬM; vế đòi
+cả hai chiều. **Nhánh thành thật tự chứng minh mình có ích ngay trong lượt vá**: bản đầu chỉ đọc
+`stdout` nên in *"không đọc được TÊN suite đỏ"* — và chính câu đó chỉ ra tên nằm ở `stderr`. Lùi
+im lặng thì lỗi sống thêm một vòng. 3 đột biến, cả 3 bị bắt.
+
+**Đức chốt chuyển `_root`** lần hai để đóng bản — đã ghi vào bảng quyền, trả ngay sau khi đẩy.
+
+**Số:** bản **1.3.76** · sổ nợ **25/25** · suite **22 suite** · `cong-do-that` **11 → 12 vế** ·
+`khoa-file` **7 vế**.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-50` · `KHUNG-51` · `KHUNG-53`.
