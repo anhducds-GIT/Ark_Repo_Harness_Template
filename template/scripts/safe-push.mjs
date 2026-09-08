@@ -19,6 +19,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
+import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -239,7 +240,46 @@ for (const row of rows) {
 }
 
 const blocked = rows.filter((row) => row.foreign.length);
+
+/* `--carry` TU LAM KHI DU HAI DIEU KIEN — Duc chot 2026-09-09, AGENTS.md muc 2 hang 2.
+ *
+ * Ba luot trong hai ngay phai dung hoi Duc cho cung mot hinh dang: commit cua lane khac nam duoi
+ * commit cua minh, va git xep theo thu tu nen day cai tren la buoc day cai duoi. Ca ba luot Duc
+ * deu duyet. Mot cua ma lan nao cung mo thi no khong con la cua — no la thu tuc, va thu tuc lap
+ * lai bi bo qua truoc khi bi go.
+ *
+ * HAI DIEU KIEN, va thieu mot la van hoi:
+ *   ⑴ MOI commit sap day deu QUY THUOC DUOC — co nhan `Lane:` doc ra ten phien. Day la cai
+ *     `--carry` thuc su mua: neu sau nay co gi sai, tra nguoc ve dung phien lam ra no.
+ *   ⑵ Cong dong phien da chay va XANH tren DUNG cay lam viec nay — doc dau xac nhan, khong tin
+ *     loi ai. Dau buoc vao HEAD + bam cay lam viec, nen no khong muon duoc cua luot truoc.
+ *
+ * VE ⑵ LA CHO DE LAM SAI NHAT: bo no di thi luat con lai la "co nhan Lane thi day duoc", tuc
+ * mot lane co the day viec cua lane khac di khi cong dang DO. Dau xac nhan la thu duy nhat o
+ * day biet cong da chay hay chua. */
+let tuDong = null;
 if (blocked.length && !carry) {
+  const thieuNhan = rows.filter((r) => !r.lane).map((r) => r.sha.slice(0, 7));
+  let dauXanh = false;
+  let viSaoDau = "chua doc duoc dau xac nhan";
+  try {
+    const xet = xetDau(docDau(ROOT), dauCay(ROOT), bamLenh(danhSachSuite(ROOT)));
+    dauXanh = Boolean(xet && xet.dung);
+    viSaoDau = (xet && xet.vi_sao) || viSaoDau;
+  } catch (e) {
+    dauXanh = false;
+    viSaoDau = String(e.message).split(String.fromCharCode(10))[0];
+  }
+  if (!thieuNhan.length && dauXanh) {
+    tuDong = viSaoDau;
+  } else {
+    console.error(`${String.fromCharCode(10)}TU CHOI PUSH — dieu kien tu dong CHUA du:`);
+    if (thieuNhan.length) console.error(`  · commit khong quy thuoc duoc (thieu nhan ${LANE_TRAILER}): ${thieuNhan.join(" ")}`);
+    if (!dauXanh) console.error(`  · cong dong phien chua xanh tren cay lam viec nay — ${viSaoDau}`);
+  }
+}
+
+if (blocked.length && !carry && !tuDong) {
   console.error(`\nTỪ CHỐI PUSH — bạn đang cuốn theo việc của phiên khác:`);
   for (const row of blocked) {
     console.error(`  ${row.sha.slice(0, 7)} → ${row.foreign.map((f) => `${f.area} (của "${f.owner}")`).join(", ")}`);
@@ -261,6 +301,12 @@ if (blocked.length && !carry) {
   for (const dong of loiKhuyenKhiChan(claims)) console.error(dong);
   console.error("");
   process.exit(1);
+}
+if (blocked.length && tuDong) {
+  const ai = [...new Set(blocked.flatMap((r) => r.foreign.map((f) => f.owner)))].join(", ");
+  console.log(`${String.fromCharCode(10)}CUON THEO viec cua ${ai} — tu dong cho qua (Duc chot 09/09).`);
+  console.log(`  du hai dieu kien: moi commit deu co nhan ${LANE_TRAILER} · cong da xanh (${tuDong})`);
+  console.log("  Duc THOI duoc bao tung luot — do la cai gia da ghi trong AGENTS.md muc 2.");
 }
 if (blocked.length && carry) {
   console.log(`\n--carry: Đức đã duyệt cho đẩy kèm việc của ${[...new Set(blocked.flatMap((r) => r.foreign.map((f) => f.owner)))].join(", ")}.`);

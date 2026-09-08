@@ -160,4 +160,34 @@ const DAU_TOT = { ok: true, head: CAY.head, bam: CAY.bam, lenh: LENH, moi_truong
   ok(`không ai chạm ${soPhatHanh} thật mà quên khai chạy-riêng — ${rieng.length} suite khai riêng, ${benDoc} bước công cụ đọc sổ`);
 }
 
+/* ---- `--carry` tự động PHẢI đứng trên dấu xác nhận, không đứng trên lời hứa --- */
+{
+  /* Đức chốt 09/09: `--carry` thôi phải hỏi **khi cổng đã XANH TOÀN BỘ và mọi commit quy thuộc
+   * được**. Đây là **nới một lớp bảo vệ**, nên hai điều kiện đó phải do MÁY xét, không do người
+   * gọi tự khai. Bỏ vế dấu xác nhận đi thì luật còn lại là *"có nhãn Lane thì đẩy được"* — tức
+   * một lane đẩy việc của lane khác đi được **trong lúc cổng đang ĐỎ**, và đó đúng là thứ mục 2
+   * hàng 2 sinh ra để chặn.
+   *
+   * VẾ NÀY ĐỌC MÃ NGUỒN, và nói thẳng là nó yếu hơn một ca chạy thật: `safe-push.mjs` chạy phần
+   * chính ngay lúc nạp module rồi THOÁT khi thiếu `--as`, nên không suite nào `import` nổi nó
+   * (ghi chú này đã có sẵn trong `repo-structure.mjs`). Ca chạy thật cần một remote giả — đáng
+   * làm, chưa làm. Cái vế này bắt được: ai đó gỡ một trong hai điều kiện. */
+  const sp = fs.readFileSync(path.join(ROOT, "scripts", "safe-push.mjs"), "utf8");
+  const iAuto = sp.indexOf("let tuDong = null;");
+  assert.ok(iAuto > 0, "safe-push.mjs khong con duong --carry tu dong — neu da bo thi bo luon ve nay");
+  const khoi = sp.slice(iAuto, iAuto + 1400);
+
+  assert.match(khoi, /xetDau\(/,
+    "duong --carry tu dong PHAI hoi dau xac nhan — khong hoi thi no cho day khi cong dang DO");
+  assert.match(khoi, /!r\.lane/,
+    "va PHAI doi moi commit quy thuoc duoc — do la thu --carry thuc su mua");
+  // Hai điều kiện phải cùng đúng, không phải một trong hai.
+  assert.match(khoi, /!thieuNhan\.length && dauXanh/,
+    "hai dieu kien phai noi bang VA, khong duoc noi bang HOAC");
+  // Và không đo được thì KHÔNG cho qua — fail-closed.
+  assert.match(khoi, /catch[\s\S]{0,80}dauXanh = false/,
+    "doc dau xac nhan that bai thi phai coi la CHUA xanh, khong duoc nga ve cho qua");
+  ok("--carry tự động: đòi CẢ dấu xác nhận LẪN nhãn lane · nối bằng VÀ · không đo được thì chặn");
+}
+
 console.log(`\n${so} passed, 0 failed, ${so} total`);
