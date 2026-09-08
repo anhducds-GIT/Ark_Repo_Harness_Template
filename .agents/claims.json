@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "claude-cua-kiem",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-08T09:40:43.117Z",
       "task": "bump ban sau dong bo",
-      "released_at": null,
+      "released_at": "2026-09-08T09:51:51.858Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -23,21 +23,21 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "claude-cua-kiem",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-08T09:40:43.020Z",
       "task": "dong bo phep ghim dau: hoi HANH VI thay vi ten bien",
-      "released_at": null,
+      "released_at": "2026-09-08T09:51:51.732Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "claude-cua-kiem",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-08T09:40:43.201Z",
       "task": "phat lai",
-      "released_at": null
+      "released_at": "2026-09-08T09:51:52.017Z"
     }
   }
 }
