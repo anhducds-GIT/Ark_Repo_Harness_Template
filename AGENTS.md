@@ -37,9 +37,10 @@ node scripts/chay-test.mjs --chi <một-phần-tên-suite>    # không ghi dấu
 Đủ bộ chạy **một lần**, ở cuối. Đo 08/09: một ngày mất **sáu vòng đủ bộ** cho một thay đổi, và
 phần lớn là để phát hiện thứ mà một suite lẻ đã đủ để bắt.
 
-**Phát bản trích (`npm run template`) MỘT LẦN, sau khi suite xanh.** Sổ phát hành cưỡng chế
-*một số một nội dung*, nên mỗi lượt sửa nguồn sau khi phát là **một số bản bị đốt**. Đo 08/09:
-một thay đổi đốt **bảy số bản** vì phát trước rồi mới chạy test.
+**Bộ sinh nào GHI VÀO MỘT SỔ CÓ RÀNG BUỘC thì chạy MỘT LẦN, sau khi suite xanh.** Sổ phát hành
+cưỡng chế *một số một nội dung*, nên mỗi lượt sửa nguồn sau khi đã ghi sổ là **một số bản bị
+đốt**, không lấy lại được. Đo 08/09: một thay đổi đốt **bảy số bản** vì chạy bộ sinh trước rồi
+mới chạy test.
 
 > Ba dòng trên là **luật tốc độ**, không phải lời khuyên: chúng thay cho thói quen "chạy cho chắc"
 > đã đo được là tốn **1.095 giây một vòng** thay vì **278**.

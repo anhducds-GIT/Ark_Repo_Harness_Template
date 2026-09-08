@@ -502,8 +502,11 @@ function phanLuatChung(text) {
  *   Đổi gì: thêm mục 0b "THỨ TỰ ĐÓNG PHIÊN" vào luật chung — ba luật tốc độ, mỗi luật có số đo
  *   đứng sau: chạy `npm test` SAU commit (đúng thứ tự cổng 22s, sai ~9 phút) · trong lúc làm dùng
  *   `--chi <suite>` thay vì đủ bộ · phát bản trích MỘT LẦN sau khi suite xanh (08/09 đốt 7 số bản
- *   vì làm ngược). Vân tay trước: 8a414ccaf80728686d35d0a36a5f238c731909a76d61857dc77b7e6884ebc4b1 */
-const COMMON_LAW_SHA256 = "0f6f62e08d379abb2faa27f7dbd570667af5892a3f3192abee7154d473f0c7eb";
+ *   vì làm ngược). Vân tay trước: 8a414ccaf80728686d35d0a36a5f238c731909a76d61857dc77b7e6884ebc4b1
+ *   Bản đầu (0f6f62e0…) gọi thẳng tên lệnh `npm run template` trong luật CHUNG — sai, vì repo
+ *   tiêu thụ không có lệnh đó, và phép kiểm "tài liệu dạy lệnh nào thì bản trích phải khai lệnh
+ *   đó" bắt đúng. Bản này nói về "bộ sinh ghi vào một sổ có ràng buộc", không nêu tên lệnh. */
+const COMMON_LAW_SHA256 = "6cc563d6300679847690172d8c3dd1c91f693aca8ec31fe5c9d8b6c2f23058ff";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
