@@ -713,4 +713,65 @@ vế nào đòi nó biết ĐỎ.
 Tức cổng GitHub **có khai** mà tài khoản đang đẩy **đi qua được**. Tần suất CAO (mọi lượt đẩy),
 tác hại THẤP (ba lớp trước nó còn răng). Đức chốt: ghi bằng chứng, chưa đổi gì.
 
-**Còn mở:** `KHUNG-47` · `KHUNG-49` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51`.
+**Còn mở:** `KHUNG-47` · `KHUNG-49` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51` · `KHUNG-52`.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · Cổng báo "suite ĐỎ" mà giấu tên suite đỏ
+
+**Lần thứ BA trong một phiên tôi vấp đúng một bẫy, và lần này nó GIẾT CẢ SUITE** chứ không đỏ một
+vế. Vế `5b` vừa thêm đọc `scripts/build-template.mjs` — công cụ của NƠI PHÁT HÀNH — mà không kiểm
+nó có tồn tại. Ở repo hạt giống `readFileSync` ném ENOENT, `features-smoke` **chết ngang**, không
+phải đỏ. Đã kiểm-rồi-mới-đọc, bỏ qua CÓ TÊN.
+
+**Nhưng phần đắt hơn là CHẨN ĐOÁN, và nó là một lỗ của chính cổng.** Cổng in:
+
+```
+[ĐỎ  ] Test xanh
+       suite gốc repo ĐỎ →  6.7s node tests/khoa-dau-vet.mjs | 2.3s node tests/assistant-smoke.mjs | …
+```
+
+Ba tên đó **KHÔNG phải suite đỏ** — chúng là ba suite CHẬM NHẤT. `session-check.mjs:838` lấy
+`.slice(-3)` của stdout, mà ba dòng cuối của bộ chạy là bảng xếp hạng thời gian. Tên suite đỏ nằm
+ngay phía trên, bị cắt mất.
+
+**Giá phải trả, đo được:** tôi đuổi theo ba cái tên sai trong **bốn lượt** — chạy từng suite riêng
+(cả ba XANH), dựng một repo mới bằng `init-repo` (XANH), dựng một worktree ở bản trước để so
+(XANH), rồi mới phải chép suite ra bản gỡ lỗi để in nội dung thật. Suite đỏ thật là
+`features-smoke`, chưa lần nào xuất hiện trên màn hình.
+
+**Đây là kiểu hỏng tệ nhất của một cổng:** nó không im lặng — nó **nói sai một cách tự tin**, và
+người đọc tin nó vì nó có tên file và có số giây. Ghi `KHUNG-52`, điều kiện đóng là một lệnh chạy
+được: dựng một repo có đúng MỘT suite đỏ và MỘT suite chậm khác nhau, rồi đòi câu cổng in ra chứa
+tên suite ĐỎ.
+
+**Còn mở:** `KHUNG-52` — chưa vá, vì `session-check.mjs` đang là vùng tôi vừa sửa cho ba việc
+khác và một lượt sửa nữa lúc này là trộn bốn việc vào một bản vá.
+
+## 2026-09-08 (khuya, tiếp) · harness-loi-01 · KHUNG-49 đóng: bộ đo thôi hỏi câu dễ
+
+**Bệnh:** `F4.7` — luật hai vai, thứ Đức gọi là quan trọng nhất để đưa AI assistant vào việc —
+khai phép đo là `can.file = ["AGENTS.md","BACKLOG.md"]`. Hai file đó có ở MỌI repo đã lắp từ lâu,
+nên mục báo `[x]` **khắp nơi**, trong khi `grep -cE "giữ lõi|phát & thu"` ra **0 trên 4 repo đã
+migrate**. Bộ đo báo ĐẠT cho một tính năng ở nơi nó **không tồn tại**.
+
+**Gốc bệnh:** có tính năng là một ĐOẠN LUẬT nằm trong file repo đích TỰ SỞ HỮU. `upgrade.mjs`
+không bao giờ ghi `AGENTS.md` của họ — đúng, đó là file của họ — nên *"file có tồn tại"* và
+*"nội dung đã tới"* là hai câu khác nhau, và danh mục chỉ hỏi câu dễ.
+
+**Vá:** kiểu đo thứ tư `trong_file` (file + các chuỗi phải khớp). `F4.7` đo ba chuỗi của chính
+luật. **Ca hỏng dựng được và đã chạy:** chép một repo dựng từ bản trích, xoá đúng ba dòng luật,
+giữ nguyên mọi thứ khác → `[x]` thành `[~]` **kèm tên ba chuỗi thiếu**.
+
+**Vế `5c`:** `AGENTS.md` và `CLAUDE.md` **cấm đo bằng sự có mặt**. Nó bắt thêm một chỗ ngay lượt
+đầu — `F4.5` cũng đang đo `AGENTS.md` kiểu đó. Sửa đúng chỗ chứ không nới vế: `F4.5` khẳng định
+**cánh cửa**, nên nó đo nội dung `CLAUDE.md`; `AGENTS.md` có luật hay không là việc của `F5.1`.
+Hai mục thôi đo trùng một thứ.
+
+**3 đột biến, cả 3 bị bắt** — kể cả cửa ngã về phía dễ nhất: *đọc không được thì coi như CÓ*.
+
+**Và vế 1 đỏ oan ngay lượt đầu:** nó đếm phép đo bằng `file + lenh`, nên một mục chỉ có
+`trong_file` bị coi là *"không đo được"*. Danh sách kiểu đo phải theo kịp `xetMuc` — nay bốn kiểu.
+
+**Số của lượt này:** sổ nợ **26 → 25** · `features-smoke` **8 → 11 vế** · danh mục **42 → 43 mục**
+· bản **1.3.73**.
+
+**Còn mở:** `KHUNG-47` · `KHUNG-50` (lane ② bàn giao) · `KHUNG-51` · `KHUNG-52`.

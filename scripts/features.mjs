@@ -79,8 +79,14 @@ const coTrenDia = (repo, rel) => {
   try { fs.statSync(path.join(repo, ...rel.split("/"))); return true; } catch (_) { return false; }
 };
 
+/* Đọc nội dung một file của repo đích. `null` = không đọc được, và bên gọi phải coi đó là THIẾU
+   chứ không phải "chắc là có" — đây là chỗ một phép đo dễ ngã về phía dễ nhất. */
+const docNoiDungTrenDia = (repo, rel) => {
+  try { return fs.readFileSync(path.join(repo, ...rel.split("/")), "utf8"); } catch (_) { return null; }
+};
+
 /** Đo MỘT mục. Thuần với `deps`, nên đột biến kiểm được mà không cần dựng repo thật. */
-export function xetMuc(muc, repo, laRepoNha, lenh, co = coTrenDia) {
+export function xetMuc(muc, repo, laRepoNha, lenh, co = coTrenDia, docNoiDung = docNoiDungTrenDia) {
   if (muc.pham_vi === "chi-repo-nha" && !laRepoNha) return { trangThai: TRANG_THAI.NGOAI_PHAM_VI, thieu: [], co: [] };
   if (muc.pham_vi === "chi-repo-dich" && laRepoNha) return { trangThai: TRANG_THAI.NGOAI_PHAM_VI, thieu: [], co: [] };
 
@@ -93,6 +99,23 @@ export function xetMuc(muc, repo, laRepoNha, lenh, co = coTrenDia) {
    * là `test:song-song` — hỏi tên là hỏi chi tiết triển khai. Nên hỏi HÀNH VI: có alias nào TRỎ
    * VÀO nó không. */
   const canChuoi = muc.can?.chuoi ?? [];
+  /* `trong_file` đo NỘI DUNG, không đo sự có mặt. Vì sao cần kiểu đo thứ tư — đo 08/09 trên bốn
+   * repo đã migrate: `F4.7` (luật hai vai) khai `can.file = ["AGENTS.md","BACKLOG.md"]`, mà hai
+   * file đó có ở MỌI repo đã lắp từ lâu, nên mục báo `[x]` khắp nơi trong khi
+   * `grep -cE "giữ lõi|phát & thu"` ra **0 trên 4**. Danh mục báo ĐẠT cho một tính năng ở nơi nó
+   * KHÔNG TỒN TẠI.
+   *
+   * Gốc bệnh: có những tính năng là một ĐOẠN LUẬT nằm trong một file repo đích TỰ SỞ HỮU.
+   * `upgrade.mjs` không bao giờ ghi `AGENTS.md` của họ — đúng, đó là file của họ — nên với loại
+   * mục này *"file có tồn tại"* và *"nội dung đã tới"* là hai câu khác nhau, và `can.file` chỉ
+   * hỏi câu dễ. */
+  const canTrongFile = muc.can?.trong_file ?? [];
+  const doTrongFile = (m) => {
+    const noi = docNoiDung(repo, m.file);
+    return noi !== null && (m.chuoi ?? []).every((c) => noi.includes(c));
+  };
+  const coTrong = canTrongFile.filter(doTrongFile);
+  const thieuTrong = canTrongFile.filter((m) => !doTrongFile(m));
   const coFile = canFile.filter((f) => co(repo, f));
   const thieuFile = canFile.filter((f) => !co(repo, f));
 
@@ -106,25 +129,27 @@ export function xetMuc(muc, repo, laRepoNha, lenh, co = coTrenDia) {
   const coChuoi = lenh === null ? canChuoi : canChuoi.filter((c) => giaTri.some((v) => v.includes(c)));
   const thieuChuoi = lenh === null ? [] : canChuoi.filter((c) => !giaTri.some((v) => v.includes(c)));
 
-  const tongCan = canFile.length + canLenh.length + canChuoi.length;
-  const tongCo = coFile.length + coLenh.length + coChuoi.length;
+  const tongCan = canFile.length + canLenh.length + canChuoi.length + canTrongFile.length;
+  const tongCo = coFile.length + coLenh.length + coChuoi.length + coTrong.length;
   const trangThai = tongCo === 0 && tongCan > 0 ? TRANG_THAI.THIEU
     : tongCo === tongCan ? TRANG_THAI.XONG
       : TRANG_THAI.MOT_PHAN;
 
   return {
     trangThai,
-    co: [...coFile, ...coLenh.map((l) => `npm run ${l}`), ...coChuoi.map((c) => `một alias npm gọi ${c}`)],
-    thieu: [...thieuFile, ...thieuLenh.map((l) => `npm run ${l}`), ...thieuChuoi.map((c) => `một alias npm gọi ${c}`)]
+    co: [...coFile, ...coLenh.map((l) => `npm run ${l}`), ...coChuoi.map((c) => `một alias npm gọi ${c}`),
+      ...coTrong.map((m) => `nội dung trong ${m.file}`)],
+    thieu: [...thieuFile, ...thieuLenh.map((l) => `npm run ${l}`), ...thieuChuoi.map((c) => `một alias npm gọi ${c}`),
+      ...thieuTrong.map((m) => `nội dung trong ${m.file} (thiếu: ${(m.chuoi ?? []).filter((c) => !(docNoiDung(repo, m.file) ?? "").includes(c)).join(" · ")})`)]
   };
 }
 
 /** Đo cả danh mục trên một repo. */
-export function do1Repo(danhMuc, repo, laRepoNha, co = coTrenDia) {
+export function do1Repo(danhMuc, repo, laRepoNha, co = coTrenDia, docNoiDung = docNoiDungTrenDia) {
   const lenh = docLenh(repo);
   return danhMuc.blocks.map((b) => ({
     ...b,
-    muc: b.muc.map((m) => ({ ...m, ket: xetMuc(m, repo, laRepoNha, lenh, co) }))
+    muc: b.muc.map((m) => ({ ...m, ket: xetMuc(m, repo, laRepoNha, lenh, co, docNoiDung) }))
   }));
 }
 

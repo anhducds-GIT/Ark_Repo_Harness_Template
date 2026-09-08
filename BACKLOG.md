@@ -90,6 +90,38 @@ KHUNG-1, sửa cùng lượt. Vùng: `_code`.
 
 ## P2
 
+### KHUNG-52 · Cổng báo "suite ĐỎ" rồi in ra tên ba suite CHẬM NHẤT, không phải suite đỏ
+
+**Đo 08/09, và giá phải trả đã tính được.** Khi chuỗi suite đỏ, `session-check.mjs:838` lấy
+`String(error.stdout).split(NL).slice(-3)` làm phần giải thích. Ba dòng cuối của
+`chay-test.mjs` là **bảng xếp hạng thời gian** (top-5 chậm nhất), không phải danh sách đỏ. Nên
+cổng in ra:
+
+```
+suite gốc repo ĐỎ →  6.7s node tests/khoa-dau-vet.mjs | 2.3s node tests/assistant-smoke.mjs | …
+```
+
+trong khi suite đỏ thật là `features-smoke.mjs` — **chưa lần nào xuất hiện trên màn hình**.
+
+**Vì sao đây là kiểu hỏng tệ nhất của một cổng:** nó không im lặng, nó **nói sai một cách tự
+tin**. Câu in ra có tên file thật, có số giây thật, nên người đọc tin. Một cổng im lặng thì người
+ta đi tìm; một cổng nói sai thì người ta đi sai hướng.
+
+**Giá đo được ở chính phiên phát hiện:** bốn lượt đuổi theo ba cái tên sai — chạy riêng từng suite
+(cả ba XANH) · dựng repo mới bằng `init-repo` (XANH) · dựng worktree ở bản trước để so (XANH) ·
+rồi mới phải chép suite ra một bản gỡ lỗi để in nội dung thật.
+
+**Vì sao chưa vá ngay:** `session-check.mjs` là vùng vừa bị sửa cho ba việc khác trong cùng phiên;
+một lượt sửa nữa lúc này là trộn bốn việc vào một bản vá. Lối rẻ: `chay-test.mjs` đã BIẾT suite
+nào đỏ (`doThat`) — cho nó in danh sách đó ở dòng CUỐI, hoặc cho cổng bắt theo mẫu `── node … (mã`
+thay vì `slice(-3)`.
+
+Vùng: `_code`.
+
+**đóng khi:** dựng một repo có ĐÚNG MỘT suite đỏ và một suite khác CHẬM HƠN hẳn, chạy cổng, và
+đòi câu nó in ra chứa tên suite ĐỎ — kèm đối chứng: đổi suite nào đỏ thì tên trong câu đổi theo.
+
+
 ### ~~KHUNG-2~~ · Hai quy trình migrate không đi theo bản trích
 
 **ĐỨC CHỐT 05/09, xem [decisions.md](decisions.md):** migrate là việc của người **cầm** bộ khung,
@@ -1225,7 +1257,34 @@ và vế đó ĐỎ khi xoá thử mục vừa thêm.
 
 </details>
 
-### KHUNG-49 · `F4.7` XANH GIẢ ở mọi repo đã migrate — phép đo chỉ hỏi file có tồn tại
+### ~~KHUNG-49~~ · ĐÓNG 08/09 · `F4.7` XANH GIẢ ở mọi repo đã migrate — phép đo chỉ hỏi file có tồn tại
+
+**Đóng đủ ba vế.**
+
+⑴ **Kiểu đo `trong_file`** (file + các chuỗi phải khớp) trong `features.mjs`; `F4.7` dùng nó với
+ba chuỗi của chính luật: `① Giữ lõi` · `② Phát & thu` · `tự ký nghiệm thu`.
+
+⑵ **Ca hỏng dựng được, đã chạy thật:** chép một repo dựng từ bản trích, xoá đúng ba dòng luật hai
+vai khỏi `AGENTS.md`, giữ nguyên mọi thứ khác. Trước: `[x]`. Sau khi vá: `[~]` **và kể tên đúng
+ba chuỗi thiếu**. Đối chứng: bản chưa xoá vẫn `[x]`.
+
+⑶ **Vế `5c` trong `features-smoke.mjs`:** `AGENTS.md` và `CLAUDE.md` — hai file repo đích TỰ SỞ
+HỮU, `upgrade.mjs` không bao giờ ghi — **chỉ được đo bằng `trong_file`, cấm đo bằng `can.file`**.
+Cộng vế `5d` đòi chính kiểu đo đó biết ĐỎ.
+
+**Vế `5c` bắt thêm MỘT chỗ ngay lượt đầu:** `F4.5` cũng đang đo `AGENTS.md` bằng sự có mặt. Sửa
+đúng chỗ chứ không nới vế: điều `F4.5` khẳng định là **cánh cửa** — `CLAUDE.md` phải TRỎ SANG một
+bản luật duy nhất — nên nó đo nội dung `CLAUDE.md`, còn `AGENTS.md` có luật hay không là việc của
+`F5.1`. Hai mục thôi đo trùng một thứ.
+
+**3 đột biến đã chạy, cả 3 bị bắt:** đưa `F4.7` về `can.file` → vế 5c đỏ · `trong_file` luôn ĐẠT
+→ vế 5d đỏ · đọc-không-được-thì-coi-như-CÓ → vế 5d đỏ (đây là cửa ngã về phía dễ nhất).
+
+**Và vế 1 đỏ oan ngay lượt đầu:** nó đếm phép đo bằng `file + lenh` nên một mục chỉ có
+`trong_file` bị coi là *"không đo được"*. Danh sách kiểu đo phải theo kịp `xetMuc` — nay có bốn.
+
+<details><summary>Nội dung gốc của mục</summary>
+
 
 **Đo 08/09, bốn repo đã migrate cộng repo tiêu thụ.** `F4.7` khai phép đo là
 `can.file = ["AGENTS.md", "BACKLOG.md"]` — **chỉ hỏi hai file có tồn tại**. Cả hai có ở mọi repo
@@ -1257,6 +1316,8 @@ file + chuỗi/regex phải khớp), và `F4.7` dùng kiểu đó thay cho `can.
 `node scripts/features.mjs <một repo chưa nhận luật>` báo `F4.7` là `[ ]` hoặc `[~]` chứ không phải
 `[x]` — dựng nổi ca hỏng; **và** ⑶ một vế trong `tests/features-smoke.mjs` đòi mọi mục có
 `pham_vi: "ca-hai"` mà đích là một file repo-đích-tự-sở-hữu thì **không được** chỉ đo bằng `can.file`.
+
+</details>
 
 ### KHUNG-50 · Bộ trích băm CÂY LÀM VIỆC, nên một lane sửa dở là CHẶN toàn bộ đường phát — và ledger bị đọc lúc đang ghi
 

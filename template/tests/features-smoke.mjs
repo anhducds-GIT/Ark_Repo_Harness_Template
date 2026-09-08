@@ -67,7 +67,12 @@ const danhMuc = docDanhMuc(ROOT);
       assert.ok(m.ma.startsWith(`${b.ma}.`), `${m.ma} khong thuoc khoi ${b.ma}`);
       assert.match(String(m.tu_ban), /^\d+\.\d+\.\d+$/, `${m.ma} phai khai tu_ban dang x.y.z — day la con so phien AI o repo dich doi chieu de biet minh thieu gi`);
       assert.ok(PV.has(m.pham_vi), `${m.ma} khai pham_vi la "${m.pham_vi}" — chi co ba gia tri`);
-      assert.ok((m.can?.file?.length ?? 0) + (m.can?.lenh?.length ?? 0) > 0,
+      // BỐN kiểu đo, không phải hai. Danh sách này phải theo kịp `xetMuc` — bỏ sót một kiểu ở đây
+      // thì một mục đo bằng kiểu đó bị coi là "không đo được", và vế này đỏ oan (đã xảy ra ngay
+      // lượt thêm `trong_file`).
+      const soPhepDo = (m.can?.file?.length ?? 0) + (m.can?.lenh?.length ?? 0)
+        + (m.can?.chuoi?.length ?? 0) + (m.can?.trong_file?.length ?? 0);
+      assert.ok(soPhepDo > 0,
         `${m.ma} KHONG co phep do nao. Mot muc khong do duoc la mot dong quang cao, khong phai checklist`);
       assert.ok(m.khong_co_thi && m.khong_co_thi.length > 30,
         `${m.ma} phai noi KHONG CO NO THI HONG RA SAO — nguoi doc can biet cai gia, khong chi cai ten`);
@@ -199,8 +204,14 @@ const danhMuc = docDanhMuc(ROOT);
    * Vế này bịt chiều đó: mọi script bộ khung PHÁT ĐI được thì phải xuất hiện trong ít nhất một
    * phép đo. Không đòi mỗi script một mục — nhiều script thuộc cùng một cơ chế. Chỉ đòi: không
    * script nào phát đi mà danh mục **chưa từng nhắc tới**. */
-  const nguon = readFileSync(join(ROOT, "scripts", "build-template.mjs"), "utf8");
-  const khoi = /const PORTABLE_SCRIPTS = \[([\s\S]*?)\];/.exec(nguon);
+  /* ĐỌC CÓ THỂ NÉM — và nó đã ném thật, ngay lượt chạy đầu ở repo hạt giống (08/09).
+   * `build-template.mjs` là công cụ của NƠI PHÁT HÀNH; repo tiêu thụ không có nó, nên
+   * `readFileSync` ném ENOENT và **cả suite chết** — không phải đỏ một vế, mà chết cả file, ở
+   * một repo hoàn toàn khoẻ mạnh. Kiểm sự tồn tại TRƯỚC khi đọc, rồi bỏ qua CÓ TÊN.
+   * Đây là lần thứ BA trong một phiên tôi vấp đúng chỗ này. */
+  let nguon = null;
+  try { nguon = readFileSync(join(ROOT, "scripts", "build-template.mjs"), "utf8"); } catch { nguon = null; }
+  const khoi = nguon === null ? null : /const PORTABLE_SCRIPTS = \[([\s\S]*?)\];/.exec(nguon);
   if (!khoi) {
     boQuaVi("chiều ngược: script phát đi phải được khai", "repo này không có build-template.mjs (không phải nơi phát hành)");
   } else {
@@ -217,6 +228,51 @@ const danhMuc = docDanhMuc(ROOT);
       + " → thêm nó vào một mục của features.json. Danh mục nói THIẾU thì mọi báo cáo migrate dựng trên nó thiếu theo.");
     ok(`5b · chiều ngược: ${phatDi.length}/${phatDi.length} script phát đi đều nằm trong một phép ĐO (không tính văn xuôi)`);
   }
+}
+
+/* ---- 5c. File repo đích TỰ SỞ HỮU thì phải đo NỘI DUNG, không đo sự có mặt --- */
+{
+  /* KHUNG-49, đo 08/09 trên bốn repo đã migrate. `F4.7` (luật hai vai — thứ Đức gọi là quan
+   * trọng nhất để đưa AI assistant vào việc) khai `can.file = ["AGENTS.md","BACKLOG.md"]`. Hai
+   * file đó có ở MỌI repo đã lắp từ lâu, nên mục báo `[x]` **khắp nơi**, trong khi
+   * `grep -cE "giữ lõi|phát & thu"` ra **0 trên 4**. Bộ đo báo ĐẠT cho một tính năng ở nơi nó
+   * không tồn tại.
+   *
+   * `AGENTS.md` và `CLAUDE.md` là hai file repo đích TỰ SỞ HỮU — `upgrade.mjs` không bao giờ ghi
+   * chúng, và đúng là không nên. Nên với chúng, *"file có tồn tại"* trả lời một câu hỏi khác hẳn
+   * *"nội dung đã tới"*. Vế này cấm hỏi câu dễ. */
+  const FILE_TU_SO_HUU = ["AGENTS.md", "CLAUDE.md"];
+  const pham = [];
+  for (const b of danhMuc.blocks) {
+    for (const m of b.muc) {
+      const doBangCoMat = (m.can?.file ?? []).filter((f) => FILE_TU_SO_HUU.includes(f));
+      if (doBangCoMat.length === 0) continue;
+      const doNoiDung = (m.can?.trong_file ?? []).map((t) => t.file);
+      const thieu = doBangCoMat.filter((f) => !doNoiDung.includes(f));
+      if (thieu.length) pham.push(`${m.ma} đo ${thieu.join(", ")} bằng SỰ CÓ MẶT`);
+    }
+  }
+  assert.deepEqual(pham, [],
+    `file repo đích tự sở hữu chỉ được đo bằng \`trong_file\` (nội dung), không bằng \`file\` (có mặt). `
+    + `Đang vi phạm: ${pham.join(" · ")}`);
+  ok(`5c · ${FILE_TU_SO_HUU.join(" và ")} chỉ được đo bằng NỘI DUNG, không bằng sự có mặt`);
+}
+
+/* ---- 5d. Phép đo `trong_file` phải biết ĐỎ ------------------------------ */
+{
+  /* Thêm một kiểu đo mà không có ca hỏng thì nó là trang trí. Ca dựng ở đây là đúng hình dạng
+   * KHUNG-49: file CÓ, nội dung KHÔNG. */
+  const muc = { ma: "T.3", pham_vi: "ca-hai", can: { trong_file: [{ file: "AGENTS.md", chuoi: ["① Giữ lõi"] }] } };
+  const coFile = () => true;
+  assert.equal(xetMuc(muc, "/r", false, {}, coFile, () => "... ① Giữ lõi ...").trangThai,
+    TRANG_THAI.XONG, "noi dung CO thi XONG");
+  assert.equal(xetMuc(muc, "/r", false, {}, coFile, () => "mot AGENTS.md khong co luat hai vai").trangThai,
+    TRANG_THAI.THIEU, "file CO ma noi dung KHONG thi phai THIEU — day la ca da xay ra o 4 repo");
+  assert.equal(xetMuc(muc, "/r", false, {}, coFile, () => null).trangThai,
+    TRANG_THAI.THIEU, "doc khong duoc thi la THIEU, khong duoc nga ve 'chac la co'");
+  assert.match(xetMuc(muc, "/r", false, {}, coFile, () => "khong co gi").thieu[0], /① Giữ lõi/,
+    "phai KE TEN chuoi con thieu, khong chi noi 'thieu noi dung'");
+  ok("5d · phép đo nội dung: có XONG · file có mà chữ không THIẾU · đọc không được THIẾU · kể tên chữ thiếu");
 }
 
 /* ---- 6. Khối markdown dán vào hồ sơ migrate ----------------------------- */

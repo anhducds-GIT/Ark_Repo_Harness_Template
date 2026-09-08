@@ -971,6 +971,11 @@ function packageJson(version) {
       /* DANH MỤC TÍNH NĂNG — lệnh phiên AI của repo này dùng để tự đo mình đang thiếu gì so với
          bộ khung. Không có lệnh thì không ai chạy, và checklist migrate quay về lời tự khai. */
       features: "node scripts/features.mjs",
+      /* NHẬT KÝ — thước trần mỗi mục và nhịp xoay theo tháng. Bản trích phát `scripts/handoff.mjs`
+         từ 1.3.58 mà QUÊN phát alias, nên repo mới nhận công cụ không ai gọi được bằng tên chuẩn
+         — đúng ca `[~]` MỘT PHẦN mà danh mục cảnh báo, và nó sống cho tới khi vế chiều-ngược của
+         `features-smoke` bắt được ở repo hạt giống (08/09). Đo được, không suy. */
+      handoff: "node scripts/handoff.mjs",
       // KHÔNG ĐƯỢC BỎ. `session-check.mjs` hỏi `package.json.scripts.test`; không khai thì
       // `hasRootTestScript()` false VĨNH VIỄN và cổng đóng phiên không chạy một dòng test nào
       // của repo bạn. Thêm suite của bạn vào chuỗi này, đừng thay thế suite hạt giống.
