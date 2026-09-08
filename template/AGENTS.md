@@ -132,8 +132,8 @@ Vai là của **PHIÊN**, không của hãng; một phiên đóng **đúng một
 | **② Phát & thu** | cửa duy nhất ra ngoài. **Mang chỗ vấp về** thành mục sổ nợ | sửa lõi để bên ngoài chạy được · báo ĐẠT khi chưa chạy thật |
 
 **Vai ② được *phát hiện*, Vai ① được *sửa*** — gộp lại thì người tìm ra lỗi tự chấm bản sửa của mình.
-Bàn giao: ② ghi `BACKLOG.md` kèm `đóng khi:`, ① biến thành bản vá cộng một phép ghim — **vế duy
-nhất máy kiểm ĐƯỢC**, và repo này chưa cưỡng chế (`KHUNG-8`). Hai vai cùng lúc được, nhưng **khác
+Bàn giao: ② ghi `BACKLOG.md` kèm `đóng khi:`, ① biến thành bản vá cộng một phép ghim — **chưa repo
+nào cưỡng chế đủ** (`KHUNG-8`), nên tới 08/09 luật này chưa có răng. Hai vai cùng lúc được, nhưng **khác
 vùng**. AI nào không tự nạp file này thì Đức dán: *"Đọc AGENTS.md ở gốc repo trước khi làm gì."*
 
 ## 6. Sổ tay mở khi cần — Tầng 2

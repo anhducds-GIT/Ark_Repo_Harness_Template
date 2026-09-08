@@ -7,29 +7,42 @@ deciders: Đức (chốt 08/09 — "apply hệ thống assistant này ở 2 repo
 
 # ADR-0008 — Vai chia theo VIỆC, không chia theo hãng
 
-## Bối cảnh — bảng cũ phân việc cho những bên chưa từng ghi gì
+## Bối cảnh — không đo được HÃNG từ repo, và đó chính là lý do
 
 Mục 5 của hiến pháp từng chia việc theo tên hãng: Claude / Codex / Antigravity, mỗi hãng một dòng
-*"việc chính"* và *"không được"*. Đếm nhãn `Lane:` của **mọi commit 14 ngày**:
+*"việc chính"* và *"không được"*. Đếm nhãn `Lane:` trên 14 ngày, có chặn cả hai đầu:
 
 ```bash
-git log --since=2026-08-25 --format=%B | grep -oE "^Lane: \S+" | sort | uniq -c | sort -rn
+git log --since=2026-08-25 --until=2026-09-08 --format=%B   | grep -oE "^Lane: \S+" | sort | uniq -c | sort -rn
 ```
 
-| Repo | Tổng commit có nhãn | Antigravity | Codex | Ghi chú |
-|---|---|---|---|---|
-| Bộ khung | **306** | **0** | **1** (0,33%) | lane lớn nhất `harness-vong2` **112 commit** |
-| Extension | ~500 | **0** | **0** | `claude-codex-*` là phiên Claude *làm việc với* Codex |
+| Đo được | Bộ khung |
+|---|---|
+| Dòng `Lane:` | **306** |
+| Tên lane khác nhau | 39 |
+| Lane lớn nhất | `harness-vong2` — **112 dòng** |
+| Tên lane có chuỗi `antigravity` | **0** |
+| Tên lane có chuỗi `codex` | **2** (`codex-khoi-a` 1 · `claude-codex` 1) |
 
-Hai điều bảng cũ không làm được:
+**PHẢN BIỆN CỦA PHIÊN CODEX, 08/09, và nó ĐÚNG — bản đầu của ADR này sai ở đúng chỗ đó.** Bản
+đầu viết *"Antigravity 0 · Codex 1 (0,33%)"* như một sự thật đã đo. Nó **không phải**: lệnh trên
+đếm **dòng**, không đếm commit, và **không có gì ánh xạ tên lane sang hãng**. Một lane tên
+`harness-vong2` có thể là bất kỳ hãng nào. Tôi suy hãng từ **chuỗi ký tự trong tên lane** — tức
+tin đúng loại **lời tự khai** mà chính repo này cấm tin.
 
-⑴ Nó phân việc cho **Antigravity và Codex**, hai bên gộp lại viết **1 trên 306 commit**.
+Và chỗ sai đó lại làm lập luận **mạnh lên**, không yếu đi:
 
-⑵ Nó **không xếp nổi người làm nhiều nhất vào đâu**: lane lớn nhất mang tên `harness-vong2`, một
-cái tên nói về *việc*, không nói về *hãng*. Bảng chia theo hãng không có ô nào cho nó.
+> **Repo không ghi lại hãng ở bất kỳ đâu.** Nhãn `Lane:` ghi *việc*, không ghi *ai*. Nên một bảng
+> luật chia theo hãng là bảng **không đo được, không kiểm được, và không ai biết nó có đúng
+> không** — kể cả hôm nay. Đó là lý do đủ để bỏ nó, và nó không cần con số nào chống lưng.
 
-Nói cách khác: trục phân loại sai. Việc thật chia theo **hướng đi** — ở nhà, hay ra ngoài — chứ
-không chia theo ai đang gõ.
+Hai điều còn lại vẫn đứng, vì chúng không phụ thuộc việc biết hãng:
+
+⑴ **Lane lớn nhất mang tên nói về VIỆC** (`harness-vong2`, 112 dòng — 37%), nên bảng chia theo
+hãng **không có ô nào** cho chính người làm nhiều nhất.
+
+⑵ Trục phân loại sai: việc thật chia theo **hướng đi** — ở nhà, hay ra ngoài — chứ không theo ai
+đang gõ. Trục này thì **đo được** (vùng file bị chạm), còn trục hãng thì không.
 
 ## Quyết định
 
@@ -58,9 +71,24 @@ riêng cho phần luật chung nên lượt phát này **bị chặn cho tới k
 
 ## Điều KHÔNG được đọc rộng hơn
 
-**Chỉ vế bàn giao là máy kiểm được** — trường `đóng khi:` trong `BACKLOG.md`. Vế *"② phát hiện ·
-① sửa"* **không dựng nổi ca hỏng**, nên theo đúng câu ③ của mục 8 nó là **chữ, không phải luật**.
-Câu này được ghi thẳng vào hiến pháp thay vì giấu đi, để không ai tin nó đang được cưỡng chế.
+**Hôm nay chỉ vế bàn giao được cưỡng chế** — trường `đóng khi:` trong `BACKLOG.md`, và ngay cả vế
+đó thì repo NÀY cũng chưa bật (`KHUNG-8`). Nên tính tới 08/09, luật hai vai **chưa có răng**.
+
+**PHẢN BIỆN CODEX 08/09, và nó ĐÚNG:** bản đầu của mục này viết *"không dựng nổi ca hỏng, nên nó
+là chữ chứ không phải luật"*. Codex tách hai chuyện tôi gộp làm một — **"chưa cưỡng chế" KHÁC
+"không thể kiểm bằng máy"** — và nó chỉ ra ba thứ máy kiểm được:
+
+⑴ **vùng file bị chạm** so với vai đã khai (Vai ① chạm lõi · Vai ② chạm cửa ra);
+⑵ **liên kết bàn giao** — mục sổ nợ có dẫn tới bản vá đóng nó không;
+⑶ **người ký nghiệm thu phải khác người sửa.**
+
+Vế ⑶ **đã tồn tại và đã chạy**: đó chính là `SELF_ATTESTATION` trong `scripts/quyen.mjs`, có phép
+ghim và đã bị đột biến bắn thử. Nên câu *"không kiểm được"* của tôi **rộng hơn sự thật**, và rộng
+theo hướng tự bào chữa — nó biến một việc chưa làm thành một việc không làm được.
+
+**Giới hạn thật, hẹp hơn nhiều:** máy **không** chứng minh được **AI** thực sự phát hiện lỗi, vì
+`--as` là tên tự khai. Máy chỉ chứng minh được **hai cái tên khác nhau**. Đó là giới hạn về danh
+tính, không phải về khả năng kiểm — và nó biến mất khi danh tính đến từ nguồn được xác thực.
 
 Và **cố ý không thêm** một quy ước đặt tên `--as` theo vai: không máy nào kiểm được nó, mà mục 8
 nói luật máy không kiểm được thì sớm muộn cũng bị bỏ qua — thêm vào chỉ để có thêm một dòng.
