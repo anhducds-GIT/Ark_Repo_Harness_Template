@@ -25,6 +25,19 @@ ra, không phải quét cả cây thư mục và không phải hỏi chủ repo 
 | Tra một thuật ngữ lạ | [docs/LEGEND.md](docs/LEGEND.md) |
 | Sửa chính bộ khung | đọc [AGENTS.md](AGENTS.md) trước — đó là hiến pháp của repo này |
 
+## Lắp bộ khung vào một repo mới
+
+**Lắp từ mốc Stable Baseline `v1.2.17`, không lắp từ HEAD đang chạy** —
+[ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md):
+
+```bash
+git clone --branch v1.2.17 https://github.com/anhducds-GIT/Ark_Repo_Harness_Template.git
+```
+
+**Đừng thêm `--depth 1`:** sổ phát hành đối chiếu với lịch sử git, clone nông thì bộ khung **từ
+chối phát** (`NHAN_CHUNG_HONG`) — đã thử thật 04/09 và nó từ chối đúng. Clone xong bạn đứng ở
+`detached HEAD`; không sao, vì từ bản sao này bạn chỉ **phát đi**, không đẩy lên.
+
 ## Nguyên tắc gốc
 
 **Mỗi lần AI phải hỏi bạn một câu, nghĩa là repo còn thiếu một chỗ để ghi câu trả lời đó.**

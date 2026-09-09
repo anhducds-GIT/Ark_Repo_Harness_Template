@@ -51,6 +51,20 @@ lặng đẩy việc người khác lên remote. Đó là lý do nhãn phải n�
 Vùng nào có những khoá gì thì khai ở `.repo-structure.json`, khối `areas`, trường `steward`.
 Đừng gõ cứng tên khoá vào tài liệu hay script — mỗi repo chia vùng một kiểu.
 
+### Ba luật cơ chế — máy tự chặn, nên chúng ở ĐÂY chứ không ở hiến pháp
+
+Ba điều dưới đây `claim.mjs` và cổng đóng phiên **tự cưỡng chế và tự nêu tên khoá còn thiếu**,
+nên `AGENTS.md` chỉ trỏ sang đây — luật nào máy nói kịp lúc hỏng thì không cần mọi phiên nạp trước.
+
+- **Chứa nhau hai chiều.** Vùng đang có chủ khác → khoá **file** trong vùng đó bị từ chối. Trong
+  vùng còn khoá file của người khác → nhận cả **vùng** bị từ chối. Thiếu một chiều là một lane
+  chui lọt qua lane kia.
+- **Gốc repo chia làm NHIỀU khoá**, không phải một. Nhận đúng vùng mình đụng, đừng nhận cả gốc;
+  cổng đóng phiên sẽ nêu tên khoá còn thiếu.
+- **Hai file được MIỄN khoá vùng:** `.agents/claims.json` (không miễn thì không ai trả lại được
+  quyền) và `HANDOFF.md` ở gốc (luật bắt MỌI phiên ghi Log). Miễn **chỉ khi chỉ THÊM dòng** —
+  sửa hay xoá dòng cũ là viết lại lịch sử phiên khác.
+
 ### Giới hạn: bốn cơ chế này KHÔNG phải một lớp bảo mật
 
 **Chúng chống GIẪM CHÂN DO VÔ Ý. Chúng KHÔNG chống MẠO DANH CỐ Ý.** Đức chốt 09/09 sau audit độc

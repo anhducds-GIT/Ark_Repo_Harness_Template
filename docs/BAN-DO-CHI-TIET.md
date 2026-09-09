@@ -10,12 +10,25 @@ ttl_days: 365
 > và nó chiếm **10.029 / 13.799 token — 73%** của thứ MỌI phiên phải nạp, ở MỌI repo. Một phiên
 > nạp 10k token để rốt cuộc mở một hai file. Đo 2026-09-09.
 >
-> Nay `AGENTS.md` giữ **16 cửa vào** (chỉ mục mỏng, kèm liên kết), còn *vì sao · có gì bên trong ·
-> đã vấp ở đâu* nằm ở đây — **mở khi cần**, không nạp mỗi lượt. Đây cũng là **bản đồ file chính
-> thức** của repo: `.repo-structure.json` khai `docs.file_map` trỏ vào đây, nên cổng *"File mới
-> đã khai"* đối chiếu với bản ĐẦY ĐỦ này.
+> Nay `AGENTS.md` giữ **bảy cửa hay dùng nhất**, còn *vì sao · có gì bên trong · đã vấp ở đâu*
+> nằm ở đây — **mở khi cần**, không nạp mỗi lượt. Đây cũng là **bản đồ file chính thức** của repo:
+> `.repo-structure.json` khai `docs.file_map` trỏ vào đây, nên cổng *"File mới đã khai"* đối
+> chiếu với bản ĐẦY ĐỦ này, và **file mới thì khai ở ĐÂY**, không khai vào hiến pháp.
 >
 > **Chữ giữ nguyên từng byte, chỉ đổi chỗ.** Thêm một file mới thì thêm một mục ở đây.
+
+### Cãi một luật, hay sắp THÊM một luật — bằng chứng sinh ra nó
+
+[docs/VI-SAO-LUAT.md](docs/VI-SAO-LUAT.md) — **sổ bằng chứng, không phát biểu luật.** Sự cố nào,
+ngày nào, đo được gì, đã mất gì; kèm **năm câu phải trả lời trước khi thêm một luật**. Tách khỏi
+`AGENTS.md` ngày 09/09 vì lý lẽ chiếm gần một nửa thứ mọi phiên phải nạp, trong khi nó chỉ cần
+đọc một lần trong đời — lúc có người muốn đổi luật.
+
+### Trạng thái repo lúc MỞ PHIÊN — đang ở đâu, việc kế là gì
+
+[STATUS.md](STATUS.md) — **một trang, khai bằng tay, và là thứ MỌI phiên đọc ngay sau hiến pháp.**
+Đức chốt 09/09: phần đuôi `HANDOFF.md` là *một lượt việc*, không phải *trạng thái*, nên nó rời
+đường nạp sang Tầng 2. Bảng trạng thái đọc frontmatter của file này; đừng gõ số nào mà máy đo được.
 
 ### Hiểu bộ khung này gồm gì và dùng thế nào
 

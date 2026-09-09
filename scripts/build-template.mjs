@@ -597,8 +597,19 @@ function phanLuatChung(text) {
  *   `docs/SO-TAY-AGENT.md` và `IDEAS.md` — **bản trích KHÔNG mang hai file đó**. Sửa thành mô tả
  *   VAI TRÒ ("sổ riêng, khai vào bảng mục 6"), đúng bài học cũ: luật chung tả HÀNH VI, không gọi
  *   tên thứ chỉ nơi phát hành mới có.
- *   Vân tay trước: 51d31f3eda172dea51e5c5a7d259657cb050c535517efb289a975c7dfaaac7e4 */
-const COMMON_LAW_SHA256 = "b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be";
+ *   Vân tay trước: 51d31f3eda172dea51e5c5a7d259657cb050c535517efb289a975c7dfaaac7e4
+ *
+ * ĐỔI 09/09 — NÉN LUẬT, Đức chốt và uỷ quyền: *"tôi ủy quyền cho bạn duy trì tự động cơ chế nén
+ *   rules, tái tổ chức và cấu tạo lại kiến trúc… mục tiêu không phải đạt ngưỡng, mà phải nhỏ hơn
+ *   ngưỡng margin 30-40%"*. KHÔNG một luật nào bị bỏ; ba thứ ĐỔI CHỖ, mỗi thứ có nhà mới khai
+ *   trong bản đồ: ⑴ lý lẽ và số đo lịch sử → `docs/VI-SAO-LUAT.md` · ⑵ ba luật cơ chế khoá mà
+ *   `claim.mjs` tự cưỡng chế và tự nêu tên khoá thiếu (chứa nhau hai chiều · chia gốc repo ·
+ *   hai file được miễn) → `docs/protocols/MULTIFLOW.md` · ⑶ bảng tra mục 6 rút còn bảy cửa, bản
+ *   đầy đủ đã ở `docs/BAN-DO-CHI-TIET.md` từ lượt trước. Và một luật ĐỔI THẬT: mở phiên đọc
+ *   `STATUS.md` thay cho phần đuôi `HANDOFF.md` — ghi ở `decisions.md`.
+ *   Đo: phần MỌI phiên phải nạp **4.907 → 3.202 token** cho hiến pháp, tổng nạp **5.804 → 3.761**.
+ *   Vân tay trước: b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be */
+const COMMON_LAW_SHA256 = "e7d9bb9e7caba1c6b0a009af372f6ef3bd9d74e667f55f64c06936ad2958bfc9";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -1082,11 +1093,48 @@ function packageJson(version) {
 // cũng hết đúng: bộ khung đã chạy thật trên hai repo khác nghề (Python và Node/chứng khoán).
 export const TEMPLATE_VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
 
+/* HẠT GIỐNG SỔ BẰNG CHỨNG. Hiến pháp trỏ tới file này ở hai chỗ (đầu file và mục 8), nên bản
+   trích BẮT BUỘC mang theo — bắt được 09/09 bởi chính phép kiểm "luật trỏ tới file bản trích
+   không mang". Nội dung là KHUNG RỖNG có chủ đích: bằng chứng của repo NHÀ là sự cố của repo
+   nhà, chép sang repo khác thì thành chữ vô nghĩa. Cái đáng mang đi là **thói quen tách lý lẽ
+   ra khỏi luật**, vì đó là thứ giữ hiến pháp mỏng. */
+const VI_SAO_SEED = `---
+kind: guide
+status: active
+ttl_days: 365
+---
+
+# VÌ SAO có luật này — bằng chứng, và cách thêm một luật mới
+
+> **File này KHÔNG phát biểu luật.** Luật ở \`AGENTS.md\`, một bản duy nhất. Đây là **sổ bằng
+> chứng**: sự cố nào, ngày nào, đo được gì, đã mất gì — mở khi bạn định cãi một luật, hoặc khi
+> bạn định thêm một luật mới.
+>
+> Tách ra khỏi \`AGENTS.md\` là cố ý: lý lẽ chỉ cần đọc **một lần trong đời**, lúc có người muốn
+> đổi luật, còn luật thì MỌI phiên phải nạp. Trộn hai thứ là bắt mọi phiên trả tiền cho lý lẽ.
+
+## Năm câu phải trả lời trước khi thêm một luật
+
+1. **Đã có chuyện gì xảy ra thật chưa?** Chưa thì đừng thêm — viết vào \`BACKLOG.md\` và chờ.
+2. **Nó thay chỗ cái nào?** Không thay được cái nào thì nói rõ vì sao đáng thêm hẳn.
+3. **Dựng nổi ca hỏng cho nó không?** Không dựng nổi thì nó là chữ, không phải luật.
+4. **Nó thuộc NHÓM nào?** Sáu nhà, xem \`AGENTS.md\` mục 8. **Máy canh câu này.**
+5. **Nó có CHỦ NGỮ không, và nó phủ luật nào?** Luật thiếu chủ ngữ bị đọc ngược, và đã bị đọc
+   ngược thật ít nhất một lần ở repo sinh ra bộ khung này.
+
+## Bằng chứng của repo BẠN
+
+Mỗi lần một luật ở \`AGENTS.md\` sinh ra hoặc đổi, ghi vào đây MỘT mục: luật nào · ngày nào · sự
+cố gì · đo được gì · đã mất gì. Chưa có mục nào là bình thường — nghĩa là repo bạn chưa phải trả
+giá lần nào.
+`;
+
 export function buildTemplateFiles() {
   const files = new Map();
   for (const name of PORTABLE_SCRIPTS) files.set(`scripts/${name}`, read(`scripts/${name}`));
   for (const [from, to] of VERBATIM) files.set(to, genericize(to, read(from)));
   files.set("docs/adr/0000-ghi-nhan-quyet-dinh-kien-truc.md", ADR_SEED);
+  files.set("docs/VI-SAO-LUAT.md", VI_SAO_SEED);
   files.set("AGENTS.md", lawForTemplate());
   files.set("CLAUDE.md", CLAUDE_STUB);
   files.set(".repo-structure.json", STRUCTURE_SEED);

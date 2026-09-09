@@ -339,7 +339,8 @@ export function deXuatTrim(root = ROOT) {
  *
  * BA TẦNG, đúng thứ tự đọc:
  *   NHÂN      — `AGENTS.md`: luật chung, mọi phiên nạp trước tiên, không có ngoại lệ.
- *   TRẠNG THÁI— phần CUỐI `HANDOFF.md`: phiên trước làm tới đâu.
+ *   TRẠNG THÁI— `STATUS.md`: một trang, đang ở đâu và việc kế là gì. Đức chốt 09/09: phần đuôi
+ *               `HANDOFF.md` là MỘT LƯỢT VIỆC, không phải TRẠNG THÁI — nó sang Tầng 2.
  *   THEO VIỆC — mở khi cần, theo bảng mục 6. **KHÔNG nạp trước.**
  *
  * Con số quan trọng nhất mà lệnh này in ra không phải tổng đã nạp, mà là **tổng KHÔNG nạp**: nó
@@ -357,7 +358,7 @@ export function deXuatTrim(root = ROOT) {
  * số token thật của một nhà cung cấp cụ thể. */
 export const uocToken = (s) => Math.round(String(s).length / 2.6);
 
-export function napContext(root = ROOT, tran = 6000) {
+export function napContext(root = ROOT, tran = 4200) {
   /* `doc` trả CHỮ (để đếm token), `dem` trả số dòng. Hai đơn vị, một nguồn đọc — tách ra thì
      sớm muộn hai con số nói về hai nội dung khác nhau. */
   const doc = (rel, gioiHan) => {
@@ -372,7 +373,7 @@ export function napContext(root = ROOT, tran = 6000) {
   };
   const nhan = [
     { tang: "NHÂN", file: "AGENTS.md", dong: dem("AGENTS.md"), token: uocToken(doc("AGENTS.md")), vi: "luật chung — mọi phiên, không ngoại lệ" },
-    { tang: "TRẠNG THÁI", file: "HANDOFF.md (40 dòng cuối)", dong: dem("HANDOFF.md", 40), token: uocToken(doc("HANDOFF.md", 40)), vi: "phiên trước làm tới đâu" }
+    { tang: "TRẠNG THÁI", file: "STATUS.md", dong: dem("STATUS.md"), token: uocToken(doc("STATUS.md")), vi: "đang ở đâu · việc kế · còn gì mở" }
   ];
   const napDong = nhan.reduce((a, b) => a + b.dong, 0);
   const napToken = nhan.reduce((a, b) => a + b.token, 0);

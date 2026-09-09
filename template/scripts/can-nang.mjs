@@ -42,11 +42,14 @@ export const NGAN_SACH_MAC_DINH = {
   soNhatKy: 600,       // dòng HANDOFF.md — thứ phình nhanh nhất và chưa từng có nhịp dọn
   tiLeDaDong: 50,      // % mục nợ đã đóng còn nằm trong sổ; quá thì chuyển sang kho lưu
   soPhatHanh: 300,     // dòng CHANGELOG.md — sổ chỉ-thêm, không bao giờ nhỏ lại
-  /* TRẦN TOKEN cho phần MỌI phiên phải nạp — Đức chốt 09/09: *"giảm mọi phiên xuống 4.000–6.000
-     token"*. Đây là con số duy nhất trong bảng này nhân theo (số repo × số phiên), nên nới nó
-     đắt hơn mọi mục khác. `docBatBuoc` (đo bằng DÒNG) bỏ đi vì nó đo sai đơn vị: nó báo
-     284/300 ĐẠT trong khi thứ nạp thật là ~13.800 token. */
-  tokenNap: 6000
+  /* TRẦN TOKEN cho phần MỌI phiên phải nạp. Đức chốt 09/09 hai lượt: trước là *"giảm mọi phiên
+     xuống 4.000–6.000 token"*, sau là *"mục tiêu không phải đạt ngưỡng, mà phải nhỏ hơn ngưỡng
+     margin là 30-40%, vì sau này sẽ tiếp tục phình ra"* — nên trần SIẾT xuống 4.000, tức đúng
+     mức thấp của dải cũ, và phần nạp phải nằm dưới nó chứ không chạm nó. Đây là con số duy nhất
+     trong bảng này nhân theo (số repo × số phiên), nên nới nó đắt hơn mọi mục khác. `docBatBuoc`
+     (đo bằng DÒNG) bỏ đi vì nó đo sai đơn vị: nó báo 284/300 ĐẠT trong khi thứ nạp thật là
+     ~13.800 token. */
+  tokenNap: 4200
 };
 
 /* NGÂN SÁCH KHAI ĐƯỢC, vì repo khác có kích thước khác. Repo nhỏ mà bắt theo ngân sách của một

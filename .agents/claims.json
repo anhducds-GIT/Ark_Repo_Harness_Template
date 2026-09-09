@@ -39,5 +39,83 @@
       "task": "giam token nap",
       "released_at": "2026-09-09T08:50:48.510Z"
     }
+  },
+  "tam": {
+    "AGENTS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:56:35.173Z"
+    },
+    "docs/VI-SAO-LUAT.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:56:35.173Z"
+    },
+    "docs/BAN-DO-CHI-TIET.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:56:35.173Z"
+    },
+    "scripts/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:56:35.173Z"
+    },
+    "STATUS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:58:55.051Z"
+    },
+    "scripts/can-nang.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:05:43.943Z"
+    },
+    "docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:08:03.792Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:08:46.140Z"
+    },
+    "README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:09:16.349Z"
+    },
+    "scripts/build-template.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:13:27.140Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:21:36.157Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/AGENTS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/scripts/can-nang.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/scripts/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    },
+    "template/docs/VI-SAO-LUAT.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:28:42.703Z"
+    }
   }
 }
