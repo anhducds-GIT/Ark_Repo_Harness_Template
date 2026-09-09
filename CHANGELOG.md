@@ -3,6 +3,33 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.1 — 2026-09-09 — Cổng thôi đòi khoá VÙNG cho mọi commit; nhãn `Lane:` là câu trả lời
+
+**Vì sao có bản này:** tầng máy đổi thì **buộc** phải tăng số — `build-template.mjs` từ chối phát
+khi một số phiên bản trỏ tới hai nội dung khác nhau. Không phải một bản phát theo kế hoạch.
+
+Từ 08/09 mặc định là **khoá mức FILE**, trả ngay sau commit. Nhưng cổng đóng phiên vẫn đi tìm câu
+*"ai đứng tên việc này"* trong bảng khoá **VÙNG** — thứ trống một cách hợp lệ vào đúng lúc cổng
+chạy. Nên một phiên làm **đúng** luật mới vẫn bị ĐỎ, và phải nhận lại khoá vùng chỉ để đóng phiên.
+Đo 08/09: 4 khoá vùng cho 6 lượt commit.
+
+Nay nhãn `Lane:` của **chính phiên đang hỏi** cũng là một câu trả lời, y như nhãn của người khác
+(`ADR-0012` mục ⑷). Đổi đúng một điều đó; chiều fail-closed giữ nguyên từng vế — commit **không
+nhãn** vẫn ĐỎ, sửa còn trong **cây làm việc** vẫn ĐỎ.
+
+**Nửa thứ hai, mục nợ chưa nêu:** `rootSuite` cũng suy từ `myRootAreas`, nên phiên chỉ dùng khoá
+file có mục *"Test xanh"* rơi vào **BỎ**. Đây là vế **SIẾT LẠI**: trước bản này, phiên đó thoát cả
+*Test xanh*, *ghi Log HANDOFF*, và *vùng chỉ-thêm* — trong im lặng.
+
+Phép ghim: `cong-do-that.mjs` khối 1 (1 → **3 vế**) và khối 7 (3 → **4 vế**). Ba lượt đột biến trên
+bản chép cách ly, mỗi lượt revert đúng một dòng, mỗi lượt ĐỎ đúng vế của nó.
+
+**CHƯA QUA AUDIT ĐỘC LẬP.** Codex hết lượt dùng tới 10/09 01:25; mục 5 cấm người sửa tự ký nghiệm
+thu. Nên `KHUNG-53` để **MỞ**, và bản này **chưa đẩy** — chờ Đức chốt.
+
+**Một chỗ hở ghi ra cho rõ:** sổ này nhảy từ **1.3.50 → 1.8.1**, các bản 1.4–1.8.0 không có khối
+nào. Lịch sử của chúng nằm ở `RELEASE-LEDGER.json` và `git log`, không ở đây.
+
 ## 1.3.50 — 2026-09-08 — Xoá 1.716 dòng sổ quyền chưa ai gọi, và trần sổ nợ lần đầu có máy canh
 
 Đức uỷ quyền chốt hai câu treo lại từ đêm trước. Cả hai chốt **ngược với dự đoán** ghi trong bản
