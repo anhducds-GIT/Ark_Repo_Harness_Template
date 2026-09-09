@@ -240,7 +240,7 @@ khai `generated_names` trong `.repo-structure.json` — từ bản 1.3.11 ba tê
 
 ### Sắp sửa KHOÁ MỨC FILE, hay thắc mắc vì sao có HAI loại khoá
 
-[docs/adr/0012-khoa-muc-file.md](docs/adr/0012-khoa-muc-file.md) — số đo của CHÍNH repo này (620 cặp va chạm, **57% là chặn oan**, p90 **12 file** một lượt sửa), sáu quyết định, và một mục **"cái này KHÔNG chữa"** phải đọc trước khi tin: khoá không giữ file, *git* giữ, và khoá file làm chỗ đó **xấu đi** vì nó bỏ bớt sự serial hoá. Ghim ở [tests/khoa-file.mjs](tests/khoa-file.mjs) — 8 vế, 6 đột biến đã chạy
+[docs/adr/0012-khoa-muc-file.md](docs/adr/0012-khoa-muc-file.md) — số đo của CHÍNH repo này (620 cặp va chạm, **57% là chặn oan**, p90 **12 file** một lượt sửa), sáu quyết định, và một mục **"cái này KHÔNG chữa"** phải đọc trước khi tin: khoá không giữ file, *git* giữ, và khoá file làm chỗ đó **xấu đi** vì nó bỏ bớt sự serial hoá. Ghim ở [tests/khoa-file.mjs](tests/khoa-file.mjs) — 12 vế, 6 đột biến đã chạy; bốn vế cuối là **dấu niêm phong bảng quyền** (ADR-0017), kéo về từ repo tiêu thụ 09/09
 
 ### Một cửa TỪ CHỐI đã trả lời đúng mà vẫn không chặn được gì
 

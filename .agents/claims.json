@@ -68,7 +68,11 @@
     "docs/adr/0017-dau-niem-phong-bang-quyen.md": {
       "owner": "harness-loi-01",
       "luc": "2026-09-09T14:49:36.548Z"
+    },
+    "docs/BAN-DO-CHI-TIET.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T15:07:55.666Z"
     }
   },
-  "_fingerprint": "c9617ef92db2cd99"
+  "_fingerprint": "e5d39250218b09e2"
 }
