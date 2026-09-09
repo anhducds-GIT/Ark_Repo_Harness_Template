@@ -771,3 +771,23 @@ hướng **fail-OPEN**.
 
 **Bản 1.8.2, đã vào bản trích** — cả 4 file kèm phép ghim. `KHUNG-15` + `KHUNG-53` **chờ audit độc
 lập** (Codex hết lượt tới 01:25), nên **chưa đẩy**.
+
+### 2026-09-10 (23) · harness-loi-02 · Lời cảnh báo của tôi bị vượt sau 20 phút — `KHUNG-56`
+
+**Cổng lượt này XANH cả 12 mục** (Test xanh: 22/22 trong 528.8s · kho chữ 3371/3371 · nạp
+4055/4200). Không ghi được dấu cổng: **mốc remote đổi giữa lượt** — và đó chính là chuyện phải ghi.
+
+**5 commit của tôi ĐÃ LÊN `origin/main`, do lane khác `safe-push` cuốn theo:** `a33166d` ·
+`1cb9011` · `f711bed` · `b4f8b6c` · `020f971` — tức bản **1.8.1 + 1.8.2**, gồm cả bản vá
+`session-check.mjs` / `chay-test.mjs` / `repo-structure.mjs` **CHƯA qua audit độc lập**.
+
+Lượt (21) và (22) tôi ghi đúng câu *"đừng `--carry` commit này trước khi có audit"*. Nó nằm trong
+`HANDOFF.md` — **Tầng 2, không nạp mặc định**. Lane `harness-migrate-3repo` **không làm gì sai**:
+cổng của họ xanh, mọi commit mang nhãn `Lane:` quy thuộc được — đủ đúng ba điều kiện mà **máy**
+biết kiểm. Vế *"đã qua audit độc lập"* của mục 2 **không có phép kiểm nào**.
+
+`AGENTS.md` mục 7 tự nói: *"Luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua."* Ở đây
+*"sớm muộn"* = **20 phút**. Vào sổ: `KHUNG-56`, kèm hai lối vá và đối chứng ngược.
+
+**Chưa làm, và cố ý:** không force-push, không sửa lịch sử — mục 2 đòi Đức chốt. Bản vá vẫn cần
+audit, chỉ là nay nó là audit **sau khi phát** thay vì trước. Đề bài 7 câu đã soạn sẵn.

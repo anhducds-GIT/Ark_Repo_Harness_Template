@@ -717,3 +717,38 @@ chưa theo. Vùng: `_code`.
 lane B **không đụng** `docs/` — rồi đòi cổng của lane B **XANH** ở mục *"Ngân sách trong trần"*,
 kèm đối chứng NGƯỢC: cùng kho đó, khi chính lane B là người làm phình (đã commit) thì mục đó vẫn
 phải **ĐỎ** kèm mã `KHO_CHU_PHINH`.
+
+
+### KHUNG-56 · Điều kiện "đã qua audit độc lập" KHÔNG có phép kiểm nào — `--carry` phát hộ việc chưa ai duyệt
+
+**Xảy ra thật lúc 00:4x ngày 10/09, trong vòng ~20 phút sau khi được ghi ra giấy.**
+
+`AGENTS.md` mục 2 cho phép tự commit và push khi đủ ba, trong đó điều ⑵ là *"cổng XANH TOÀN BỘ,
+**code thì đã qua audit độc lập**"*. Vế **cổng xanh** có máy canh — `safe-push` đòi dấu cổng. Vế
+**đã qua audit** thì **không có gì canh cả**: không cờ, không trường trong dấu, không phép kiểm.
+
+Ca thật: lane `harness-loi-02` commit 5 lượt (bản 1.8.1, 1.8.2 — sửa `session-check.mjs`,
+`chay-test.mjs`, `repo-structure.mjs`), ghi rõ trong `HANDOFF.md` lượt (21) và (22):
+
+> *"chưa qua audit độc lập… **chưa đẩy**. Phiên sau: đừng `--carry` commit này trước khi có audit."*
+
+Lane `harness-migrate-3repo` chạy `safe-push` và **cuốn cả 5 commit đó lên `origin/main`** —
+`a33166d · 1cb9011 · f711bed · b4f8b6c · 020f971`. Họ **không làm gì sai**: cổng của họ xanh, mọi
+commit đều mang nhãn `Lane:` quy thuộc được, tức đủ đúng ba điều kiện mà **máy** biết kiểm.
+
+**Gốc bệnh, và nó là gốc bệnh của cả bộ khung:** lời cảnh báo nằm trong `HANDOFF.md` — Tầng 2,
+**không nạp mặc định**. Không lane nào phải đọc nhật ký của lane khác trước khi đẩy, và cũng không
+nên phải. Đúng câu `AGENTS.md` mục 7 tự nói: *"Luật nào không kiểm được bằng máy thì sớm muộn cũng
+bị bỏ qua"* — ở đây *"sớm muộn"* là **hai mươi phút**.
+
+**Đừng vá bằng cách bắt người ta đọc thêm.** Chỗ mang tín hiệu phải là chỗ máy đã đọc: commit hoặc
+dấu cổng. Hai lối đáng cân nhắc, cả hai phải đo trước: ⑴ một nhãn trong commit kiểu
+`Audit: chua-co` mà `safe-push` từ chối cuốn theo khi `--carry` (rẻ, nhưng người sửa tự khai) ⑵ dấu
+cổng mang thêm trường `audit` chỉ được đặt bởi một lệnh nghiệm thu riêng (chặt hơn, đắt hơn, và
+`Y-02` đã bàn hình dạng lệnh đó).
+
+Liên quan: `KHUNG-44` (luật bàn giao hai vai chưa cưỡng chế), `Y-02` (lệnh nghiệm thu). Vùng: `_code`.
+
+**đóng khi:** dựng một kho hai lane — lane A có một commit khai *chưa qua audit*, lane B cổng XANH
+chạy `safe-push --carry` — rồi đòi `safe-push` **TỪ CHỐI** và nêu đích danh commit chưa duyệt, kèm
+đối chứng NGƯỢC: cùng kho đó, khi commit của A khai *đã qua audit* thì `--carry` phải **cho qua**.
