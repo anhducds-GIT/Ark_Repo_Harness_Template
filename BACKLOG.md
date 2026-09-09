@@ -947,6 +947,27 @@ index tạm của cây đang commit bằng gốc repo khác → `fatal: unable t
 fail-closed sẽ **chặn mọi commit**. Vá bằng `--goc` do hook truyền vào. Chỗ này sẽ va thật ở
 `KHUNG-50`: một `git worktree` riêng có gốc khác gốc module.
 
+**VÒNG AUDIT ĐỘC LẬP 10/09 trả `REVISE`, và nó đúng cả bốn chỗ** — tự dựng lại từng ca rồi mới
+tin (luật vàng 4). Bốn fail-open THẬT trong bản đầu của tôi, nay đã vá và đã ghim:
+
+| Mã | Ca hỏng | Vá |
+|---|---|---|
+| `CUA_INDEX_AMEND_BYPASS` | commit KHÔNG nhãn (cửa im lặng) → `git commit --amend` thêm nhãn của mình. Index bằng HEAD nên `diff --cached` RỖNG → cửa cho qua. Commit cuối mang tên tôi, chứa việc lane khác, **và cổng không thấy gì lạ vì nhãn đã có** | mẻ rỗng thì soi lại nội dung so với `HEAD^` |
+| `CUA_INDEX_PATH_LOSS` | `--name-only` trần thì git TRÍCH DẪN đường dẫn ngoài ASCII, tên đã trích dẫn không khớp bảng quyền → file CÓ CHỦ đọc thành VÔ CHỦ. Repo này có sẵn danh sách `grandfathered` toàn đường dẫn tiếng Việt có dấu | `-z` + `core.quotepath=false`, không `trim` — ở CẢ `--cua-index` và `--soat` |
+| `CUA_INDEX_LANE_AMBIGUOUS` | hook tự đọc nhãn bằng `sed 's/^[Ll]ane:…' \| head -1` = **bộ đọc thứ hai** cho khái niệm đã có nhà. Lệch `laneFromMessage` ở chữ thường · nhiều nhãn · nhãn có khoảng trắng. Nên `lane: A` + `Lane: B` lọt cửa dưới tên A rồi được cổng quy cho B | hook chuyển nguyên FILE lời nhắn; `claim.mjs` gọi `laneFromMessage`. Nhãn không quy thuộc được → TỪ CHỐI |
+| `CUA_INDEX_ACTIVATION_GAP` | phép kiểm ở cổng chỉ hỏi *"file hook có tồn tại không"*, nên **xoá file hook đi là cổng chuyển sang XANH** | phân biệt *"repo theo dõi mà file mất"* (ĐỎ) với *"repo chưa nhận cửa"* (bỏ qua) |
+
+**Bài học tầng, không phải bài học dòng:** ba trong bốn chỗ là **tôi tự viết bản thứ hai của một
+thứ đã có** — bộ đọc nhãn, cách đọc tên file từ index, và cách hỏi "cửa có đó không". Cùng họ với
+bài học 10/09 *"vá ba lần cùng một chỗ = vá SAI TẦNG"*.
+
+**Codex nêu hai chỗ tôi KHÔNG sửa, kèm lý do:**
+⑴ *"khoá file thuộc A mà vùng thuộc B thì B qua cửa"* — trạng thái đó **không dựng nổi** bằng
+lệnh: `khoaFileTrongVung` (CHIỀU HAI của luật chứa nhau) chặn B nhận vùng khi A còn khoá file
+trong đó, và `quyetDinhSua` chặn A nhận khoá file trong vùng của B. Đã ghim ở `tests/khoa-file.mjs`.
+⑵ *"lane không gọi `--sua`, không chạy cổng thì cửa không bật"* — đúng, và **không có máy nào
+với tới**: lane đó cũng bỏ qua mọi lớp khác. Nó là đường bỏ-qua-hết, không phải đường lách cửa.
+
 **CÒN HỞ, mang theo cả vế này:** cửa chỉ thấy thứ **đã khai vào bảng quyền**. Hai lane đều không
 nhận khoá thì không lớp nào biết của ai — bảng quyền là bằng chứng duy nhất máy có.
 

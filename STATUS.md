@@ -5,7 +5,7 @@ name: Ark Repo Harness
 lifecycle: active
 last_verified: 2026-09-10
 last_verified_commit: d6da6a0290bbb58c1837be86f2dfaf6e0982a852
-last_verified_how: "23 suite · cổng đóng phiên XANH TOÀN BỘ · bản 1.8.8 (xem CHANGELOG)"
+last_verified_how: "23 suite · cổng đóng phiên XANH TOÀN BỘ · bản 1.8.9 (xem CHANGELOG)"
 evidence_ref: HANDOFF.md
 owner: harness-loi-02
 priority_rank: 1

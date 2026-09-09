@@ -29,7 +29,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { claimPrefixesFrom, generatedFrom, readStructureFromDisk, stewardOf } from "./repo-structure.mjs";
+import { claimPrefixesFrom, generatedFrom, laneFromMessage, readStructureFromDisk, stewardOf } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(MODULE_FILE), "..");
@@ -373,6 +373,28 @@ export function soatDanHang({ daDan, tam, claims, as, mienKhoa, maySinh, vungCua
 export function cuaIndex(doiSo) {
   const { la } = soatDanHang(doiSo);
   return la.filter((x) => (x.chuFile && x.chuFile !== doiSo.as) || (x.chuVung && x.chuVung !== doiSo.as));
+}
+
+/* CỬA ĐÃ BẬT CHƯA — quyết định THUẦN, để cổng đóng phiên ghim được cả ba nhánh bằng chuỗi.
+ *
+ * HAI CA TRÔNG GIỐNG NHAU, và gộp chúng là một fail-open — vòng audit 10/09 bắt đúng chỗ này:
+ * bản đầu chỉ hỏi *"file hook có tồn tại không"*, nên XOÁ file hook đi là cổng chuyển sang XANH
+ * (bỏ qua). Phân biệt bằng git: repo có THEO DÕI file hook thì cửa là thứ repo này phải có, và
+ * thiếu nó là ĐỎ; repo chưa bao giờ nhận bản trích thì không theo dõi, và bỏ qua là đúng. */
+export function xetCuaIndex({ coTrenDia, daTheoDoi, hooksPath }) {
+  if (!coTrenDia) {
+    if (!daTheoDoi) return { ok: true, skipped: true, msg: "repo này chưa nhận cửa index (`.githooks/commit-msg`) — không có cửa thì không đo." };
+    return { ok: false, msg: "CUA_INDEX_BI_THAO: repo theo dõi `.githooks/commit-msg` nhưng file không còn trên đĩa. Lấy lại: git checkout -- .githooks/commit-msg" };
+  }
+  const dang = String(hooksPath ?? "").trim();
+  if (dang === ".githooks") return { ok: true, msg: "cửa index đang bật" };
+  return {
+    ok: false,
+    msg: `CUA_INDEX_TAT: core.hooksPath ${dang ? `đang trỏ "${dang}"` : "chưa đặt"}, nên \`.githooks/commit-msg\` KHÔNG chạy.`
+      + " Cửa đó là thứ duy nhất chặn `git commit` của bạn cuốn theo file lane khác vừa `git add` (KHUNG-59)."
+      + " Bật: git config core.hooksPath .githooks"
+      + (dang ? " — đang trỏ nơi khác thì HỎI người đặt trước, đừng ghi đè." : ""),
+  };
 }
 
 /* Bật cửa index cho bản sao repo này. `core.hooksPath` là cấu hình MỖI BẢN SAO, không theo git
@@ -780,10 +802,6 @@ async function main() {
    * Chỗ DUY NHẤT thấy đúng mẻ sắp vào commit. `--soat` là một LỆNH người nhớ gọi, và cửa sổ
    * nguy hiểm nằm SAU nó (KHUNG-59). Cửa này nằm trong chính `git commit`. */
   if (flag("cua-index")) {
-    if (typeof as !== "string") {
-      console.error("CUA_INDEX_THIEU_LANE: hook phải truyền `--as <lane đọc từ nhãn Lane:>`.");
-      process.exit(EXIT.MISUSE);
-    }
     /* GỐC LÀ THỨ HOOK TRUYỀN VÀO, không phải đường dẫn của file này.
      *
      * ĐO ĐƯỢC 10/09, chính fixture của phép ghim lôi ra: `claim.mjs` suy gốc repo từ vị trí
@@ -793,39 +811,88 @@ async function main() {
      *
      * Chỗ này sẽ va thật ở `KHUNG-50`: một `git worktree` riêng có gốc khác gốc module. */
     const goc = typeof flag("goc") === "string" ? path.resolve(flag("goc")) : ROOT;
-    try { parsed = readClaims(path.join(goc, ".agents", "claims.json")); }
-    catch (e) { console.error(`CUA_INDEX_KHONG_DOC_DUOC_BANG: ${String(e.message).split(String.fromCharCode(10))[0]}`); process.exit(EXIT.REFUSED); }
+    const fileLoiNhan = flag("loi-nhan");
+
+    /* MỘT BỘ ĐỌC NHÃN, KHÔNG HAI. Vòng audit 10/09: bản đầu để hook tự đọc bằng `sed
+     * 's/^[Ll]ane:...'`, tức bộ đọc thứ hai cho một khái niệm đã có nhà (`laneFromMessage`, thứ
+     * cổng đóng phiên và `safe-push` dùng). Hai bộ đọc lệch nhau ở ba chỗ: chữ thường `lane:`
+     * (hook nhận, bộ kia không) · nhiều nhãn khác nhau (hook lấy cái đầu, bộ kia TỪ CHỐI) ·
+     * nhãn có khoảng trắng (bộ kia từ chối). Nên viết được một lời nhắn lọt cửa dưới tên A rồi
+     * được cổng quy cho tên B. Đúng luật mục 8: một khái niệm một nhà. */
+    let khai = { lane: null, problem: null };
+    if (typeof fileLoiNhan === "string") {
+      try { khai = laneFromMessage(fs.readFileSync(fileLoiNhan, "utf8")); }
+      catch (e) {
+        console.error(`CUA_INDEX_KHONG_DOC_DUOC_LOI_NHAN: ${String(e.message).split(String.fromCharCode(10))[0]}`);
+        process.exit(EXIT.REFUSED);
+      }
+    } else if (typeof as === "string") {
+      khai = { lane: as, problem: null };            // đường gọi tay, để dựng lại ca hỏng
+    }
+    /* CÓ dòng `Lane:` mà KHÔNG dùng được (rỗng · có khoảng trắng · hai nhãn khác nhau) thì
+       TỪ CHỐI, đừng cho qua. Cổng đóng phiên cũng sẽ đỏ, nhưng nó đỏ SAU khi commit đã hình
+       thành — và cái commit đó đã cuốn việc lane khác vào lịch sử rồi. */
+    if (khai.problem) {
+      console.error(`CUA_INDEX_NHAN_KHONG_QUY_THUOC_DUOC: ${khai.problem}`);
+      console.error("Cửa không biết bạn là ai thì không biết file nào của bạn. Sửa nhãn rồi commit lại.");
+      process.exit(EXIT.REFUSED);
+    }
+    /* KHÔNG có nhãn nào: cửa này IM LẶNG, cố ý. Cửa đó là phép kiểm "Nhãn lane trong commit"
+       của cổng và của `safe-push`; hai cửa canh một điều là hai câu trả lời cho một câu hỏi. */
+    if (!khai.lane) process.exit(EXIT.OK);
+    const toi = khai.lane;
+
+    /* ĐỌC TÊN FILE BẰNG `-z`, và KHÔNG `trim`. Vòng audit 10/09: `--name-only` trần thì git
+     * TRÍCH DẪN mọi đường dẫn có ký tự ngoài ASCII — `"docs/Ká»¹..."` — và tên đã
+     * trích dẫn không khớp hàng nào trong bảng quyền, nên file CÓ CHỦ đọc thành VÔ CHỦ và cửa
+     * cho qua. Repo này có sẵn một danh sách `grandfathered` toàn đường dẫn tiếng Việt có dấu,
+     * nên đây không phải ca giả định. `trim()` thì làm mất khoảng trắng cuối tên. */
+    const docIndex = (...them) => execFileSync("git", ["-c", "core.quotepath=false", "diff", "--cached", "--name-only", "-z", ...them],
+      { cwd: goc, encoding: "utf8" }).split(String.fromCharCode(0)).filter(Boolean);
     let daDan = [];
     try {
-      daDan = execFileSync("git", ["diff", "--cached", "--name-only"], { cwd: goc, encoding: "utf8" })
-        .split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean);
+      daDan = docIndex();
+      /* MẺ RỖNG mà commit vẫn đang hình thành = `--amend` (hoặc `--allow-empty`): index bằng
+       * HEAD nên `diff --cached` không thấy gì. Vòng audit 10/09 nêu đúng đường lách này:
+       * commit KHÔNG nhãn (cửa im lặng) → `git commit --amend` thêm nhãn của mình → mẻ rỗng →
+       * cửa cho qua, và commit cuối mang tên tôi mà chứa việc lane khác. Nên soi lại NỘI DUNG
+       * đang được đóng lại: so với HEAD^. */
+      if (!daDan.length) {
+        const coCha = (() => {
+          try { execFileSync("git", ["rev-parse", "--verify", "HEAD^"], { cwd: goc, stdio: "ignore" }); return true; }
+          catch { return false; }
+        })();
+        if (coCha) daDan = docIndex("HEAD^");
+      }
     } catch (e) {
       /* FAIL-CLOSED. Không đọc được index thì không biết mình đang commit gì của ai — và đúng
-         thứ mục này chữa là commit mù. Cửa ra là `git commit --no-verify`, thấy được và có chủ ý. */
+         thứ mục này chữa là commit mù. Cửa ra là `git commit --no-verify`, thấy được, có chủ ý. */
       console.error(`CUA_INDEX_KHONG_DOC_DUOC: ${String(e.message).split(String.fromCharCode(10))[0]}`);
       process.exit(EXIT.REFUSED);
     }
     if (!daDan.length) process.exit(EXIT.OK);
+    try { parsed = readClaims(path.join(goc, ".agents", "claims.json")); }
+    catch (e) { console.error(`CUA_INDEX_KHONG_DOC_DUOC_BANG: ${String(e.message).split(String.fromCharCode(10))[0]}`); process.exit(EXIT.REFUSED); }
     const cauTruc = readStructureFromDisk(goc);
     const tienTo = claimPrefixesFrom(cauTruc);
     const la = cuaIndex({
       daDan,
       tam: parsed.tam,
       claims: parsed.claims,
-      as,
+      as: toi,
       mienKhoa: MIEN_KHOA,
       maySinh: [...generatedFrom(cauTruc), ".agents/claims.json"],
       vungCua: (d) => vungBaoNgoai(d, cauTruc, tienTo),
     });
     if (!la.length) process.exit(EXIT.OK);
-    console.error(`CUA_INDEX_CUON_VIEC_LANE_KHAC: commit dưới nhãn "${as}" đang mang ${la.length} đường dẫn của lane khác.`);
+    console.error(`CUA_INDEX_CUON_VIEC_LANE_KHAC: commit dưới nhãn "${toi}" đang mang ${la.length} đường dẫn của lane khác.`);
     for (const x of la) {
       const chu = x.chuFile ? `file do "${x.chuFile}" khoá` : `vùng ${x.vung} do "${x.chuVung}" giữ`;
       console.error(`  ✗ ${x.duongDan} — ${chu}`);
     }
     console.error("");
     console.error("Một cây làm việc có ĐÚNG MỘT index, nên `git add` của họ nằm trong mẻ commit của bạn.");
-    console.error(`Cách xử: commit đúng phần của mình — git commit --only ${la.length ? "<đường dẫn của bạn>" : ""}`);
+    console.error("Cách xử: commit đúng phần của mình — git commit --only <đường dẫn của bạn>");
     console.error("Hoặc bỏ phần của họ ra: git restore --staged <đường dẫn ✗>  (KHÔNG xoá nội dung của họ)");
     process.exit(EXIT.REFUSED);
   }
@@ -841,8 +908,12 @@ async function main() {
     }
     let daDan = [];
     try {
-      daDan = execFileSync("git", ["diff", "--cached", "--name-only"], { cwd: ROOT, encoding: "utf8" })
-        .split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean);
+      /* `-z` và KHÔNG `trim` — cùng lớp bệnh vòng audit 10/09 nêu ở `--cua-index`: `--name-only`
+         trần thì git TRÍCH DẪN đường dẫn ngoài ASCII, và tên đã trích dẫn không khớp hàng nào
+         trong bảng quyền, nên file CÓ CHỦ đọc thành VÔ CHỦ. Vá cả hai cửa cùng lượt: để một cửa
+         đọc kiểu này, cửa kia kiểu khác là dựng lại đúng chỗ vừa vá. */
+      daDan = execFileSync("git", ["-c", "core.quotepath=false", "diff", "--cached", "--name-only", "-z"], { cwd: ROOT, encoding: "utf8" })
+        .split(String.fromCharCode(0)).filter(Boolean);
     } catch (e) {
       console.error(`KHONG_DO_DUOC_INDEX: ${String(e.message).split(String.fromCharCode(10))[0]}`);
       process.exit(EXIT.REFUSED);

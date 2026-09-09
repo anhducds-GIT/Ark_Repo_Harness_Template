@@ -52,6 +52,30 @@ van, roi got token o cho TRUNG THAT — `STATUS.md` co hai truong noi cung mot c
 **Bai hoc mang di:** nen van xuoi de vua ngan sach la doi mot lop bao ve lay may token. Got o
 cho TRUNG, dung got o cho NGAN.
 
+### VONG AUDIT DOC LAP tra REVISE — bon cho, ca bon deu DUNG (ban 1.8.9)
+
+Tu dung lai tung ca roi moi tin (luat vang 4). **Ca bon la fail-open THAT** trong ban 1.8.8:
+
+| Ma | Ca hong | Va |
+|---|---|---|
+| `CUA_INDEX_AMEND_BYPASS` | commit KHONG nhan (cua im lang) -> `--amend` them nhan cua minh; index bang HEAD nen me RONG -> cua cho qua. **Cong khong thay gi la vi nhan da co** | me rong thi soi lai noi dung so `HEAD^` |
+| `CUA_INDEX_PATH_LOSS` | git TRICH DAN duong dan ngoai ASCII -> file CO CHU doc thanh VO CHU | `-z` + `core.quotepath=false`, ca hai cua |
+| `CUA_INDEX_LANE_AMBIGUOUS` | hook tu doc nhan bang `sed` = bo doc THU HAI; `lane: A` + `Lane: B` lot cua duoi ten A roi duoc cong quy cho B | hook chuyen FILE loi nhan; dung `laneFromMessage` |
+| `CUA_INDEX_ACTIVATION_GAP` | cong chi hoi "file hook co ton tai khong" -> **xoa file hook la cong XANH** | tach "repo theo doi ma file mat" (DO) khoi "repo chua nhan cua" (bo qua) |
+
+**BA TRONG BON CHO LA CUNG MOT LOI: toi tu viet BAN THU HAI cua mot thu da co** — bo doc nhan,
+cach doc ten file tu index, cach hoi "cua co do khong". Luat muc 8 da noi truoc (*mot khai niem
+mot nha*) va toi van lam, vi bo doc `sed` ba dong "trong nhu" khong phai mot bo doc.
+
+**Bai hoc mang di:** truoc khi viet mot doan doc/phan tich gi, hoi **da co ai doc thu nay chua**.
+Hom qua bai hoc la "va ba lan cung mot cho = va sai tang"; hom nay la hinh dang som hon cua no —
+dung nguon su that thu hai NGAY LUOT DAU.
+
+Phep ghim: 8 -> **12 ve**, **9 dot bien, 9 luot DO**. Ghi ca MOT dot bien XANH: bo `-z` ma giu
+`core.quotepath=false` thi ve van xanh, va nguoc lai — hai cai moi cai tu du. Nen ve do ghim
+"co it nhat mot trong hai", khong ghim `-z` la thu chiu luc. Noi sai cho chiu luc la de phien
+sau go dung cai dang do.
+
 ### Con ho, mang theo ca ve nay
 
 Cua chi thay thu **da khai vao bang quyen**. Hai lane deu khong nhan khoa thi khong lop nao biet

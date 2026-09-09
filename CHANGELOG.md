@@ -3,6 +3,34 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.9 — 2026-09-10 — Vòng audit độc lập trả REVISE, và cả bốn chỗ đều đúng
+
+Bản 1.8.8 cắt xong thì đưa audit độc lập. Kết luận **`REVISE`**, bốn chỗ. Tự dựng lại từng ca rồi
+mới tin (luật vàng 4) — **cả bốn là fail-open THẬT** trong bản của tôi.
+
+| Mã | Ca hỏng dựng lại được | Vá |
+|---|---|---|
+| `CUA_INDEX_AMEND_BYPASS` | commit KHÔNG nhãn (cửa im lặng, cố ý) → `git commit --amend` thêm nhãn của mình. Index bằng HEAD nên mẻ RỖNG → cửa cho qua. Commit cuối mang tên tôi, chứa việc lane khác, **cổng không thấy gì lạ vì nhãn đã có** | mẻ rỗng thì soi lại nội dung so `HEAD^` |
+| `CUA_INDEX_PATH_LOSS` | git TRÍCH DẪN đường dẫn ngoài ASCII, tên trích dẫn không khớp bảng quyền → file CÓ CHỦ đọc thành VÔ CHỦ | `-z` + `core.quotepath=false`, không `trim`, ở CẢ hai cửa |
+| `CUA_INDEX_LANE_AMBIGUOUS` | hook tự đọc nhãn bằng `sed` = bộ đọc THỨ HAI. `lane: A` + `Lane: B` lọt cửa dưới tên A rồi được cổng quy cho B | hook chuyển FILE lời nhắn; dùng `laneFromMessage`. Nhãn không quy thuộc được → TỪ CHỐI |
+| `CUA_INDEX_ACTIVATION_GAP` | cổng chỉ hỏi *"file hook có tồn tại không"* → **xoá file hook là cổng XANH** | tách *"repo theo dõi mà file mất"* (ĐỎ) khỏi *"repo chưa nhận cửa"* (bỏ qua) |
+
+**BÀI HỌC TẦNG, không phải bài học dòng:** ba trong bốn chỗ là **tôi tự viết bản thứ hai của một
+thứ đã có** — bộ đọc nhãn, cách đọc tên file từ index, cách hỏi *"cửa có đó không"*. Cùng họ với
+bài học hôm qua *"vá ba lần cùng một chỗ = vá SAI TẦNG"*, chỉ khác hình dạng: lần này không phải
+vá ba lần, mà là **dựng một nguồn sự thật thứ hai ngay lượt đầu**. Luật mục 8 đã nói trước — *một
+khái niệm một nhà* — và tôi vẫn làm, vì bộ đọc `sed` ba dòng "trông như" không phải một bộ đọc.
+
+**Hai chỗ Codex nêu mà tôi KHÔNG sửa, kèm lý do:** ⑴ *"khoá file thuộc A, vùng thuộc B thì B qua"*
+— trạng thái đó không dựng nổi bằng lệnh (`khoaFileTrongVung` là CHIỀU HAI của luật chứa nhau,
+đã ghim ở `tests/khoa-file.mjs`); ⑵ *"lane không gọi `--sua`, không chạy cổng"* — đúng, nhưng
+không máy nào với tới: lane đó bỏ qua mọi lớp, đây là đường bỏ-qua-hết chứ không phải đường lách.
+
+`tests/cua-index.mjs`: 8 → **12 vế**, **9 đột biến đã chạy, 9 lượt ĐỎ**. Ghi thêm MỘT đột biến
+XANH vì nó nói điều khác: bỏ `-z` mà giữ `core.quotepath=false` thì vế vẫn xanh, và ngược lại —
+hai cái mỗi cái tự đủ, ca hỏng cần thiếu CẢ HAI. Nên vế đó ghim *"có ít nhất một trong hai"*,
+không ghim `-z` là thứ chịu lực. Nói sai chỗ chịu lực là để phiên sau gỡ đúng cái đang đỡ.
+
 ## 1.8.8 — 2026-09-10 — CỬA INDEX: `git commit` của bạn thôi cuốn được việc lane khác (KHUNG-59)
 
 **Ca hỏng thật, hai lượt trong một ngày, hai chiều, hai lane.** Một cây làm việc git có ĐÚNG MỘT
