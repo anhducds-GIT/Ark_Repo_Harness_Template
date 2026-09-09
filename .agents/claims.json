@@ -39,5 +39,15 @@
       "task": "context compiler",
       "released_at": "2026-09-09T06:55:51.503Z"
     }
+  },
+  "tam": {
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:58:01.256Z"
+    },
+    "docs/archive/HANDOFF-2026-09-5.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:58:01.256Z"
+    }
   }
 }
