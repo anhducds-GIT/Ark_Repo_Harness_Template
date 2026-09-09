@@ -40,75 +40,23 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "4cea5fcfc59c303f",
+  "_fingerprint": "1dd77d104086187a",
   "tam": {
-    ".githooks/commit-msg": {
+    "scripts/init-repo.mjs": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:23:26.792Z"
+      "luc": "2026-09-09T20:49:19.168Z"
     },
-    "scripts/claim.mjs": {
+    "scripts/upgrade.mjs": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:23:26.792Z"
+      "luc": "2026-09-09T20:49:19.168Z"
     },
-    "scripts/session-check.mjs": {
+    "tests/template-null-repo.mjs": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:23:26.792Z"
-    },
-    "tests/cua-index.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:23:26.792Z"
-    },
-    "BACKLOG.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:30:59.888Z"
-    },
-    "CHANGELOG.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:30:59.888Z"
-    },
-    "docs/BAN-DO-CHI-TIET.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:30:59.888Z"
+      "luc": "2026-09-09T20:49:19.168Z"
     },
     "HANDOFF.md": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:30:59.888Z"
-    },
-    "STATUS.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:02.370Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "template/.githooks/commit-msg": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "template/scripts/claim.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "template/scripts/session-check.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
-    },
-    "template/tests/cua-index.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:32:31.708Z"
+      "luc": "2026-09-09T20:53:55.395Z"
     }
   }
 }

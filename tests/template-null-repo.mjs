@@ -88,6 +88,11 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
     gitAt("config", "user.name", "Khoi A Fixture");
     gitAt("config", "user.email", "khoi-a@example.invalid");
     gitAt("config", "core.autocrlf", "false");
+    /* BẬT CỬA INDEX như một repo thật. `init-repo.mjs` và `upgrade.mjs` đều bật nó ngay lúc
+       dựng/nâng, nên fixture không bật là fixture dựng một repo KHÔNG TỒN TẠI — và cả Khối A đỏ
+       vì `CUA_INDEX_TAT`, một lý do không liên quan tới thứ nó định đo. Lần thứ ba cùng hình
+       dạng (hai lần trước: bảng tra tách hai file, và `harness-smoke`). */
+    gitAt("config", "core.hooksPath", ".githooks");
     gitAt("add", ".");
     gitAt("commit", "-q", "-m", "baseline fixture");
     execFileSync(process.execPath, [join(tempRoot, "scripts", "build-dashboard.mjs")], { cwd: tempRoot, encoding: "utf8" });

@@ -76,6 +76,18 @@ Phep ghim: 8 -> **12 ve**, **9 dot bien, 9 luot DO**. Ghi ca MOT dot bien XANH: 
 "co it nhat mot trong hai", khong ghim `-z` la thu chiu luc. Noi sai cho chiu luc la de phien
 sau go dung cai dang do.
 
+### Cho thu ba: MANG mot co che sang ma khong BAT no
+
+Suite `template-null-repo` DO ngay sau ban 1.8.9, va no dung: fixture dung mot repo tu ban trich
+nen repo do CO file `.githooks/commit-msg`, ma khong ai dat `core.hooksPath` — cong DO
+`CUA_INDEX_TAT`. **Do la trang thai that cua moi repo dich sau khi nang.** Mang mot co che sang
+ma khong bat no la mang mot co che DA TAT, trieu chung y het luc chua mang gi.
+
+Va o ba cho, khong o mot: `init-repo.mjs` bat luc DUNG · `upgrade.mjs` bat luc NANG (va NEU TEN,
+khong ghi de, neu repo dich da tro hooksPath di noi khac) · `claim.mjs --sua` bat luc GHI. Fixture
+cung bat, vi khong bat la fixture dung mot repo KHONG TON TAI — lan thu ba cung hinh dang trong
+repo nay.
+
 ### Con ho, mang theo ca ve nay
 
 Cua chi thay thu **da khai vao bang quyen**. Hai lane deu khong nhan khoa thi khong lop nao biet

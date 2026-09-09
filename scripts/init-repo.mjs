@@ -159,6 +159,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   git("add", "-A");
   git("commit", "-q", "-m", `sinh trang lan dau${lane}`);
 
+  /* BẬT CỬA INDEX NGAY LÚC DỰNG. `core.hooksPath` là cấu hình MỖI BẢN SAO nên nó không theo git
+     được — và một cơ chế chưa bật thì triệu chứng y hệt lúc chưa có nó. `claim.mjs --sua` cũng
+     tự bật, nhưng đường đó chỉ đi qua khi có người GHI; repo vừa dựng mà chạy cổng trước khi ghi
+     gì thì ĐỎ oan, và một cổng chặn oan ở repo người khác là một cổng bị tắt. */
+  const cuaIndexBat = fs.existsSync(path.join(root, ".githooks", "commit-msg"));
+  if (cuaIndexBat) git("config", "core.hooksPath", ".githooks");
+
   let bootstrap = "";
   let sach = true;
   try {
@@ -173,7 +180,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   console.log(`${NL}  tên repo    : ${ten}`);
   console.log(`  file         : ${files.size}`);
   console.log(`  phụ lục nghề : ${giuPhuLucNghe ? "GIỮ bản mẫu (tự động hoá trình duyệt)" : "bỏ — viết cái của bạn theo docs/_TEMPLATE-annex.md"}`);
-  console.log(`  cổng cấu trúc: ${tongKet}${NL}`);
+  console.log(`  cổng cấu trúc: ${tongKet}`);
+  console.log(`  cửa index    : ${cuaIndexBat ? "ĐÃ BẬT (core.hooksPath = .githooks)" : "không có .githooks/commit-msg"}${NL}`);
   console.log("  Ba việc kế tiếp, theo đúng thứ tự:");
   console.log("    1. Sửa mục 6 của AGENTS.md — bản đồ file của RIÊNG repo bạn");
   console.log("    2. Khai `units` và `areas` trong .repo-structure.json cho khớp hình dạng repo");

@@ -512,5 +512,21 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   if (Object.keys(giuLai).length) {
     console.log(`${Object.keys(giuLai).length} file ĐÃ BỎ vẫn còn ở repo — ghi vào khối \`retired\` của sổ ghim, chưa xoá.`);
   }
+  /* BẬT CỬA INDEX Ở REPO ĐÍCH. `core.hooksPath` là cấu hình MỖI BẢN SAO nên nó KHÔNG đi theo
+     file — mang `.githooks/commit-msg` sang mà không bật là mang một cơ chế đã tắt, và triệu
+     chứng y hệt lúc chưa mang gì. Repo đích nào đã trỏ hooksPath đi nơi khác thì NÊU TÊN, không
+     ghi đè: đó có thể là hook của chính họ, và cổng đóng phiên bên đó sẽ nói tiếp. */
+  if (fs.existsSync(path.join(repo, ".githooks", "commit-msg"))) {
+    let troToi = "";
+    try { troToi = execFileSync("git", ["config", "--get", "core.hooksPath"], { cwd: repo, encoding: "utf8" }).trim(); } catch { /* chưa đặt */ }
+    if (troToi === ".githooks") console.log("Cửa index: đã bật từ trước.");
+    else if (troToi) console.log(`⚠ Cửa index KHÔNG bật được: core.hooksPath ở repo đích đang trỏ "${troToi}". Hỏi chủ repo trước, đừng ghi đè.`);
+    else {
+      try {
+        execFileSync("git", ["config", "core.hooksPath", ".githooks"], { cwd: repo, stdio: "ignore" });
+        console.log("Cửa index: ĐÃ BẬT (core.hooksPath = .githooks) — chặn `git commit` cuốn theo file lane khác.");
+      } catch (e) { console.log(`⚠ Cửa index không bật được: ${String(e.message).split(NL)[0]}`); }
+    }
+  }
   console.log(`Bước kế ở repo đích: chạy \`npm test\`, rồi cổng đóng phiên.${NL}`);
 }
