@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { behaviourGlobsFrom, DEFAULT_UNITS, FILE_HANH_CHINH, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, tenMaySinhFrom, tenTrangFrom, unitsFrom } from "./repo-structure.mjs";
+import { behaviourGlobsFrom, DEFAULT_UNITS, generatedFrom, profileFrom, repoIdentityFrom, STRUCTURE_FILE, tenMaySinhFrom, tenTrangFrom, unitsFrom } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -437,9 +437,7 @@ function duoiTuGlob(globs) {
    `fa7e8a7` chạm ĐÚNG MỘT file là `claims.json`, và bộ đếm nhảy 4 → 5.
    Luật mục 1 của `AGENTS.md` đã miễn file này khỏi luật khoá vùng vì cùng lý do — "nhận/trả
    quyền là thao tác hành chính". Đây chỉ là cho phép đo trùng với luật đã viết. */
-// Nhà của khái niệm ở `repo-structure.mjs` (`FILE_HANH_CHINH`) — `chay-test.mjs` cũng đọc
-// chính danh sách đó. Hai bản cạnh nhau thì lệch được; một hằng dùng chung thì không.
-const HANH_CHINH = new Set(FILE_HANH_CHINH);
+const HANH_CHINH = new Set([".agents/claims.json"]);
 
 export function isBehaviourFile(file, opts = {}) {
   const normalized = String(file).replaceAll("\\", "/");
