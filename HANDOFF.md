@@ -505,3 +505,34 @@ nó gộp *thiếu bộ máy* với *bộ máy bản cũ* thành một mức, n�
 
 Bản **1.3.91**. Còn chờ Đức: ngân sách tài liệu · số phép kiểm · `KHUNG-6` · `37` · `40`.
 <!-- HANDOFF-THANG: 2026-09 -->
+
+### 2026-09-09 (11) · harness-loi-01 · Bốn chốt của Đức: đóng 2 mục, gộp 32 phép kiểm còn 25
+
+**Đức chốt bốn việc.** Hai đóng ngay, một làm xong, một còn đang đo.
+
+**`KHUNG-6` ĐÓNG** — Đức chọn *ghi rõ giới hạn*, không siết bằng chữ ký. `MULTIFLOW.md` nay có mục
+nói thẳng: bốn cơ chế chống **giẫm chân do vô ý**, KHÔNG chống **mạo danh cố ý**; cả bốn chốt quy
+trách nhiệm chỉ so chuỗi. Cái hại thật nó chặn: ai đó đọc chúng như một lớp bảo mật.
+
+**`KHUNG-30` ĐÓNG** — Đức chốt để nguyên, không nâng. Nhánh repo đích đã hết lệch (0 sau/63 trước)
+nhưng luật *Cloud Sync Hold* của chính nó vẫn chặn, và phiên ở đó **DỪNG đúng luật** — hành vi ĐÚNG.
+
+**Phép kiểm 32 → 25, bằng GỘP chứ không xoá.** Xếp hạng xong thì thấy không cần xoá cái nào: sáu
+cặp trả lời **cùng một câu hỏi** bằng hai mục riêng — trùng ở lớp BÁO CÁO, không phải hai lớp bảo vệ.
+Cổng phiên **16 → 12** (ai đứng tên · vùng chỉ-thêm · HANDOFF · ngân sách). Dãy B **16 → 13** (B8
+nuốt B13 và nay nhận CẢ danh sách artifact đọc từ cấu hình; B2 nuốt B5+B7). Bất biến của hàm gộp:
+**một con đỏ thì cả mục ĐỎ**, và lời nhắn nêu đích danh phép đo con — đã kiểm trên hai mục đỏ thật.
+**Cái mất, nói thẳng:** danh sách chặn nay bật/tắt được cả cụm B2, không bật riêng B5/B7.
+
+**Ba phép ghim gãy vì việc gộp, và cả ba gãy cùng một lý do:** chúng khoá vào **cú pháp đăng ký**
+(`check("<tên mục>"`) chứ không vào hành vi. Đúng bài học `KHUNG-47`. Đã neo lại vào tên hàm, và
+thêm một vế *"mất đối tượng đo"* để lần sau đổi cách viết thì nó ĐỎ chứ không xanh rỗng.
+
+**Kho chữ:** trả giá cho mục `KHUNG-6` mới thêm bằng cách dọn `HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md` —
+hàng đợi 3 việc **đã đóng cả 3**, bảng số đo ở bản 1.3.19 (nay 1.3.9x) đã bỏ, giữ lại KẾT LUẬN. Và
+**hai hàng sai**: nó ghi `handoffCapFrom`/`tran_byte_moi_muc` là *"bộ khung KHÔNG lấy"* — sai từ khi
+ADR-0011 vào; `canDayTruocKhiTra` ghi *"nhận sau"* — đã nhận 07/09. Kho chữ giữ **3.185/3.185**.
+
+**Còn chờ Đức:** ngân sách tài liệu (3.602/2.200) — anh muốn xem bản xếp hạng trước khi quyết.
+`KHUNG-37` (giết tiến trình nền, 22 tiến trình `node`, cũ nhất 10,1h) · `KHUNG-14` (mở một phiên AI
+ở repo đã migrate) · `KHUNG-40` (số đã đo lại, chờ anh đặt trần).

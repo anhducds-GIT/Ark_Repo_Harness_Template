@@ -53,20 +53,16 @@ Vùng nào có những khoá gì thì khai ở `.repo-structure.json`, khối `a
 
 ### Giới hạn: bốn cơ chế này KHÔNG phải một lớp bảo mật
 
-**Chúng chống GIẪM CHÂN DO VÔ Ý giữa các phiên hợp tác. Chúng KHÔNG chống MẠO DANH CỐ Ý.** Đức
-chốt 09/09 sau audit độc lập 05/09 — ghi rõ giới hạn, không siết bằng chữ ký. Cả bốn chốt quy
-trách nhiệm đều **chỉ so chuỗi**, không có gì chứng minh người chạy đúng là người họ khai:
+**Chúng chống GIẪM CHÂN DO VÔ Ý. Chúng KHÔNG chống MẠO DANH CỐ Ý.** Đức chốt 09/09 sau audit độc
+lập: ghi rõ giới hạn, không siết bằng chữ ký. Cả bốn chốt quy trách nhiệm **chỉ so chuỗi** —
+**trả quyền** chỉ kiểm `--as` khớp `owner` (biết tên phiên A là chạy được `--release … --as A`) ·
+**quy chủ commit** chỉ dựa vào dòng chữ `Lane:` ai cũng gõ được · **commit thiếu nhãn** chỉ bị nhắc
+rồi quy về chủ vùng hiện tại, nên sau khi vùng đổi chủ thì commit cũ **bị quy cho người mới** ·
+**báo cáo của phiên nhận việc** là lời tự khai (ca thật 05/09: khai ba mã thoát `2/1/1`, đo lại cả
+ba exit 0).
 
-- **Trả quyền** chỉ kiểm `--as` có khớp `owner`. Biết tên phiên A là chạy được `--release … --as A`.
-- **Quy chủ commit** chỉ dựa vào dòng chữ `Lane:` trong thông điệp — ai cũng gõ được dòng đó.
-- **Commit thiếu nhãn** chỉ bị cảnh báo, rồi quy về chủ vùng hiện tại; nên sau khi vùng đổi chủ,
-  commit cũ không nhãn **bị quy cho người mới**.
-- **Báo cáo của phiên nhận việc** là lời tự khai. Ca thật 05/09: khai ba lệnh thoát `2/1/1`, đo
-  lại cả ba exit 0.
-
-Đọc chúng như một lớp bảo mật là hiểu sai công dụng, và **hiểu sai theo chiều nguy hiểm**: tin
-vào thứ không bảo vệ mình. Chống mạo danh thật cần chữ ký — một hạng mục khác hẳn về quy mô, và
-Đức đã cân nhắc rồi quyết chưa làm. Đối tượng đe doạ ở đây là **nhầm lẫn**, không phải kẻ tấn công.
+Đọc chúng như một lớp bảo mật là hiểu sai **theo chiều nguy hiểm**: tin vào thứ không bảo vệ mình.
+Đối tượng đe doạ ở đây là **nhầm lẫn**, không phải kẻ tấn công.
 
 ## 3. Một ngày làm việc — năm bước
 

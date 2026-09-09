@@ -3,41 +3,75 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T04:03:25.873Z",
-      "task": "dong cac khung",
-      "released_at": "2026-09-09T04:10:20.772Z",
+      "claimed_at": "2026-09-09T04:53:19.397Z",
+      "task": "gop phep kiem",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T04:03:25.942Z",
-      "task": "dong cac khung",
-      "released_at": "2026-09-09T04:10:20.894Z",
+      "claimed_at": "2026-09-09T04:53:19.487Z",
+      "task": "gop phep kiem",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T04:03:26.004Z",
-      "task": "dong cac khung",
-      "released_at": "2026-09-09T04:10:21.003Z",
+      "claimed_at": "2026-09-09T04:53:19.588Z",
+      "task": "gop phep kiem",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T04:03:26.074Z",
-      "task": "dong cac khung",
-      "released_at": "2026-09-09T04:10:21.130Z"
+      "claimed_at": "2026-09-09T04:53:19.664Z",
+      "task": "gop phep kiem",
+      "released_at": null
+    }
+  },
+  "tam": {
+    "docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "template/docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:04:00.801Z"
     }
   }
 }
