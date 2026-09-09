@@ -148,6 +148,32 @@ export function docBanDo(luat) {
     .filter((c) => c.length >= 2 && c[0]);
 }
 
+/* Bản đồ ĐẦY ĐỦ: file khai ở `docs.file_map`. Định dạng khác bảng — mỗi mục là `### <khi nào>`
+   rồi một đoạn văn — nên đọc riêng, không dùng lại bộ đọc bảng. */
+export function banDoKhaiTu(rawJson) {
+  /* Đọc từ CHỮ THÔ, không đòi đối tượng đã parse: bộ sinh chỉ có `doc()` đọc theo HEAD, và cấu
+     trúc đã parse nằm ở một hàm khác. Hỏng JSON thì trả null — bảng vẫn dựng được, chỉ mất phần
+     bản đồ đầy đủ, và cổng cấu trúc mới là chỗ báo JSON hỏng. */
+  try {
+    const v = JSON.parse(rawJson || "{}")?.docs?.file_map;
+    return (typeof v === "string" && v.trim()) ? v.trim() : null;
+  } catch { return null; }
+}
+export function docBanDoChiTiet(text) {
+  if (!text) return [];
+  const dong = String(text).split(CR).join("").split(NL);
+  const ra = [];
+  let ten = null;
+  let than = [];
+  for (const d of dong) {
+    const m = /^###\s+(.+)$/.exec(d);
+    if (m) { if (ten) ra.push([ten, than.join(" ").trim()]); ten = m[1].trim(); than = []; continue; }
+    if (ten) than.push(d);
+  }
+  if (ten) ra.push([ten, than.join(" ").trim()]);
+  return ra.filter((c) => c[0] && c[1]);
+}
+
 /* Nhật ký: mỗi khối `## <bản> — <ngày> — <một câu>`. Bản đầu mở sẵn, các bản cũ gập lại — người
    xem quan tâm "vừa đổi gì", không phải toàn bộ lịch sử. */
 /* VIỆC ĐÃ XONG 100% — đọc từ sổ nợ, mục có mã BỊ GẠCH (`### ~~MÃ~~ · …`).
@@ -2299,7 +2325,11 @@ export async function gomDuLieu() {
     // không biết trước bao giờ có người mở nó.
     ngay: headDate,
     lenh: Object.entries(pkg.scripts || {}),
-    banDo: docBanDo(doc("AGENTS.md")),
+    /* BẢN ĐỒ = chỉ mục mỏng ở `AGENTS.md` mục 6 CỘNG bản ĐẦY ĐỦ đã khai ở `docs.file_map`.
+       Tách 09/09 (token nạp 13.800 -> 5.660) đẩy 43 mục sang bản đầy đủ; đọc mỗi hiến pháp thì
+       bảng của Đức mất 43 dòng bản đồ và mất luôn khối *Trang liên quan* — `overview-smoke` bắt
+       đúng chỗ đó. Bảng cho NGƯỜI ĐỌC thì phải thấy bản đầy đủ; chỉ phần NẠP mới cần mỏng. */
+    banDo: [...docBanDo(doc("AGENTS.md")), ...docBanDoChiTiet(doc(banDoKhaiTu(doc(".repo-structure.json"))))],
     trangCo: new Set(lietHTML()),
     workflows, protocols, adrs, nhatKy, daXong, briefs, dichDen,
     ideas, canDuc, khoa, noMo, noMuc, coChe, batBien, vung, fileGoc, hoSo, laRepoNha,
