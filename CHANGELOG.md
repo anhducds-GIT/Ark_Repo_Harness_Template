@@ -3,6 +3,46 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.3 — 2026-09-10 — Audit độc lập bắt được một FAIL-OPEN của 1.8.2, và nó chỉ nổ ở repo TIÊU THỤ
+
+**Bản này tồn tại vì audit độc lập làm đúng việc của nó.** 1.8.2 vá chỗ cổng gọi một suite xanh là
+ĐỎ. Cách nó nhận ra "suite xanh" là khớp `/(\d+) passed, 0 failed, \d+ total/` — **một dòng tổng
+bất kỳ**. Ở repo NHÀ vô hại: bộ chạy chỉ in dòng đó khi cả chuỗi xanh, và mọi lượt đỏ đều in
+`── <suite> (mã N) ──`.
+
+**Nhưng cổng này ĐƯỢC PHÁT ĐI, và ở repo tiêu thụ `scripts.test` là runner KHÁC** — jest, vitest,
+script riêng. Ca hỏng đã dựng và đo: một runner in
+
+```text
+PASS  du-an-1
+12 passed, 0 failed, 12 total
+FAIL  du-an-2
+```
+
+rồi thoát 1, **không có tiêu đề `──` nào** → bản 1.8.2 hạ một suite **ĐỎ THẬT** xuống BỎ. Đúng
+hướng fail-OPEN, tức hướng nặng.
+
+**Vá:** cổng chỉ tin **bằng chứng DƯƠNG của chính bộ chạy** — hậu tố `— SUITE XANH` (chỉ
+`chay-test.mjs` in, và chỉ khi CẢ chuỗi xanh) **và** không có chuỗi `SUITE ĐỎ`. Runner lạ không in
+hậu tố đó nên rơi về ĐỎ.
+
+**Hai chỗ nữa audit nêu, đều là hướng fail-open, đều đã chặn:**
+
+- `nhanHopLe` dùng `[].every(Boolean)` → trả `true` cho Set RỖNG, tức *"quy thuộc được"* khi không
+  nhãn nào đứng tên. Hôm nay không tới được (chỗ điền Map luôn `.add` ngay sau `set`), nhưng thêm
+  `size > 0` là một token. Không có fixture — **không dựng nổi ca hỏng**, và điều đó được ghi thành
+  chữ ngay tại chỗ thay vì để lượt sau tưởng đã có phép kiểm.
+- `rootMine` / `rootTouched`: **đã xoá**. Chỗ dùng duy nhất là `rootIsMine`, biến không ai đọc.
+  Audit nêu nó như một chỗ nghĩa có thể lệch sau khi `myRootAreas` được nới — nghĩa của code chết
+  thì không lệch được, nên đường rẻ nhất là xoá.
+
+Ghim: `dau-suite-smoke.mjs` **16 → 17 vế**. Đột biến: trả điều kiện về đúng nghĩa 1.8.2 → vế mới
+ĐỎ với câu *"đây là FAIL-OPEN"*.
+
+**Audit KHÔNG ký nghiệm thu.** Nguyên văn ba câu: *"chưa đủ bằng chứng để nghiệm thu"* — vì sandbox
+Codex trên máy này không đọc được repo, nên nó chỉ thấy `git diff` chứ không thấy thân các phép
+kiểm. `KHUNG-15` và `KHUNG-53` vẫn **MỞ**. Hai chỗ nó nêu mà chưa dựng nổi ca hỏng: `KHUNG-58`.
+
 ## 1.8.2 — 2026-09-10 — `KHUNG-15` tìm ra gốc: dấu xác nhận băm cả bảng quyền, nên 29 phút mất trắng
 
 **Đây là bản đáng phát đi nhất trong ngày**, vì cái nó chữa thu thuế ở **mọi** repo có nhiều hơn

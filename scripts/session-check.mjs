@@ -204,7 +204,12 @@ if (originMainResolves) {
  *   · một nguồn KHÔNG nhãn (hoặc nhãn HỎNG) là đủ để KHÔNG quy thuộc được → vẫn ĐỎ;
  *   · file còn trong CÂY LÀM VIỆC thì chưa commit nào đứng tên nó → vẫn phải có khoá, vẫn ĐỎ.
  * Cả hai vế có ca hỏng dựng sẵn ở `tests/cong-do-that.mjs` khối 1. */
-const nhanHopLe = (file) => nhanCuaFile.has(file) && [...nhanCuaFile.get(file)].every(Boolean);
+/* `size > 0` KHÔNG dư: `[].every(Boolean)` trả `true`, nên một mục Map rỗng sẽ nói "quy thuộc
+   được" khi KHÔNG nhãn nào đứng tên. Hôm nay không tới được (chỗ điền Map luôn `.add` ngay sau
+   khi `set`), nhưng hướng hỏng là fail-OPEN, và audit độc lập nêu đúng chỗ này 10/09. Không có
+   fixture vì không dựng nổi ca hỏng — ghi ra đây để lượt sau đọc được lý do, không phải để tin. */
+const nhanHopLe = (file) => nhanCuaFile.has(file) && nhanCuaFile.get(file).size > 0
+  && [...nhanCuaFile.get(file)].every(Boolean);
 const daQuyThuoc = (file) => !workingFiles.has(file) && nhanHopLe(file);
 // Nhãn của TÔI trên một file đã commit → vùng đó là việc của tôi, dù tôi không giữ khoá vùng nào.
 const nhanCuaToi = (file) => daQuyThuoc(file) && [...nhanCuaFile.get(file)].some((nhan) => nhan === asLabel);
@@ -344,10 +349,10 @@ const orphanRootAreas = ownershipKeys(touchedToiPhaiTraLoi, structure, claimPref
   .filter((k) => k.startsWith("_"))
   .filter((k) => !CLAIMS?.[k] || !CLAIMS[k].owner);
 const foreignRootAreas = rootAreasTouched.filter((k) => ownedBy(k) && ownedBy(k) !== asLabel);
-const rootTouched = rootAreasTouched.length > 0;
-// "Gốc là của tôi" chỉ đúng khi MỌI khoá gốc đã chạm đều của tôi. Một khoá của người khác là
-// đủ để phần đó không phải trách nhiệm của tôi.
-const rootMine = rootTouched && myRootAreas.length === rootAreasTouched.length;
+/* `rootTouched` / `rootMine` ĐÃ XOÁ 10/09. `rootMine` chỉ còn một chỗ dùng là `rootIsMine`, mà
+   biến đó không ai đọc — code chết từ lâu. Audit độc lập nêu nó như một chỗ nghĩa CÓ THỂ lệch sau
+   khi `myRootAreas` được nới; nghĩa của một biến chết thì không lệch được, nên đường rẻ nhất là
+   xoá. Cần lại thì `git log` có. */
 const mine = (file) => myPackages.some((pkg) => file.startsWith(`${pkg}/`))
   || (areaOf(file, claimPrefixes) === "_root" && myRootAreas.includes(keyOf(file)));
 
@@ -396,7 +401,6 @@ const doPhamVi = () => {
   if (orphanRootAreas.length) {
     return { ok: false, msg: `Vùng gốc repo bị sửa nhưng chưa ai đứng tên: ${orphanRootAreas.join(", ")}. Nhận bằng: node scripts/claim.mjs --take ${orphanRootAreas[0]} --as ${asLabel} --task "…"` };
   }
-  const rootIsMine = rootMine;
   // Việc của phiên khác trong cùng thư mục KHÔNG phải lỗi của bạn — báo cho
   // biết rồi loại khỏi mọi phép kiểm sau. Cổng không thể biết ai gõ phím nào;
   // giả vờ biết chỉ tạo ra lời buộc tội sai.
@@ -991,8 +995,22 @@ check("Test xanh", () => {
        * FAIL-CLOSED hai lớp: chỉ hạ xuống `skipped` khi (a) KHÔNG bắt được tên suite đỏ nào, VÀ
        * (b) có dòng tổng xanh tường minh do bộ chạy in ra. Thiếu một trong hai thì giữ ĐỎ như cũ
        * — không đo được thì nói không đo được, đừng đoán về phía nhẹ hơn. */
-      const xanh = raw.match(/(\d+) passed, 0 failed, \d+ total/);
-      if (!ten.length && xanh) {
+      /* ĐÒI DẤU HIỆU CỦA CHÍNH BỘ CHẠY, KHÔNG PHẢI MỘT DÒNG TỔNG BẤT KỲ — audit độc lập bắt
+       * được, 10/09, và đây là lỗi FAIL-OPEN nên nó nặng.
+       *
+       * Bản 1.8.2 khớp `/(\d+) passed, 0 failed, \d+ total/`. Ở repo NHÀ thì vô hại: bộ chạy chỉ
+       * in dòng tổng khi cả chuỗi xanh, và mọi lượt đỏ đều in `── <suite> (mã N) ──`. Nhưng cổng
+       * này ĐƯỢC PHÁT ĐI, và ở repo tiêu thụ `scripts.test` là **runner khác** — jest, vitest,
+       * script riêng. Đo được ca hỏng: một runner in `12 passed, 0 failed, 12 total` cho dự án
+       * thứ nhất rồi `FAIL` dự án thứ hai và thoát 1 → không có tiêu đề `──` nào → bản 1.8.2
+       * HẠ một suite ĐỎ THẬT xuống BỎ.
+       *
+       * Nên hai vế, và cả hai là bằng chứng DƯƠNG của bộ chạy này: hậu tố `— SUITE XANH` (chỉ
+       * `chay-test.mjs` in, và chỉ khi CẢ chuỗi xanh) và KHÔNG có chuỗi `SUITE ĐỎ`. Runner lạ
+       * không in hậu tố đó, nên nó rơi về ĐỎ — đúng chiều fail-closed. */
+      const xanh = raw.match(/(\d+) passed, 0 failed, \d+ total — SUITE XANH/);
+      const coSuiteDo = raw.includes("SUITE ĐỎ");
+      if (!ten.length && xanh && !coSuiteDo) {
         const viSao = (raw.match(/^[A-Z_]{4,}:.*$/m) || ["bộ chạy không nêu lý do"])[0].trim();
         return {
           ok: true,

@@ -787,3 +787,40 @@ find docs -name "*.md" -not -path "docs/adr/*" -not -path "docs/archive/*" \
 ghi số vào mục này), in ra **đúng cùng các con số** như trước khi vá — đối chiếu từng vế với
 `session-check`, không chỉ "trông giống" — và có một phép ghim canh trần thời gian đó, để lần sau
 nó chậm lại thì máy nói chứ không phải người phát hiện sau 10 phút chờ.
+
+
+### KHUNG-58 · Hai chỗ audit độc lập 10/09 NÊU mà chưa dựng nổi ca hỏng
+
+Lượt audit độc lập cho bản 1.8.2 tìm ra **một lỗi thật** (đã vá ở 1.8.3, kèm phép ghim) và nêu
+thêm hai chỗ nó **không kết luận được** vì sandbox không đọc được repo. Ghi ra đây để không ai
+tưởng chúng đã được trả lời — và cũng để không ai vá một thứ chưa có ca hỏng.
+
+**⒜ Hợp đồng của dấu xác nhận với repo TIÊU THỤ chưa được viết ra.** Bản 1.8.3 bỏ
+`.agents/claims.json` khỏi băm cây, với lập luận *"không suite nào phụ thuộc nội dung bảng
+quyền"*. Ở repo NHÀ tôi đã soát và điều đó đúng: mọi suite tự dựng bảng quyền trong fixture của
+nó, và `tests/bang-song.mjs` đọc **mã nguồn** của bộ sinh chứ không đọc bảng thật. Nhưng cổng
+này **được phát đi**, và một repo tiêu thụ hoàn toàn có thể viết một suite đọc
+`.agents/claims.json` trên **đĩa**. Lúc đó một dấu xanh cũ có thể được dùng lại sai.
+
+Audit nói đúng một điều then chốt: `isBehaviourFile(".agents/claims.json") === false` chỉ chứng
+minh **cách phân loại của bộ đếm hành vi**, nó KHÔNG chứng minh suite độc lập với file đó.
+
+**đóng khi:** hoặc ⑴ có một phép kiểm ĐỎ khi một suite của repo đọc `.agents/claims.json` từ đĩa
+(bắt được bằng dò mã nguồn suite, cùng kiểu `bang-song.mjs` khối 7 đã làm), hoặc ⑵ hợp đồng này
+được ghi thành một câu trong `docs/protocols/MULTIFLOW.md` **và** `upgrade.mjs` nêu nó lúc phát.
+Đừng làm cả hai.
+
+**⒝ Một vùng có thể vừa là "phần của bạn" vừa là "của phiên khác" trong cùng một câu.** Sau khi
+`myRootAreas` / `myPackages` nhận thêm đường nhãn `Lane:`, một vùng mà tôi **đã commit** nhưng
+lane khác **đang giữ khoá** rơi vào cả hai rổ. Hệ quả đo được: `doPhamVi` in nó ở *"Phần của
+bạn"* **và** ở *"bỏ qua (của phiên khác)"*.
+
+Không phải lỗ bảo vệ — `mine()` thành `true` là **siết**, không phải nới, nên vùng chỉ-thêm và
+Log HANDOFF soi kỹ hơn. Nhưng nó là một câu **tự mâu thuẫn**, đúng họ bệnh `KHUNG-15`: cổng nói
+sai một cách tự tin thì người đọc tin và đi sai hướng. Biến `rootMine`/`rootTouched` mà audit nêu
+cùng chỗ đã **xoá** ở 1.8.3 — code chết, nghĩa của nó không lệch được.
+
+**đóng khi:** một kho hai lane, lane A commit vào `_docs` rồi lane B nhận khoá `_docs`, và cổng
+của A in vùng đó ở **đúng một** rổ, kèm câu nói rõ *"của tôi, nhưng lane khác đang giữ khoá"*.
+
+Vùng: `_code`.

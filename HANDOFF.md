@@ -791,3 +791,31 @@ biết kiểm. Vế *"đã qua audit độc lập"* của mục 2 **không có p
 
 **Chưa làm, và cố ý:** không force-push, không sửa lịch sử — mục 2 đòi Đức chốt. Bản vá vẫn cần
 audit, chỉ là nay nó là audit **sau khi phát** thay vì trước. Đề bài 7 câu đã soạn sẵn.
+
+### 2026-09-10 (24) · harness-loi-02 · Audit độc lập bắt một FAIL-OPEN của chính bản vá tôi vừa phát
+
+**Codex có lượt lúc 01:11, chạy được đề bài 7 câu. Nó tìm ra MỘT lỗi thật.**
+
+Bản 1.8.2 nhận ra *"suite xanh"* bằng cách khớp **một dòng tổng bất kỳ**. Ở repo nhà vô hại. Nhưng
+cổng **được phát đi**, và ở repo tiêu thụ `scripts.test` là runner khác — jest, vitest, script
+riêng. **Đã tự dựng lại ca hỏng và đo** (luật vàng 4, không tin lời Codex): một runner in
+`12 passed, 0 failed, 12 total` cho dự án 1 rồi `FAIL` dự án 2 và thoát 1, không tiêu đề `──` nào →
+1.8.2 **hạ một suite ĐỎ THẬT xuống BỎ**. Hướng fail-OPEN.
+
+**Vá 1.8.3:** cổng chỉ tin bằng chứng DƯƠNG của chính bộ chạy — hậu tố `— SUITE XANH` và không có
+chuỗi `SUITE ĐỎ`. Ghim: `dau-suite-smoke` **16 → 17 vế**; đột biến trả điều kiện về nghĩa 1.8.2 →
+vế mới ĐỎ. Thêm `size > 0` cho `nhanHopLe` (`[].every(Boolean)` trả `true` — fail-open, hôm nay
+không tới được, và **ghi rõ là không có fixture** thay vì để lượt sau tưởng có). Xoá `rootMine` +
+`rootTouched`: code chết, chỗ dùng duy nhất là `rootIsMine` không ai đọc.
+
+**AUDIT KHÔNG KÝ NGHIỆM THU, và lý do là lỗi của TÔI trong cách giao đề.** Ba câu Codex trả lời
+*"chưa đủ bằng chứng để nghiệm thu"* — vì sandbox nó không đọc được repo, nên nó chỉ thấy
+`git diff`, không thấy thân các phép kiểm nó cần đọc để kết luận. **Lượt sau: nhét cả thân hàm
+liên quan vào stdin, đừng chỉ nhét diff.** Hai chỗ nó nêu mà chưa dựng nổi ca hỏng → `KHUNG-58`.
+
+**Câu 7 tôi cố ý đặt để nó soi chính tôi** — *"quyết định tự bác kế hoạch `TREE_CHANGED → exit 0`
+đúng hay sai"* — Codex trả lời **đúng**: *"suite xanh không chứng minh trạng thái cuối lượt đã được
+kiểm nếu cây đổi giữa chừng"*.
+
+`KHUNG-15` và `KHUNG-53` vẫn **MỞ**. Bản 1.8.1+1.8.2 đã ở trên `origin/main` (xem lượt 23);
+1.8.3 là bản sửa đè lên đó, không phải bản rút lại.

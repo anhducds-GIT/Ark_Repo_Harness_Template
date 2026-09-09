@@ -305,6 +305,36 @@ try {
     write("tests/fixture.mjs", 'console.log("1 passed, 0 failed, 1 total");' + NL);
     git("add", "."); git("commit", "-qm", "tra fixture ve xanh\n\nLane: fixture");
     ok("cổng: suite XANH mà thiếu dấu → BỎ đúng lý do · suite ĐỎ thật → vẫn ĐỎ đúng tên");
+    // ĐỐI CHỨNG THỨ HAI, và no la ca AUDIT DOC LAP bat duoc 10/09 — huong FAIL-OPEN.
+    //
+    // Cong nay DUOC PHAT DI. O repo tieu thu, `scripts.test` la runner KHAC — jest, vitest,
+    // script rieng — va no co the in mot dong dang "N passed, 0 failed, M total" cho mot du an
+    // roi FAIL du an khac va thoat != 0, KHONG co tieu de `── <suite> (mã N) ──` nao.
+    // Ban 1.8.2 khop dong tong BAT KY, nen no ha mot suite DO THAT xuong BO. Ve nay ghim rang
+    // cong chi tin hau to `— SUITE XANH` cua chinh bo chay.
+    write("package.json", JSON.stringify({
+      name: "thu", version: "0.0.1",
+      scripts: { test: "node tests/runner-la.mjs" }
+    }, null, 2));
+    write("tests/runner-la.mjs",
+      'console.log("PASS  du-an-1");' + NL
+      + 'console.log("12 passed, 0 failed, 12 total");' + NL
+      + 'console.log("FAIL  du-an-2");' + NL
+      + 'process.exit(1);' + NL);
+    git("add", "."); git("commit", "-qm", "runner la cua repo tieu thu\n\nLane: fixture");
+    const gl = run("scripts/session-check.mjs", "--as", "fixture");
+    const baoLa = String(gl.stdout) + String(gl.stderr);
+    assert.match(baoLa, /suite gốc repo ĐỎ/,
+      "runner LA thoat != 0 ma in mot dong tong 'xanh' -> KHONG duoc ha xuong BO. Day la FAIL-OPEN.");
+    assert.doesNotMatch(baoLa, /suite gốc repo XANH/, "khong duoc goi la xanh khi runner bao FAIL");
+    assert.equal(gl.status, 1, "phai DO, ma 1");
+
+    write("package.json", JSON.stringify({
+      name: "thu", version: "0.0.1", scripts: { test: "node tests/that.mjs" }
+    }, null, 2));
+    write("tests/that.mjs", 'console.log("1 passed, 0 failed, 1 total");' + NL);
+    git("add", "."); git("commit", "-qm", "tra runner ve\n\nLane: fixture");
+    ok("cổng: runner LẠ của repo tiêu thụ in dòng tổng 'xanh' rồi FAIL → vẫn ĐỎ (fail-closed)");
   }
 } finally {
   assert.ok(path.resolve(fixture).startsWith(path.resolve(os.tmpdir()) + path.sep));
