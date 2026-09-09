@@ -40,7 +40,7 @@ lane dùng **chung một cây làm việc git**, nên chung luôn đĩa, chung i
 
 | Mã | Cái giá ĐO ĐƯỢC |
 |---|---|
-| `KHUNG-59` | chung **index**: `git add` của lane A bị `git commit` của lane B cuốn theo — **2 lần/ngày**, hai chiều |
+| ~~`KHUNG-59`~~ | chung **index** — **ĐÃ VÁ 1.8.9** bằng cửa `.githooks/commit-msg`; chờ một vòng audit sạch rồi gạch mã |
 | `KHUNG-50` | chung **đĩa + HEAD**: dấu xác nhận không ghi được → 3 lượt đủ bộ **29 phút**, 0 dấu |
 | `KHUNG-55` | chung **đĩa**: lane khác sửa dở một file `docs/` là cổng bạn ĐỎ, và lời nhắn **nói sai tên người** |
 | `KHUNG-51` | chung **đĩa**: suite đột biến ghi đè file thật đúng lúc lane khác `git add` |
@@ -52,8 +52,8 @@ trong bốn?* Đo rồi mới quyết — vá từng mục là cách một bện
 
 | Mã | Vì sao đứng đây |
 |---|---|
-| `KHUNG-59` | **Đắt và nguy nhất** — nó **quy sai người**, có thể công bố việc dở của lane khác. Ứng viên rẻ: mọi chỗ commit đổi sang `git commit --only <đường dẫn>` |
-| `KHUNG-50` | Nửa còn lại của bài toán tốc độ. 1.8.2 đã bỏ `claims.json` khỏi băm; còn lại là **HEAD đổi giữa lượt** — hợp lệ, nên chữa bằng worktree riêng, không phải nới băm |
+| `KHUNG-50` | **Việc kế.** Nửa còn lại của bài toán tốc độ, và 10/09 nó nổ hai lần trong một phiên: lane khác commit GIỮA LÚC suite chạy → `TREE_CHANGED`, mất dấu sau 461 giây xanh. Chữa bằng worktree riêng, không phải nới băm |
+| ~~`KHUNG-59`~~ | Đã vá 1.8.9 — cửa index. Đọc `CHANGELOG` 1.8.8→1.8.9 trước khi đụng lại: bốn fail-open của vòng audit đều là *tự viết bản thứ hai của một thứ đã có* |
 | `KHUNG-57` | `can-nang` **603 giây**, đắt hơn cả `npm test` |
 | `KHUNG-55` | Thước kho chữ đọc **ĐĨA** thay vì HEAD |
 
