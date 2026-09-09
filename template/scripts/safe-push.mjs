@@ -18,7 +18,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, AUDIT_CHUA_CO, AUDIT_TRAILER, auditFromMessage, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, nguoiDuyetFrom, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
+import { appendOnlyAtEof, AUDIT_CHUA_CO, AUDIT_TRAILER, auditFromMessage, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, nguoiDuyetFrom, nguoiDuyetSaiKhuon, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDauCong, xetDauCong } from "./chay-test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -326,6 +326,13 @@ if (blocked.length && carry) {
 /* MỘT LƯỢT ĐỌC, DÙNG CHUNG. Bản đầu đọc thông điệp hai lần (một cho cảnh báo, một cho cửa) —
    audit độc lập nêu chi phí N tiến trình git; gộp lại thì còn một lượt. */
 const dsNguoiDuyet = nguoiDuyetFrom(structure);
+/* NÊU TÊN SAI KHUÔN, ĐỪNG BỎ IM LẶNG — audit vòng 4. Khai `Duc` hay `nguyen van a` thì tên đó
+   không có hiệu lực, và người khai tưởng mình đã cấp quyền duyệt. Chỉ NÊU, không đổi mã thoát. */
+const saiKhuon = nguoiDuyetSaiKhuon(structure);
+if (saiKhuon.length) {
+  console.log(`${NL}⚠ ${saiKhuon.length} tên trong \`audit.nguoi_duyet\` SAI KHUÔN nên KHÔNG có hiệu lực: ${saiKhuon.join(", ")}`);
+  console.log(`  Tên người duyệt là một thẻ chữ thường: khớp \`^[a-z0-9][a-z0-9._-]*$\`, ví dụ "codex-r04".`);
+}
 const rowsAudit = rows.map((row) => ({ ...row, audit: auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha), dsNguoiDuyet) }));
 const chamCode = rowsAudit.filter((row) => {
   const files = gitQuiet("show", "--name-only", "--format=", row.sha).split(NL).filter(Boolean);

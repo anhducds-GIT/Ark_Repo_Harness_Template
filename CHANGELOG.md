@@ -3,6 +3,37 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.7 — 2026-09-10 — Vòng audit 4 nói *"logic ĐẠT"*, và một chỗ fail-SILENT cuối
+
+**Vòng audit độc lập thứ tư kết luận: *"Logic bản vá: ĐẠT. Không xác định được lỗi bắt buộc sửa
+ngay."*** Nó tự chạy lại parser và báo **27/27 ca đạt kỳ vọng**, và nói thêm một câu đáng giữ:
+*"Không dùng giới hạn đó để buộc thêm một vòng vá chuỗi."*
+
+Bản này làm **đúng một** việc vòng 4 nêu: `nguoiDuyetFrom` bản trước `filter` thẳng, nên repo khai
+`Duc` (hoa) hay `nguyen van a` (có khoảng trắng) thì tên đó **rơi mất không một tiếng nào** —
+người khai tưởng mình đã cấp quyền duyệt, mà thật ra chưa. Không phải lỗ nhận nhầm; nó là chỗ
+**fail SILENT**, và repo này có luật riêng cho đúng chuyện đó.
+
+Nay `safe-push` **nêu đích danh** tên sai khuôn, và **chỉ nêu — không đổi mã thoát**. Không tự
+chuẩn hoá (không tự hạ chữ thường): đoán ý người khai là một cửa khác.
+
+Ghim: khối `Audit:` **9 vế** (thêm vế ⑼ — nêu tên sai khuôn, và cấm nó đổi mã thoát).
+
+**Bốn vòng audit, và đây là hình dạng đường đi — đáng giữ hơn bản thân bản vá:**
+
+| Vòng | Kết luận | Cái nó bắt |
+|---|---|---|
+| 1 | CẦN SỬA | cổng nhận *một dòng tổng bất kỳ* là suite xanh → **fail-open ở repo tiêu thụ** |
+| 2 | CẦN SỬA | `chua-co (dang cho)` → **ĐÃ DUYỆT** |
+| 3 | CẦN SỬA | `pending` · `none` · `todo` → **ĐÃ DUYỆT** |
+| 4 | **logic ĐẠT** | một chỗ fail-silent ở cấu hình |
+
+Ba vòng đầu, mỗi vòng bắt một **fail-open** mà người sửa không tự thấy. Không vòng nào là thừa.
+
+**Giới hạn CÒN NGUYÊN, và vòng 4 xác nhận nó là giới hạn ĐÃ CÔNG BỐ, không phải lỗi:** ai cũng
+viết được `Audit: codex`; danh sách kiểm **tên được phép**, không chứng minh người đó thực sự
+duyệt. Nhãn cũng không ràng buộc với khoảng commit đã soi. Cần `Y-02`.
+
 ## 1.8.6 — 2026-09-10 — `pending` cũng là "đã duyệt": vòng audit thứ ba, và lần này vá GỐC
 
 **Ba vòng audit độc lập mới tới được hình dạng đúng, và hai vòng đầu tôi vá SAI CHỖ.**

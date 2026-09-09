@@ -455,7 +455,7 @@ try {
     gA("add", "-A"); gA("commit", "-qm", "sua them sau audit" + NL + NL + "Lane: fixture" + NL + "Audit: chua-co");
     p = dayA();
     assert.equal(p.status, 1, "commit MOI HON loi go van phai bi chan — khong go duoc thu lam sau");
-    ok("nhãn Audit: 8 vế — không khai→qua · chưa duyệt→CHẶN · `--carry` không mở · đã duyệt→qua · Đức chốt→qua · commit sau GỠ được khai cũ · nhưng KHÔNG gỡ được thứ làm SAU nó · SÁU biến thể fail-OPEN đều CHẶN (kể cả pending/none/ngoài danh sách)");
+    ok("nhãn Audit: 9 vế — không khai→qua · chưa duyệt→CHẶN · `--carry` không mở · đã duyệt→qua · Đức chốt→qua · commit sau GỠ được khai cũ · nhưng KHÔNG gỡ được thứ làm SAU nó · SÁU biến thể fail-OPEN đều CHẶN (kể cả pending/none/ngoài danh sách) · tên khai SAI KHUÔN được NÊU TÊN");
   } finally {
     assert.ok(path.resolve(chaA).startsWith(path.resolve(os.tmpdir()) + path.sep));
     fs.rmSync(chaA, { recursive: true, force: true });

@@ -385,10 +385,24 @@ export function laneFromMessage(text) {
 export const AUDIT_TRAILER = "Audit:";
 export const AUDIT_CHUA_CO = "chua-co";
 
-/** Ai được coi là NGƯỜI DUYỆT — đọc từ `.repo-structure.json`, không đoán từ chữ. */
+/** Ai được coi là NGƯỜI DUYỆT — đọc từ `.repo-structure.json`, không đoán từ chữ.
+ *
+ *  TRẢ CẢ TÊN SAI KHUÔN, KHÔNG BỎ IM LẶNG. Audit vòng 4 nêu: bản đầu `filter` thẳng, nên repo
+ *  khai `Duc` (hoa) hay `nguyen van a` (có khoảng trắng) thì tên đó **rơi mất không một tiếng
+ *  nào** — người khai tưởng mình đã cấp quyền duyệt, mà thật ra chưa. Đây không phải lỗ nhận
+ *  nhầm; nó là chỗ **fail SILENT**, và repo này có luật riêng cho đúng chuyện đó.
+ *  Không tự chuẩn hoá (không tự hạ về chữ thường): đoán ý người khai là một cửa khác. */
 export function nguoiDuyetFrom(structure) {
   const ds = structure?.audit?.nguoi_duyet;
-  return Array.isArray(ds) ? ds.filter((x) => typeof x === "string" && /^[a-z0-9][a-z0-9._-]*$/.test(x)) : [];
+  if (!Array.isArray(ds)) return [];
+  return ds.filter((x) => typeof x === "string" && /^[a-z0-9][a-z0-9._-]*$/.test(x));
+}
+
+/** Tên khai trong `audit.nguoi_duyet` mà SAI KHUÔN, nên không có hiệu lực. Để cổng nêu tên. */
+export function nguoiDuyetSaiKhuon(structure) {
+  const ds = structure?.audit?.nguoi_duyet;
+  if (!Array.isArray(ds)) return [];
+  return ds.filter((x) => typeof x !== "string" || !/^[a-z0-9][a-z0-9._-]*$/.test(x)).map((x) => String(x));
 }
 
 /** Đọc nhãn `Audit:`. **CHỈ một tên trong DANH SÁCH KHAI mới là "đã duyệt"; mọi thứ khác là CHƯA.**

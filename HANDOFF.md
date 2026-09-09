@@ -921,3 +921,73 @@ Cộng bài học lượt (26): *phép ghim chỉ gồm phủ định thì chưa
 
 **Còn mở:** `KHUNG-56` (chờ một vòng audit không tìm thêm lối fail-open) · `KHUNG-58` ·
 `KHUNG-50` (worktree riêng — nửa còn lại của bài toán tốc độ, chưa làm, có lý do ở lượt 25).
+
+### 2026-09-10 (28) · harness-loi-02 · Vòng audit 4: *"logic ĐẠT"* — bản 1.8.7, và cửa audit đóng
+
+**Vòng 4 kết luận: *"Logic bản vá: ĐẠT. Không xác định được lỗi bắt buộc sửa ngay."*** Nó tự chạy
+lại parser, báo **27/27 ca đạt kỳ vọng**, và nói thêm một câu tôi giữ nguyên vào sổ: *"Không dùng
+giới hạn đó để buộc thêm một vòng vá chuỗi."*
+
+Bản 1.8.7 làm **đúng một** việc vòng 4 nêu: `nguoiDuyetFrom` `filter` thẳng, nên repo khai `Duc`
+hay `nguyen van a` thì tên đó **rơi mất không một tiếng nào** — người khai tưởng đã cấp quyền
+duyệt mà chưa. Nay `safe-push` **nêu đích danh**, và **chỉ nêu, không đổi mã thoát**. Ghim vế ⑼.
+
+**BỐN VÒNG AUDIT — hình dạng đường đi, đáng giữ hơn bản thân bản vá:**
+
+| Vòng | Kết luận | Cái nó bắt |
+|---|---|---|
+| 1 | CẦN SỬA | cổng nhận *một dòng tổng bất kỳ* là suite xanh → fail-open ở repo TIÊU THỤ |
+| 2 | CẦN SỬA | `chua-co (dang cho)` → **ĐÃ DUYỆT** |
+| 3 | CẦN SỬA | `pending` · `none` · `todo` → **ĐÃ DUYỆT** |
+| 4 | **logic ĐẠT** | một chỗ fail-silent ở cấu hình |
+
+**Ba vòng đầu, mỗi vòng bắt một FAIL-OPEN tôi không tự thấy.** Không vòng nào thừa. Cả ba lần tôi
+tự dựng lại ca hỏng trước khi tin — có hình dạng không tới được ở repo nhà nhưng tới được ở **repo
+tiêu thụ**, nên vẫn là lỗi thật.
+
+**Hai bài học về CÁCH GIAO ĐỀ, cho phiên sau:** ⑴ sandbox Codex không đọc được repo → phải nhét
+cả **thân hàm**, không chỉ `git diff`; vòng 2 nó nói *"chưa đủ bằng chứng"* đúng vì tôi giao thiếu.
+⑵ đặt một câu bắt nó soi **chính quyết định của tôi** — vòng 2 câu 7 hỏi *"tôi tự bác kế hoạch đã
+hứa với Đức, đúng hay sai?"*, và nó trả lời **đúng**, kèm lý do tôi chưa nghĩ tới.
+
+**Bài học về phép ghim, cộng dồn ba lượt:** vế thành công đòi **mã 0 + chuỗi dương**; vế từ chối
+đòi **đúng thông báo của cửa** (mã 1 một mình không phân biệt chết ở cửa nào); *phép ghim chỉ gồm
+phủ định thì chưa ghim gì*.
+
+**Còn mở:** `KHUNG-58` · `KHUNG-50` (worktree riêng). Giới hạn đã công bố: ai cũng viết được
+`Audit: codex` — danh sách kiểm **tên được phép**, không chứng minh đã duyệt. Cần `Y-02`.
+
+### 2026-09-10 · harness-migrate-3repo · Protocol migrate: 8 → 12 bước, và một bản TRÙNG NHÀ 335 dòng về lưu trữ
+
+**Đức chốt:** lượt migrate làm **90% từ phía repo nhà**, rồi sinh một đề bài bàn giao cho phiên AI
+thường trú của repo đích làm nốt 10% + ghi lịch sử. Rà lại thì protocol **thiếu đúng hai việc anh
+nêu**, grep ra 0 kết quả cho cả `features` lẫn `rule-compiler` trong brief.
+
+**Hai bước mới:**
+
+- **8 · Đo FEATURE, đừng đo FILE.** `assess` đếm file, `features` đếm năng lực, và hai số lệch
+  thật: 09/09 ở `n8n_Local host` `assess` báo **3/3 · 0/0/0** trong khi `features-smoke` ĐỎ vì
+  thiếu `F4.7`. `--apply` không mang nổi vì đó là **nội dung trong một file cấm đè**.
+- **9 · Bốn thước + bàn giao phần PHÁN ĐOÁN qua SỔ.** Trước chỉ có `budget.tokenNap`; nay đủ bốn.
+  Phần cơ học (khai + siết thước) lượt migrate làm hết. Phần nén luật thì **KHÔNG**, ba lý do:
+  `rule-compiler.mjs` đóng `ROOT` vào repo chứa nó nên **không có `--repo`, không chạy từ xa
+  được** · câu nào thừa là phán đoán về NGHỀ của họ · mục 5 cấm người sửa tự nghiệm thu.
+
+**Cách giữ ngữ cảnh mà không đốt lại token:** chạy `--trim`/`--check` **tại repo đích** rồi dán
+nguyên kết quả vào `BACKLOG.md` của họ kèm `đóng khi:`. Ngữ cảnh nằm trong **SỔ**, không nằm
+trong cửa sổ chat — chat biến mất, sổ thì không. Bước **12** sinh đề bài bàn giao bằng
+`--viec onboard`, thứ **đã có sẵn** từ trước; nó chỉ chưa được nối vào cuối lượt migrate.
+
+**Trả giá theo mục 8, và lần này giá dương.** `docs/protocols/CHUYEN-REPO-LEN-CHUAN.md` là **bản
+CŨ của chính brief migrate** — cùng tiêu đề, cùng câu luật nền, cùng "tám bước", số liệu dừng ở
+1.3.9x. Hai câu trả lời cho một câu hỏi. Đã chuyển sang `docs/archive/` kèm `superseded_by`, giữ
+nguyên văn. Bản mới thắng vì **`giao-viec.mjs` sinh đề bài từ nó**.
+
+| | Trước | Sau |
+|---|---|---|
+| brief migrate | 186 dòng · 8 bước | **241 dòng · 12 bước** |
+| brief onboard | 161 dòng | **188 dòng** |
+| kho chữ `docs/` | 3.371 / thước 3.371 (sát mép) | **3.117 / thước 3.117** |
+
+**Việc kế (một việc):** áp bước 8–9–12 ngược lại cho ba repo đã migrate hôm qua — cả ba đều chưa
+có khối `features --migrate` trong hồ sơ, và chưa repo nào được dán kết quả `--trim`.
