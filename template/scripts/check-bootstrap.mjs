@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 
 import { collectModel, createHeadDeps, parseStatus } from "./build-dashboard.mjs";
 import { chuDeKhaiTu, docAdr, soatLuat } from "./rule-compiler.mjs";
-import { readStructureFromDisk } from "./repo-structure.mjs";
+import { generatedFrom, readStructureFromDisk } from "./repo-structure.mjs";
 
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -170,6 +170,30 @@ export function checkStatusCode(model, code) {
   return report(code, meta.level, meta.title, findings);
 }
 
+/* GỘP B2+B5+B7 THÀNH MỘT MÃ — Đức chốt 09/09 (*"giảm xuống 25"*).
+ *
+ * Ba mã cũ là CÙNG MỘT HÀM gọi ba lần với ba mã lỗi của **cùng một bộ kiểm tra** (`validateStatus
+ * Detailed`). Đó là một phép kiểm in ra ba dòng, không phải ba lớp bảo vệ — và mỗi mã lỗi mới của
+ * bộ đó lại đẻ thêm một mã B, tức số phép kiểm phình theo số MÃ LỖI chứ không theo số RỦI RO.
+ *
+ * KHÔNG mất khẳng định nào: mọi finding vẫn giữ `tag` riêng (`NO-SUPERSEDED-BY` · `SCHEMA-V2` ·
+ * `BAD-LIFECYCLE`), nên đỏ vì lý do nào vẫn đọc ra được.
+ *
+ * CÁI MẤT, nói thẳng: `bootstrap.blocking` nay chỉ bật/tắt được CẢ CỤM, không bật riêng từng mã.
+ * Hôm nay cả ba đều đang chặn nên chưa mất gì thật; repo nào cần tách lại thì tách — và lúc đó
+ * phải trả bằng một phép kiểm khác, đúng luật mục 8. */
+export function checkStatusSchema(model) {
+  const findings = [];
+  for (const code of ["B2", "B5", "B7"]) {
+    const meta = STATUS_CODE_META[code];
+    for (const entry of (model.statusErrors ?? []).filter((e) => e.code === code)) {
+      findings.push({ tag: meta.tag, where: entry.message, fix: meta.fix });
+    }
+  }
+  return report("B2", RED, "STATUS.md hợp lệ (schema v2 · lifecycle · superseded_by)", findings,
+    `${(model.rows ?? []).length} đơn vị`);
+}
+
 /* ---- B3 · thư mục top-level chưa khai chủ --------------------------------- */
 export function checkB3(model) {
   const findings = model.topLevel.filter((entry) => !entry.owner_declared).map((entry) => ({
@@ -294,30 +318,40 @@ function isRetiredDoc(deps, relPath) {
 /* Cùng một phép so, hai đích khác nhau, nên viết một lần. So bằng GIÂY của commit chứ không
    bằng NGÀY: hai commit cùng ngày là chuyện thường ở repo này, so theo ngày thì một artifact
    cũ hơn nửa buổi vẫn được coi là tươi. */
-export function checkGeneratedFreshness(deps, { code, file, times }) {
+/* GỘP B8+B13 THÀNH MỘT — Đức chốt 09/09 *"xếp hạng lại phép kiểm, giảm xuống 25"*.
+ *
+ * Hai mã cũ là CÙNG MỘT HÀM gọi hai lần với hai tên file. Đó không phải hai phép kiểm, đó là
+ * một phép kiểm chạy hai lượt — và mỗi artifact máy sinh thêm vào là thêm một mã B nữa, tức
+ * con số phép kiểm phình theo số artifact chứ không theo số RỦI RO. Nay nhận cả DANH SÁCH file,
+ * báo mỗi file một dòng finding. Không mất một khẳng định nào: file nào cũ vẫn bị nêu đích danh.
+ *
+ * DANH SÁCH ĐỌC TỪ CẤU HÌNH, không gõ cứng — repo khai `generated_names` khác thì phép kiểm phải
+ * đi theo, đúng bài học F17. */
+export function checkGeneratedFreshness(deps, { code, file, files, times }) {
+  const dsFile = files ?? [file];
   const statuses = deps.git.trackedPaths().filter((relPath) => /(^|\/)STATUS\.md$/.test(relPath));
   const newest = statuses
     .map((relPath) => ({ relPath, time: times.get(relPath) }))
     .filter((entry) => Number.isFinite(entry.time))
     .sort((a, b) => b.time - a.time)[0];
-  const title = `${file} cũ hơn commit gần nhất của một STATUS.md`;
+  const title = `Artifact máy sinh cũ hơn commit gần nhất của một STATUS.md`;
   if (!newest) return skip(code, WARN, title, "không có STATUS.md nào có lịch sử commit — không đo được");
-  const own = times.get(file);
-  if (!Number.isFinite(own)) {
-    return report(code, WARN, title, [{
-      tag: `MISSING-${code}`,
-      where: file,
-      why: "chưa từng được commit",
-      fix: [`chạy: node scripts/build-dashboard.mjs`, `rồi commit ${file}`]
-    }]);
+
+  const findings = [];
+  const tuoi = [];
+  for (const f of dsFile) {
+    const own = times.get(f);
+    if (!Number.isFinite(own)) {
+      findings.push({ tag: `MISSING-${code}`, where: f, why: "chưa từng được commit",
+        fix: ["chạy: node scripts/build-dashboard.mjs", `rồi commit ${f}`] });
+      continue;
+    }
+    if (own >= newest.time) { tuoi.push(f); continue; }
+    findings.push({ tag: `STALE-${code}`, where: f,
+      why: `chạm cuối ${stamp(own)}, trong khi ${newest.relPath} chạm ${stamp(newest.time)}`,
+      fix: ["chạy: node scripts/build-dashboard.mjs", `rồi commit ${f} (commit nguồn TRƯỚC, sinh lại SAU — bộ sinh đọc từ HEAD)`] });
   }
-  if (own >= newest.time) return ok(code, WARN, title, `${file} tươi hơn ${newest.relPath}`);
-  return report(code, WARN, title, [{
-    tag: `STALE-${code}`,
-    where: file,
-    why: `chạm cuối ${stamp(own)}, trong khi ${newest.relPath} chạm ${stamp(newest.time)}`,
-    fix: ["chạy: node scripts/build-dashboard.mjs", `rồi commit ${file} (commit nguồn TRƯỚC, sinh lại SAU — bộ sinh đọc từ HEAD)`]
-  }]);
+  return report(code, WARN, title, findings, `${tuoi.length}/${dsFile.length} artifact tươi hơn ${newest.relPath}`);
 }
 
 function stamp(seconds) {
@@ -707,18 +741,15 @@ export function collectChecks(deps) {
   const appendOnly = appendOnlyAreas(deps);
   const checks = [
     checkB1(model),
-    checkStatusCode(model, "B2"),
+    checkStatusSchema(model),
     checkB3(model),
     checkB4(model),
-    checkStatusCode(model, "B5"),
     checkB6(deps, appendOnly),
-    checkStatusCode(model, "B7"),
-    checkGeneratedFreshness(deps, { code: "B8", file: "DASHBOARD.md", times }),
+    checkGeneratedFreshness(deps, { code: "B8", files: generatedFrom(readStructureFromDisk(deps.root ?? ROOT)), times }),
     checkB9(deps),
     checkB10(deps),
     checkB11(model),
     checkB12(deps),
-    checkGeneratedFreshness(deps, { code: "B13", file: "llms.txt", times }),
     checkB14(deps, model, times),
     checkB15(model),
     checkB16(deps)

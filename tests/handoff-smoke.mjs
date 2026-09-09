@@ -243,9 +243,15 @@ for (const f of CAC_FILE) {
     "cong phai do MUC MOI roi moi so voi tran — bo mucMoi di la chan ca chu cua lane khac");
   assert.match(gate, /handoffCapFrom\(structure\)/,
     "tran phai doc tu .repo-structure.json, khong duoc go cung mot con so trong cong");
-  assert.ok(!/\b26\d\d\b/.test(gate.slice(gate.indexOf("HANDOFF: mục mới trong trần"))),
+  /* NEO VAO TEN HAM, KHONG VAO CU PHAP DANG KY — 09/09 bon cap phep kiem duoc GOP lai (Duc chot
+     giam 32 -> 25), va ve nay do vi no cat lat theo chuoi `check("HANDOFF: muc moi trong tran"`.
+     Hanh vi no canh khong doi mot chut nao — chi cho DANG KY doi. Dung bai hoc KHUNG-47: ghim
+     HANH VI, dung ghim hinh dang loi goi. */
+  const NEO = "const doTranHandoff";
+  assert.ok(gate.includes(NEO), `ve nay MAT DOI TUONG DO: khong con ham ${NEO} trong cong`);
+  assert.ok(!/\b26\d\d\b/.test(gate.slice(gate.indexOf(NEO))),
     "khong duoc go cung con so tran o trong cong");
-  const khoi = gate.slice(gate.indexOf('check("HANDOFF: mục mới trong trần'));
+  const khoi = gate.slice(gate.indexOf(NEO));
   assert.match(khoi.slice(0, khoi.indexOf("\n/* ----")), /HANDOFF_MUC_QUA_DAI[\s\S]*ok: false/,
     "vuot tran phai tra ok:false — mot canh bao khong chan thi khong phai cong");
 }

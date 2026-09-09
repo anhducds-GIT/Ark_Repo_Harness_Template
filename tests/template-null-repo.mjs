@@ -423,7 +423,7 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
     appendFileSync(join(tempRoot, "HANDOFF.md"), "- them evidence moi" + String.fromCharCode(10), "utf8");
     const result = runGate();
     khongCoDo(result, "them evidence moi da khai phai duoc phep:\n");
-    assert.match(result.out, /\[XANH\] Vùng bằng chứng không bị sửa/,
+    assert.match(result.out, /\[XANH\] Vùng CHỈ-THÊM/,
       "doi chung A1 phai di qua nhanh XANH cua chinh gate evidence");
   });
 
@@ -445,7 +445,7 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
     appendFileSync(join(tempRoot, "HANDOFF.md"), "- ghi Log phien nay" + String.fromCharCode(10), "utf8");
     const result = runGate();
     khongCoDo(result, "them records moi da khai phai duoc phep:\n");
-    assert.match(result.out, /\[XANH\] Vùng bằng chứng không bị sửa/,
+    assert.match(result.out, /\[XANH\] Vùng CHỈ-THÊM/,
       "doi chung A2 phai di qua nhanh XANH cua chinh gate append-only");
   });
 
