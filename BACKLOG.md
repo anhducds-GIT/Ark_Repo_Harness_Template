@@ -883,3 +883,36 @@ cùng chỗ đã **xoá** ở 1.8.3 — code chết, nghĩa của nó không l�
 của A in vùng đó ở **đúng một** rổ, kèm câu nói rõ *"của tôi, nhưng lane khác đang giữ khoá"*.
 
 Vùng: `_code`.
+
+### KHUNG-59 · Hai lane chung một cây git thì chung luôn **INDEX** — `git add` của tôi, `git commit` của họ
+
+**Xảy ra HAI LẦN trong một ngày, hai chiều ngược nhau, hai lane khác nhau.** Đây là cơ chế, không
+phải sơ suất của ai.
+
+| Lượt | Ai `git add` | Ai `git commit` | Kết quả |
+|---|---|---|---|
+| 09/09 | `harness-migrate-3repo` (`git add -A`) | chính nó | cuốn 2 file `scripts/` **đang sửa dở** của `harness-loi-02` vào `69e0a84` |
+| 10/09 | `harness-migrate-3repo` (`git add` 7 file, đã `--soat` XANH) | **`harness-loi-02`** | 7 file protocol của tôi nằm trong `ed08d0f`, mang nhãn `Lane: harness-loi-02` |
+
+**Gốc: `claim` bảo vệ FILE, `safe-push` bảo vệ lượt ĐẨY — không lớp nào bảo vệ INDEX.** Một cây
+làm việc có **đúng một** index dùng chung. Nên giữa `git add` và `git commit` của tôi, bất kỳ
+`git commit` nào của lane khác cũng gom trọn thứ tôi vừa dàn — và ngược lại.
+
+`--soat` **không cứu được**, và nó không sai: nó soi index **tại thời điểm được gọi**. Cửa sổ nguy
+hiểm nằm **sau** nó.
+
+**Hệ quả đo được:** ở lượt 10/09, `--soat` báo *"7 file · 0 file bạn KHÔNG có quyền ghi"*, rồi
+`git commit` của tôi trả *"nothing to commit, working tree clean"* — việc đã bị commit mất, dưới
+tên người khác. **Không mất nội dung, mất TRUY NGUỒN.** Mà truy nguồn chính là thứ nhãn `Lane:`
+sinh ra để giữ, và là điều kiện `safe-push` kiểm.
+
+**Chưa đề xuất bản vá** — chỗ này chạm `safe-push`, `claim` và cả cách phiên gọi git, nên phải có
+người quyết kiến trúc trước. Ba hướng đã nghĩ tới, chưa cái nào đo: `git commit -- <đường dẫn>`
+bỏ qua index dùng chung · mỗi lane một `git worktree` riêng · một khoá INDEX giữ trong khoảnh khắc
+`add`→`commit`.
+
+**đóng khi:** hai lane cùng chạy trên một cây **không thể** commit chéo việc của nhau — dựng được
+ca hỏng bằng một phép ghim (lane A `add`, lane B `commit`, và B **không** nuốt file của A), phép
+ghim đó ĐỎ trên bản hôm nay, và `AGENTS.md` mục 0b nêu cách gọi git đã chốt. Không đóng bằng một
+dòng dặn *"nhớ commit ngay sau add"* — dặn dò thì lần thứ ba sẽ có người bỏ qua, và lần này người
+bỏ qua đã là hai lane khác nhau trong cùng một ngày.

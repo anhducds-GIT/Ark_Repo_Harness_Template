@@ -973,10 +973,10 @@ nêu**, grep ra 0 kết quả cho cả `features` lẫn `rule-compiler` trong br
   `rule-compiler.mjs` đóng `ROOT` vào repo chứa nó nên **không có `--repo`, không chạy từ xa
   được** · câu nào thừa là phán đoán về NGHỀ của họ · mục 5 cấm người sửa tự nghiệm thu.
 
-**Cách giữ ngữ cảnh mà không đốt lại token:** chạy `--trim`/`--check` **tại repo đích** rồi dán
-nguyên kết quả vào `BACKLOG.md` của họ kèm `đóng khi:`. Ngữ cảnh nằm trong **SỔ**, không nằm
-trong cửa sổ chat — chat biến mất, sổ thì không. Bước **12** sinh đề bài bàn giao bằng
-`--viec onboard`, thứ **đã có sẵn** từ trước; nó chỉ chưa được nối vào cuối lượt migrate.
+**Giữ ngữ cảnh mà không đốt lại token:** chạy `--trim`/`--check` **tại repo đích**, dán nguyên
+kết quả vào `BACKLOG.md` của họ kèm `đóng khi:`. Ngữ cảnh nằm trong **SỔ**, không nằm trong cửa
+sổ chat. Bước **12** sinh đề bài bàn giao bằng `--viec onboard` — thứ **đã có sẵn**, chỉ chưa
+được nối vào cuối lượt migrate.
 
 **Trả giá theo mục 8, và lần này giá dương.** `docs/protocols/CHUYEN-REPO-LEN-CHUAN.md` là **bản
 CŨ của chính brief migrate** — cùng tiêu đề, cùng câu luật nền, cùng "tám bước", số liệu dừng ở
@@ -991,3 +991,16 @@ nguyên văn. Bản mới thắng vì **`giao-viec.mjs` sinh đề bài từ nó
 
 **Việc kế (một việc):** áp bước 8–9–12 ngược lại cho ba repo đã migrate hôm qua — cả ba đều chưa
 có khối `features --migrate` trong hồ sơ, và chưa repo nào được dán kết quả `--trim`.
+
+### 2026-09-10 · harness-migrate-3repo · Bản vá protocol nằm trong commit của LANE KHÁC — ghi cho đúng sự thật
+
+Bảy file của mục trên (`MIGRATE-REPO` 8→12 bước · `ONBOARD` · khai tử bản trùng nhà · siết thước
+3371→3117) **đã vào HEAD**, nhưng nằm trong `ed08d0f` của `harness-loi-02`, mang nhãn
+`Lane: harness-loi-02`. Tôi `git add` xong, `--soat` XANH, rồi lane kia `git commit` trước — index
+là **của chung cả cây**. `git commit` của tôi trả *"nothing to commit"*.
+
+**Không mất nội dung, mất TRUY NGUỒN.** Không sửa lịch sử (mục 2 bắt hỏi trước). Ai truy `git log`
+tìm bản vá protocol 12 bước sẽ thấy tên sai — đọc mục này để biết vì sao.
+
+Sáng nay tôi rơi vào **chiều ngược lại**: `git add -A` của tôi cuốn hai file `scripts/` đang sửa
+dở của họ. Cùng một lỗ, hai chiều, một ngày → `KHUNG-59`.
