@@ -1099,3 +1099,34 @@ Bốn mục trông như đang hỏng mà thật ra đã vá.
 
 Bốn luật làm việc rút ra 10/09 nằm ở cuối mục roadmap đó — trong đó câu đắt nhất: **vá ba lần cùng
 một chỗ nghĩa là đang vá sai tầng.**
+
+## 2026-09-10 · `harness-migrate-3repo` — chạy bước 8 · 9 · 12 lên CẢ BA repo đích
+
+Protocol lên 12 bước hôm 10/09 rồi để đó thì chỉ là chữ. Lượt này chạy ba bước mới lên cả ba repo:
+
+| Repo | Tính năng (bước 8) | Thước thiếu trước lượt này (bước 9) | Cổng |
+|---|---|---|---|
+| n8n-orchestrator | 32→33 xong · **0 một phần** | 2/4 → **4/4** · `blocking` `[]` → 7 mã | XANH · **đã đẩy** |
+| n8n_Local host | 32→33 xong · **0 một phần** | 4/4 khai sẵn nhưng 3 là số MẶC ĐỊNH · `blocking` `[]` → **9 mã** | XANH · **đã đẩy** |
+| nav_platform_main | 33→34 xong · **0 một phần** | **2/4** — thiếu hẳn `docs.tran` và `backlog.tran` | **1 ĐỎ · chưa đẩy** |
+
+**Ba phát hiện, cả ba đều là *thứ TẮT mà cổng vẫn XANH*:**
+
+1. **`bootstrap.blocking` rỗng ở hai repo.** Cổng cấu trúc chạy đủ 13 phép rồi báo *"CHẶN: không
+   có"* — xanh vô điều kiện. Chỉ đưa vào nhóm CHẶN những mã đo được là ĐANG xanh.
+2. **Thước không khai thì cổng báo "chưa đo" và VẪN XANH.** `nav_platform_main` chạy 7 ngày không
+   có trần kho chữ lẫn trần sổ nợ. Cùng họ với lỗi `budget.tokenNap` tìm ra hôm 09/09.
+3. **`assess.mjs` nói mức 3/3 cho cả ba repo, trong khi `features --migrate` tìm ra 3–5 mục
+   thiếu ở mỗi repo.** Một cái đếm FILE, một cái đo NĂNG LỰC. **Mức 3/3 không có nghĩa đã xong.**
+
+**Một mục nợ tôi ghi SAI, ở HAI repo, cùng một nguyên nhân.** `CP-5` (n8n-orchestrator) và `NAV-5` đều hoãn
+vá ADR vì *"B12 canh ADR đã Accepted"*. `check-bootstrap.mjs:499` so bằng
+`normalizeForCompare(body)` — B12 chỉ so **PHẦN THÂN**, frontmatter miễn hẳn; và cả hai ADR còn
+`Proposed`. Vá mỗi nơi hai dòng. **Đọc code trước khi ghi nợ.**
+
+**Bước 12 chạy được ở cả ba:** `drafts/DE-BAI-ONBOARD.md` (400 dòng, mang số đo thật) nằm trong
+từng repo, đã khai vào bản đồ file của repo đó.
+
+**Còn mở:** `nav_platform_main` **16 commit chưa đẩy**, cổng còn **đúng một đỏ** —
+`LANE_KHONG_QUY_THUOC_DUOC` ở `1f49daf0` (nhãn `Lane:` có khoảng trắng, commit của chính tôi từ
+trước khi biết luật đó). Sửa = `--amend` = **sửa lịch sử**, mục 2 bắt hỏi Đức. Đã trả khoá kèm lý do.
