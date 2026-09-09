@@ -31,7 +31,9 @@ const ok = (t) => { passed += 1; console.log("  ok  " + t); };
 function khoThu(nganSach) {
   const kho = mkdtempSync(join(tmpdir(), "don-"));
   mkdirSync(join(kho, "scripts"), { recursive: true });
-  for (const f of ["don.mjs", "can-nang.mjs", "repo-structure.mjs", "claim.mjs", "build-dashboard.mjs"]) {
+  /* CHÉP CẢ `scripts/` — xem ghi chú ở `tests/cong-do-that.mjs`. Danh sách gõ tay ở đây từng
+     thiếu `rule-compiler.mjs` đúng hôm `can-nang.mjs` bắt đầu import nó, và fixture chết lúc nạp. */
+  for (const f of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
     try { copyFileSync(join(ROOT, "scripts", f), join(kho, "scripts", f)); } catch { /* không cần thì thôi */ }
   }
   const ct = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"));

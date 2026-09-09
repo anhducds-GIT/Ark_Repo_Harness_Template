@@ -659,28 +659,28 @@ function docMuc(kho, ten, as = "thu") {
   try {
     const datTran = (n) => {
       const ct = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
-      ct.budget = { ...(ct.budget || {}), docBatBuoc: n };
+      ct.budget = { ...(ct.budget || {}), tokenNap: n };
       writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(ct, null, 2) + NL, "utf8");
     };
     const luot = (ten) => { at("add", "-A"); at("commit", "-q", "-m", ten + NL + NL + "Lane: thu"); };
 
     // Doi chung: tran rong rai thi XANH. Chua xanh o day thi moi khang dinh duoi vo nghia.
     writeFileSync(join(kho, "AGENTS.md"), ["# AGENTS", "", "luat ngan."].join(NL) + NL, "utf8");
-    datTran(300);
+    datTran(9000);
     luot("luat ngan, tran rong");
     let m = docMuc(kho, "Ngân sách trong trần");
-    assert.equal(m.trangThai, "XANH", `luat ngan / tran 300 phai XANH, dang: ${m.chiTiet}`);
+    assert.equal(m.trangThai, "XANH", `luat ngan / tran 9000 phai XANH, dang: ${m.chiTiet}`);
 
     // Phá ĐÚNG MỘT thứ: hạ trần xuống dưới số dòng thật. Khong dung toi file nao khac.
     datTran(2);
-    luot("ha tran nap xuong 2");
+    luot("ha tran nap xuong 5");
     m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "ĐỎ", `phan nap vuot tran phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.ok(m.chiTiet.includes("PHAN_NAP_VUOT_TRAN"), `thieu ma loi PHAN_NAP_VUOT_TRAN: ${m.chiTiet}`);
 
     // Cua ra phai mo: nang tran lai thi XANH. Mot cong khong xoa duoc la cai bay khoa ca repo.
-    datTran(300);
-    luot("tra tran ve 300");
+    datTran(8000);
+    luot("tra tran ve 8000");
     m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH", `tra tran ve thi phai XANH lai, dang: ${m.chiTiet}`);
     ok("14 · phần NẠP: trong trần XANH · vượt trần ĐỎ kèm mã lỗi · trả trần về thì XANH lại");

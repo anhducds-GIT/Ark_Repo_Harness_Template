@@ -1054,14 +1054,21 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   const doSo = (s) => (/^\d+$/.test(s) ? Number(s) : CHU_SO.get(s.toLowerCase()));
   const MAU_SO = new RegExp(`(\\d+|${[...CHU_SO.keys()].join("|")})\\s+vế`, "gi");
 
-  const luat = readFileSync(join(ROOT, "AGENTS.md"), "utf8");
-  const re = /\[tests\/([a-z0-9-]+\.mjs)\]\(tests\/\1\)([\s\S]{0,400}?)(?=\n\||$)/g;
+  /* ĐỌC FILE BẢN ĐỒ ĐÃ KHAI, không đóng cứng `AGENTS.md` — 09/09 bảng tra tách làm hai: hiến pháp
+     giữ 16 cửa vào (~4.800 token), bản ĐẦY ĐỦ sang `docs/BAN-DO-CHI-TIET.md`. Phần văn xuôi mang
+     các con số `N vế` đi theo bản đầy đủ, nên vế này MẤT ĐỐI TƯỢNG ĐO nếu còn bám vào `AGENTS.md`.
+     Đọc CẢ HAI: con số có thể nằm ở một trong hai chỗ, và cả hai đều là luật. */
+  const khaiBanDo = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"))?.docs?.file_map;
+  const luat = (khaiBanDo ? readFileSync(join(ROOT, khaiBanDo), "utf8") : "")
+    + readFileSync(join(ROOT, "AGENTS.md"), "utf8");
+  // Biên là HẾT ĐOẠN, không phải hết hàng bảng: ở bản đầy đủ nội dung là văn xuôi, không phải ô.
+  const re = /\[[^\]]*\]\(([^)]*tests\/([a-z0-9-]+\.mjs))\)([\s\S]{0,400}?)(?=\n\n|\n\||$)/g;
   const lech = [];
   let soDo = 0;
   let khop;
   while ((khop = re.exec(luat)) !== null) {
-    const ten = khop[1];
-    const khai = [...khop[2].matchAll(MAU_SO)].map((x) => doSo(x[1])).filter((x) => x !== undefined)[0];
+    const ten = khop[2];
+    const khai = [...khop[3].matchAll(MAU_SO)].map((x) => doSo(x[1])).filter((x) => x !== undefined)[0];
     if (khai === undefined) continue;
     if (!existsSync(join(ROOT, "tests", ten))) {
       lech.push(`tests/${ten}: luat tro toi mot suite KHONG TON TAI`);

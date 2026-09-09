@@ -286,18 +286,21 @@ const maLoi = (ds) => ds.map((v) => v.ma).sort();
  * Con so dang nhin nhat khong phai tong da nap, ma la tong KHONG nap — no do bang muc 6 dang
  * tiet kiem bao nhieu. Bang do mat tac dung thi con so kia tut, va thay ngay. */
 {
-  const kq = napContext(ROOT, 300);
+  /* ĐO BẰNG TOKEN, không bằng dòng — Đức chốt 09/09 giảm mỗi phiên xuống 4.000–6.000 token.
+     Bản đầu của vế này đo DÒNG và báo `284/300 ĐẠT` trong khi thứ nạp thật là ~13.800 token.
+     Đếm dòng là đo một đại lượng không liên quan tới cái đang tốn tiền. */
+  const kq = napContext(ROOT, 6000);
   assert.ok(kq.nhan.length >= 2, "phan NAP phai co it nhat NHAN + TRANG THAI");
   assert.ok(kq.nhan.some((t) => t.file === "AGENTS.md"), "AGENTS.md PHAI nam trong phan nap — no la nhan");
-  assert.ok(kq.napDong > 0 && kq.napDong <= kq.tran,
-    `phan nap phai duoi tran: ${kq.napDong}/${kq.tran}`);
+  assert.ok(kq.napToken > 0 && kq.napToken <= kq.tran, `phan nap phai duoi tran: ${kq.napToken}/${kq.tran} token`);
   assert.equal(kq.dat, true);
   // Doi chung: vuot tran thi `dat` phai FALSE. Khong co ve nay thi `dat` co the luon true.
-  assert.equal(napContext(ROOT, 10).dat, false, "tran 10 dong thi phai bao VUOT — neu khong, co le `dat` luon true");
-  // Va phan KHONG nap phai lon hon han phan nap, khong thi bang muc 6 dang vo dung.
-  assert.ok(kq.khongNap > kq.napDong * 3,
-    `phan KHONG nap (${kq.khongNap}) phai lon hon han phan nap (${kq.napDong}) — neu khong, tai lieu tang hai dang bi nap het`);
-  ok(`10 · nạp: ${kq.napDong}/${kq.tran} dòng · không nạp ${kq.khongNap} dòng (${Math.round(kq.napDong * 100 / (kq.napDong + kq.khongNap))}% nạp)`);
+  assert.equal(napContext(ROOT, 10).dat, false, "tran 10 token thi phai bao VUOT — neu khong, co le `dat` luon true");
+  // Phan KHONG nap phai lon hon HAN phan nap; khong thi bang muc 6 dang vo dung va tai lieu
+  // tang hai dang bi nap het.
+  assert.ok(kq.khongNapToken > kq.napToken * 3,
+    `phan KHONG nap (${kq.khongNapToken}) phai lon hon han phan nap (${kq.napToken})`);
+  ok(`10 · nạp: ~${kq.napToken}/${kq.tran} token · không nạp ~${kq.khongNapToken} token (${Math.round(kq.napToken * 100 / (kq.napToken + kq.khongNapToken))}% nạp)`);
 }
 
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

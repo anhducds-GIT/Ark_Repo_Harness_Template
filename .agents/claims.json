@@ -39,5 +39,87 @@
       "task": "chot phien",
       "released_at": "2026-09-09T07:05:45.011Z"
     }
+  },
+  "tam": {
+    "AGENTS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "docs/BAN-DO-CHI-TIET.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "scripts/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "scripts/can-nang.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "template/scripts/can-nang.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "template/scripts/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "template/scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "tests/cong-do-that.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "tests/core-contract.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "tests/harness-smoke.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "tests/don-smoke.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "template/tests/harness-smoke.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    },
+    "tests/rule-compiler.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T08:10:47.196Z"
+    }
   }
 }

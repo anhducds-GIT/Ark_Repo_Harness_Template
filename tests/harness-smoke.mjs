@@ -24,6 +24,14 @@ import { claimPrefixesFrom, kiemKhoaLa, ownershipKeys, readStructureFromDisk, un
 import { grandfatheredNote } from "../scripts/check-bootstrap.mjs";
 import { isBehaviourFile } from "../scripts/build-dashboard.mjs";
 
+/* Cấu trúc cho fixture: bỏ `docs.file_map` để bản đồ quay về mặc định `AGENTS.md` — fixture tự
+   dựng bản đồ của nó trong AGENTS.md, còn repo thật khai bản đồ ở `docs/BAN-DO-CHI-TIET.md`.
+   Không bỏ thì cổng báo "khai sai bản đồ" (đúng luật) thay vì kể tên file chưa khai. */
+const docCauTrucThu = () => {
+  const ct = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"));
+  if (ct.docs) delete ct.docs.file_map;
+  return ct;
+};
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -54,7 +62,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const name of ["safe-push.mjs", "repo-structure.mjs", "chay-test.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
+    writeFileSync(join(temp, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     writeFileSync(join(temp, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
     writeFileSync(join(temp, "a.txt"), "hi", "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "mot");
@@ -300,9 +308,9 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const n of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
+    writeFileSync(join(fx, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     copyFileSync(join(ROOT, "AGENTS.md"), join(fx, "AGENTS.md"));
-    const cauHinhFx = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"));
+    const cauHinhFx = docCauTrucThu();
     // Khai DU moi steward. Thieu mot khoa thi phep kiem "bat bien quyen so huu" do, va khoi
     // nay se doc nham cai do do la ket qua cua chinh no.
     const claimsFx = { claims: {} };
@@ -371,7 +379,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const n of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
+    writeFileSync(join(fx, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     copyFileSync(join(ROOT, "AGENTS.md"), join(fx, "AGENTS.md"));
     writeFileSync(join(fx, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
     writeFileSync(join(fx, "HANDOFF.md"), "# HANDOFF\n", "utf8");
@@ -442,7 +450,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const name of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
+    writeFileSync(join(temp, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     // Phiên PHẢI GIỮ vùng, nếu không thì phép kiểm bản đồ tự bỏ qua (BỎ vì rỗng) và cả hai
     // ca (c)(d) dưới đây xanh mà không kiểm gì — đúng loại phép kiểm rỗng nghĩa mà repo này
     // đã bắt được bảy lần. Bản đầu của khối này mắc đúng lỗi đó.
@@ -519,7 +527,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const name of ["safe-push.mjs", "repo-structure.mjs", "chay-test.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
     writeFileSync(join(kho, "a.txt"), "hi", "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");
@@ -602,7 +610,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const name of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
     writeFileSync(join(kho, "a.txt"), "hi", "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");
@@ -668,7 +676,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const name of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
     // Mot "buc anh": co byte 0 trong 8KB dau.
     writeFileSync(join(kho, "anh.png"), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x01, 0x02]));
@@ -729,7 +737,7 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     for (const name of ["safe-push.mjs", "repo-structure.mjs", "chay-test.mjs"]) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
-    copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(docCauTrucThu(), null, 2), "utf8");
     writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify({ claims: {} }), "utf8");
     writeFileSync(join(kho, "a.txt"), "hi", "utf8");
     at("add", "-A"); at("commit", "-q", "-m", "mot\n\nLane: thu");

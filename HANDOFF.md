@@ -464,3 +464,33 @@ bản ghi việc đã xong LẪN một nguyên tắc đang sống.
 
 Bản **1.4.3**. Bộ luật: **16 ADR · 6 chủ đề · 0 vi phạm**.
 <!-- HANDOFF-THANG: 2026-09 -->
+
+### 2026-09-09 (15) · harness-loi-01 · TÁI KIẾN TRÚC token nạp: 13.800 → 5.660
+
+**Đức chốt:** giảm token mỗi phiên xuống **4.000–6.000**. Đo trước khi động: `AGENTS.md`
+**~13.799 token**, và **mục 6 một mình chiếm 10.029 — 73%**. Luật thật (mục 0–5, 7, 8) chỉ 3.770.
+**Luật đã vừa khổ; thứ ăn hết là BẢNG TRA.**
+
+**Việc làm:** tách bảng tra làm hai. `AGENTS.md` giữ **16 cửa vào** (chỉ mục mỏng, kèm mọi liên
+kết vì B6 đi theo liên kết); **43 mục còn lại** kèm trọn văn xuôi sang `docs/BAN-DO-CHI-TIET.md`,
+và `.repo-structure.json` khai nó là **bản đồ chính thức** (`docs.file_map`) — nên cổng *"File mới
+đã khai"* đối chiếu với bản ĐẦY ĐỦ.
+
+**Số:** `AGENTS.md` **13.799 → 4.907 token** (244 → 202 dòng). Phần nạp mỗi phiên
+**~5.660/6.000 — ĐẠT**. Đối chiếu độc lập: **0 file rơi khỏi bản đồ** (67 liên kết trước, 68 sau).
+
+**Phép đo cũng phải sửa, và đây là chỗ đáng nhớ:** `--nap` trước đo **DÒNG** và báo `284/300 —
+ĐẠT` trong khi thực tế là 13.800 token. Đếm dòng là đo một đại lượng **không liên quan tới cái
+đang tốn tiền**. Nay ba chỗ (`--nap` · cổng · `can-nang`) dùng chung `napContext` và đo bằng
+**token**; ngân sách đổi từ `docBatBuoc` (dòng) sang `tokenNap` (token).
+
+**Ba lỗi tự gây trong lượt này, ghi vì cả ba sẽ lặp:** ⑴ `split("|")` làm mất nửa sau mọi ô có
+pipe thoát `\|` → **5 file rơi khỏi bản đồ**, phải làm lại từ HEAD bằng bộ tách đúng; ⑵ chọn hàng
+giữ lại **theo chỉ số** → lệch 2 và giữ nhầm gần hết, mất cả `decisions.md`/`MULTIFLOW`/`LEGEND` —
+đổi sang chọn theo TỪ KHOÁ; ⑶ `sed` thay hàng loạt `datTran(2)` làm **hỏng vế 10** của
+`cong-do-that` (ca ĐỎ biến thành ca XANH) — đã khôi phục và đọc lại cả khối.
+
+**Thước kho chữ NỚI 3.173 → 3.427**, lần duy nhất trong ngày, và có lý do: ta **đổi 10k token ra
+khỏi đường nạp** vào thư viện tra cứu. Từ đây lại CHỈ ĐƯỢC SIẾT.
+
+Bản **1.5.0**.

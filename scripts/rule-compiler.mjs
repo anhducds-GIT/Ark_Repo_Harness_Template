@@ -345,18 +345,37 @@ export function deXuatTrim(root = ROOT) {
  * Con số quan trọng nhất mà lệnh này in ra không phải tổng đã nạp, mà là **tổng KHÔNG nạp**: nó
  * cho thấy bảng mục 6 đang tiết kiệm bao nhiêu. Bảng đó mất tác dụng thì con số kia tụt, và ta
  * thấy ngay. */
-export function napContext(root = ROOT, tran = 300) {
-  const dem = (rel, gioiHan) => {
+/* ƯỚC LƯỢNG TOKEN — đơn vị đúng, và đây là chỗ bản đầu đo SAI.
+ *
+ * Bản đầu đếm DÒNG và báo `284/300 — ĐẠT`, trong khi thứ nạp thật là **13.799 token**. Một dòng
+ * luật tiếng Việt đặc chữ nặng gấp ~32 lần một dòng trống, nên đếm dòng là đo một đại lượng
+ * KHÔNG liên quan tới cái đang tốn tiền. Đo 09/09: mục 6 của hiến pháp một mình chiếm **73%**
+ * tổng token mà đếm dòng không hề thấy.
+ *
+ * Hệ số 2.6 ký tự/token là đo thô cho tiếng Việt có dấu — đủ chính xác để XẾP HẠNG và để canh
+ * một cái trần, không đủ để báo cáo con số tuyệt đối. Nói rõ ở đây để không ai đọc nó thành
+ * số token thật của một nhà cung cấp cụ thể. */
+export const uocToken = (s) => Math.round(String(s).length / 2.6);
+
+export function napContext(root = ROOT, tran = 6000) {
+  /* `doc` trả CHỮ (để đếm token), `dem` trả số dòng. Hai đơn vị, một nguồn đọc — tách ra thì
+     sớm muộn hai con số nói về hai nội dung khác nhau. */
+  const doc = (rel, gioiHan) => {
     try {
       const d = fs.readFileSync(path.join(root, rel), "utf8").replace(/\r\n?/g, NL).split(NL);
-      return Number.isFinite(gioiHan) ? Math.min(d.length, gioiHan) : d.length;
-    } catch { return 0; }
+      return (Number.isFinite(gioiHan) ? d.slice(-gioiHan) : d).join(NL);
+    } catch { return ""; }
+  };
+  const dem = (rel, gioiHan) => {
+    const t = doc(rel, gioiHan);
+    return t ? t.split(NL).length : 0;
   };
   const nhan = [
-    { tang: "NHÂN", file: "AGENTS.md", dong: dem("AGENTS.md"), vi: "luật chung — mọi phiên, không ngoại lệ" },
-    { tang: "TRẠNG THÁI", file: "HANDOFF.md (40 dòng cuối)", dong: dem("HANDOFF.md", 40), vi: "phiên trước làm tới đâu" }
+    { tang: "NHÂN", file: "AGENTS.md", dong: dem("AGENTS.md"), token: uocToken(doc("AGENTS.md")), vi: "luật chung — mọi phiên, không ngoại lệ" },
+    { tang: "TRẠNG THÁI", file: "HANDOFF.md (40 dòng cuối)", dong: dem("HANDOFF.md", 40), token: uocToken(doc("HANDOFF.md", 40)), vi: "phiên trước làm tới đâu" }
   ];
   const napDong = nhan.reduce((a, b) => a + b.dong, 0);
+  const napToken = nhan.reduce((a, b) => a + b.token, 0);
 
   // Tầng hai: đo nhưng KHÔNG nạp. Đây là phần bảng mục 6 tiết kiệm được.
   const khiCan = [];
@@ -366,12 +385,14 @@ export function napContext(root = ROOT, tran = 300) {
     for (const m of ms) {
       const p2 = `${d}/${m.name}`;
       if (m.isDirectory()) { if (!/archive|migrations/.test(m.name)) di(p2); }
-      else if (m.name.endsWith(".md")) khiCan.push({ file: p2, dong: dem(p2) });
+      else if (m.name.endsWith(".md")) khiCan.push({ file: p2, dong: dem(p2), token: uocToken(doc(p2)) });
     }
   };
   di("docs");
   const khongNap = khiCan.reduce((a, b) => a + b.dong, 0);
-  return { nhan, napDong, tran, khiCan, khongNap, dat: napDong <= tran };
+  const khongNapToken = khiCan.reduce((a, b) => a + b.token, 0);
+  // TRẦN ĐO BẰNG TOKEN, không bằng dòng — xem ghi chú ở `uocToken`.
+  return { nhan, napDong, napToken, tran, khiCan, khongNap, khongNapToken, dat: napToken <= tran };
 }
 
 function main() {
@@ -411,16 +432,15 @@ function main() {
     return EXIT.OK;
   }
   if (process.argv.includes("--nap")) {
-    let tran = 300;
-    try { tran = readStructureFromDisk(ROOT)?.budget?.docBatBuoc ?? 300; } catch { /* dùng mặc định */ }
+    let tran = 6000;
+    try { tran = readStructureFromDisk(ROOT)?.budget?.tokenNap ?? 6000; } catch { /* dùng mặc định */ }
     const kq = napContext(ROOT, tran);
     console.log(`# NẠP — thứ một phiên THẬT SỰ phải đọc${NL}`);
-    for (const t of kq.nhan) console.log(`  ${t.tang.padEnd(11)} ${String(t.dong).padStart(4)} dòng  ${t.file}${NL}${" ".repeat(18)}${t.vi}`);
-    console.log(`${NL}  TỔNG NẠP: **${kq.napDong}/${kq.tran} dòng** — ${kq.dat ? "ĐẠT" : "VƯỢT TRẦN"}`);
+    for (const t of kq.nhan) console.log(`  ${t.tang.padEnd(11)} ~${String(t.token).padStart(5)} token  ${String(t.dong).padStart(4)} dòng  ${t.file}${NL}${" ".repeat(18)}${t.vi}`);
+    console.log(`${NL}  TỔNG NẠP: **~${kq.napToken}/${kq.tran} token** (${kq.napDong} dòng) — ${kq.dat ? "ĐẠT" : "VƯỢT TRẦN"}`);
     console.log(`  KHÔNG nạp: **${kq.khongNap} dòng** trong ${kq.khiCan.length} file \`docs/\` — mở khi cần, theo bảng mục 6.`);
-    console.log(`${NL}  Tỉ lệ tiết kiệm: nạp ${kq.napDong} / tổng ${kq.napDong + kq.khongNap} = ${Math.round(kq.napDong * 100 / (kq.napDong + kq.khongNap))}%.`);
-    console.log(`  Con số đáng nhìn KHÔNG phải tổng đã nạp, mà là tổng KHÔNG nạp: nó đo bảng mục 6`);
-    console.log("  đang tiết kiệm bao nhiêu. Bảng đó mất tác dụng thì con số này tụt, và thấy ngay.");
+    console.log(`${NL}  Tỉ lệ: nạp ${Math.round(kq.napToken * 100 / (kq.napToken + kq.khongNapToken))}% tổng kho chữ. Con số đáng nhìn là phần KHÔNG nạp.`);
+    
     if (!kq.dat) {
       console.error(`${NL}VI_PHAM: phần NẠP vượt trần \`budget.docBatBuoc\`. Bớt ở NHÂN, đừng nới trần —`);
       console.error("nới trần ở đây là cho phép mọi phiên ở mọi repo tốn thêm, nhân theo (số repo × số phiên).");

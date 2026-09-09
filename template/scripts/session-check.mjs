@@ -1398,12 +1398,12 @@ ghepKiem("HANDOFF đã ghi Log, đúng trần, đúng tháng", ["ghi Log", doGhi
  * Đo cái gì: `AGENTS.md` + phần cuối `HANDOFF.md` — thứ MỌI phiên ở MỌI repo phải nạp, nên mỗi
  * dòng ở đây nhân theo (số repo × số phiên). Kho `docs/` KHÔNG tính: nó mở khi cần. */
 const doNap = () => {
-  const tran = structure?.budget?.docBatBuoc;
-  if (typeof tran !== "number") return { ok: true, msg: "repo chưa khai `budget.docBatBuoc` — không có thước thì không đo." };
+  const tran = structure?.budget?.tokenNap;
+  if (typeof tran !== "number") return { ok: true, msg: "repo chưa khai `budget.tokenNap` — không có thước thì không đo." };
   let kq;
   try { kq = napContext(ROOT, tran); } catch (e) { return { ok: true, skipped: true, msg: `không đo được phần nạp: ${String(e.message).split(String.fromCharCode(10))[0]}` }; }
-  const tyLe = Math.round(kq.napDong * 100 / Math.max(1, kq.napDong + kq.khongNap));
-  if (kq.dat) return { ok: true, msg: `${kq.napDong}/${kq.tran} dòng nạp mỗi phiên · ${kq.khongNap} dòng để dành (${tyLe}% nạp).` };
+  const tyLe = Math.round(kq.napToken * 100 / Math.max(1, kq.napToken + kq.khongNapToken));
+  if (kq.dat) return { ok: true, msg: `~${kq.napToken}/${kq.tran} token nạp mỗi phiên · ${kq.khongNapToken} token để dành (${tyLe}% nạp).` };
   return {
     ok: false,
     msg: `PHAN_NAP_VUOT_TRAN: ${kq.napDong}/${kq.tran} dòng. Đây là thứ MỌI phiên ở MỌI repo nạp, nên mỗi dòng nhân theo (số repo × số phiên). `

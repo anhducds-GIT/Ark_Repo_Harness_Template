@@ -27,6 +27,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { readStructureFromDisk, THU_MUC_DOCS_KHONG_TINH } from "./repo-structure.mjs";
+import { napContext } from "./rule-compiler.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
@@ -35,13 +36,17 @@ const NL = String.fromCharCode(10);
    lại, không phải nới ra cho vừa hiện trạng. Nới ngân sách để báo cáo đẹp lên là đúng cái bệnh
    file này sinh ra để bắt. */
 export const NGAN_SACH_MAC_DINH = {
-  docBatBuoc: 300,     // dòng một phiên AI phải đọc TRƯỚC KHI làm được gì
   tongTaiLieu: 2200,   // tổng dòng tài liệu (không tính bản trích)
   soPhepKiem: 30,      // tổng phép kiểm hai cổng
   giayDongPhien: 180,  // giây để chạy trọn bộ kiểm khi đóng phiên
   soNhatKy: 600,       // dòng HANDOFF.md — thứ phình nhanh nhất và chưa từng có nhịp dọn
   tiLeDaDong: 50,      // % mục nợ đã đóng còn nằm trong sổ; quá thì chuyển sang kho lưu
-  soPhatHanh: 300      // dòng CHANGELOG.md — sổ chỉ-thêm, không bao giờ nhỏ lại
+  soPhatHanh: 300,     // dòng CHANGELOG.md — sổ chỉ-thêm, không bao giờ nhỏ lại
+  /* TRẦN TOKEN cho phần MỌI phiên phải nạp — Đức chốt 09/09: *"giảm mọi phiên xuống 4.000–6.000
+     token"*. Đây là con số duy nhất trong bảng này nhân theo (số repo × số phiên), nên nới nó
+     đắt hơn mọi mục khác. `docBatBuoc` (đo bằng DÒNG) bỏ đi vì nó đo sai đơn vị: nó báo
+     284/300 ĐẠT trong khi thứ nạp thật là ~13.800 token. */
+  tokenNap: 6000
 };
 
 /* NGÂN SÁCH KHAI ĐƯỢC, vì repo khác có kích thước khác. Repo nhỏ mà bắt theo ngân sách của một
@@ -219,10 +224,13 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   const NS = nganSachTu(readStructureFromDisk(ROOT));
   console.log(`${NL}CÂN NẶNG BỘ KHUNG — "có đáng không", không phải "có đúng không"${NL}`);
 
-  const bb = docBatBuoc();
-  const tongBB = bb.reduce((a, b) => a + b.dong, 0);
-  dong("Đọc bắt buộc trước khi làm gì", tongBB, NS.docBatBuoc, "dòng");
-  for (const f of bb) console.log(`      ${f.file.padEnd(30)} ${String(f.dong).padStart(5)}`);
+  /* ĐO BẰNG TOKEN, không bằng dòng — Đức chốt 09/09. Dùng chung `napContext` với cổng đóng
+     phiên và với `npm run luat -- --nap`: ba chỗ hỏi cùng một câu thì phải đọc cùng một phép đo,
+     không thì sớm muộn chúng nói ba con số. */
+  const nap = napContext(ROOT, NS.tokenNap);
+  dong("Token MỌI phiên phải nạp", nap.napToken, NS.tokenNap, "token");
+  for (const t of nap.nhan) console.log(`      ${t.file.padEnd(30)} ${String(t.token).padStart(5)} token`);
+  console.log(`      KHÔNG nạp (mở khi cần)         ${String(nap.khongNapToken).padStart(5)} token trong ${nap.khiCan.length} file docs/`);
 
   const taiLieu = [...liet("docs"), "README.md", "CHANGELOG.md", "STATUS.md"];
   const tongTL = taiLieu.reduce((a, f) => a + dem(f), 0);
