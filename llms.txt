@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Việc ưu tiên #1
 
-- **_root** — Giữ token nạp mỗi phiên dưới vạch biên 4.200 — xem BACKLOG.md nhóm P0.
+- **_root** — Đức chốt có dời mốc Stable Baseline v1.2.17 sang 1.7.0 không — repo thứ ba trở đi vẫn đang lắp từ mốc cũ, tức vẫn nhận hiến pháp 13.8k token. Xem BACKLOG.md nhóm P0.
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2.
+- [ark-repo-harness](STATUS.md): active — Nén luật xong cả hai đầu: repo nhà nạp 4.002 token, repo đích nhận bản trích nạp 4.119
 
 ## Luật bắt buộc trước khi sửa gì
 
