@@ -1005,3 +1005,24 @@ protocol 12 bước đã mang tên sai vĩnh viễn.
 
 Sáng nay tôi rơi vào **chiều ngược lại**: `git add -A` của tôi cuốn hai file `scripts/` đang sửa
 dở của họ. Cùng một lỗ, hai chiều, một ngày → `KHUNG-59`.
+
+### 2026-09-10 (29) · harness-loi-02 · Roadmap bước kế: bốn mục đắt nhất là MỘT bệnh
+
+**Đức sẽ compact rồi chạy theo roadmap, nên thứ tự phải nằm trong FILE, không nằm trong hội thoại.**
+Đã ghi `docs/ROADMAP-V2.md` mục *Thứ tự việc — bản 10/09*, và `STATUS.md` trỏ thẳng vào đó.
+
+**Phát hiện đáng giữ nhất:** `KHUNG-59` · `KHUNG-50` · `KHUNG-55` · `KHUNG-51` trông như bốn việc
+rời, nhưng là **một**: nhiều lane chung một cây làm việc git → chung đĩa, chung index, chung HEAD.
+Chung index làm `git add` của lane này bị `git commit` của lane kia cuốn theo (2 lần trong ngày,
+hai chiều — tôi gây một lần, đã `git reset` lui, chưa đẩy). Chung đĩa+HEAD làm dấu xác nhận không
+ghi được (29 phút, 0 dấu) và làm thước kho chữ đỏ oan.
+
+**Nên phiên sau hỏi TRƯỚC khi vá:** một `git worktree` riêng cho suite + bộ sinh đóng được mấy
+trong bốn? Đo trước rồi quyết. Vá từng mục là cách một bệnh sinh ra bốn bản vá không cái nào chữa gốc.
+
+**Đợt 2 của roadmap là việc RẺ mà dọn được nhiều:** `KHUNG-53` · `KHUNG-15` · `KHUNG-56` ·
+`KHUNG-58` đều **đã có bản vá trong HEAD**, chỉ chờ một vòng audit không tìm thêm lỗi rồi gạch mã.
+Bốn mục trông như đang hỏng mà thật ra đã vá.
+
+Bốn luật làm việc rút ra 10/09 nằm ở cuối mục roadmap đó — trong đó câu đắt nhất: **vá ba lần cùng
+một chỗ nghĩa là đang vá sai tầng.**

@@ -39,53 +39,78 @@ ttl_days: 120
 Một số vượt trần từ 06/09 tới nay **chưa ai xử**: thời gian chạy trọn bộ phép kiểm. Nhà của nó là
 `Y-06` trong [IDEAS.md](../IDEAS.md), không phải file này — đo bằng `npm run can-nang`.
 
-## Thứ tự việc — bản 09/09, xếp theo THỨ ĐANG THU THUẾ MỖI PHIÊN
+## Thứ tự việc — bản 10/09, xếp theo THỨ ĐANG THU THUẾ MỖI PHIÊN
 
 > Xếp theo **thuế mỗi phiên phải trả**, không theo số mã việc. Nội dung từng mục ở
 > [BACKLOG.md](../BACKLOG.md) và [IDEAS.md](../IDEAS.md) — ở đây **chỉ có thứ tự và vì sao**.
-> Kế hoạch sáu đợt cũ (đợt 0→5) đã dời sang
-> [docs/archive/ROADMAP-V2-dot-0-den-5.md](archive/ROADMAP-V2-dot-0-den-5.md).
+
+### PHÁT HIỆN LỚN NHẤT của phiên 09→10/09: bốn mục đắt nhất là MỘT bệnh
+
+`KHUNG-59` · `KHUNG-50` · `KHUNG-55` · `KHUNG-51` trông như bốn việc rời. Chúng là **một**:
+nhiều lane dùng **chung một cây làm việc git**, nên chung luôn đĩa, chung index, chung HEAD.
+
+| Mã | Chung cái gì | Cái giá đo được |
+|---|---|---|
+| `KHUNG-59` | **index** | `git add` của lane A bị `git commit` của lane B cuốn theo — **2 lần trong một ngày**, hai chiều ngược nhau |
+| `KHUNG-50` | **đĩa + HEAD** | dấu xác nhận suite không ghi được → 3 lượt đủ bộ **29 phút**, 0 dấu |
+| `KHUNG-55` | **đĩa** | lane khác sửa dở một file `docs/` là cổng của bạn ĐỎ, và lời nhắn **nói sai tên người** |
+| `KHUNG-51` | **đĩa** | suite đột biến ghi đè file thật, một lane khác `git add` trúng lúc đó |
+
+**Đừng vá bốn lần.** Một phiên nên hỏi trước: *chạy suite và bộ sinh trong một `git worktree`
+riêng có đóng được mấy mục trong bốn?* Đo trước, rồi mới quyết — nhưng đừng đi vá từng mục như
+bốn việc độc lập, vì đó đúng là cách một bệnh sinh ra bốn bản vá không cái nào chữa gốc.
 
 ### Đợt 1 · TRẢ THUẾ — làm trước, hiệu quả đo được ngay
 
 | Mã | Vì sao đứng đây |
 |---|---|
-| `KHUNG-53` | **Đắt nhất.** Luật đã đổi sang khoá FILE từ 08/09, cổng vẫn đòi khoá VÙNG. Đo 09/09: một phiên nhận/trả **4 khoá vùng cho 6 lượt commit**, mỗi lượt chặn lane khác vô ích. Đóng mục này cần kèm **đối chứng ngược** |
-| `KHUNG-50` | Một lane sửa dở **chặn toàn bộ đường phát**. Thuế rơi vào người khác, không rơi vào người gây ra |
-| `KHUNG-15` | **KIỂM CHỨNG TRƯỚC KHI SỬA.** Codex đã sửa vùng dấu suite ở 1.7.1 — có thể mục này đã tự đóng. Đóng một mục đã tự khỏi cũng là việc; làm lại từ đầu thì không |
+| `KHUNG-59` | **Đắt nhất và nguy nhất.** Không chỉ chậm — nó **quy sai người** và có thể công bố việc làm dở của lane khác. Ứng viên rẻ: mọi chỗ commit đổi sang `git commit --only <đường dẫn>` |
+| `KHUNG-50` | Nửa còn lại của bài toán tốc độ. Vá 1.8.2 đã bỏ `claims.json` khỏi băm; cái còn lại là **HEAD đổi giữa lượt** — hợp lệ, nên chỗ chữa là worktree riêng, không phải nới băm |
+| `KHUNG-57` | `can-nang` **603 giây**, đắt hơn cả `npm test`. Lane `harness-migrate-3repo` mở 09/09 |
+| `KHUNG-55` | Thước kho chữ đọc **ĐĨA** thay vì HEAD |
 
-### Đợt 2 · CHỐNG TỰ DỐI — phép kiểm không phân biệt được hai nhánh là đồ trang trí
+### Đợt 2 · CHỜ MỘT VÒNG AUDIT SẠCH — không phải việc mới, là việc chưa đóng được
 
-`KHUNG-9` → `KHUNG-47` → `KHUNG-44` → `KHUNG-4`.
+`KHUNG-53` · `KHUNG-15` · `KHUNG-56` · `KHUNG-58`.
 
-Xếp sau đợt 1 vì đây là thuế **tương lai**, không phải thuế mỗi phiên: một phép kiểm luôn xanh
-không làm ai chậm hôm nay, nó chỉ làm mọi số đo mất giá **lúc ta cần tin chúng nhất**. Bốn mục
-độc lập nhau, chạy song song được nếu khác khoá.
+Bốn mục này **đã có bản vá trong HEAD** và đã qua audit độc lập, nhưng **chưa mục nào đóng** —
+người sửa không tự ký nghiệm thu (mục 5). Việc còn lại là **một vòng audit không tìm thêm lỗi**,
+rồi gạch mã. Rẻ, và nó dọn sổ nợ khỏi bốn mục trông như đang hỏng mà thật ra đã vá.
 
-### Đợt 3 · ĐƯỜNG PHÁT HÀNH
+**Đọc `docs/adr/` và `CHANGELOG.md` bản 1.8.1→1.8.7 trước khi động vào** — bốn vòng audit ngày
+10/09 để lại lý lẽ mà đọc code không thấy được.
 
-`KHUNG-7` → `KHUNG-39` → `KHUNG-51`.
+### Đợt 3 · CHỐNG TỰ DỐI — phép kiểm không phân biệt được hai nhánh là đồ trang trí
 
-Cả ba là chỗ hở của bản trích. Đứng sau đợt 2 vì sửa đường phát mà phép kiểm còn đang nói dối
-thì không biết mình đã sửa được hay chưa. `KHUNG-51`: Codex đã cô lập `upgrade-smoke` — **kiểm
-phần còn lại trước khi kết luận**.
+`KHUNG-9` → `KHUNG-47` → `KHUNG-44` → `KHUNG-4`. Bốn mục độc lập, chạy song song được nếu khác khoá.
 
-### Đợt 4 · Việc mới sinh 09/09
+### Đợt 4 · ĐƯỜNG PHÁT HÀNH
 
-`Y-12` (ONE LOADING LAW) → `Y-13` (đã bác, giữ để không ai đề xuất lại).
+`KHUNG-7` → `KHUNG-39`. (`KHUNG-51` đã dời lên đợt 1 vì nó thuộc họ cây-làm-việc-chung.)
 
-`Y-12` có một bản đề xuất 619 dòng **đã qua hai lượt review** ở repo `Chrome_Extension_AI_Agentic`.
-**ĐỌC TRƯỚC KHI THIẾT KẾ LẠI** — đừng phát minh lại thứ họ đã cho reviewer đập.
+### Đợt 5 · Việc mới sinh 09/09
+
+`Y-12` ONE LOADING LAW — có một bản đề xuất **619 dòng đã qua hai lượt review** ở repo
+`Chrome_Extension_AI_Agentic`. **ĐỌC TRƯỚC KHI THIẾT KẾ LẠI.**
 
 ### KHÔNG ĐỘNG VÀO — đang chờ Đức chốt
 
 `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08`.
 
-Và: **4 commit ở repo `Chrome_Extension_AI_Agentic` đang nằm local** vì cổng bên đó ĐỎ ở `B12` —
-nợ **có trước** lượt migrate. Đức chưa chốt có đẩy hay không. **Đừng tự đẩy.**
+### BỐN LUẬT LÀM VIỆC rút ra ngày 10/09 — áp cho MỌI mục ở trên
+
+1. **Vá ba lần cùng một chỗ = đang vá SAI TẦNG.** Cửa audit vá ba vòng, mỗi vòng bịt một chuỗi,
+   vòng sau lòi ra chuỗi khác. Gốc là *ai được quyền định nghĩa*, không phải regex nào thiếu.
+2. **Đề bài cho audit phải có THÂN HÀM, không chỉ `git diff`.** Sandbox Codex không đọc được repo;
+   vòng 2 nó nói *"chưa đủ bằng chứng"* và nó đúng — lỗi ở cách tôi giao đề.
+3. **Đặt một câu bắt người audit soi chính QUYẾT ĐỊNH của mình**, không chỉ soi code. Vòng 2 câu
+   *"tôi tự bác kế hoạch đã hứa với Đức, đúng hay sai?"* trả về một lý do tôi chưa nghĩ tới.
+4. **Phép ghim chỉ gồm phủ định thì chưa ghim gì.** Vế thành công đòi **mã thoát 0 + một chuỗi
+   dương**; vế từ chối đòi **đúng thông báo của cửa đó** — mã 1 một mình không phân biệt được nó
+   chết ở cửa nào. Đã dính đúng bẫy này một lần, trong chính lượt viết phép ghim.
 
 **Luật cắt ngang còn nguyên hiệu lực: GOM BẢN PHÁT.** Mỗi lượt cắt bản là một lần mọi repo đích
-phải nâng — gom nhiều mục vào một bản, đừng cắt một bản cho mỗi mục.
+phải nâng.
 
 ## Ba thứ roadmap này CỐ Ý không chứa
 
