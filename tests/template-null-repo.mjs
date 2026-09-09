@@ -58,9 +58,19 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
     claims.claims._root.task = "fixture Khoi A";
     fixture.set(".agents/claims.json", JSON.stringify(claims, null, 2) + "\n");
 
+    /* KHAI VÀO ĐÚNG FILE BẢN ĐỒ ĐÃ KHAI, không đóng cứng `AGENTS.md`. Bản trích 09/09 tách bảng
+       tra làm hai và khai `docs.file_map` trỏ sang `docs/BAN-DO-CHI-TIET.md`; fixture còn chèn vào
+       `AGENTS.md` thì cổng đọc một file còn fixture khai ở file khác — và CẢ KHỐI A đỏ vì một lý
+       do KHÔNG liên quan tới thứ nó định đo. Lần thứ hai cùng hình dạng trong một ngày (lần đầu:
+       `harness-smoke`), nên: ĐỌC KHAI BÁO, đừng nhớ tên file. */
     if (declared.length) {
+      const banDo = JSON.parse(fixture.get(".repo-structure.json"))?.docs?.file_map ?? "AGENTS.md";
       const rows = declared.map((rel) => `| Fixture Khoi A | \`${rel}\` |`).join("\n");
-      fixture.set("AGENTS.md", fixture.get("AGENTS.md").replace("\n## 7.", `\n${rows}\n\n## 7.`));
+      const cu = fixture.get(banDo);
+      assert.ok(cu, `fixture thieu file ban do da khai: ${banDo}`);
+      fixture.set(banDo, banDo === "AGENTS.md"
+        ? cu.replace("\n## 7.", `\n${rows}\n\n## 7.`)
+        : `${cu}\n${rows}\n`);
     }
     for (const [rel, content] of fixture) {
       const abs = join(tempRoot, ...rel.split("/"));
