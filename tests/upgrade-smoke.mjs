@@ -18,7 +18,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -30,6 +30,31 @@ let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 const NL = String.fromCharCode(10);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+// Toàn bộ đột biến chạy trong bản sao có lịch sử git; không sửa ledger của lane đang làm việc.
+if (process.env.ARK_UPGRADE_FIXTURE !== ROOT) {
+  const cha = mkdtempSync(join(tmpdir(), "ark-upgrade-fixture-"));
+  const rieng = join(cha, "source");
+  try {
+    execFileSync("git", ["clone", "--quiet", "--no-hardlinks", "--no-checkout", ROOT, rieng]);
+    execFileSync("git", ["reset", "--mixed", "HEAD"], { cwd: rieng, stdio: "pipe" });
+    const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+      { cwd: ROOT, encoding: "utf8" }).split("\0").filter(Boolean);
+    for (const rel of new Set(files)) {
+      if (!existsSync(join(ROOT, rel))) continue;
+      mkdirSync(dirname(join(rieng, rel)), { recursive: true });
+      cpSync(join(ROOT, rel), join(rieng, rel), { recursive: true });
+    }
+    const child = spawnSync(process.execPath, [join(rieng, "tests", "upgrade-smoke.mjs")],
+      { cwd: rieng, env: { ...process.env, ARK_UPGRADE_FIXTURE: rieng }, stdio: "inherit" });
+    if (child.error) throw child.error;
+    process.exitCode = child.status ?? 1;
+  } finally {
+    assert.ok(resolve(cha).startsWith(resolve(tmpdir()) + "/") || resolve(cha).startsWith(resolve(tmpdir()) + "\\"));
+    rmSync(cha, { recursive: true, force: true });
+  }
+  process.exit(process.exitCode ?? 0);
+}
 const chuan = buildTemplateFiles();
 
 const dungRepo = (ghiSoGhim) => {

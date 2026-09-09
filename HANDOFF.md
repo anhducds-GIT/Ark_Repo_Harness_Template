@@ -580,3 +580,7 @@ Dấu vân tay luật chung **KHÔNG đổi** — mục 6 vốn không thuộc p
 3.943. Thân ADR đã `Accepted` bất biến (B12), sổ chỉ-thêm đính chính bằng cách thêm.
 
 Bản **1.7.0**.
+
+### 2026-09-09 · codex-harness-hooks · Vá tối thiểu bằng chứng suite/cổng
+
+Đức giao trực tiếp sửa Ark, giữ rules, flow compile và trần context. Phạm vi: băm nội dung/index thay vì tên file; cổng xanh thật mới cấp bằng chứng cho tự carry; suite/cổng kiểm cây trước và sau lượt chạy; upgrade-smoke đột biến trong clone riêng. Không đổi luật hay thêm bước vận hành. Test mục tiêu: **14/14 xanh**, gồm đường suite → cổng → safe-push qua remote Git cục bộ và các ca cây đổi giữa lượt. Đang chờ audit độc lập, sinh bản trích và suite cuối; chưa nghiệm thu, chưa push.
