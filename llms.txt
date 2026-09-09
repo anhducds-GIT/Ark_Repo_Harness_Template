@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Việc ưu tiên #1
 
-- **_root** — Đức chốt có dời mốc Stable Baseline v1.2.17 sang 1.7.0 không — repo thứ ba trở đi vẫn đang lắp từ mốc cũ, tức vẫn nhận hiến pháp 13.8k token. Xem BACKLOG.md nhóm P0.
+- **_root** — Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà.
 
 ## Đọc theo thứ tự này
 

@@ -36,7 +36,7 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-loi-01",
-      "next_step": "Đức chốt có dời mốc Stable Baseline v1.2.17 sang 1.7.0 không — repo thứ ba trở đi vẫn đang lắp từ mốc cũ, tức vẫn nhận hiến pháp 13.8k token. Xem BACKLOG.md nhóm P0.",
+      "next_step": "Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà.",
       "human_action": "CÓ — bảng tự đếm, xem nhóm \\\"Công việc\\\". Trường này cố ý không giữ số: bản gõ tay là nguồn sự thật thứ hai, và 07/09 nó đã lệch thật.",
       "priority_rank": 1,
       "superseded_by": null,
@@ -49,7 +49,7 @@
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Đức chốt có dời mốc Stable Baseline v1.2.17 sang 1.7.0 không — repo thứ ba trở đi vẫn đang lắp từ mốc cũ, tức vẫn nhận hiến pháp 13.8k token. Xem BACKLOG.md nhóm P0.",
+      "title": "Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà.",
       "rank": 1,
       "claim": null
     }
