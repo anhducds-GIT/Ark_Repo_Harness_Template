@@ -23,76 +23,40 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 
 ## 2026-09-10 · harness-loi-02 · KHUNG-59: cua INDEX — `git commit` thoi cuon duoc viec lane khac
 
-**Da va, CHUA GACH MA** (muc 5: nguoi sua khong tu nghiem thu). Ban 1.8.8.
-
-`.githooks/commit-msg` doc nhan `Lane:` roi goi `claim.mjs --cua-index`; cua tu choi khi me sap
-vao commit co duong dan ma **chu khong phai lane do**. `--sua` tu bat `core.hooksPath`; cong DO
-`CUA_INDEX_TAT` neu tat. Ban trich 62 -> **64 file**.
+**Da va, CHUA GACH MA** (muc 5). Ban **1.8.9**. Chi tiet co che + bang do: `CHANGELOG.md` 1.8.8
+va 1.8.9. Bon fail-open cua vong audit + hai cho Codex neu ma toi khong sua (kem ly do):
+muc `KHUNG-59` trong `BACKLOG.md`. Day chi ghi **cho vap**.
 
 | Do | So |
 |---|---|
-| hook thay gi o `commit --only` va `-a` | DUNG me sap commit — git dat `GIT_INDEX_FILE` sang index TAM |
-| hook thoat != 0 | commit BI HUY · HEAD khong doi · me cua lane kia con nguyen trong index |
-| thao cua ra | ca hong KHUNG-59 **quay lai** (ve 3e) |
+| suite | 22 -> **23** · `cua-index.mjs` 12 ve, **9 dot bien, 9 luot DO** |
 | phan nap | 4.161 -> **4.194/4.200** token · kho chu **3.117/3.117** khong doi |
+| ban trich | 62 -> **64 file** |
 
-### HAI CHO VAP, deu do LOP BAO VE CUA REPO BAT, khong do toi doc lai code
+### BA CHO VAP — deu do LOP BAO VE CUA REPO BAT, khong do toi doc lai code
 
-⑴ **Fixture loi ra loi trong chinh ban va cua toi.** Cua suy goc repo tu **vi tri module**, nen
-doc index tam cua cay dang commit bang goc khac -> `fatal: unable to read <oid>`, va cua
-fail-closed se **chan MOI commit**. Va bang `--goc` do hook truyen vao. Cho nay se va that o
-`KHUNG-50`: mot `git worktree` rieng co goc khac goc module.
+⑴ **Fixture loi ra loi trong chinh ban va cua toi:** cua suy goc repo tu VI TRI MODULE, nen doc
+index tam cua cay dang commit bang goc khac -> `fatal: unable to read <oid>`; cua fail-closed se
+chan MOI commit. Va bang `--goc`. Se va that o `KHUNG-50` (`git worktree` co goc khac goc module).
 
-⑵ **Toi NEN muc 0b cho vua tran token, va lam RUNG BA MENH LENH PHU** — `node scripts/` bien mat
-khoi lenh chay mot suite (lenh khong con chay duoc), *"ghi vao so co rang buoc"* va *"sau khi
-suite xanh"* bien mat khoi luat bo sinh. **`COMMON_LAW_SHA256` cua bo trich chan lai.** Dung bai
-hoc da ghi 09/09 trong chinh file do, lan thu sau cung hinh dang. Cach xu dung: tra lai nguyen
-van, roi got token o cho TRUNG THAT — `STATUS.md` co hai truong noi cung mot cau *"MOT benh"*.
+⑵ **`COMMON_LAW_SHA256` chan toi nen muc 0b cho vua tran token** — rung ba menh lenh phu:
+`node scripts/` bien mat khoi mot lenh, *"ghi vao so co rang buoc"* va *"sau khi suite xanh"* bien
+mat khoi luat bo sinh. Lan thu SAU cung hinh dang trong repo nay. **Got o cho TRUNG, dung got o
+cho NGAN** — cho trung that la `STATUS.md` co hai truong noi cung mot cau.
 
-**Bai hoc mang di:** nen van xuoi de vua ngan sach la doi mot lop bao ve lay may token. Got o
-cho TRUNG, dung got o cho NGAN.
+⑶ **Ba trong bon fail-open cua vong audit la CUNG MOT LOI: tu viet BAN THU HAI cua mot thu da co**
+— bo doc nhan (`laneFromMessage` da co nha), cach doc ten file tu index, cach hoi *"cua co do
+khong"*. Luat muc 8 noi truoc roi, va toi van lam, vi mot bo doc `sed` ba dong "trong nhu" khong
+phai mot bo doc. Hom qua bai hoc la *"va ba lan cung mot cho = va sai tang"*; day la hinh dang
+SOM HON cua no.
 
-### VONG AUDIT DOC LAP tra REVISE — bon cho, ca bon deu DUNG (ban 1.8.9)
+### Con ho, va mot so dang nhin
 
-Tu dung lai tung ca roi moi tin (luat vang 4). **Ca bon la fail-open THAT** trong ban 1.8.8:
+Cua chi thay thu **da khai vao bang quyen**: hai lane deu khong nhan khoa thi khong lop nao biet
+cua ai. **Phan nap con 6 token du** — co che tiep theo khong ghi them duoc vao `AGENTS.md`.
 
-| Ma | Ca hong | Va |
-|---|---|---|
-| `CUA_INDEX_AMEND_BYPASS` | commit KHONG nhan (cua im lang) -> `--amend` them nhan cua minh; index bang HEAD nen me RONG -> cua cho qua. **Cong khong thay gi la vi nhan da co** | me rong thi soi lai noi dung so `HEAD^` |
-| `CUA_INDEX_PATH_LOSS` | git TRICH DAN duong dan ngoai ASCII -> file CO CHU doc thanh VO CHU | `-z` + `core.quotepath=false`, ca hai cua |
-| `CUA_INDEX_LANE_AMBIGUOUS` | hook tu doc nhan bang `sed` = bo doc THU HAI; `lane: A` + `Lane: B` lot cua duoi ten A roi duoc cong quy cho B | hook chuyen FILE loi nhan; dung `laneFromMessage` |
-| `CUA_INDEX_ACTIVATION_GAP` | cong chi hoi "file hook co ton tai khong" -> **xoa file hook la cong XANH** | tach "repo theo doi ma file mat" (DO) khoi "repo chua nhan cua" (bo qua) |
-
-**BA TRONG BON CHO LA CUNG MOT LOI: toi tu viet BAN THU HAI cua mot thu da co** — bo doc nhan,
-cach doc ten file tu index, cach hoi "cua co do khong". Luat muc 8 da noi truoc (*mot khai niem
-mot nha*) va toi van lam, vi bo doc `sed` ba dong "trong nhu" khong phai mot bo doc.
-
-**Bai hoc mang di:** truoc khi viet mot doan doc/phan tich gi, hoi **da co ai doc thu nay chua**.
-Hom qua bai hoc la "va ba lan cung mot cho = va sai tang"; hom nay la hinh dang som hon cua no —
-dung nguon su that thu hai NGAY LUOT DAU.
-
-Phep ghim: 8 -> **12 ve**, **9 dot bien, 9 luot DO**. Ghi ca MOT dot bien XANH: bo `-z` ma giu
-`core.quotepath=false` thi ve van xanh, va nguoc lai — hai cai moi cai tu du. Nen ve do ghim
-"co it nhat mot trong hai", khong ghim `-z` la thu chiu luc. Noi sai cho chiu luc la de phien
-sau go dung cai dang do.
-
-### Cho thu ba: MANG mot co che sang ma khong BAT no
-
-Suite `template-null-repo` DO ngay sau ban 1.8.9, va no dung: fixture dung mot repo tu ban trich
-nen repo do CO file `.githooks/commit-msg`, ma khong ai dat `core.hooksPath` — cong DO
-`CUA_INDEX_TAT`. **Do la trang thai that cua moi repo dich sau khi nang.** Mang mot co che sang
-ma khong bat no la mang mot co che DA TAT, trieu chung y het luc chua mang gi.
-
-Va o ba cho, khong o mot: `init-repo.mjs` bat luc DUNG · `upgrade.mjs` bat luc NANG (va NEU TEN,
-khong ghi de, neu repo dich da tro hooksPath di noi khac) · `claim.mjs --sua` bat luc GHI. Fixture
-cung bat, vi khong bat la fixture dung mot repo KHONG TON TAI — lan thu ba cung hinh dang trong
-repo nay.
-
-### Con ho, mang theo ca ve nay
-
-Cua chi thay thu **da khai vao bang quyen**. Hai lane deu khong nhan khoa thi khong lop nao biet
-cua ai. Va **phan nap con 6 token du** — co che tiep theo khong ghi them duoc vao `AGENTS.md`.
-
+**`KHUNG-50` vua xay ra truoc mat:** lane khac commit `c3a85a3` TRONG LUC suite toi chay -> HEAD
+doi -> `TREE_CHANGED`, mat dau xac nhan sau 461 giay xanh. Do la viec ke.
 
 ## 2026-09-09 · harness-phat-01 · Phat 1.3.76 ra 3 repo — 1 xanh, 2 BI CHINH LUAT CUA BO KHUNG CHAN
 
