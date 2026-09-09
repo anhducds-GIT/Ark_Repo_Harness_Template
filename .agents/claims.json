@@ -3,63 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T11:50:24.367Z",
       "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": null,
+      "released_at": "2026-09-09T12:20:42.094Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T11:50:24.415Z",
       "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": null,
+      "released_at": "2026-09-09T12:20:42.214Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T11:50:24.488Z",
       "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": null,
+      "released_at": "2026-09-09T12:20:42.343Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T11:50:24.543Z",
       "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": null
-    }
-  },
-  "tam": {
-    "scripts/build-template.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T11:48:53.883Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T11:48:53.883Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T11:50:24.309Z"
-    },
-    "STATUS.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T11:50:24.309Z"
-    },
-    "tests/template-null-repo.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T12:03:51.623Z"
+      "released_at": "2026-09-09T12:20:42.449Z"
     }
   }
 }
