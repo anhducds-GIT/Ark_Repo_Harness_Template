@@ -39,47 +39,5 @@
       "task": "chot phien ra soat luat",
       "released_at": "2026-09-08T23:28:01.239Z"
     }
-  },
-  "tam": {
-    "docs/protocols/ORCHESTRATOR.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "docs/briefs/ONBOARD-AI-REPO-DICH.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "tests/core-contract.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "decisions.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "template/docs/protocols/ORCHESTRATOR.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T02:21:47.759Z"
-    }
   }
 }
