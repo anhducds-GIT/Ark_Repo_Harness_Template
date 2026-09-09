@@ -40,27 +40,11 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "e59713a4eb4dfe2a",
+  "_fingerprint": "dcc5a9d0b910315a",
   "tam": {
-    "scripts/repo-structure.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T17:20:12.111Z"
-    },
-    "scripts/chay-test.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T17:20:12.111Z"
-    },
-    "scripts/build-dashboard.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T17:20:12.111Z"
-    },
-    "scripts/session-check.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T17:22:30.222Z"
-    },
-    "tests/dau-suite-smoke.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T17:22:30.222Z"
+    "docs/migrations/2026-09-09-nav-platform.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T17:34:57.553Z"
     }
   }
 }

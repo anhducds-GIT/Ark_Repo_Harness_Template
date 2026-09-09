@@ -66,8 +66,9 @@ sạch — không cần `--force`, không xoá việc của ai.
 
 ## CÒN MỞ — phải báo Đức
 
-Repo này có **6 commit chưa đẩy**, trong đó **2 commit không mang nhãn `Lane:`**: một của lane
-trước (`a222239`), một **của tôi** (`1f49daf`). Tên phiên tôi được giao có khoảng trắng, và
+Repo này có **9 commit chưa đẩy** (đếm lại cuối lượt: 4 của lane trước + 5 của tôi), trong đó
+**2 không quy thuộc được**: `a222239` không có nhãn `Lane:` nào (lane trước), và `1f49daf` **của
+tôi** mang nhãn `harness Asistant migration` — có nhãn nhưng máy **từ chối** vì có khoảng trắng. Tên phiên tôi được giao có khoảng trắng, và
 `laneFromMessage` từ chối nhãn có khoảng trắng (`LANE_CO_KHOANG_TRANG`) — tôi phát hiện sau khi
 đã commit, và **không tự sửa lịch sử** vì `AGENTS.md` mục 2 bắt hỏi trước.
 
