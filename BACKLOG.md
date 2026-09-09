@@ -752,3 +752,38 @@ Liên quan: `KHUNG-44` (luật bàn giao hai vai chưa cưỡng chế), `Y-02` (
 **đóng khi:** dựng một kho hai lane — lane A có một commit khai *chưa qua audit*, lane B cổng XANH
 chạy `safe-push --carry` — rồi đòi `safe-push` **TỪ CHỐI** và nêu đích danh commit chưa duyệt, kèm
 đối chứng NGƯỢC: cùng kho đó, khi commit của A khai *đã qua audit* thì `--carry` phải **cho qua**.
+
+### KHUNG-57 · `can-nang.mjs` chạy **603 giây** — đắt hơn cả bộ test, mà số nó in ra lấy được trong 0 giây
+
+Đo 09/09 trên repo nhà, đồng hồ tường:
+
+| Lệnh | Giây | Ghi chú |
+|---|---|---|
+| `node scripts/rule-compiler.mjs --nap` | **0** | |
+| `node scripts/check-bootstrap.mjs` | **14** | |
+| `node scripts/session-check.mjs --quick` | **34** | đã gồm mục "Ngân sách trong trần" |
+| `npm test` (22 suite) | **582** | dấu xác nhận, `so_suite: 22` |
+| **`node scripts/can-nang.mjs`** | **603** | **đắt hơn cả `npm test`** |
+
+`AGENTS.md` mục 8 kết bằng đúng lệnh này — *"Cân nặng được ĐO, không để cảm tính"* + `npm run
+can-nang`. Tức hiến pháp mời mọi phiên chạy một lệnh **10 phút**, ở đúng lúc phiên đang muốn cân
+nhắc thêm một dòng luật. Lệnh nào đắt hơn cả bộ test thì phiên sau sẽ bỏ qua nó, rồi quay lại
+đúng chỗ *"cảm tính luôn nói thêm một cái nữa thì có sao đâu"*.
+
+**Và con số chính nó in ra thì miễn phí.** Vế kho chữ, đo cùng lúc:
+
+```bash
+find docs -name "*.md" -not -path "docs/adr/*" -not -path "docs/archive/*" \
+  -not -path "docs/migrations/*" -exec cat {} + | wc -l      # 3371, trong 0 giây
+```
+
+`session-check` báo `3371/3371` — **khớp từng đơn vị**. Phiên này đã gọi cổng 34 giây **tám lượt**
+để lấy một con số có sẵn trong 0 giây: **~4,5 phút đốt vì chọn nhầm dụng cụ đo.**
+
+**Chưa dò ra hàm nào chậm** — mới đo ở mức lệnh, chưa mở máy. Nghi cùng họ với KHUNG-9/KHUNG-10
+(quét đệ quy cả `docs/` nhiều lượt).
+
+**đóng khi:** `node scripts/can-nang.mjs` ở repo nhà chạy **dưới 30 giây** (đo bằng đồng hồ tường,
+ghi số vào mục này), in ra **đúng cùng các con số** như trước khi vá — đối chiếu từng vế với
+`session-check`, không chỉ "trông giống" — và có một phép ghim canh trần thời gian đó, để lần sau
+nó chậm lại thì máy nói chứ không phải người phát hiện sau 10 phút chờ.
