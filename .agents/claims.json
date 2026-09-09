@@ -39,5 +39,51 @@
       "task": "rule compiler v1 + fixture",
       "released_at": "2026-09-09T06:35:26.832Z"
     }
+  },
+  "tam": {
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "tests/cong-do-that.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "docs/adr/0015-context-compiler.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "decisions.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    },
+    "template/scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:41:03.328Z"
+    }
   }
 }

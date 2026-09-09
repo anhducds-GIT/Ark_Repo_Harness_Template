@@ -17,6 +17,7 @@ import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_DOCS_KHONG_TINH, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { napContext } from "./rule-compiler.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
 import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
@@ -1386,7 +1387,31 @@ check("Mọi lệnh git đọc được", () => {
 ghepKiem("Ai đứng tên việc này", ["khoá file", doKhoaFile], ["phạm vi", doPhamVi]);
 ghepKiem("Vùng CHỈ-THÊM không bị viết lại", ["bằng chứng", doBangChung], ["sổ quyết định", doSoQuyetDinh]);
 ghepKiem("HANDOFF đã ghi Log, đúng trần, đúng tháng", ["ghi Log", doGhiLog], ["trần/tháng", doTranHandoff]);
-ghepKiem("Ngân sách trong trần", ["kho chữ", doKhoChu], ["sổ nợ", doSoNo]);
+/* PHẦN NẠP — CONTEXT COMPILER, gắn vào cổng ở ĐÂY chứ không thành một mục riêng.
+ *
+ * Đây là thứ Đức gọi là điểm quan trọng nhất: sổ cái được phép phình vô hạn, **thứ NẠP thì
+ * không**. Một lệnh không ai chạy thì nó không canh gì — nên nó phải nằm trong cổng.
+ *
+ * Vì sao GỘP vào mục ngân sách thay vì thêm mục thứ 26: nó LÀ một thước ngân sách, và Đức vừa
+ * chốt giảm số phép kiểm xuống 25. Thêm một mục để cưỡng chế luật chống-phình thì tự mâu thuẫn.
+ *
+ * Đo cái gì: `AGENTS.md` + phần cuối `HANDOFF.md` — thứ MỌI phiên ở MỌI repo phải nạp, nên mỗi
+ * dòng ở đây nhân theo (số repo × số phiên). Kho `docs/` KHÔNG tính: nó mở khi cần. */
+const doNap = () => {
+  const tran = structure?.budget?.docBatBuoc;
+  if (typeof tran !== "number") return { ok: true, msg: "repo chưa khai `budget.docBatBuoc` — không có thước thì không đo." };
+  let kq;
+  try { kq = napContext(ROOT, tran); } catch (e) { return { ok: true, skipped: true, msg: `không đo được phần nạp: ${String(e.message).split(String.fromCharCode(10))[0]}` }; }
+  const tyLe = Math.round(kq.napDong * 100 / Math.max(1, kq.napDong + kq.khongNap));
+  if (kq.dat) return { ok: true, msg: `${kq.napDong}/${kq.tran} dòng nạp mỗi phiên · ${kq.khongNap} dòng để dành (${tyLe}% nạp).` };
+  return {
+    ok: false,
+    msg: `PHAN_NAP_VUOT_TRAN: ${kq.napDong}/${kq.tran} dòng. Đây là thứ MỌI phiên ở MỌI repo nạp, nên mỗi dòng nhân theo (số repo × số phiên). `
+      + "Bớt ở `AGENTS.md` (luật mục 8: thêm một luật thì bớt một luật), đừng nới trần."
+  };
+};
+
+ghepKiem("Ngân sách trong trần", ["kho chữ", doKhoChu], ["sổ nợ", doSoNo], ["phần nạp", doNap]);
 
 const EXPECTED_CHECKS = 12;
 if (results.length !== EXPECTED_CHECKS) {

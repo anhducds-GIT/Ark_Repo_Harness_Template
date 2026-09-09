@@ -673,3 +673,28 @@ thì phải nhắc cả `AGENTS.md` — phát biểu luật một mình là khô
 **Bài học về phép đo, lặp lại lần thứ ba trong ngày:** bản đầu đo theo **dòng** và báo lệch hai chỗ
 lành (một bảng đối chiếu kỹ thuật, một dòng NỐI của đoạn đã trỏ đúng). Đo theo **đoạn** thì sạch.
 Phép đo chặt hơn thực tế cũng nguy như phép đo lỏng hơn — người ta sẽ tắt nó.
+
+## 2026-09-09 · CONTEXT COMPILER, và máy KHÔNG được tự cắt luật
+
+> **trạng thái:** đang hiệu lực — hai nguyên tắc dưới đây đang cưỡng chế ở cổng đóng phiên.
+
+**Đức chốt:** *"chốt thiết kế Rule Compiler V1 riêng gồm append → merge → supersede → trim →
+compile, rồi mới gắn nó vào Context Compiler. đây là điểm quan trọng nhất để chốt các rules."*
+Kèm uỷ quyền: *"việc tổng hợp rules, tự động compile & control sẽ do AI chủ động hoàn toàn."*
+
+**Chốt:** [ADR-0015](docs/adr/0015-context-compiler.md), bổ sung ADR-0014. Năm lệnh:
+`--so-cai` · `--de-xuat` · frontmatter (supersede) · `--trim` · **`--nap`**.
+
+**Số đo 09/09:** một phiên nạp **284/300 dòng**; phần **KHÔNG nạp 4.499 dòng** — **6% nạp**.
+Nên *"tổng tài liệu 3.602/2.200"* **không phải chi phí ngữ cảnh**: kho tài liệu là thư viện tra
+cứu, 94% không bao giờ được nạp. Thứ phải giữ nhỏ là **phần NẠP**, và nó đang trong trần.
+
+**Bài học đắt nhất:** `--trim` bản đầu cắt theo tín hiệu đo được và **bắt oan ba lượt liên tiếp**
+— *Trần sổ nợ giữ 25* (trần vẫn cưỡng chế) · *Migrate là BA việc* (định nghĩa đang dùng) · *Cơ chế
+suite song song* (chứa nguyên tắc vừa áp lại cùng ngày). **Một mục sổ quyết định thường chứa CẢ
+bản ghi việc đã xong LẪN một nguyên tắc đang sống.** Nên máy chỉ cắt thứ ĐÃ KHAI
+(`> **trạng thái:** đã thi hành`), và `đang hiệu lực` thắng mọi tín hiệu.
+
+**Cưỡng chế:** cổng đóng phiên, gộp vào mục *"Ngân sách trong trần"* — **không** thành mục thứ 26,
+vì thêm một phép kiểm để cưỡng chế luật chống-phình thì tự mâu thuẫn. Ghim ca đỏ thật ở
+`tests/cong-do-that.mjs` vế 14.

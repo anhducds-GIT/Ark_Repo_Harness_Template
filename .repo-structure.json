@@ -135,5 +135,9 @@
       "tran-ngan-sach": "Trần và ngân sách",
       "khoa": "Khoá: vùng và file"
     }
+  },
+  "budget": {
+    "docBatBuoc": 300,
+    "_doc_nap": "docBatBuoc = so dong MOI phien phai nap truoc khi lam duoc gi (AGENTS.md + phan cuoi HANDOFF.md). Cong doc no qua `napContext`. Moi dong o day nhan theo (so repo x so phien) — noi tran la cho phep moi phien o moi repo ton them."
   }
 }

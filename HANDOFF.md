@@ -591,3 +591,16 @@ ngữ cảnh 200 ký tự không với tới `copyFileSync`). Và nó từng bá
 đó dùng để QUÉT MÃ NGUỒN chứ không chép — đã thu hẹp về đúng ngữ cảnh `copyFileSync`.
 
 Bản **1.4.1**.
+
+### 2026-09-09 (14) · harness-loi-01 · Context Compiler có RĂNG + ADR-0015
+
+**Gắn `--nap` vào cổng đóng phiên**, gộp vào mục *"Ngân sách trong trần"* — **không** thành mục
+thứ 26, vì thêm một phép kiểm để cưỡng chế luật chống-phình thì tự mâu thuẫn. Số phép kiểm vẫn
+**25**. Ghim ca ĐỎ THẬT: `cong-do-that` vế 14 — hạ trần xuống 2 thì cổng ĐỎ kèm mã
+`PHAN_NAP_VUOT_TRAN`, trả trần về thì XANH lại (cửa ra phải mở, không thì người ta tháo cổng).
+
+**ADR-0015** ghi hai thứ ADR-0014 chưa có: ⑴ Context Compiler và số đo **6% nạp**; ⑵ **máy KHÔNG
+được tự cắt luật** — ba lượt bắt oan liên tiếp chứng minh một mục sổ quyết định thường chứa CẢ
+bản ghi việc đã xong LẪN một nguyên tắc đang sống.
+
+Bản **1.4.3**. Bộ luật: **16 ADR · 6 chủ đề · 0 vi phạm**.

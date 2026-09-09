@@ -646,4 +646,45 @@ function docMuc(kho, ten, as = "thu") {
   } finally { rmSync(cha, { recursive: true, force: true }); }
 }
 
+/* ---- 14. Phan NAP vuot tran thi cong DO ---------------------------------
+ *
+ * CONTEXT COMPILER co rang hay khong nam o ve nay. Duc chot 09/09 day la diem quan trong nhat:
+ * so cai duoc phep phinh vo han, thu NAP thi khong. Mot lenh khong ai chay thi no khong canh gi,
+ * nen no phai nam trong cong — va cong phai DO THAT duoc.
+ *
+ * Gop vao muc "Ngan sach trong tran" chu khong thanh muc thu 26: no LA mot thuoc ngan sach, va
+ * them mot muc de cuong che luat chong-phinh thi tu mau thuan. */
+{
+  const { cha, kho, at } = khoNen();
+  try {
+    const datTran = (n) => {
+      const ct = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+      ct.budget = { ...(ct.budget || {}), docBatBuoc: n };
+      writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(ct, null, 2) + NL, "utf8");
+    };
+    const luot = (ten) => { at("add", "-A"); at("commit", "-q", "-m", ten + NL + NL + "Lane: thu"); };
+
+    // Doi chung: tran rong rai thi XANH. Chua xanh o day thi moi khang dinh duoi vo nghia.
+    writeFileSync(join(kho, "AGENTS.md"), ["# AGENTS", "", "luat ngan."].join(NL) + NL, "utf8");
+    datTran(300);
+    luot("luat ngan, tran rong");
+    let m = docMuc(kho, "Ngân sách trong trần");
+    assert.equal(m.trangThai, "XANH", `luat ngan / tran 300 phai XANH, dang: ${m.chiTiet}`);
+
+    // Phá ĐÚNG MỘT thứ: hạ trần xuống dưới số dòng thật. Khong dung toi file nao khac.
+    datTran(2);
+    luot("ha tran nap xuong 2");
+    m = docMuc(kho, "Ngân sách trong trần");
+    assert.equal(m.trangThai, "ĐỎ", `phan nap vuot tran phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+    assert.ok(m.chiTiet.includes("PHAN_NAP_VUOT_TRAN"), `thieu ma loi PHAN_NAP_VUOT_TRAN: ${m.chiTiet}`);
+
+    // Cua ra phai mo: nang tran lai thi XANH. Mot cong khong xoa duoc la cai bay khoa ca repo.
+    datTran(300);
+    luot("tra tran ve 300");
+    m = docMuc(kho, "Ngân sách trong trần");
+    assert.equal(m.trangThai, "XANH", `tra tran ve thi phai XANH lai, dang: ${m.chiTiet}`);
+    ok("14 · phần NẠP: trong trần XANH · vượt trần ĐỎ kèm mã lỗi · trả trần về thì XANH lại");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+}
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);
