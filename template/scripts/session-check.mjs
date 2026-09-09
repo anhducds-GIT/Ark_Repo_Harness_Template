@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_DOCS_KHONG_TINH, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
 import { napContext } from "./rule-compiler.mjs";
-import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
+import { bamLenh, danhSachSuite, dauCay, docDau, xetDau, ghiDauCong, xoaDauCong, moiTruongNay } from "./chay-test.mjs";
 import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
 
@@ -91,6 +91,14 @@ const MOC = (() => {
   } catch { /* chưa có upstream */ }
   return "origin/main";
 })();
+
+// Mỗi lượt cổng thay thế bằng chứng cũ, kể cả lượt --quick hay lượt bị lỗi.
+let dauCongTruoc;
+let loiDauCong;
+try {
+  xoaDauCong(ROOT);
+  dauCongTruoc = { ...dauCay(ROOT), lenh: bamLenh(danhSachSuite(ROOT)), moc: git("rev-parse", "--verify", MOC).trim() };
+} catch (e) { loiDauCong = e.message; }
 
 const results = [];
 const check = (name, fn) => {
@@ -908,7 +916,7 @@ check("Test xanh", () => {
      * kiểm thêm được gì so với nửa đầu.
      *
      * KHÔNG PHẢI NỚI LỚP BẢO VỆ. Điều kiện để dùng lại chặt hơn vẻ ngoài của nó: dấu phải khớp
-     * **HEAD** + **băm của `git status --porcelain -uall`** + **danh sách suite** + còn **trong
+     * **HEAD** + **băm index và nội dung thay đổi** + **danh sách suite** + còn **trong
      * hạn**. Sửa một byte ở bất kỳ file nào, kể cả file chưa track, là băm đổi và cổng chạy lại
      * đủ bộ. Suite đỏ thì `chay-test.mjs` XOÁ dấu chứ không ghi dấu đỏ, nên không có đường nào
      * để một cây chưa xanh lại có dấu hợp lệ. Dấu không được commit, nên không mượn được của
@@ -1538,6 +1546,19 @@ if (boQua.length) {
   console.log("KHÔNG được báo xong: cổng chưa nhìn thấy thứ nó phải canh. Từng mục:");
   for (const r of boQua) console.log(`  · ${r.name}`);
   console.log("");
+  process.exit(2);
+}
+try {
+  if (loiDauCong) throw new Error(loiDauCong);
+  const sau = dauCay(ROOT);
+  if (sau.head !== dauCongTruoc.head || sau.bam !== dauCongTruoc.bam
+      || git("rev-parse", "--verify", MOC).trim() !== dauCongTruoc.moc) {
+    throw new Error("TREE_CHANGED: cây hoặc mốc remote đã đổi trong lúc chạy cổng; chạy lại trên cây ổn định.");
+  }
+  ghiDauCong(ROOT, { ...dauCongTruoc, loai: "session-check", as: asLabel, ok: true,
+    moi_truong: moiTruongNay(), luc: new Date().toISOString() });
+} catch (e) {
+  console.error(`\nCHƯA ĐỦ BẰNG CHỨNG — không ghi được kết quả cổng: ${e.message}`);
   process.exit(2);
 }
 console.log(`\nXANH TOÀN BỘ — được phép báo xong.\n`);

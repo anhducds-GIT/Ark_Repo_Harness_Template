@@ -233,3 +233,9 @@ Danh sách **54 lối** ở tab Cấu trúc chiếm **2.011px trong 3.052px** c�
 ---
 
 **Phần CŨ hơn đã dời sang kho lưu trữ** — [`docs/archive/`](docs/archive/) · chữ giữ nguyên từng dòng, cắt bằng `npm run don`.
+
+## 1.7.1 — 2026-09-09 — Sửa bằng chứng suite/cổng và cô lập test ledger
+
+Dấu suite ghim nội dung file thay đổi và index; sửa tiếp file đã bẩn cũng hết hiệu lực. Suite và cổng chỉ cấp dấu khi cây trước/sau lượt chạy khớp. Tự carry dùng kết quả toàn cổng của đúng phiên và mốc remote, không dùng dấu suite thay thế. Test upgrade phá ledger trong clone riêng có lịch sử Git.
+
+Không đổi rules, flow compile, trần context, lệnh vận hành hay số mục cổng. Audit độc lập mã `e46492a`: PASS; 14 ca dấu/cổng, 24 ca upgrade và 9 ca template-null đạt.

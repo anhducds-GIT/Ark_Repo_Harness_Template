@@ -3,11 +3,11 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "codex-harness-hooks",
       "ai": null,
-      "claimed_at": "2026-09-09T11:50:24.367Z",
-      "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": "2026-09-09T12:20:42.094Z",
+      "claimed_at": "2026-09-09T13:26:33.606Z",
+      "task": "Phat ban va 1.7.1, ghi changelog va ledger; khong doi luat hay tran",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
@@ -33,25 +33,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "codex-harness-hooks",
       "ai": null,
-      "claimed_at": "2026-09-09T11:50:24.543Z",
-      "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": "2026-09-09T12:20:42.449Z"
-    }
-  },
-  "tam": {
-    "package.json": {
-      "owner": "codex-harness-hooks",
-      "luc": "2026-09-09T13:11:51.464Z"
-    },
-    "CHANGELOG.md": {
-      "owner": "codex-harness-hooks",
-      "luc": "2026-09-09T13:11:51.464Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "codex-harness-hooks",
-      "luc": "2026-09-09T13:11:51.464Z"
+      "claimed_at": "2026-09-09T13:26:32.740Z",
+      "task": "Sinh ban va 1.7.1 sau audit doc lap",
+      "released_at": null
     }
   }
 }

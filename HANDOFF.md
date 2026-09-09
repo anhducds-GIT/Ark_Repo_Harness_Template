@@ -584,3 +584,7 @@ Bản **1.7.0**.
 ### 2026-09-09 · codex-harness-hooks · Vá tối thiểu bằng chứng suite/cổng
 
 Đức giao trực tiếp sửa Ark, giữ rules, flow compile và trần context. Phạm vi: băm nội dung/index thay vì tên file; cổng xanh thật mới cấp bằng chứng cho tự carry; suite/cổng kiểm cây trước và sau lượt chạy; upgrade-smoke đột biến trong clone riêng. Không đổi luật hay thêm bước vận hành. Test mục tiêu: **14/14 xanh**, gồm đường suite → cổng → safe-push qua remote Git cục bộ và các ca cây đổi giữa lượt. Đang chờ audit độc lập, sinh bản trích và suite cuối; chưa nghiệm thu, chưa push.
+
+### 2026-09-09 · codex-harness-hooks · Audit PASS, chuẩn bị bản 1.7.1
+
+Auditor độc lập nghiệm thu mã `e46492a`: **PASS**, tự chạy dấu/cổng **14/14**, upgrade **24/24**, template-null **9/9**; bản thử trong clone khớp **62 file**. Tôi thử ba đột biến (bỏ băm nội dung, dùng dấu suite thay cổng, bỏ so cây trước/sau): cả ba bị ca hành vi bắt. Khi chạy upgrade, **3.117 lần đọc ledger nguồn mỗi 50 ms**, không lần nào thấy nội dung đổi. Bản 1.7.1 giữ nguyên luật, flow compile, trần context và số mục cổng. Suite/cổng cuối là bước sau commit và sinh artifact; chưa tuyên bố đã xanh ở đây.

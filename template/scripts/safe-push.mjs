@@ -19,7 +19,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
-import { bamLenh, danhSachSuite, dauCay, docDau, xetDau } from "./chay-test.mjs";
+import { bamLenh, danhSachSuite, dauCay, docDauCong, xetDauCong } from "./chay-test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -263,7 +263,8 @@ if (blocked.length && !carry) {
   let dauXanh = false;
   let viSaoDau = "chua doc duoc dau xac nhan";
   try {
-    const xet = xetDau(docDau(ROOT), dauCay(ROOT), bamLenh(danhSachSuite(ROOT)));
+    const xet = xetDauCong(docDauCong(ROOT), dauCay(ROOT), bamLenh(danhSachSuite(ROOT)),
+      { as: asLabel, moc: gitQuiet("rev-parse", "--verify", REMOTE).trim() });
     dauXanh = Boolean(xet && xet.dung);
     viSaoDau = (xet && xet.vi_sao) || viSaoDau;
   } catch (e) {
