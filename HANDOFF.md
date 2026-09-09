@@ -494,3 +494,44 @@ giữ lại **theo chỉ số** → lệch 2 và giữ nhầm gần hết, mất
 khỏi đường nạp** vào thư viện tra cứu. Từ đây lại CHỈ ĐƯỢC SIẾT.
 
 Bản **1.5.0**.
+
+### 2026-09-09 (16) · harness-loi-01 · HIẾN PHÁP MỎNG: nạp mỗi phiên 5.804 → 3.943 token
+
+**Đức chốt ba điều:** ⑴ *"mục tiêu không phải đạt ngưỡng, mà phải nhỏ hơn ngưỡng margin là
+30-40%"* · ⑵ *"mục 1 đổi từ 'đọc cuối HANDOFF.md' sang 'đọc STATUS.md'"* · ⑶ uỷ quyền thường
+trực cho AI tự nén và tái kiến trúc luật.
+
+**Chẩn đoán:** lượt trước cắt bảng tra (73% token). Thứ thừa lần này **không phải bảng** mà là
+**LÝ LẼ** — mỗi luật mang theo sự cố sinh ra nó, và sự cố chỉ cần đọc **một lần trong đời**.
+
+**Việc làm — KHÔNG xoá luật nào, chỉ ĐỔI CHỖ, mỗi thứ có nhà đã khai trong bản đồ:**
+lý lẽ · số đo · sự cố → `docs/VI-SAO-LUAT.md` (mới) · ba luật cơ chế khoá mà `claim.mjs` **tự
+chặn và tự nêu tên khoá thiếu** → `MULTIFLOW.md` · cách lắp repo mới → `README.md`. Tiêu chí
+chia **không phải độ dài mà là**: *luật nào máy KHÔNG chặn được thì ở lại Tầng 1*.
+
+**Số:** `AGENTS.md` **4.907 → 3.386** · TRẠNG THÁI **897 → 557** (đuôi `HANDOFF` → `STATUS.md`)
+· **tổng nạp 5.804 → 3.943/4.200 — ĐẠT**. So mốc đầu 13.799: **giảm 71%**. `budget.tokenNap`
+siết **6.000 → 4.200**, tức **vạch biên 30%** dưới trần thật, để cổng ĐỎ **sớm**.
+
+**AUDIT ĐỘC LẬP CODEX — và đây là phần đáng nhớ nhất của lượt.** Codex đọc diff (sandbox của nó
+không đọc được repo, phải đưa nội dung qua stdin) và nêu **bốn chỗ luật bị LÀM YẾU**. Kiểm lại
+từng cái: **cả bốn đúng**, đã trả lại nguyên văn — ⑴ mục 0 mất lệnh đọc luật của VÙNG sắp đụng ·
+⑵ năm câu thu hẹp còn "thêm một luật", mất *"phép kiểm hay tài liệu"* · ⑶ mất QUYỀN *"vai nào
+cũng được tìm lỗi ở bất kỳ đâu"* · ⑷ mất mệnh lệnh *"viết lại đơn giản hơn"*.
+**Bài học: nén văn xuôi làm RỤNG MỆNH LỆNH PHỤ, và người nén không thấy vì họ vẫn nhớ câu gốc.**
+Ghi cạnh dấu vân tay trong `build-template.mjs` để lượt nén sau đọc trước khi cắt.
+
+Codex cũng bắt hai chỗ trùng/mâu thuẫn, đã sửa: `VI-SAO-LUAT.md` tự nhận *"không phát biểu
+luật"* trong khi năm câu chính là luật → nói thẳng nó có ĐÚNG MỘT luật và là nhà duy nhất ·
+số đo 22 giây/9 phút nằm hai chỗ → **một con số một chỗ**. Và ADR-0015 còn dạy *"TRẠNG THÁI =
+phần cuối HANDOFF"* → **ADR-0016** khai `sua: 0015`.
+
+**Ba lỗi tự gây, ghi vì sẽ lặp:** ⑴ heredoc bash chết giữa chừng với văn bản dài có rào ```` ``` ````
+— đổi sang công cụ ghi file · ⑵ `last_verified_commit` viết băm 7 ký tự, B2 đòi 40 — và nó đọc
+từ **HEAD**, nên sửa trên đĩa không đủ, phải commit rồi mới kiểm lại · ⑶ dấu vân tay luật chung
+phải cập nhật **hai lần** vì tôi sửa `AGENTS.md` sau khi đã chốt băm.
+
+**Bản trích nay mang `docs/VI-SAO-LUAT.md`** (hạt giống khung rỗng): hiến pháp trỏ tới nó ở hai
+chỗ, và phép kiểm *"luật trỏ tới file bản trích không mang"* bắt đúng chỗ đó.
+
+Bản **1.6.0**. `npm test` **22/22 xanh**. Bộ luật: **17 ADR · 6 chủ đề · 0 vi phạm**.

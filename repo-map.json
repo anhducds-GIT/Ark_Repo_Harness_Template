@@ -35,21 +35,21 @@
       "path": ".",
       "lifecycle": "active",
       "status_md": "STATUS.md",
-      "owner": "claude-bang9tab",
-      "next_step": "Gọt bộ khung theo bài học của repo tiêu thụ: bảy giới hạn Đức chốt 07/09, quan trọng nhất là NGÂN SÁCH DÒNG cho file luật và luật DỪNG khi hết việc sản phẩm. Xem BACKLOG.md nhóm P0.",
-      "human_action": "CÓ — bảng tự đếm, xem nhóm \\\"Công việc\\\". Trường này CỐ Ý không giữ danh sách và không giữ con số: máy đếm được thì máy đếm, còn một bản gõ tay là nguồn sự thật thứ hai, và ngày 07/09 nó đã lệch thật — nó nói bốn mục trong khi máy đếm mười ba, và hai trong bốn mục nó nêu đã đóng. Xem ADR-0006.",
+      "owner": "harness-loi-01",
+      "next_step": "Giữ token nạp mỗi phiên dưới vạch biên 4.200 — xem BACKLOG.md nhóm P0.",
+      "human_action": "CÓ — bảng tự đếm, xem nhóm \\\"Công việc\\\". Trường này cố ý không giữ số: bản gõ tay là nguồn sự thật thứ hai, và 07/09 nó đã lệch thật.",
       "priority_rank": 1,
       "superseded_by": null,
-      "last_verified": "2026-09-06",
-      "last_verified_commit": "baebd07fafa3a5e1435977894372a2ba76a76599",
-      "open_item": "Bảng gom 10 tab thành BỐN nhóm, mỗi khái niệm một chỗ canonical — xem ADR-0006. Đây là lượt CẮT: thước đo của lượt là số dòng luật GIẢM, không phải số tính năng tăng."
+      "last_verified": "2026-09-09",
+      "last_verified_commit": "0b3a256ac8719add20d262aca566d2285ac171e6",
+      "open_item": "Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2."
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Gọt bộ khung theo bài học của repo tiêu thụ: bảy giới hạn Đức chốt 07/09, quan trọng nhất là NGÂN SÁCH DÒNG cho file luật và luật DỪNG khi hết việc sản phẩm. Xem BACKLOG.md nhóm P0.",
+      "title": "Giữ token nạp mỗi phiên dưới vạch biên 4.200 — xem BACKLOG.md nhóm P0.",
       "rank": 1,
       "claim": null
     }

@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Việc ưu tiên #1
 
-- **_root** — Gọt bộ khung theo bài học của repo tiêu thụ: bảy giới hạn Đức chốt 07/09, quan trọng nhất là NGÂN SÁCH DÒNG cho file luật và luật DỪNG khi hết việc sản phẩm. Xem BACKLOG.md nhóm P0.
+- **_root** — Giữ token nạp mỗi phiên dưới vạch biên 4.200 — xem BACKLOG.md nhóm P0.
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — Bảng gom 10 tab thành BỐN nhóm, mỗi khái niệm một chỗ canonical — xem ADR-0006
+- [ark-repo-harness](STATUS.md): active — Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2.
 
 ## Luật bắt buộc trước khi sửa gì
 

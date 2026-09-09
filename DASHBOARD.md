@@ -6,7 +6,7 @@ Trang được sinh ngày 2026-09-09. Đây là lúc sinh trang, **KHÔNG phải
 
 ## A · Bắt đầu từ đâu
 
-1. **Việc ưu tiên #1** — **_root** — Gọt bộ khung theo bài học của repo tiêu thụ: bảy giới hạn Đức chốt 07/09, quan trọng nhất là NGÂN SÁCH DÒNG cho file luật và luật DỪNG khi hết việc sản phẩm. Xem BACKLOG.md nhóm P0. · [STATUS](STATUS.md)
+1. **Việc ưu tiên #1** — **_root** — Giữ token nạp mỗi phiên dưới vạch biên 4.200 — xem BACKLOG.md nhóm P0. · [STATUS](STATUS.md)
 2. **Phiên gần nhất** — 2026-09-09 · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
@@ -15,7 +15,7 @@ Trang được sinh ngày 2026-09-09. Đây là lúc sinh trang, **KHÔNG phải
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.5.3 | active | 0 | 21 | 2026-09-06 @ `baebd07` — npm test 145/145 xanh · cổng đóng phiên XANH TOÀN BỘ 11/11 · bản 1.3.1 đã phát, dấu vân tay 5b2b74c0eee8e3b6 trong sổ phát hành · audit độc lập Codex 05/09 ra 14 phát hiện, đã kiểm chứng lại từng cái ([bằng chứng](HANDOFF.md)) | CÓ (95 commit) | Bảng gom 10 tab thành BỐN nhóm, mỗi khái niệm một chỗ canonical — xem ADR-0006. Đây là lượt CẮT: thước đo của lượt là số dòng luật GIẢM, không phải số tính năng tăng. | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.6.0 | active | 0 | 21 | 2026-09-09 @ `0b3a256` — npm test 22 suite xanh · cổng đóng phiên XANH TOÀN BỘ 25/25 · bản 1.5.3 đã phát ([bằng chứng](HANDOFF.md)) | CÓ (1 commit) | Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2. | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 
