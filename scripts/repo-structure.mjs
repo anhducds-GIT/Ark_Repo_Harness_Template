@@ -385,17 +385,39 @@ export function laneFromMessage(text) {
 export const AUDIT_TRAILER = "Audit:";
 export const AUDIT_CHUA_CO = "chua-co";
 
-/** Đọc nhãn `Audit:`. `chuaAudit` chỉ TRUE khi commit TỰ KHAI là chưa duyệt. */
+/** Đọc nhãn `Audit:`. **CHỈ một thẻ người-duyệt ĐÚNG KHUÔN mới là "đã duyệt"; mọi thứ khác là
+ *  CHƯA.** Đây là chiều fail-closed, và audit độc lập 10/09 bắt được đúng chỗ này ở bản đầu.
+ *
+ *  Bản đầu hỏi ngược: *"giá trị có đúng bằng `chua-co` không? Không thì coi là tên người duyệt."*
+ *  Hai ca đo được, cả hai FAIL-OPEN, và ca thứ nhất là câu một người cẩn thận sẽ tự viết:
+ *    · `Audit: chua-co (dang cho Codex)` → **coi là ĐÃ DUYỆT**
+ *    · `Audit: chua co`  (dấu cách thay gạch) → **coi là ĐÃ DUYỆT**
+ *  Nay hỏi đúng chiều: chỉ `^[a-z0-9][a-z0-9._-]*$` — một thẻ, không khoảng trắng, không mở đầu
+ *  bằng `chua` — mới được tính là người duyệt. Nhãn không đọc được thì **CHƯA**, kèm mã lỗi;
+ *  cùng khuôn `laneFromMessage` đã dùng cho `LANE_CO_KHOANG_TRANG`.
+ *
+ *  Khoá `Audit:` so KHÔNG PHÂN BIỆT HOA THƯỜNG: `AUDIT: chua-co` ở bản đầu rơi vào "không khai",
+ *  tức một lời khai thật bị mất im lặng. */
 export function auditFromMessage(text) {
   const values = String(text ?? "").split("\n")
-    .filter((line) => line.startsWith(AUDIT_TRAILER))
-    .map((line) => line.slice(AUDIT_TRAILER.length).trim().toLowerCase());
-  if (!values.length) return { chuaAudit: false, khai: null };
-  /* RỖNG CŨNG LÀ CHƯA. `Audit:` không có gì sau nó là một lời khai bỏ dở, và hướng an toàn ở đây
-     là coi bỏ dở = chưa duyệt. Ngược lại là biến chính nhãn này thành đường lách: gõ `Audit:` rỗng
-     là qua cửa. */
-  const chuaAudit = values.some((v) => v === AUDIT_CHUA_CO || v === "");
-  return { chuaAudit, khai: values.join(" · ") };
+    .filter((line) => /^audit:/i.test(line))
+    .map((line) => line.slice(line.indexOf(":") + 1).trim().toLowerCase());
+  if (!values.length) return { chuaAudit: false, khai: null, problem: null };
+  const khai = values.join(" · ");
+  /* RỖNG hoặc mở đầu bằng `chua` = CHƯA. Bắt cả `chua-co`, `chua co`, `chua-co (dang cho)`,
+     `chuaduyet` — mọi cách một người viết ý *"chưa"*, không chỉ đúng một chuỗi. */
+  if (values.some((v) => v === "" || /^chua/.test(v.split(/\s+/)[0]))) {
+    return { chuaAudit: true, khai, problem: null };
+  }
+  const bad = values.find((v) => !/^[a-z0-9][a-z0-9._-]*$/.test(v));
+  if (bad !== undefined) {
+    return {
+      chuaAudit: true,
+      khai,
+      problem: `AUDIT_KHONG_DOC_DUOC: nhãn "${bad}" không phải một thẻ duy nhất. Tên người duyệt là MỘT từ, ví dụ "codex-r02". Không đọc được thì coi là CHƯA duyệt.`,
+    };
+  }
+  return { chuaAudit: false, khai, problem: null };
 }
 
 /* BẤT BIẾN BA TẦNG — LAW `steward` ↔ STATE khoá quyền ↔ MÁY một hàm duy nhất.

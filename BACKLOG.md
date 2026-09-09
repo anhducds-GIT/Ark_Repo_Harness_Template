@@ -778,7 +778,31 @@ gỡ cửa → vế ⑵ ĐỎ · cho `--carry` mở cửa → vế ⑶ ĐỎ · 
 chứng minh đã có audit — nó chỉ làm một lời tự khai *"chưa duyệt"* đi được tới máy, thay vì chết
 trong một quyển sổ Tầng 2 mà không lane nào phải đọc. Bản chặt hơn là `Y-02`.
 
-**còn thiếu để đóng:** audit độc lập cho chính bản vá này.
+**AUDIT ĐỘC LẬP ĐÃ CHẠY 10/09, và nó nói CẦN SỬA — đã sửa ở 1.8.5.** Chính cửa vừa dựng có **hai
+lối fail-open**, và lối thứ nhất là câu một người cẩn thận sẽ tự viết:
+
+| Nhãn | 1.8.4 đọc thành | Đúng |
+|---|---|---|
+| `Audit: chua-co (dang cho Codex)` | **ĐÃ DUYỆT** | chưa duyệt |
+| `Audit: chua co` | **ĐÃ DUYỆT** | chưa duyệt |
+| `AUDIT: chua-co` | lời khai **mất im lặng** | chưa duyệt |
+
+Một cơ chế mà **viết cẩn thận hơn thì mất an toàn** thì nó không phải cơ chế an toàn. Nay chỉ một
+thẻ ĐÚNG KHUÔN mới là "đã duyệt"; mọi thứ khác là CHƯA. Cộng ba chỗ nữa: câu *"đã gỡ"* in cả khi
+không gỡ được gì · dòng ⚠ tắt cho mọi commit khi chỉ một commit có nhãn · đọc thông điệp hai lượt.
+
+**Và ba vế trong phép ghim cũng bị siết:** `doesNotMatch` một mình **xanh được khi tiến trình chết
+vì lý do khác** — đã dính đúng bẫy đó một lần trong chính lượt viết nó. Nay mỗi vế thành công đòi
+**mã thoát 0** cộng một chuỗi **dương**.
+
+**đóng khi:** vẫn như trên, CỘNG một lượt audit độc lập cho bản 1.8.5 không còn tìm ra lối fail-open
+nào. Ghi rõ ở đây vì đây là lần thứ hai một bản vá của mục này tự mở một lỗ mới.
+
+**GIỚI HẠN AUDIT NÊU, CHƯA VÁ và có lý do:** một commit khai tên người duyệt **không bị ràng buộc**
+với khoảng commit thật sự đã kiểm — nó gỡ theo *thứ tự*, không theo *phạm vi đã soi*. Vá đúng cần
+một lệnh nghiệm thu ghi phạm vi vào dấu, tức `Y-02`. Cho tới lúc đó, cơ chế này là *"đưa một lời tự
+khai tới máy"*, **không phải** máy canh *"đã qua audit độc lập"* — và câu đó phải nằm nguyên ở đây,
+không được nói gọn thành "đã có máy canh".
 
 ### KHUNG-57 · `can-nang.mjs` chạy **603 giây** — đắt hơn cả bộ test, mà số nó in ra lấy được trong 0 giây
 

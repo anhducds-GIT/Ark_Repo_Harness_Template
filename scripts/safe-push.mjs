@@ -323,12 +323,18 @@ if (blocked.length && carry) {
  * Chỗ dạy rẻ nhất là ngay đây — lúc người ta sắp đẩy code. Cùng khuôn với khối ⚠ nhãn `Lane:`
  * phía trên: NÊU TÊN, không đổi mã thoát. Bật chặn cho commit thiếu nhãn là khoá repo ngay lượt
  * đầu, và `AGENTS.md` mục 2 vốn đã đòi audit bằng chữ rồi. */
-const chamCode = rows.filter((row) => {
+/* MỘT LƯỢT ĐỌC, DÙNG CHUNG. Bản đầu đọc thông điệp hai lần (một cho cảnh báo, một cho cửa) —
+   audit độc lập nêu chi phí N tiến trình git; gộp lại thì còn một lượt. */
+const rowsAudit = rows.map((row) => ({ ...row, audit: auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha)) }));
+const chamCode = rowsAudit.filter((row) => {
   const files = gitQuiet("show", "--name-only", "--format=", row.sha).split(NL).filter(Boolean);
-  return files.some((f) => f.startsWith("scripts/") || f.startsWith("tests/"));
+  return files.some((f) => f.replace(/^"|"$/g, "").startsWith("scripts/") || f.replace(/^"|"$/g, "").startsWith("tests/"));
 });
-if (chamCode.length && !chamCode.some((row) => auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha)).khai)) {
-  console.log(`${NL}⚠ ${chamCode.length} commit chạm \`scripts/\` hoặc \`tests/\` mà KHÔNG commit nào khai \`${AUDIT_TRAILER}\`.`);
+/* ĐẾM COMMIT THIẾU KHAI, không hỏi "có commit nào khai không". Bản đầu tắt cảnh báo cho MỌI
+   commit code khi chỉ MỘT commit có nhãn — audit độc lập nêu đúng chỗ này. */
+const codeThieuKhai = chamCode.filter((row) => !row.audit.khai);
+if (codeThieuKhai.length) {
+  console.log(`${NL}⚠ ${codeThieuKhai.length}/${chamCode.length} commit chạm \`scripts/\` hoặc \`tests/\` mà KHÔNG khai \`${AUDIT_TRAILER}\`.`);
   console.log(`  AGENTS.md mục 2 điều ⑵ đòi code phải QUA AUDIT ĐỘC LẬP trước khi đẩy — cổng không đo được điều đó.`);
   console.log(`  Chưa qua audit thì thêm một dòng cuối thông điệp commit, và cửa này sẽ giữ nó lại:`);
   console.log(`      ${AUDIT_TRAILER} ${AUDIT_CHUA_CO}`);
@@ -339,20 +345,40 @@ if (chamCode.length && !chamCode.some((row) => auditFromMessage(gitQuiet("log", 
  *
  * `--carry` KHÔNG mở được cửa này, và đó là chủ ý. Điều Đức chốt 09/09 là *"cuốn theo việc QUY
  * THUỘC ĐƯỢC"* — một câu về truy nguồn. Nó không nói gì về việc đã duyệt hay chưa. Gộp hai câu
- * làm một là dùng lời chấp thuận cho việc A để làm việc B. */
-const chuaDuyet = rows
-  .map((row) => ({ ...row, audit: auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha)) }))
-  .filter((row) => row.audit.chuaAudit);
+ * làm một là dùng lời chấp thuận cho việc A để làm việc B.
+ *
+ * MỘT COMMIT SAU GỠ ĐƯỢC LỜI KHAI CỦA COMMIT TRƯỚC — nếu thiếu vế này thì cơ chế là ngõ cụt:
+ * thông điệp commit không sửa được mà không viết lại lịch sử, nên một commit đã khai `chua-co`
+ * sẽ bị chặn VĨNH VIỄN kể cả sau khi audit đạt, và đường ra duy nhất là gọi Đức mỗi lượt — trái
+ * đúng `AGENTS.md` mục 2, vốn cho tự đẩy KHI ĐÃ có audit. (Tôi đã tự đi vào ngõ cụt đó một lần,
+ * ngay lượt viết ra nó.)
+ *
+ * ĐƠN VỊ LÀ "TỚI ĐÂY", KHÔNG PHẢI TỪNG COMMIT — vì audit thật ở repo này soi CẢ KHOẢNG diff, không
+ * soi từng commit. Nên một commit khai tên người duyệt sẽ gỡ mọi lời khai `chua-co` CŨ HƠN nó;
+ * commit MỚI HƠN vẫn bị chặn. `rows` xếp mới→cũ, nên "cũ hơn" là chỉ số LỚN hơn. */
+const iDaDuyet = rowsAudit.findIndex((row) => row.audit.khai && !row.audit.chuaAudit);
+const chuaDuyet = rowsAudit.filter((row, i) => row.audit.chuaAudit && (iDaDuyet === -1 || i < iDaDuyet));
 if (chuaDuyet.length && !ducDuyetChuaAudit) {
   console.error(`${NL}TU CHOI PUSH — ${chuaDuyet.length} commit TU KHAI la chua qua audit doc lap:`);
-  for (const row of chuaDuyet) console.error(`  ${row.sha.slice(0, 7)}  ${row.subject.slice(0, 62)}`);
+  for (const row of chuaDuyet) {
+    console.error(`  ${row.sha.slice(0, 7)}  ${row.subject.slice(0, 62)}`);
+    if (row.audit.problem) console.error(`             ${row.audit.problem}`);
+  }
   console.error(`${NL}AGENTS.md muc 2 dieu (2): cong XANH TOAN BO, va code thi DA QUA AUDIT DOC LAP.`);
   console.error(`Cong xanh khong thay duoc audit — do la hai dieu kien, khong phai mot.`);
   console.error(`${NL}Ba duong ra, khong co duong thu tu:`);
-  console.error(`  · lay audit that, roi commit ban va (neu co) — nhan cu nam lai trong lich su, khong sao`);
+  console.error(`  · lay audit that, roi commit KET QUA audit kem dong cuoi:  ${AUDIT_TRAILER} <ten-nguoi-duyet>`);
+  console.error(`    commit do go moi loi khai "${AUDIT_CHUA_CO}" CU HON no — khong phai sua lai lich su`);
   console.error(`  · Duc chot cho day khi chua duyet:  --duc-duyet-chua-audit`);
   console.error(`  · de commit do nam lai, day rieng phan con lai${NL}`);
   process.exit(1);
+}
+/* CHỈ NÓI KHI THẬT SỰ GỠ ĐƯỢC MỘT CÁI. Bản đầu in câu này bất cứ khi nào có một nhãn duyệt và
+   một lời khai `chua-co` ở ĐÂU ĐÓ — kể cả khi lời khai đó MỚI HƠN nên không hề được gỡ. Một câu
+   đúng-một-nửa ở cổng là đúng họ bệnh `KHUNG-15`. */
+const daGo = rowsAudit.filter((row, i) => row.audit.chuaAudit && iDaDuyet >= 0 && i > iDaDuyet);
+if (daGo.length) {
+  console.log(`${NL}Nhan ${AUDIT_TRAILER} ${rowsAudit[iDaDuyet].audit.khai} o ${rowsAudit[iDaDuyet].sha.slice(0, 7)} go ${daGo.length} loi khai "${AUDIT_CHUA_CO}" cu hon no.`);
 }
 if (chuaDuyet.length && ducDuyetChuaAudit) {
   console.log(`${NL}--duc-duyet-chua-audit: Duc chot cho day ${chuaDuyet.length} commit chua qua audit.`);

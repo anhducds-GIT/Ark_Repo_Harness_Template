@@ -850,3 +850,40 @@ Ghim: `dau-suite-smoke` **17 → 18 vế**. Đột biến: gỡ cửa · cho `--
 · `KHUNG-50` (suite chạy trong worktree riêng) — đây mới là **nửa còn lại** của bài toán tốc độ,
   và nó có ca thật (3 lượt hôm nay). Nhưng nó sửa chính bộ chạy tôi vừa vá, ở cuối một phiên dài.
   Sửa lõi lúc mệt là cách 1.8.2 sinh ra lỗ fail-open. Để nguyên, ưu tiên đầu cho phiên sau.
+
+### 2026-09-10 (26) · harness-loi-02 · Cửa audit vừa dựng TỰ CÓ hai lối fail-open — bản 1.8.5
+
+**Audit độc lập cho 1.8.4 nói CẦN SỬA, và nó đúng.** Lần thứ hai trong một phiên, một bản vá của
+tôi tự mở một lỗ mới — và cả hai lần đều là **fail-open**, cả hai lần đều do audit bắt, không do
+tôi.
+
+`auditFromMessage` bản 1.8.4 hỏi ngược chiều: *"có đúng bằng `chua-co` không? Không thì coi là tên
+người duyệt."* Tôi đã **tự đo lại** ba biến thể (luật vàng 4):
+
+| Nhãn | 1.8.4 đọc thành |
+|---|---|
+| `Audit: chua-co (dang cho Codex)` | **ĐÃ DUYỆT** |
+| `Audit: chua co` | **ĐÃ DUYỆT** |
+| `AUDIT: chua-co` | lời khai **mất im lặng** |
+
+Ca đầu là câu **một người cẩn thận sẽ tự viết** — thêm ghi chú cho rõ, và cửa mở ra. Cơ chế mà
+viết cẩn thận hơn thì mất an toàn thì không phải cơ chế an toàn.
+
+**1.8.5 hỏi đúng chiều:** chỉ một thẻ ĐÚNG KHUÔN `^[a-z0-9][a-z0-9._-]*$` mới là "đã duyệt"; rỗng,
+mở đầu `chua`, hay không đọc được → **CHƯA** kèm mã `AUDIT_KHONG_DOC_DUOC`. Khoá so không phân biệt
+hoa thường.
+
+**Ba chỗ nữa audit nêu, đã sửa:** câu *"đã gỡ lời khai cũ"* in cả khi **không gỡ được cái nào** ·
+dòng ⚠ tự dạy tắt cho MỌI commit code khi chỉ MỘT commit có nhãn · đọc thông điệp commit hai lượt.
+
+**BÀI HỌC VỀ PHÉP GHIM, và nó đắt hơn ba lỗi trên:** audit nêu rằng `doesNotMatch` một mình **xanh
+được khi tiến trình chết vì lý do khác**. Tôi đã dính đúng bẫy đó **trong chính lượt viết phép
+ghim này** — một vế báo xanh mà không chứng minh gì. Nay mỗi vế thành công đòi **mã thoát 0** cộng
+một chuỗi **DƯƠNG**. Từ nay: *một phép ghim chỉ gồm phủ định thì nó chưa ghim gì.*
+
+Ghim: khối `Audit:` **8 vế**. Sáu đột biến, mỗi lượt ĐỎ đúng vế của nó.
+
+**Giới hạn audit nêu, CHƯA vá, có lý do:** commit khai tên người duyệt **không bị ràng buộc** với
+khoảng commit thật sự đã soi — nó gỡ theo *thứ tự*, không theo *phạm vi*. Vá đúng cần `Y-02`. Nên
+cơ chế này là *"đưa một lời tự khai tới máy"*, **KHÔNG phải** máy canh *"đã qua audit độc lập"*.
+Câu đó phải giữ nguyên, đừng nói gọn thành "đã có máy canh".

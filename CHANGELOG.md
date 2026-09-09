@@ -3,6 +3,46 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.5 — 2026-09-10 — Chính cửa audit vừa dựng có HAI lối fail-open, và audit độc lập bắt được
+
+**Bản 1.8.4 hỏi ngược chiều.** Nó hỏi *"giá trị có đúng bằng `chua-co` không? Không thì coi là tên
+người duyệt."* Hai ca đo được, cả hai **FAIL-OPEN**, và ca thứ nhất là câu **một người cẩn thận sẽ
+tự viết**:
+
+| Nhãn | 1.8.4 đọc thành | Đúng phải là |
+|---|---|---|
+| `Audit: chua-co (dang cho Codex)` | **ĐÃ DUYỆT** | chưa duyệt |
+| `Audit: chua co` (dấu cách thay gạch) | **ĐÃ DUYỆT** | chưa duyệt |
+| `AUDIT: chua-co` (khoá viết hoa) | không khai — lời khai **mất im lặng** | chưa duyệt |
+
+Ca đầu nguy nhất: người viết thêm ghi chú *để rõ hơn*, và cái cửa mở ra. Một cơ chế mà **viết
+cẩn thận hơn thì mất an toàn** thì nó không phải cơ chế an toàn.
+
+**Nay hỏi đúng chiều — CHỈ một thẻ người-duyệt ĐÚNG KHUÔN mới là "đã duyệt"**, `^[a-z0-9][a-z0-9._-]*$`:
+một thẻ, không khoảng trắng, không mở đầu bằng `chua`. Rỗng, mở đầu `chua`, hay không đọc được →
+**CHƯA**, kèm mã lỗi `AUDIT_KHONG_DOC_DUOC`. Khoá `Audit:` so không phân biệt hoa thường. Cùng
+khuôn `laneFromMessage` đã dùng cho `LANE_CO_KHOANG_TRANG`.
+
+**Ba chỗ nữa audit nêu, đã sửa:**
+
+- Cổng in *"đã gỡ lời khai cũ"* **kể cả khi không gỡ được cái nào** (lời khai mới hơn nên không
+  thuộc diện gỡ). Một câu đúng-một-nửa ở cổng là đúng họ bệnh `KHUNG-15`. Nay chỉ nói khi thật sự
+  gỡ được, và nói **gỡ mấy cái**.
+- Dòng ⚠ tự dạy tắt cho **mọi** commit code khi chỉ **một** commit có nhãn. Nay **đếm commit thiếu
+  khai**, và in `N/M`.
+- Đọc thông điệp commit **hai lượt** (một cho cảnh báo, một cho cửa) → gộp còn một lượt.
+
+**Và ba chỗ trong PHÉP GHIM cũng bị siết, vì audit nói đúng:** `doesNotMatch` một mình **xanh được
+khi tiến trình chết vì lý do khác** — tôi đã dính đúng bẫy đó một lần trong chính lượt viết nó.
+Nay mỗi vế thành công đòi **mã thoát 0** cộng một chuỗi **dương**, không chỉ phủ định.
+
+Ghim: `dau-suite-smoke.mjs` **8 vế** trong khối `Audit:` (thêm vế ⑻ cho ba biến thể fail-open).
+Sáu đột biến trên bản chép cách ly, mỗi lượt ĐỎ đúng vế của nó — kể cả lượt trả parser về nghĩa 1.8.4.
+
+**Giới hạn KHÔNG đổi, và audit nói thẳng:** nhãn do người sửa TỰ KHAI, và một commit khai tên người
+duyệt **không bị ràng buộc** với khoảng commit thật sự đã kiểm. Nên đây là *"đưa một lời tự khai
+tới máy"*, **chưa** phải máy canh *"đã qua audit độc lập"*. Bản chặt hơn là `Y-02`.
+
 ## 1.8.4 — 2026-09-10 — Điều kiện "đã qua audit độc lập" lần đầu có máy canh
 
 **`AGENTS.md` mục 2 cho tự đẩy khi đủ ba, trong đó điều ⑵ là *"cổng XANH TOÀN BỘ, code thì đã qua
