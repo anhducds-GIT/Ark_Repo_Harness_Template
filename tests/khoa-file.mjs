@@ -26,6 +26,7 @@ import { readFileSync } from "node:fs";
 import {
   chuanDuongDan, EXIT, khoaFileQuaHan, khoaFileTrongVung, MIEN_KHOA,
   PHUT_NHAC_KHOA_FILE, quyetDinhSua, quyetDinhXong, soatDanHang,
+  FINGERPRINT_FIELD, claimsFingerprint, fingerprintState,
 } from "../scripts/claim.mjs";
 import { generatedFrom } from "../scripts/repo-structure.mjs";
 
@@ -259,6 +260,70 @@ const vungCua = (d) => (d.startsWith("scripts/") || d.startsWith("tests/") ? "_c
     "phep loc 'file dang sua do' cua --take phai bo artifact may sinh ra — neu khong, mot lenh"
     + " sinh lai bang moi luot se tu chan chinh minh, va no da chan that mot quyet dinh cua nguoi chot");
   ok("5c · ba cửa (--soat · --sua · --take) nói CÙNG một câu về artifact máy sinh");
+}
+
+/* ---- 6. DẤU NIÊM PHONG bảng quyền ---------------------------------------------
+ *
+ * Luật mục 1 viết "nhận và trả BẰNG LỆNH, không sửa tay" từ lâu, mà KHÔNG gì cưỡng chế.
+ * Kéo lớp này về từ repo tiêu thụ 09/09, nơi nó đã trả giá thật: bốn khoá gốc bị đổi chủ
+ * bằng một lượt sửa hàng loạt đi vòng qua lệnh, phiên đang giữ khoá không hề biết.
+ *
+ * FIXTURE PHẢI DỰNG NỔI CA HỎNG (luật vàng 2): mỗi vế dưới đây có một ca ĐỎ THẬT, không chỉ
+ * ca xanh. Một phép kiểm không phân biệt được hai nhánh là đồ trang trí, dù nó xanh. */
+{
+  const banGoc = { claims: { _root: { owner: "lane-a" }, _docs: { owner: null } } };
+
+  // 6a — ba trạng thái, KHÔNG gộp: chưa đóng dấu ≠ dấu nguyên ≠ dấu vỡ.
+  assert.equal(fingerprintState(banGoc).ok, null, "bang chua co dau thi tra null, khong duoc tra true");
+
+  const daDong = { ...banGoc, [FINGERPRINT_FIELD]: claimsFingerprint(banGoc.claims, banGoc.tam) };
+  assert.equal(fingerprintState(daDong).ok, true, "vua dong dau xong thi dau phai con nguyen");
+
+  const suaTay = JSON.parse(JSON.stringify(daDong));
+  suaTay.claims._root.owner = "ke-la-mat";
+  assert.equal(fingerprintState(suaTay).ok, false, "CA DO THAT: sua tay chu khoa PHAI lam vo dau");
+  ok("6a · ba trạng thái dấu niêm phong: chưa đóng · còn nguyên · ĐÃ VỠ — ca đỏ dựng được");
+
+  /* 6b — THỨ TỰ KHOÁ KHÔNG ĐƯỢC ĐỔI DẤU. Nếu băm theo `JSON.stringify` thẳng thì một lượt
+     ghi lại cùng nội dung nhưng khác thứ tự khoá sẽ báo VỠ oan, và người ta sẽ tắt phép kiểm. */
+  const daoThuTu = { claims: { _docs: { owner: null }, _root: { owner: "lane-a" } } };
+  assert.equal(claimsFingerprint(daoThuTu.claims), claimsFingerprint(banGoc.claims),
+    "dao thu tu khoa ma dau doi la bao oan — se bi tat");
+
+  /* 6c — KHỐI `tam` RỖNG PHẢI BĂM Y HỆT KHI KHÔNG CÓ `tam`. Đây là chỗ dễ sai nhất: băm
+     thẳng {claims, tam} là đổi dấu của MỌI bảng đang tồn tại, nên ngay lượt sau mọi phiên
+     khác thấy DAU_VO và cổng của họ đỏ vì một cải tiến họ không liên quan. */
+  assert.equal(claimsFingerprint(banGoc.claims, {}), claimsFingerprint(banGoc.claims, undefined),
+    "khoi `tam` rong phai bam y het khi khong co `tam`");
+  assert.notEqual(claimsFingerprint(banGoc.claims, { "a.md": { owner: "x" } }), claimsFingerprint(banGoc.claims),
+    "CA DO THAT: co khoa file that thi dau PHAI khac");
+  ok("6b/6c · dấu ổn định theo NỘI DUNG: đảo thứ tự không đổi, `tam` rỗng không đổi, `tam` thật thì đổi");
+
+  /* 6d — MỌI ĐƯỜNG GHI PHẢI ĐI QUA `ghiBang`. Một nhánh ghi thẳng `writeFileSync(CLAIMS_FILE…)`
+     là một nhánh sinh ra bảng VỠ DẤU, và phiên sau lãnh đủ — cổng đỏ mà không ai sửa tay cả.
+     Đo bằng sự VẮNG MẶT trong nguồn, vì đó là thứ duy nhất đo được mà không dựng repo thật. */
+  const nguonKhoa = readFileSync(new URL("../scripts/claim.mjs", import.meta.url), "utf8");
+  const ghiThang = nguonKhoa.split(String.fromCharCode(10))
+    .filter((d) => /writeFileSync\(\s*CLAIMS_FILE/.test(d));
+  assert.deepEqual(ghiThang, [],
+    "co nhanh ghi THANG vao CLAIMS_FILE, khong qua ghiBang() — nhanh do se sinh bang vo dau:"
+    + String.fromCharCode(10) + ghiThang.join(String.fromCharCode(10)));
+  assert.match(nguonKhoa, /export function ghiBang\(/, "phai co duong ghi duy nhat ten ghiBang");
+
+  // ĐỐI CHỨNG DƯƠNG: phép lọc trên phải BẮT được một dòng ghi thẳng. Không có vế này thì
+  // regex hỏng cũng cho "khong thay gi" và vế trên xanh vĩnh viễn.
+  const gia = ['fs.writeFileSync(CLAIMS_FILE, "x", "utf8");', "ghiBang(parsed);"];
+  assert.deepEqual(gia.filter((d) => /writeFileSync\(\s*CLAIMS_FILE/.test(d)),
+    ['fs.writeFileSync(CLAIMS_FILE, "x", "utf8");'], "phep loc phai bat dung dong ghi thang");
+  ok("6d · một đường ghi DUY NHẤT: không nhánh nào ghi thẳng vào bảng quyền");
+
+  /* 6e — `--restamp` KHÔNG được là cửa sau. Sửa tay → restamp → dấu hợp lệ là hợp thức hoá
+     đúng việc luật mục 1 cấm. Nên nó phải đối chiếu HEAD và đòi câu chốt của Đức khi lượt
+     sửa đó CHUYỂN CHỦ một khoá. Đo trên nguồn: cả ba mảnh phải có mặt. */
+  assert.match(nguonKhoa, /chuTheoHead/, "restamp phai doi chieu voi HEAD, khong tin file tren dia");
+  assert.match(nguonKhoa, /duc-duyet/, "restamp phai doi cau chot khi CHUYEN CHU");
+  assert.match(nguonKhoa, /_chuyen_khoa/, "cau chot phai duoc ghi VAO bang — phien vua mat khoa chi doc bang");
+  ok("6e · `--restamp` không phải cửa sau: đối chiếu HEAD · đòi câu chốt · ghi vào bảng");
 }
 
 console.log(`khoa-file: ${so} vế xanh`);

@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 
 import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_DOCS_KHONG_TINH, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
 import { napContext } from "./rule-compiler.mjs";
+import { fingerprintState, readClaims } from "./claim.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDau, xetDau, ghiDauCong, xoaDauCong, moiTruongNay } from "./chay-test.mjs";
 import { CAU_CHI_DUONG, docMucTuFile, laNhatKy, mucMoi, thangCua, thangHienTai, vuotTran } from "./handoff.mjs";
 import { parseBacklog } from "./what-next.mjs";
@@ -1392,7 +1393,21 @@ check("Mọi lệnh git đọc được", () => {
 // thì phép kiểm xanh — nên bản khung phát đi không tự đặt trần cho repo nào.
 /* BỐN MỤC GỘP — mỗi mục một CÂU HỎI, không phải một phép đo. Xem ghi chú ở `ghepKiem`.
    Thứ tự trong mỗi mục là thứ tự đọc: cái chặn nặng nhất đứng trước. */
-ghepKiem("Ai đứng tên việc này", ["khoá file", doKhoaFile], ["phạm vi", doPhamVi]);
+/* DẤU NIEM PHONG bảng quyền — kéo về từ repo tiêu thụ 09/09.
+   Luật mục 1 viết "nhận và trả BẰNG LỆNH, không sửa tay" từ lâu, nhưng KHÔNG gì cưỡng chế nó.
+   Bên kia đã trả giá thật: bốn khoá gốc bị đổi chủ bằng một lượt sửa hàng loạt đi vòng qua lệnh,
+   và phiên đang giữ khoá không hề biết. Gộp vào mục QUYỀN chứ không thành mục thứ 26 — cùng chủ
+   đề, và thêm một mục để cưỡng chế một luật chống-lách thì đúng cái luật mục 8 cấm. */
+const doNiemPhong = () => {
+  let st;
+  try { st = fingerprintState(readClaims()); }
+  catch (e) { return { ok: false, msg: `không đọc được bảng quyền: ${String(e.message).split(String.fromCharCode(10))[0]}` }; }
+  if (st.ok === false) return { ok: false, msg: `DAU_VO: bảng quyền bị sửa NGOÀI lệnh (dấu ${st.stamped} ≠ nội dung ${st.actual}). Xem "git diff .agents/claims.json"; ĐỪNG đóng lại dấu cho xong.` };
+  if (st.ok === null) return { ok: true, skipped: true, msg: "bảng chưa có dấu niêm phong — chạy \"claim.mjs --restamp --as <phiên>\" một lần" };
+  return { ok: true, msg: "dấu niêm phong còn nguyên" };
+};
+
+ghepKiem("Ai đứng tên việc này", ["khoá file", doKhoaFile], ["phạm vi", doPhamVi], ["niêm phong", doNiemPhong]);
 ghepKiem("Vùng CHỈ-THÊM không bị viết lại", ["bằng chứng", doBangChung], ["sổ quyết định", doSoQuyetDinh]);
 ghepKiem("HANDOFF đã ghi Log, đúng trần, đúng tháng", ["ghi Log", doGhiLog], ["trần/tháng", doTranHandoff]);
 /* PHẦN NẠP — CONTEXT COMPILER, gắn vào cổng ở ĐÂY chứ không thành một mục riêng.

@@ -24,6 +24,7 @@
  * Mã thoát:  0 xong · 2 dùng sai · 3 TỪ CHỐI (đã có chủ khác / không phải chủ) · 4 bị ghi đè
  */
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,6 +36,93 @@ const ROOT = path.resolve(path.dirname(MODULE_FILE), "..");
 export const CLAIMS_FILE = path.join(ROOT, ".agents", "claims.json");
 
 export const EXIT = Object.freeze({ OK: 0, MISUSE: 2, REFUSED: 3, CLOBBERED: 4 });
+
+/* ---- DẤU NIÊM PHONG bảng quyền ------------------------------------------------
+ *
+ * Lệnh này bảo vệ ĐƯỜNG GHI. Không gì bảo vệ chính `claims.json` khỏi bị mở ra sửa tay —
+ * và điều đó đã xảy ra thật (repo tiêu thụ, 03/09): cả bốn khoá gốc bị đổi chủ bằng một
+ * lượt sửa hàng loạt, đi vòng qua lệnh, phiên đang giữ khoá không hề biết. Luật mục 1 của
+ * `AGENTS.md` đã cấm sửa tay từ lâu; khối này là thứ đầu tiên CƯỠNG CHẾ câu đó.
+ *
+ * VÌ SAO ĐÓNG DẤU CHỨ KHÔNG SO HAI ẢNH CHỤP: hướng hiển nhiên là so bảng cũ với bảng mới rồi
+ * bắt "chủ đổi thẳng từ người này sang người kia". Hướng đó BÁO OAN: `_root` đi từ lane A
+ * sang lane B trong đúng một diff, mà chuỗi thật là TRẢ rồi NHẬN — hai thao tác hợp lệ, chỉ
+ * bị ép phẳng khi so ảnh chụp.
+ *
+ * Chỉ băm khối `claims` (+ `tam` nếu có). Văn xuôi `_doc` sửa thoải mái không vỡ dấu — dấu
+ * để bắt đổi chủ lén, không phải để đóng băng tài liệu.
+ *
+ * KHÔNG hứa chống người cố tình: ai muốn thì tính lại dấu được. Nó chặn ĐƯỜNG TẮT, không
+ * chặn kẻ địch — và đường tắt mới là thứ đã xảy ra. */
+export const FINGERPRINT_FIELD = "_fingerprint";
+
+export const VO_DAU = "DAU_VO: `.agents/claims.json` đã bị sửa NGOÀI lệnh này — dấu niêm phong không khớp nội dung.\n"
+  + "Nghĩa là có người mở file ra sửa tay. Chuyện này đã lấy mất khoá của một phiên đang làm dở,\n"
+  + "và phiên đó không hề biết. ĐỪNG đóng lại dấu cho xong.\n"
+  + "  1. xem đã đổi gì:  git diff .agents/claims.json\n"
+  + "  2. khoá của bạn có bị đổi chủ không? nếu có thì HỎI Đức — luật mục 1: muốn giành thì hỏi.\n"
+  + "  3. chốt xong rồi mới đóng lại dấu: node scripts/claim.mjs --restamp --as <phiên>\n"
+  + "     (lượt sửa đó CHUYỂN CHỦ một khoá thì lệnh đòi thêm --duc-duyet \"<câu chốt của Đức>\",\n"
+  + "      và câu đó được ghi VÀO bảng — để phiên vừa mất khoá đọc được, vì họ chỉ đọc bảng)";
+
+/* Ghi nguyên tử: file tạm rồi `rename`. Không có cửa sổ nào bảng nằm dở dang trên đĩa —
+   và một lượt ghi đứt giữa chừng là mất trắng bảng quyền của mọi lane. */
+export function ghiBangNguyenTu(file, noiDung) {
+  const tam = `${file}.dang-ghi-${process.pid}`;
+  try {
+    fs.writeFileSync(tam, noiDung, "utf8");
+    fs.renameSync(tam, file);
+  } finally {
+    // Lỗi thật đã ném ở trên; một lỗi DỌN DẸP che mất lỗi gốc là kiểu báo lỗi tệ nhất.
+    try { if (fs.existsSync(tam)) fs.unlinkSync(tam); } catch { /* thôi */ }
+  }
+}
+
+/* Băm ổn định: thứ tự khoá trong file không đổi được dấu, nội dung đổi thì dấu đổi. */
+const canon = (v) => {
+  if (v === undefined) return "null";
+  if (Array.isArray(v)) return `[${v.map(canon).join(",")}]`;
+  if (v && typeof v === "object") {
+    return `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${canon(v[k])}`).join(",")}}`;
+  }
+  return JSON.stringify(v);
+};
+
+export function claimsFingerprint(claims, tam) {
+  if (!claims || typeof claims !== "object" || Array.isArray(claims)) {
+    throw new Error("CLAIMS_HONG: không băm được — khối `claims` phải là object.");
+  }
+  /* KHỐI `tam` RỖNG THÌ BĂM Y HỆT KHI KHÔNG CÓ `tam` — cố ý, và đây là chỗ dễ sai nhất.
+     Băm thẳng `{claims, tam}` là đổi dấu của MỌI bảng đang tồn tại, nên ngay lượt chạy sau
+     mọi phiên khác thấy DAU_VO và cổng của họ đỏ vì một cải tiến họ không liên quan. */
+  const coTam = tam && typeof tam === "object" && !Array.isArray(tam) && Object.keys(tam).length > 0;
+  return createHash("sha256").update(canon(coTam ? { claims, tam } : claims)).digest("hex").slice(0, 16);
+}
+
+/* BA trạng thái, cố ý không gộp: null = chưa từng đóng dấu (bảng cũ) · true = còn nguyên ·
+   false = đã vỡ. "Chưa kiểm" không được đội lốt "đã đạt". */
+export function fingerprintState(parsed) {
+  const stamped = parsed?.[FINGERPRINT_FIELD];
+  const actual = claimsFingerprint(parsed?.claims, parsed?.tam);
+  if (typeof stamped !== "string" || stamped === "") return { stamped: null, actual, ok: null };
+  return { stamped, actual, ok: stamped === actual };
+}
+
+/* Đường ghi DUY NHẤT của bảng quyền: đóng dấu rồi ghi nguyên tử. Mọi nhánh phải đi qua đây —
+   một nhánh ghi thẳng là một nhánh sinh ra bảng vỡ dấu, và phiên sau lãnh đủ. */
+export function ghiBang(parsed, file = CLAIMS_FILE) {
+  parsed[FINGERPRINT_FIELD] = claimsFingerprint(parsed.claims, parsed.tam);
+  ghiBangNguyenTu(file, `${JSON.stringify(parsed, null, 2)}${String.fromCharCode(10)}`);
+}
+
+/* Chủ khoá theo HEAD — để `--restamp` biết lượt sửa tay có CHUYỂN CHỦ hay không. */
+export function chuTheoHead(root = ROOT, file = ".agents/claims.json") {
+  try {
+    const raw = execFileSync("git", ["show", `HEAD:${file}`], { cwd: root, encoding: "utf8" });
+    const j = JSON.parse(raw);
+    return new Map(Object.entries(j.claims || {}).map(([k, v]) => [k, (v && v.owner) || null]));
+  } catch { return null; }
+}
 
 const KHUON_MUC = '"owner": null, "ai": null, "claimed_at": null, "task": null, "released_at": null }';
 
@@ -556,6 +644,7 @@ async function main() {
 
   if (flag("list") || argv.length === 0) {
     const dauVet = await doDauVet(parsed.claims);
+    const seal = fingerprintState(parsed);
     let coChua = false;
     for (const [key, value] of Object.entries(parsed.claims)) {
       const owner = value.owner || "";
@@ -597,12 +686,57 @@ async function main() {
       console.log("cẩn thận dựng nháp ở ngoài repo rồi mới ghi vào, và repo không thấy được việc đó.");
       console.log("KHÔNG nhả khoá hộ lane khác vì con số này. Hỏi lane đó, hoặc hỏi Đức — AGENTS.md mục 1.");
     }
-    process.exit(EXIT.OK);
+    if (seal.ok === false) console.error(`${String.fromCharCode(10)}${VO_DAU}`);
+    if (seal.ok === null) {
+      console.log(`${String.fromCharCode(10)}CHUA_DONG_DAU: bảng này chưa có dấu niêm phong.`);
+      console.log(`Đóng dấu: node scripts/claim.mjs --restamp --as <phiên>`);
+    }
+    process.exit(seal.ok === false ? EXIT.REFUSED : EXIT.OK);
   }
 
   /* `--as` đọc SỚM: ba nhánh khoá mức file ở dưới cần nó, và chúng chạy trước khối khoá vùng.
      Khai muộn thì `as` nằm trong vùng chết của `const` và mọi nhánh mới ném ReferenceError. */
   const as = flag("as");
+
+  /* ---- --restamp : đóng lại dấu sau khi ĐÃ xử lý lượt sửa tay -------------
+   *
+   * Lệnh này là CỬA SAU nếu để trần: sửa tay → restamp → dấu hợp lệ, cổng xanh với mọi phiên
+   * khác. Nên nó đối chiếu với HEAD: lượt sửa đó CHUYỂN CHỦ một khoá thì đòi `--duc-duyet`,
+   * và câu chốt được ghi VÀO bảng — phiên vừa mất khoá chỉ đọc bảng, không chạy lệnh. */
+  if (flag("restamp")) {
+    if (typeof as !== "string") {
+      console.error("Dùng: node scripts/claim.mjs --restamp --as <phiên> [--duc-duyet \"<câu chốt>\"]");
+      process.exit(EXIT.MISUSE);
+    }
+    const seal = fingerprintState(parsed);
+    if (seal.ok === true) {
+      console.log("dấu còn nguyên, không phải đóng lại.");
+      process.exit(EXIT.OK);
+    }
+    const truoc = chuTheoHead();
+    const doiChu = truoc
+      ? Object.entries(parsed.claims)
+          .map(([k, v]) => [k, truoc.get(k) ?? null, (v && v.owner) || null])
+          .filter(([, cu2, moi2]) => cu2 !== moi2 && cu2 !== null && moi2 !== null)
+      : [];
+    const duyet = flag("duc-duyet");
+    if (doiChu.length && typeof duyet !== "string") {
+      console.error(`${String.fromCharCode(10)}TU_CHOI: lượt sửa tay này CHUYỂN CHỦ ${doiChu.length} khoá so với HEAD:`);
+      for (const [k, cu2, moi2] of doiChu) console.error(`  ${k}: ${cu2} → ${moi2}`);
+      console.error("Đóng dấu cho xong là hợp thức hoá đúng việc luật mục 1 cấm. Hỏi Đức, rồi:");
+      console.error(`  node scripts/claim.mjs --restamp --as ${as} --duc-duyet "Đức chốt <ngày>: <lý do một câu>"`);
+      process.exit(EXIT.REFUSED);
+    }
+    if (doiChu.length) {
+      parsed._chuyen_khoa = [...(Array.isArray(parsed._chuyen_khoa) ? parsed._chuyen_khoa : []), {
+        luc: new Date().toISOString(), boi: as, duc_duyet: duyet,
+        khoa: doiChu.map(([k, cu2, moi2]) => `${k}: ${cu2} → ${moi2}`)
+      }];
+    }
+    ghiBang(parsed);
+    console.log(`dấu cũ: ${seal.stamped ?? "(chưa có)"}  →  dấu mới: ${parsed[FINGERPRINT_FIELD]}`);
+    process.exit(EXIT.OK);
+  }
 
   /* ---- --soat : file đã DÀN mà bạn không có quyền ghi -------------------
    *
@@ -698,7 +832,7 @@ async function main() {
     /* KHỐI RỖNG THÌ XOÁ HẲN, không để `"tam": {}`. Bảng của repo chưa dùng khoá file phải giữ
        nguyên từng byte — một khối rỗng thừa là mọi lane khác thấy bảng đổi mà không hiểu vì sao. */
     if (Object.keys(tam).length) parsed.tam = tam; else delete parsed.tam;
-    fs.writeFileSync(CLAIMS_FILE, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
+    ghiBang(parsed);
     nhaKhoaBang();
     const boQua = suaCo ? ds.map(chuanDuongDan).filter(laMaySinh) : [];
     const ten = ds.map((d) => chuanDuongDan(d)).filter((d) => !boQua.includes(d)).join(" · ");
@@ -836,7 +970,7 @@ async function main() {
   if (verdict.code !== EXIT.OK) { console.error(verdict.message); process.exit(verdict.code); }
 
   parsed.claims[key] = typeof task === "string" ? { ...verdict.next, task } : verdict.next;
-  fs.writeFileSync(CLAIMS_FILE, `${JSON.stringify(parsed, null, 2)}\n`, "utf8");
+  ghiBang(parsed);
 
   // GHI RỒI ĐỌC LẠI. Không chặn được đua, nhưng không để nó âm thầm.
   const after = readClaims().claims[key];

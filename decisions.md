@@ -754,3 +754,25 @@ hôm nay **không tới được repo nào** chừng nào repo thứ ba trở đ
 **Cái mất:** `v1.2.17` đã chạy thật nhiều ngày; `v1.7.2` mới một ngày tuổi. Đổi lại nó mang bốn
 tính năng trên ở trạng thái **BẬT** — mốc cũ mang bộ nén nhưng **không khai một ngân sách nào**,
 nên cổng ở repo đích không canh được gì mà vẫn báo xanh.
+
+## 2026-09-09 · Kéo lớp bảo vệ của repo tiêu thụ VỀ NHÀ trước, rồi mới migrate
+
+> **trạng thái:** đã thi hành — [ADR-0017](docs/adr/0017-dau-niem-phong-bang-quyen.md), bản 1.8.0.
+
+**Đức chốt** khi soát repo `Chrome_Extension_AI_Agentic` trước lượt migrate: *"kéo về nhà trước,
+rồi mới đẩy xuống"*.
+
+**Vì sao:** repo đó **không cũ hơn bộ khung — nó đi trước ở tầng máy**. Nó có **dấu niêm phong
+`.agents/claims.json`** cưỡng chế đúng câu luật mục 1 của ta (*"nhận và trả bằng lệnh, không sửa
+tay"*) mà **ta viết ra nhưng chưa bao giờ kiểm**. `upgrade --force` sẽ **xoá lớp bảo vệ đó khỏi
+chính repo đã phát minh ra nó** — luật vàng 3 cấm.
+
+**Đính chính con số của chính tôi:** ban đầu tôi báo *"họ hơn ta 11 năng lực"*. Đó là đếm theo
+**TÊN HÀM**. Soát lại theo **NĂNG LỰC** thì phần lớn ta đã có dưới tên khác (`DAU_VET`,
+`handoffCapFrom`, kiểm artifact theo HEAD, `don.mjs` cắt kho). Thứ thật sự thiếu là **một**: dấu
+niêm phong cộng ghi nguyên tử. Đếm tên không phải đếm năng lực.
+
+**Còn lại, ghi nợ chứ không chép:** `handoffSoMucCapFrom` (trần SỐ MỤC, ta đã có trần byte và
+trần dòng — thêm cái thứ ba vào cùng một file là phình), và **ONE LOADING LAW** trong
+`CONTEXT-COMPILER-V1-PROPOSAL.md` của họ: bảng máy đọc `việc → file#mục`, mạnh hơn bảng văn xuôi
+mục 6 của ta. Đáng làm, chưa làm.

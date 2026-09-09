@@ -619,3 +619,31 @@ mốc remote. Gọi thẳng `xetDauCong(null, …)` và `xetDauCong({loai:"suite
 ⑶ test phá sổ phát hành nay chạy trong bản sao git riêng, không chạm cây làm việc chung.
 
 Bản **1.7.2**.
+
+### 2026-09-09 (20) · harness-loi-01 · KÉO LỚP BẢO VỆ VỀ NHÀ trước khi migrate — bản 1.8.0
+
+**Đức giao migrate `Chrome_Extension_AI_Agentic` từ mốc 1.7.2, kèm: xem bên đó hơn/kém gì.**
+Audit xong thì **không migrate được ngay**, và lý do đáng ghi.
+
+**Repo đó KHÔNG cũ hơn ta — nó lệch CẢ HAI CHIỀU.** Họ thiếu 22 file · 10 lệnh (toàn bộ bộ nén,
+`STATUS.md`, `VI-SAO-LUAT`, `BAN-DO-CHI-TIET`, ngân sách). Nhưng họ **có dấu niêm phong
+`.agents/claims.json`** — thứ cưỡng chế đúng câu luật mục 1 của ta mà **ta viết ra và chưa bao
+giờ kiểm**. `--force` là xoá lớp bảo vệ đó khỏi chính repo phát minh ra nó.
+
+**Hai đường đều hỏng, đo được:** ⑴ `--force` ghi đè 14 file máy của họ. ⑵ Chỉ thả file còn thiếu
+cũng hỏng — `can-nang.mjs` nhập `THU_MUC_DOCS_KHONG_TINH` mà `repo-structure.mjs` bản của họ
+**không xuất**, nên bộ nén hạ cánh ở trạng thái GÃY. `upgrade.mjs` từ chối là ĐÚNG, không phải kẹt.
+
+**ĐÍNH CHÍNH SỐ CỦA CHÍNH TÔI:** tôi báo Đức *"họ hơn ta 11 năng lực"* — đó là đếm theo **TÊN
+HÀM**. Soát lại theo **NĂNG LỰC** thì `DAU_VET`, trần HANDOFF, kiểm artifact theo HEAD, cắt kho
+nhật ký… ta đều đã có dưới tên khác. Thật sự thiếu **MỘT**. **Đếm tên không phải đếm năng lực** —
+và tôi suýt bỏ nửa ngày chép về những thứ đã có.
+
+**Đã kéo về:** ghi nguyên tử + dấu niêm phong + `--restamp` không-phải-cửa-sau (đối chiếu HEAD,
+đòi `--duc-duyet` khi CHUYỂN CHỦ, ghi câu chốt VÀO bảng). Cổng gộp vào mục *"Ai đứng tên việc
+này"* — không thành mục thứ 26. Ghim: `khoa-file` **8 → 12 vế**, mỗi vế có ca ĐỎ dựng được.
+
+**Đo tại chỗ:** đóng dấu → sửa tay `_docs.owner` → `--list` thoát **mã 3** kèm `DAU_VO`; trả nội
+dung về → dấu nguyên trở lại, mã 0.
+
+Bản **1.8.0**. ADR-0017. Còn nợ: `handoffSoMucCapFrom` và **ONE LOADING LAW** của họ.
