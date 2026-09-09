@@ -15,7 +15,7 @@ Trang được sinh ngày 2026-09-10. Đây là lúc sinh trang, **KHÔNG phải
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.8.7 | active | 0 | 21 | 2026-09-09 @ `d6da6a0` — 22 suite · cổng đóng phiên XANH TOÀN BỘ hai lượt liền · bản 1.8.0 đã phát và đã đẩy ([bằng chứng](HANDOFF.md)) | CÓ (10 commit) | Trả thứ đang thu thuế mỗi phiên: cổng thôi đòi khoá VÙNG cho mọi commit. Thứ tự việc ở docs/ROADMAP-V2.md; bản đồ sống là `npm run what-next`. | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.8.7 | active | 0 | 21 | 2026-09-09 @ `d6da6a0` — 22 suite · cổng đóng phiên XANH TOÀN BỘ hai lượt liền · bản 1.8.0 đã phát và đã đẩy ([bằng chứng](HANDOFF.md)) | CÓ (11 commit) | Trả thứ đang thu thuế mỗi phiên: cổng thôi đòi khoá VÙNG cho mọi commit. Thứ tự việc ở docs/ROADMAP-V2.md; bản đồ sống là `npm run what-next`. | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 
