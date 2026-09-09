@@ -677,3 +677,36 @@ lượt nào truy được là đỏ thật hay đỏ oan.
 **Còn mở → `KHUNG-55`:** `doKhoChu` lấy danh sách từ `git ls-files` nhưng đọc nội dung từ **ĐĨA**.
 HEAD **3.371** = đúng thước, đĩa **3.398**: phần thêm là `docs/briefs/MIGRATE-REPO.md` **+38** của
 `harness-migrate-3repo` đang sửa dở, phần tôi là **−11**. Một lane sửa dở làm đỏ cổng lane khác.
+
+### 2026-09-09 (21) · harness-migrate-3repo · MIGRATE BA REPO lên 1.8.0 — hai cơ chế hạ cánh ở trạng thái TẮT
+
+| Repo | Bản khung | Nạp mỗi phiên | Mã CHẶN đỏ | Đẩy |
+|---|---|---|---|---|
+| `nav_platform_main` | 1.3.76 → **1.8.0** | chưa đo → **9.052/11.800** | 0 | **CHƯA** — xem dưới |
+| `n8n-orchestrator` | 1.3.76 → **1.8.0** | chưa đo → **5.816/7.600** | 0 | xong, cổng XANH TOÀN BỘ |
+| `n8n_Local host` | **chưa từng ghim** → 1.8.0 | chưa đo → **3.415/4.500** | 0 | xong, cổng XANH TOÀN BỘ · dãy B **0 đỏ 0 vàng** |
+
+Cả ba **mức 1/3 → 3/3**. Bốn file cấm-đè: không file nào ngắn đi ở bất kỳ repo nào.
+
+**MỘT BỆNH, BA REPO: `upgrade --apply` không mang được thứ nằm trong `.repo-structure.json`** —
+file cố ý thuộc repo đích (`TEP_CUA_REPO_DICH`). Nên `budget.tokenNap` **chưa repo nào khai**, và
+cổng báo *"chưa khai thước thì không đo"* rồi **XANH**. Bộ nén luật đã tới ba repo từ hôm nay mà
+nằm không, không phép kiểm nào kể tên. Cùng họ `KHUNG-48`. `bang-song/` trong `areas` cùng gốc
+bệnh nhưng ít nguy hơn vì nó **đỏ** (`B3`).
+
+**`bootstrap.blocking` là hai ca ngược nhau, và cả hai đều sai theo hướng riêng:** `nav_platform`
+khai `B5`,`B7` — bản 1.8.0 đã gộp vào `B2` — nên cổng ném `CHAN_MA_LA` và **từ chối chạy** (đúng).
+`n8n-orchestrator` thì để **RỖNG suốt bốn ngày**: cổng cấu trúc không cưỡng chế gì mà không ai
+nhận ra. *"Để rỗng lúc lắp"* chỉ đúng nếu có ai quay lại bật.
+
+**Tên phiên tôi được giao có KHOẢNG TRẮNG, máy từ chối** (`LANE_CO_KHOANG_TRANG`), và
+`session-check:1173` so nhãn `Lane:` với `--as`. Phát hiện **sau** commit đầu, nên
+`nav_platform_main` còn một commit của tôi không nhãn. Không tự sửa lịch sử — mục 2 bắt hỏi.
+
+**Bốn bài học 09/09 đã gấp vào `docs/briefs/MIGRATE-REPO.md`** (+52 dòng). Ba hồ sơ ở
+`docs/migrations/2026-09-09-*.md`.
+
+**Còn mở:** ⑴ `nav_platform_main` có **6 commit chưa đẩy**, 2 không nhãn `Lane:` (1 của lane
+trước, 1 của tôi) — chỉ Đức gỡ được bằng `--carry`. ⑵ `build-overview.mjs` **treo >300s** ở
+`n8n_Local host` (đường dẫn có dấu cách) — chưa ghi được vào `BACKLOG.md` vì lane `harness-loi-02`
+đang giữ khoá file đó.

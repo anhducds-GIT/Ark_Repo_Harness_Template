@@ -40,5 +40,27 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "c2525746ba92bf21"
+  "_fingerprint": "a75ca392c94f0b5a",
+  "tam": {
+    "docs/briefs/MIGRATE-REPO.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T16:21:49.168Z"
+    },
+    "docs/migrations/2026-09-09-nav-platform.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T16:35:26.419Z"
+    },
+    "docs/migrations/2026-09-09-n8n-orchestrator.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T16:35:26.419Z"
+    },
+    "docs/migrations/2026-09-09-n8n-local-host.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T16:35:26.419Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T16:35:26.419Z"
+    }
+  }
 }

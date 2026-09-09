@@ -31,6 +31,25 @@ wc -l AGENTS.md DASHBOARD.md decisions.md handoff.md HANDOFF.md 2>/dev/null   # 
 
 Số dòng **giảm** ở bất kỳ file nào trong bốn = đã đè mất nội dung. **Dừng, hoàn nguyên, báo.**
 
+## LUẬT CỨNG THỨ HAI — repo đích CÓ THỂ ĐI TRƯỚC BỘ KHUNG
+
+Đo 09/09 ở `Chrome_Extension_AI_Agentic`: repo đó thiếu 22 file của bộ khung **và** có một lớp
+bảo vệ bộ khung KHÔNG có (dấu niêm phong `.agents/claims.json`). Lệch **cả hai chiều**, không
+phải "cũ hơn".
+
+```bash
+# TRƯỚC khi nghĩ tới --force: so hai chiều danh sách hàm export
+comm -3 <(grep -ho 'export function [a-zA-Z]*' template/scripts/*.mjs | sort -u)         <(grep -ho 'export function [a-zA-Z]*' "<REPO ĐÍCH>"/scripts/*.mjs | sort -u)
+```
+
+`--force` khi họ đi trước là **xoá lớp bảo vệ của họ** — luật vàng 3 cấm. Đường đúng:
+**KÉO VỀ NHÀ TRƯỚC → phát bản mới ở bộ khung → rồi mới đẩy xuống.**
+
+**So theo NĂNG LỰC, đừng so theo TÊN HÀM.** Cùng lượt đó tôi đếm tên và báo Đức *"họ hơn ta 11
+thứ"*; soát lại theo năng lực thì bộ khung đã có gần hết dưới tên khác, thật sự thiếu **MỘT**.
+Suýt bỏ nửa ngày chép về thứ đã có. Mỗi tên lạ phải hỏi: *bộ khung làm được việc này chưa, dù
+gọi tên khác?*
+
 ## Migrate là BA việc trong một — Đức chốt 2026-09-05
 
 | # | Việc | Xong nghĩa là gì |
@@ -77,6 +96,12 @@ Trong `.repo-structure.json`:
 | `areas` | mỗi thư mục tầng ngoài cùng một dòng. **Chia ít thôi lúc đầu** | chia nhỏ khi chưa biết ai làm gì là tự tạo tranh chấp; gộp lại sau dễ hơn tách ra |
 | `bootstrap.blocking` | **để RỖNG** | bật chặn khi repo đang đỏ là tự khoá repo ngay ở phiên đầu tiên |
 | `generated_names` | khai khi repo đích **đã có** `DASHBOARD.md` / `llms.txt` / `repo-map.json` | không khai là bộ sinh **đè im lặng** lên file viết tay của chủ nhà |
+
+**REPO ĐÃ GHIM BẢN CŨ: `bootstrap.blocking` của nó SẼ GÃY.** Nó khai mã phép kiểm mà bản mới
+đã **gộp** — bản 1.8.0 gộp `B5`+`B7` vào `B2`. Cổng ném `CHAN_MA_LA` và **từ chối chạy**,
+đúng như nó phải làm: một mã gõ sai là một phép kiểm tưởng đang chặn mà thật ra không chặn gì.
+Sửa danh sách cho khớp mã của bản mới. Và **đừng bật thêm mã mới vào nhóm CHẶN khi mã đó đang
+đỏ** — bật chặn lúc đang đỏ là tự khoá repo người ta.
 
 Kiểm ba tên trước khi chạy bộ sinh lần đầu:
 
@@ -139,13 +164,25 @@ cd "<REPO BỘ KHUNG>" && node scripts/upgrade.mjs --apply "<REPO ĐÍCH>"
 Ghi `.ark/harness.lock.json` vào repo đích. Không ghim thì lần vá sau lại là chép tay, và chép
 tay là cách một bộ khung biến thành N bộ khung khác nhau.
 
+**BA THỨ `--apply` KHÔNG MANG SANG — phải tự làm.** Tầng máy chỉ là `.mjs` · `.cmd` ·
+`features.json`, còn `.repo-structure.json` thì cố ý thuộc repo đích. Nên:
+
+| Thứ | Thiếu thì sao | Làm gì |
+|---|---|---|
+| `STATUS.md` ở **GỐC** repo | `B2` **ĐỎ** — đơn vị gốc không có trang trạng thái | Dựng từ trạng thái THẬT của repo đó, khuôn ở `STATUS.template.md`. **Đừng bịa số** |
+| `budget.tokenNap` trong `.repo-structure.json` | cổng báo *"chưa khai thước thì không đo"* **và VẪN XANH** — bộ nén hạ cánh ở trạng thái TẮT | Đặt trần, chạy `node scripts/rule-compiler.mjs --nap` **ở repo đích**, rồi siết trần xuống sát số thật cộng biên 30%. **Thước chỉ được SIẾT** |
+| `bang-song/` khai trong `areas` | `B3` **ĐỎ** — thư mục top-level không ai khai | Thêm một dòng `areas`; file `.mjs`/`.cmd` bên trong thì `--apply` đã mang |
+
+Thứ hai nguy hơn thứ nhất, vì nó **không đỏ**. Một cơ chế tới rồi mà nằm không thì không phép
+kiểm nào kể tên nó.
+
 Rồi thêm **một** file `docs/migrations/<ngày>-<tên-repo>.md` ở **repo nhà của bộ khung**, theo
-khuôn các hồ sơ đã có, và chạy `npm run so-migrate` rồi commit.
+khuôn các hồ sơ đã có, và chạy `node scripts/build-so-migrate.mjs` rồi commit.
 
 **Vì sao bắt buộc:** migrate xảy ra **thưa** — vài tuần, có khi vài tháng một lần. Đúng loại việc
 mà cả người lẫn AI đều quên sạch. Hồ sơ **chỉ thêm, không sửa cái cũ**.
 
-## Bốn cạm bẫy, cả bốn đều đã xảy ra thật
+## Năm cạm bẫy, cả năm đều đã xảy ra thật
 
 | Bẫy | Hậu quả |
 |---|---|
@@ -153,6 +190,7 @@ mà cả người lẫn AI đều quên sạch. Hồ sơ **chỉ thêm, không s
 | Chia `areas` quá nhỏ khi chưa biết ai làm gì | Tự tạo tranh chấp quyền cho việc không hề chồng nhau |
 | Sinh trang trước khi commit nguồn | Trang dựng từ HEAD cũ — **hỏng im lặng**, trang vẫn đẹp |
 | Sửa bộ máy trong lúc chép sang | Hai nhánh của cùng một công cụ, và chúng sẽ trôi khỏi nhau |
+| Sửa `.repo-structure.json` rồi chạy lại cổng **mà chưa commit** | Cổng vẫn kể lỗi cũ, nên bạn đi sửa một thứ đã đúng — **cổng đọc HEAD, không đọc đĩa**, cùng bẫy với `last_verified_commit` |
 
 Thêm một chỗ **đúng thiết kế nhưng dễ tưởng mình sai**: cổng đóng phiên so nhãn `Lane:` với
 `origin/main`. Repo làm việc trên nhánh tính năng thì phép kiểm đó **BỎ** chứ không xanh.
