@@ -761,7 +761,7 @@ Lối ⑴ trong hai lối nêu trên, đúng như đã ghi: nhãn `Audit:` trong
 
 Bốn quyết định thiết kế, mỗi cái tránh một cách hỏng đã biết:
 
-| Quyết định | Tránh cái gì |
+| Chốt gì | Tránh cái gì |
 |---|---|
 | KHÔNG khai = KHÔNG chặn | chặn tuốt là khoá repo ngay lượt đầu — bẫy 509 commit cũ không nhãn |
 | `Audit:` **rỗng** = chưa duyệt | gõ nhãn rỗng để qua cửa là biến chính nhãn thành đường lách |

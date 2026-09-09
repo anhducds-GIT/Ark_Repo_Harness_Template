@@ -134,7 +134,7 @@ trước khi đẩy.
 **Nhãn `Audit:`** — nhà của nó là `auditFromMessage` trong `repo-structure.mjs`, cạnh
 `laneFromMessage`. `safe-push` từ chối đẩy khi có commit **tự khai** `Audit: chua-co`.
 
-| Quyết định | Tránh cái gì |
+| Chốt gì | Tránh cái gì |
 |---|---|
 | KHÔNG khai = KHÔNG chặn | chặn tuốt là khoá repo ngay lượt đầu — đúng bẫy 509 commit cũ không nhãn |
 | `Audit:` **rỗng** = chưa duyệt | gõ nhãn rỗng để qua cửa là biến chính nhãn thành đường lách |
