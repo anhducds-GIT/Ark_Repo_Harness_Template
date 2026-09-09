@@ -892,7 +892,12 @@ phải sơ suất của ai.
 | Lượt | Ai `git add` | Ai `git commit` | Kết quả |
 |---|---|---|---|
 | 09/09 | `harness-migrate-3repo` (`git add -A`) | chính nó | cuốn 2 file `scripts/` **đang sửa dở** của `harness-loi-02` vào `69e0a84` |
-| 10/09 | `harness-migrate-3repo` (`git add` 7 file, đã `--soat` XANH) | **`harness-loi-02`** | 7 file protocol của tôi nằm trong `ed08d0f`, mang nhãn `Lane: harness-loi-02` |
+| 10/09 | `harness-migrate-3repo` (`git add` 7 file, đã `--soat` XANH) | **`harness-loi-02`** | 7 file protocol của tôi bị gom vào `ed08d0f` của họ; `git commit` của tôi trả *"nothing to commit"* |
+
+**Lượt 10/09 đã được lane kia TỰ SỬA** — họ dựng lại commit (`ed08d0f` → `ecd9137`) không kèm file
+của tôi, và trả nội dung về cây làm việc để tôi commit dưới nhãn của mình. Cả hai lượt đều hồi
+phục được **vì có người nhìn thấy**. Đó chính là chỗ đáng lo: cơ chế không bắt, chỉ có mắt người
+bắt.
 
 **Gốc: `claim` bảo vệ FILE, `safe-push` bảo vệ lượt ĐẨY — không lớp nào bảo vệ INDEX.** Một cây
 làm việc có **đúng một** index dùng chung. Nên giữa `git add` và `git commit` của tôi, bất kỳ

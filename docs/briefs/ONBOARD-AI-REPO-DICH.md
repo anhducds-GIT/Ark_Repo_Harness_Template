@@ -45,6 +45,33 @@ Ba thứ bạn phải rời lượt này với:
 
 ---
 
+## Lượt migrate đã làm 90% — bạn nhận 10% cuối, và nó là phần PHÁN ĐOÁN
+
+Đừng bắt đầu từ số không. Phiên migrate vừa rời đi đã để lại **số đo, không phải lời dặn**:
+
+| Đọc ở đâu | Nó đã làm sẵn gì cho bạn |
+|---|---|
+| `HANDOFF.md`, mục cuối | Nâng bản nào → bản nào, chỗ nào vấp, còn gì mở |
+| `BACKLOG.md` | Mọi nợ tìm được, mỗi mục có `đóng khi:` — **kể cả kết quả `--trim`/`--check` đã chạy sẵn** |
+| `decisions.md` | Quyết định phiên đó tự quyết trong phạm vi uỷ quyền, kèm lý do |
+| `.repo-structure.json` | Bốn thước đã khai và đã siết: `budget.tokenNap` · `docs.tran_dong_khong_ke_adr` · `backlog.tran` · `handoff.tran_byte_moi_muc` |
+
+**Vì sao 10% cuối lại là phần của BẠN, không phải của họ.** Nén bộ luật repo này đòi biết **nghề
+của repo này** — câu nào thừa, câu nào đang gánh một ca hỏng thật. Phiên migrate không biết, nên
+nó **đo và đính kèm phân tích** rồi dừng đúng chỗ. Thêm một lý do cứng: `rule-compiler.mjs` đóng
+`ROOT` vào repo chứa nó, **không chạy từ xa được** — bản duy nhất compile được luật ở đây là bản
+nằm ở đây.
+
+Và bất biến mục 5: **người SỬA không tự NGHIỆM THU bản sửa của mình.** Phiên migrate lắp bộ nén;
+nếu nó cũng dùng bộ nén đó viết lại hiến pháp repo bạn thì không còn ai độc lập soi kết quả. Bạn
+là người soi.
+
+> **Ngữ cảnh nằm trong SỔ, không nằm trong cửa sổ chat.** Cửa sổ chat của phiên migrate đã đóng;
+> mọi thứ đáng giữ đều đã hạ cánh vào bốn chỗ trong bảng trên. Đọc chúng trước khi hỏi lại bất cứ
+> điều gì — hỏi lại là trả tiền lần thứ hai cho một phép đo đã có số.
+
+---
+
 ## Bảy bước, theo đúng thứ tự
 
 ### 1 · Đọc luật của CHÍNH repo này trước

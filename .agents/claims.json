@@ -40,5 +40,35 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "c2525746ba92bf21"
+  "_fingerprint": "bad8c466af51152c",
+  "tam": {
+    "docs/briefs/MIGRATE-REPO.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    },
+    "docs/briefs/ONBOARD-AI-REPO-DICH.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    },
+    "docs/archive/CHUYEN-REPO-LEN-CHUAN.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    },
+    "docs/BAN-DO-CHI-TIET.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    },
+    "BACKLOG.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-migrate-3repo",
+      "luc": "2026-09-09T19:19:39.684Z"
+    }
+  }
 }

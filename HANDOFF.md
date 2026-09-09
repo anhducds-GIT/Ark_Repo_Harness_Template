@@ -995,12 +995,13 @@ có khối `features --migrate` trong hồ sơ, và chưa repo nào được dá
 ### 2026-09-10 · harness-migrate-3repo · Bản vá protocol nằm trong commit của LANE KHÁC — ghi cho đúng sự thật
 
 Bảy file của mục trên (`MIGRATE-REPO` 8→12 bước · `ONBOARD` · khai tử bản trùng nhà · siết thước
-3371→3117) **đã vào HEAD**, nhưng nằm trong `ed08d0f` của `harness-loi-02`, mang nhãn
-`Lane: harness-loi-02`. Tôi `git add` xong, `--soat` XANH, rồi lane kia `git commit` trước — index
+3371→3117) bị gom mất: tôi `git add` xong, `--soat` XANH, rồi lane kia `git commit` trước — index
 là **của chung cả cây**. `git commit` của tôi trả *"nothing to commit"*.
 
-**Không mất nội dung, mất TRUY NGUỒN.** Không sửa lịch sử (mục 2 bắt hỏi trước). Ai truy `git log`
-tìm bản vá protocol 12 bước sẽ thấy tên sai — đọc mục này để biết vì sao.
+**Kết cục tốt, và không nhờ cơ chế.** `harness-loi-02` tự dựng lại commit của họ (`ed08d0f` →
+`ecd9137`) không kèm file của tôi, trả nội dung về cây làm việc; tôi commit lại dưới nhãn mình.
+Không mất nội dung, không mất truy nguồn — **vì có người nhìn thấy.** Nếu không ai nhìn thì bản vá
+protocol 12 bước đã mang tên sai vĩnh viễn.
 
 Sáng nay tôi rơi vào **chiều ngược lại**: `git add -A` của tôi cuốn hai file `scripts/` đang sửa
 dở của họ. Cùng một lỗ, hai chiều, một ngày → `KHUNG-59`.

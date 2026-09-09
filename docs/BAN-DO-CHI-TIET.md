@@ -180,7 +180,7 @@ khai `generated_names` trong `.repo-structure.json` — từ bản 1.3.11 ba tê
 
 ### Đưa một repo đang sống lên chuẩn
 
-[docs/protocols/CHUYEN-REPO-LEN-CHUAN.md](docs/protocols/CHUYEN-REPO-LEN-CHUAN.md) — **đã chạy thật 3 lần** (03/09 ×2 · 06/09), hồ sơ từng lượt ở [docs/migrations/](docs/migrations/). Đọc hồ sơ trước: chỗ vấp thật nằm ở đó, không nằm trong quy trình
+[docs/briefs/MIGRATE-REPO.md](docs/briefs/MIGRATE-REPO.md) — quy trình migrate ĐANG hiệu lực; `giao-viec.mjs` sinh đề bài từ nó. Hồ sơ từng lượt ở [docs/migrations/](docs/migrations/), **đọc hồ sơ trước**: chỗ vấp thật nằm ở đó, không nằm trong quy trình. Bản cũ đã khai tử: [docs/archive/CHUYEN-REPO-LEN-CHUAN.md](docs/archive/CHUYEN-REPO-LEN-CHUAN.md)
 
 ### Sinh lại bản trích trong `template/`
 

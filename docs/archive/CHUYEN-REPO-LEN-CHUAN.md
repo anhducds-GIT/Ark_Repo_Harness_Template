@@ -1,10 +1,20 @@
 ---
 kind: protocol
-status: active
+status: superseded
+superseded_by: docs/briefs/MIGRATE-REPO.md
 ttl_days: 180
 ---
 
 # QUY TRÌNH — đưa một repo đang sống lên chuẩn
+
+> **KHÔNG CÒN HIỆU LỰC từ 2026-09-10 — xem [MIGRATE-REPO.md](../briefs/MIGRATE-REPO.md).**
+> File này và brief kia là **hai bản của cùng một quy trình**: cùng tiêu đề, cùng câu luật nền,
+> cùng "tám bước". Hai bản cạnh nhau là hai câu trả lời cho một câu hỏi, và phiên sau bốc trúng
+> câu sai — `AGENTS.md` mục 8 cấm. Bản kia thắng vì **`giao-viec.mjs` sinh đề bài từ nó**, tức nó
+> là bản đang được thi hành thật.
+>
+> **Giữ nguyên văn bên dưới** làm bằng chứng vì sao quy trình từng chạy như thế. Số liệu trong
+> đây dừng ở bản khung 1.3.9x và 4 lượt migrate — **đừng đọc nó như trạng thái hôm nay.**
 
 > **Dùng khi nào:** đã chạy [KIEM-MOT-REPO.md](KIEM-MOT-REPO.md) và quyết định làm.
 > **Khác với khởi tạo mới:** repo này **đã có việc, đã có lịch sử, đã có người dùng**. Nên luật
