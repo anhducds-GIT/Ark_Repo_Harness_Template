@@ -15,7 +15,7 @@ Trang được sinh ngày 2026-09-09. Đây là lúc sinh trang, **KHÔNG phải
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.6.0 | active | 0 | 21 | 2026-09-09 @ `0b3a256` — npm test 22 suite xanh · cổng đóng phiên XANH TOÀN BỘ 25/25 · bản 1.5.3 đã phát ([bằng chứng](HANDOFF.md)) | CÓ (1 commit) | Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2. | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.6.0 | active | 0 | 21 | 2026-09-09 @ `0b3a256` — npm test 22 suite xanh · cổng đóng phiên XANH TOÀN BỘ 25/25 · bản 1.5.3 đã phát ([bằng chứng](HANDOFF.md)) | CÓ (2 commit) | Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2. | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 
