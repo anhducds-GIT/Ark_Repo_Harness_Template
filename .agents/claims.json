@@ -3,51 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T10:12:47.526Z",
       "task": "Nen hien phap: luat o Tang 1, ly le sang docs/VI-SAO-LUAT.md; mo phien doc STATUS.md",
-      "released_at": null,
+      "released_at": "2026-09-09T10:48:34.454Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T10:12:47.603Z",
       "task": "Nen hien phap: luat o Tang 1, ly le sang docs/VI-SAO-LUAT.md; mo phien doc STATUS.md",
-      "released_at": null,
+      "released_at": "2026-09-09T10:48:34.572Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T10:12:47.678Z",
       "task": "Nen hien phap: luat o Tang 1, ly le sang docs/VI-SAO-LUAT.md; mo phien doc STATUS.md",
-      "released_at": null,
+      "released_at": "2026-09-09T10:48:34.708Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T10:12:47.769Z",
       "task": "Nen hien phap: luat o Tang 1, ly le sang docs/VI-SAO-LUAT.md; mo phien doc STATUS.md",
-      "released_at": null
-    }
-  },
-  "tam": {
-    ".repo-structure.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T10:30:18.689Z"
-    },
-    "AGENTS.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T10:30:18.689Z"
+      "released_at": "2026-09-09T10:48:34.847Z"
     }
   }
 }
