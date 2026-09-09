@@ -141,5 +141,12 @@
   "budget": {
     "_doc_nap": "tokenNap = TRAN TOKEN cho phan MOI phien phai nap (AGENTS.md + STATUS.md). Tran THAT Duc chot 09/09 la 6.000; con so o day la VACH BIEN 30% duoi tran do (6000 x 0.7 = 4200), vi Duc chot tiep: muc tieu khong phai dat nguong, ma phai nho hon nguong margin 30-40%, vi sau nay se tiep tuc phinh ra. Cong do bang napContext va DO SOM o vach nay, truoc khi cham tran that. Do bang DONG la do sai don vi: ban dau bao 284/300 dong DAT trong khi that su la ~13.800 token. Moi token o day nhan theo (so repo x so phien).",
     "tokenNap": 4200
+  },
+  "audit": {
+    "_doc": "Ai duoc coi la NGUOI DUYET doc lap. Nhan `Audit: <ten>` trong commit chi go duoc cua audit cua safe-push khi <ten> nam trong danh sach nay (hau to vong -rNN duoc phep). Ngoai danh sach = CHUA duyet. Vi sao la danh sach chu khong phai chuoi tu do: ba vong audit 10/09 do duoc `pending`, `none`, `todo`, `not-reviewed` deu bi doc thanh DA DUYET khi con la chuoi tu do.",
+    "nguoi_duyet": [
+      "codex",
+      "duc"
+    ]
   }
 }

@@ -385,39 +385,55 @@ export function laneFromMessage(text) {
 export const AUDIT_TRAILER = "Audit:";
 export const AUDIT_CHUA_CO = "chua-co";
 
-/** Đọc nhãn `Audit:`. **CHỈ một thẻ người-duyệt ĐÚNG KHUÔN mới là "đã duyệt"; mọi thứ khác là
- *  CHƯA.** Đây là chiều fail-closed, và audit độc lập 10/09 bắt được đúng chỗ này ở bản đầu.
+/** Ai được coi là NGƯỜI DUYỆT — đọc từ `.repo-structure.json`, không đoán từ chữ. */
+export function nguoiDuyetFrom(structure) {
+  const ds = structure?.audit?.nguoi_duyet;
+  return Array.isArray(ds) ? ds.filter((x) => typeof x === "string" && /^[a-z0-9][a-z0-9._-]*$/.test(x)) : [];
+}
+
+/** Đọc nhãn `Audit:`. **CHỈ một tên trong DANH SÁCH KHAI mới là "đã duyệt"; mọi thứ khác là CHƯA.**
  *
- *  Bản đầu hỏi ngược: *"giá trị có đúng bằng `chua-co` không? Không thì coi là tên người duyệt."*
- *  Hai ca đo được, cả hai FAIL-OPEN, và ca thứ nhất là câu một người cẩn thận sẽ tự viết:
- *    · `Audit: chua-co (dang cho Codex)` → **coi là ĐÃ DUYỆT**
- *    · `Audit: chua co`  (dấu cách thay gạch) → **coi là ĐÃ DUYỆT**
- *  Nay hỏi đúng chiều: chỉ `^[a-z0-9][a-z0-9._-]*$` — một thẻ, không khoảng trắng, không mở đầu
- *  bằng `chua` — mới được tính là người duyệt. Nhãn không đọc được thì **CHƯA**, kèm mã lỗi;
- *  cùng khuôn `laneFromMessage` đã dùng cho `LANE_CO_KHOANG_TRANG`.
+ *  BA VÒNG AUDIT ĐỘC LẬP MỚI TỚI ĐƯỢC HÌNH DẠNG NÀY, và hai vòng đầu tôi vá sai chỗ:
+ *    · 1.8.4 hỏi *"có đúng bằng `chua-co` không? không thì là tên người duyệt"* → `chua-co (dang
+ *      cho)` và `chua co` thành **ĐÃ DUYỆT**.
+ *    · 1.8.5 hỏi *"có đúng khuôn một thẻ không?"* → `pending`, `none`, `todo`, `not-reviewed`
+ *      thành **ĐÃ DUYỆT**. Đo được cả bốn. Và mẹo `/^chua/` chặn oan một tên hợp lệ như `chuan`.
  *
- *  Khoá `Audit:` so KHÔNG PHÂN BIỆT HOA THƯỜNG: `AUDIT: chua-co` ở bản đầu rơi vào "không khai",
- *  tức một lời khai thật bị mất im lặng. */
-export function auditFromMessage(text) {
+ *  GỐC BỆNH của cả hai: tôi để **người viết commit** tự định nghĩa cái gì là "đã duyệt". Một
+ *  chuỗi tự do thì không có cách nào phân biệt `codex-r03` với `pending` — cả hai chỉ là chữ.
+ *  Nên câu hỏi phải đổi chủ: **repo khai trước ai được duyệt**, và mọi thứ ngoài danh sách là
+ *  CHƯA. Một phép so danh sách THAY CHỖ hai mẹo dò chuỗi, nên bản này vừa chặt hơn vừa ít luật
+ *  hơn — không phải thêm một lớp nữa.
+ *
+ *  Hậu tố vòng `-rNN` được phép (`codex` khai một lần, `codex-r03` dùng được) — không thì mỗi
+ *  vòng audit lại phải sửa cấu hình.
+ *
+ *  Repo KHÔNG khai danh sách → KHÔNG ai là người duyệt → lời khai `chua-co` chỉ gỡ được bằng
+ *  `--duc-duyet-chua-audit`. Fail-closed, và nói rõ bằng mã lỗi. */
+export function auditFromMessage(text, dsNguoiDuyet = []) {
   const values = String(text ?? "").split("\n")
-    .filter((line) => /^audit:/i.test(line))
+    .filter((line) => /^\s*audit\s*:/i.test(line))
     .map((line) => line.slice(line.indexOf(":") + 1).trim().toLowerCase());
   if (!values.length) return { chuaAudit: false, khai: null, problem: null };
   const khai = values.join(" · ");
-  /* RỖNG hoặc mở đầu bằng `chua` = CHƯA. Bắt cả `chua-co`, `chua co`, `chua-co (dang cho)`,
-     `chuaduyet` — mọi cách một người viết ý *"chưa"*, không chỉ đúng một chuỗi. */
-  if (values.some((v) => v === "" || /^chua/.test(v.split(/\s+/)[0]))) {
-    return { chuaAudit: true, khai, problem: null };
+  /* Hậu tố vòng `-rNN`: `codex` khai một lần thì `codex-r03` dùng được. So bằng CẮT HẬU TỐ chứ
+     không dựng RegExp từ chuỗi cấu hình — `.` trong một tên như `a.b` là ký tự đặc biệt của
+     RegExp, và dựng biểu thức từ dữ liệu là cách tự mở một cửa mình không nhìn thấy. */
+  const hopLe = (v) => {
+    const goc = v.replace(/-r\d+$/, "");
+    return dsNguoiDuyet.includes(v) || dsNguoiDuyet.includes(goc);
+  };
+  /* MỘT commit MỘT lời khai. Hai dòng `Audit:` khác nhau là hai câu trả lời cho một câu hỏi, và
+     phiên sau bốc trúng câu nào thì tuỳ — cùng lý do `laneFromMessage` chặn `LANE_XUNG_DOT`. */
+  if (new Set(values).size > 1) {
+    return { chuaAudit: true, khai, problem: `AUDIT_XUNG_DOT: một commit mang ${new Set(values).size} nhãn \`${AUDIT_TRAILER}\` khác nhau (${khai}). Không quy được là đã duyệt hay chưa.` };
   }
-  const bad = values.find((v) => !/^[a-z0-9][a-z0-9._-]*$/.test(v));
-  if (bad !== undefined) {
-    return {
-      chuaAudit: true,
-      khai,
-      problem: `AUDIT_KHONG_DOC_DUOC: nhãn "${bad}" không phải một thẻ duy nhất. Tên người duyệt là MỘT từ, ví dụ "codex-r02". Không đọc được thì coi là CHƯA duyệt.`,
-    };
-  }
-  return { chuaAudit: false, khai, problem: null };
+  if (values.every(hopLe)) return { chuaAudit: false, khai, problem: null };
+  return {
+    chuaAudit: true,
+    khai,
+    problem: `AUDIT_NGOAI_DANH_SACH: "${khai}" không có trong \`audit.nguoi_duyet\` của .repo-structure.json${dsNguoiDuyet.length ? ` (đang khai: ${dsNguoiDuyet.join(", ")})` : " (repo CHƯA khai ai)"}. Ngoài danh sách thì coi là CHƯA duyệt.`,
+  };
 }
 
 /* BẤT BIẾN BA TẦNG — LAW `steward` ↔ STATE khoá quyền ↔ MÁY một hàm duy nhất.

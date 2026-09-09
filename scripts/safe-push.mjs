@@ -18,7 +18,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, AUDIT_CHUA_CO, AUDIT_TRAILER, auditFromMessage, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
+import { appendOnlyAtEof, AUDIT_CHUA_CO, AUDIT_TRAILER, auditFromMessage, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, nguoiDuyetFrom, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDauCong, xetDauCong } from "./chay-test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -325,7 +325,8 @@ if (blocked.length && carry) {
  * đầu, và `AGENTS.md` mục 2 vốn đã đòi audit bằng chữ rồi. */
 /* MỘT LƯỢT ĐỌC, DÙNG CHUNG. Bản đầu đọc thông điệp hai lần (một cho cảnh báo, một cho cửa) —
    audit độc lập nêu chi phí N tiến trình git; gộp lại thì còn một lượt. */
-const rowsAudit = rows.map((row) => ({ ...row, audit: auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha)) }));
+const dsNguoiDuyet = nguoiDuyetFrom(structure);
+const rowsAudit = rows.map((row) => ({ ...row, audit: auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha), dsNguoiDuyet) }));
 const chamCode = rowsAudit.filter((row) => {
   const files = gitQuiet("show", "--name-only", "--format=", row.sha).split(NL).filter(Boolean);
   return files.some((f) => f.replace(/^"|"$/g, "").startsWith("scripts/") || f.replace(/^"|"$/g, "").startsWith("tests/"));
@@ -370,7 +371,9 @@ if (chuaDuyet.length && !ducDuyetChuaAudit) {
   console.error(`  · lay audit that, roi commit KET QUA audit kem dong cuoi:  ${AUDIT_TRAILER} <ten-nguoi-duyet>`);
   console.error(`    commit do go moi loi khai "${AUDIT_CHUA_CO}" CU HON no — khong phai sua lai lich su`);
   console.error(`  · Duc chot cho day khi chua duyet:  --duc-duyet-chua-audit`);
-  console.error(`  · de commit do nam lai, day rieng phan con lai${NL}`);
+  console.error(`  · KHONG the "day rieng phan con lai" neu commit chua duyet la TO TIEN cua thu`);
+  console.error(`    ban muon day — git day ca chuoi. Muon tach thi cherry-pick phan doc lap`);
+  console.error(`    sang mot nhanh khac roi chay lai cong o do.${NL}`);
   process.exit(1);
 }
 /* CHỈ NÓI KHI THẬT SỰ GỠ ĐƯỢC MỘT CÁI. Bản đầu in câu này bất cứ khi nào có một nhãn duyệt và

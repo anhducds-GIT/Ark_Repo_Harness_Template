@@ -365,7 +365,9 @@ try {
     const write2 = wA;
     execFileSync("git", ["init", "-q", "--bare", bareA]);
     gA("init", "-q", "-b", "main"); gA("config", "user.name", "t"); gA("config", "user.email", "t@e.invalid");
-    wA(".repo-structure.json", JSON.stringify({ units: { root_dir: null }, areas: { "scripts/": { steward: "_root", ownership_mode: "root" } } }));
+    wA(".repo-structure.json", JSON.stringify({ units: { root_dir: null },
+      areas: { "scripts/": { steward: "_root", ownership_mode: "root" } },
+      audit: { nguoi_duyet: ["codex"] } }));
     wA(".agents/claims.json", JSON.stringify({ claims: { _root: { owner: null } } }));
     wA("package.json", JSON.stringify({ type: "module", scripts: { test: "node scripts/chay-test.mjs" } }));
     wA("sample.txt", "nen");
@@ -393,11 +395,14 @@ try {
     gA("add", "-A"); gA("commit", "-qm", "ban va loi" + NL + NL + "Lane: fixture" + NL + "Audit: chua-co");
     p = dayA();
     assert.equal(p.status, 1, "commit tu khai chua audit thi safe-push PHAI tu choi");
-    assert.match(String(p.stdout) + String(p.stderr), /chua qua audit doc lap/, "phai noi ro vi sao");
+    assert.match(String(p.stderr), /TU CHOI PUSH — 1 commit TU KHAI la chua qua audit doc lap/,
+      "phai chet o DUNG cua audit, khong phai mot cua khac — ma thoat 1 mot minh khong phan biet duoc");
 
     // ⑶ `--carry` KHONG mo duoc cua nay. Duc chot 09/09 la ve QUY THUOC, khong phai ve DUYET;
     //    dung mot loi chot cho viec A de lam viec B la cho de lam sai nhat.
-    assert.equal(dayA("--carry").status, 1, "--carry khong duoc mo cua AUDIT");
+    const pc = dayA("--carry");
+    assert.equal(pc.status, 1, "--carry khong duoc mo cua AUDIT");
+    assert.match(String(pc.stderr), /chua qua audit doc lap/, "phai chet o DUNG cua audit");
 
     // ⑷ DOI CHUNG NGUOC — thieu ve nay thi mot ban va "chan tuot" cung qua duoc ba ve tren.
     gA("reset", "-q", "--hard", "HEAD~1");
@@ -405,13 +410,17 @@ try {
     gA("add", "-A"); gA("commit", "-qm", "ban va da duyet" + NL + NL + "Lane: fixture" + NL + "Audit: codex-r02");
     p = dayA();
     assert.equal(p.status, 0, "khai DA co nguoi duyet thi phai cho qua — khong thi cua nay khong bao gio mo");
+    assert.match(String(p.stdout), /--dry-run: dừng ở đây/, "phai di duoc tan cua dry-run");
     assert.doesNotMatch(String(p.stdout) + String(p.stderr), /chua qua audit doc lap/, "khong duoc chan");
 
     // ⑻ HAI CA FAIL-OPEN audit doc lap bat duoc 10/09. Ca dau la cau MOT NGUOI CAN THAN se tu
     //    viet, va ban dau coi no la DA DUYET.
     for (const [nhan, ten] of [["chua-co (dang cho Codex)", "chua-co kem ghi chu"],
                                ["chua co", "dau cach thay gach"],
-                               ["codex r02", "ten nguoi duyet co khoang trang"]]) {
+                               ["codex r02", "ten nguoi duyet co khoang trang"],
+                               ["pending", "chu 'pending' — NGOAI danh sach"],
+                               ["none", "chu 'none' — NGOAI danh sach"],
+                               ["alice", "ten la khong khai trong repo"]]) {
       gA("reset", "-q", "--hard", "HEAD~1");
       wA("sample.txt", "thu " + ten);
       gA("add", "-A"); gA("commit", "-qm", "thu " + ten + NL + NL + "Lane: fixture" + NL + "Audit: " + nhan);
@@ -446,7 +455,7 @@ try {
     gA("add", "-A"); gA("commit", "-qm", "sua them sau audit" + NL + NL + "Lane: fixture" + NL + "Audit: chua-co");
     p = dayA();
     assert.equal(p.status, 1, "commit MOI HON loi go van phai bi chan — khong go duoc thu lam sau");
-    ok("nhãn Audit: 8 vế — không khai→qua · chưa duyệt→CHẶN · `--carry` không mở · đã duyệt→qua · Đức chốt→qua · commit sau GỠ được khai cũ · nhưng KHÔNG gỡ được thứ làm SAU nó · ba biến thể fail-OPEN đều CHẶN");
+    ok("nhãn Audit: 8 vế — không khai→qua · chưa duyệt→CHẶN · `--carry` không mở · đã duyệt→qua · Đức chốt→qua · commit sau GỠ được khai cũ · nhưng KHÔNG gỡ được thứ làm SAU nó · SÁU biến thể fail-OPEN đều CHẶN (kể cả pending/none/ngoài danh sách)");
   } finally {
     assert.ok(path.resolve(chaA).startsWith(path.resolve(os.tmpdir()) + path.sep));
     fs.rmSync(chaA, { recursive: true, force: true });

@@ -795,8 +795,16 @@ không gỡ được gì · dòng ⚠ tắt cho mọi commit khi chỉ một com
 vì lý do khác** — đã dính đúng bẫy đó một lần trong chính lượt viết nó. Nay mỗi vế thành công đòi
 **mã thoát 0** cộng một chuỗi **dương**.
 
-**đóng khi:** vẫn như trên, CỘNG một lượt audit độc lập cho bản 1.8.5 không còn tìm ra lối fail-open
-nào. Ghi rõ ở đây vì đây là lần thứ hai một bản vá của mục này tự mở một lỗ mới.
+**VÒNG AUDIT THỨ BA (1.8.5) LẠI TÌM RA — và lần này tôi vá GỐC, bản 1.8.6.** `pending`, `none`,
+`todo`, `not-reviewed` đều bị đọc thành **ĐÃ DUYỆT**, vì 1.8.5 nhận *bất kỳ thẻ đúng khuôn* làm tên
+người duyệt. Gốc bệnh: **người viết commit tự định nghĩa "đã duyệt"**. Chuỗi tự do thì không phân
+biệt được `codex-r03` với `pending`. Nay `.repo-structure.json` khai `audit.nguoi_duyet`, ngoài
+danh sách là CHƯA — một phép so danh sách **thay chỗ** hai mẹo dò chuỗi.
+
+**Vá ba lần cùng một chỗ là dấu hiệu vá sai tầng.** Ghi ra vì nó sẽ lặp ở mục khác.
+
+**đóng khi:** vẫn như trên, CỘNG một lượt audit độc lập cho bản **1.8.6** không còn tìm ra lối
+fail-open nào. Ba vòng đầu, vòng nào cũng tìm ra — nên đừng coi "đã qua một vòng" là đủ.
 
 **GIỚI HẠN AUDIT NÊU, CHƯA VÁ và có lý do:** một commit khai tên người duyệt **không bị ràng buộc**
 với khoảng commit thật sự đã kiểm — nó gỡ theo *thứ tự*, không theo *phạm vi đã soi*. Vá đúng cần

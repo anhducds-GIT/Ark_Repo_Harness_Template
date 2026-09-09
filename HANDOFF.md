@@ -887,3 +887,37 @@ Ghim: khối `Audit:` **8 vế**. Sáu đột biến, mỗi lượt ĐỎ đúng
 khoảng commit thật sự đã soi — nó gỡ theo *thứ tự*, không theo *phạm vi*. Vá đúng cần `Y-02`. Nên
 cơ chế này là *"đưa một lời tự khai tới máy"*, **KHÔNG phải** máy canh *"đã qua audit độc lập"*.
 Câu đó phải giữ nguyên, đừng nói gọn thành "đã có máy canh".
+
+### 2026-09-10 (27) · harness-loi-02 · Ba vòng audit mới tới hình dạng đúng — bản 1.8.6
+
+**Hai vòng đầu tôi vá SAI TẦNG, và đây là bài học đáng giữ nhất của phiên này.**
+
+| Bản | Nó hỏi gì | Cái gì lọt |
+|---|---|---|
+| 1.8.4 | *"có đúng bằng `chua-co`?"* | `chua-co (dang cho)` · `chua co` → **ĐÃ DUYỆT** |
+| 1.8.5 | *"có đúng khuôn một thẻ?"* | `pending` · `none` · `todo` · `not-reviewed` → **ĐÃ DUYỆT** |
+| 1.8.6 | *"tên này có trong danh sách repo khai?"* | — |
+
+Tôi tự đo lại cả sáu biến thể (luật vàng 4). Mẹo `/^chua/` của 1.8.5 còn **chặn oan** `chuan`.
+
+**Gốc bệnh không phải regex:** tôi để **người viết commit** tự định nghĩa *"đã duyệt"*. Chuỗi tự
+do thì không có cách nào phân biệt `codex-r03` với `pending` — cả hai chỉ là chữ. Mỗi vòng tôi bịt
+một chuỗi, vòng sau lòi ra chuỗi khác. **Vá ba lần cùng một chỗ là dấu hiệu đang vá sai tầng.**
+
+Nay đổi CHỦ NGỮ: `.repo-structure.json` khai `audit.nguoi_duyet`, **repo** nói trước ai được duyệt,
+ngoài danh sách là CHƯA. Và đây là **BỚT luật**: một phép so danh sách thay chỗ hai mẹo dò chuỗi.
+
+**Hai chỗ nữa đã sửa:** ` Audit:` / `Audit :` bị bỏ qua → lời khai mất im lặng · **lời khuyên SAI**
+của cổng (*"đẩy riêng phần còn lại"* — không làm được khi commit chưa duyệt là TỔ TIÊN; nay nói
+cherry-pick sang nhánh khác).
+
+**BÀI HỌC VỀ PHÉP GHIM:** vế từ chối chỉ kiểm `status === 1` thì **xanh cả khi chết ở cửa khác**.
+Nay vế từ chối đòi đúng **thông báo của cửa audit**; vế thành công đòi mã 0 **cộng** chuỗi dương.
+Cộng bài học lượt (26): *phép ghim chỉ gồm phủ định thì chưa ghim gì.*
+
+**Giới hạn CÒN NGUYÊN, đừng nói gọn:** nhãn duyệt **không bị ràng buộc** với khoảng commit thật sự
+đã soi — gỡ theo *thứ tự*, không theo *phạm vi*. Cơ chế này là *"đưa một lời tự khai tới máy"*,
+**KHÔNG phải** máy canh *"đã qua audit độc lập"*. Cần `Y-02`.
+
+**Còn mở:** `KHUNG-56` (chờ một vòng audit không tìm thêm lối fail-open) · `KHUNG-58` ·
+`KHUNG-50` (worktree riêng — nửa còn lại của bài toán tốc độ, chưa làm, có lý do ở lượt 25).

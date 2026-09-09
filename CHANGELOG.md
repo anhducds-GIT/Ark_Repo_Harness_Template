@@ -3,6 +3,50 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.6 — 2026-09-10 — `pending` cũng là "đã duyệt": vòng audit thứ ba, và lần này vá GỐC
+
+**Ba vòng audit độc lập mới tới được hình dạng đúng, và hai vòng đầu tôi vá SAI CHỖ.**
+
+| Bản | Nó hỏi gì | Cái gì lọt |
+|---|---|---|
+| 1.8.4 | *"có đúng bằng `chua-co`?"* | `chua-co (dang cho)` · `chua co` → **ĐÃ DUYỆT** |
+| 1.8.5 | *"có đúng khuôn một thẻ?"* | `pending` · `none` · `todo` · `not-reviewed` → **ĐÃ DUYỆT** |
+| 1.8.6 | *"tên này có trong danh sách repo khai?"* | — |
+
+Đo được cả sáu biến thể. Và mẹo `/^chua/` của 1.8.5 còn **chặn oan** một tên hợp lệ như `chuan`.
+
+**GỐC BỆNH của cả hai vòng đầu — và nó không phải lỗi regex:** tôi để **người viết commit** tự
+định nghĩa cái gì là *"đã duyệt"*. Một chuỗi tự do thì **không có cách nào** phân biệt `codex-r03`
+với `pending` — cả hai chỉ là chữ. Mỗi vòng tôi lại bịt một chuỗi cụ thể, và vòng sau lại lòi ra
+chuỗi khác. Đó là dấu hiệu vá sai tầng.
+
+**Nay câu hỏi đổi CHỦ NGỮ:** `.repo-structure.json` khai `audit.nguoi_duyet` — **repo** nói trước
+ai được duyệt, và **mọi thứ ngoài danh sách là CHƯA**. Hậu tố vòng `-rNN` được phép, nên `codex`
+khai một lần là `codex-r03` dùng được.
+
+**Đây là BỚT luật, không phải thêm:** một phép so danh sách **thay chỗ** hai mẹo dò chuỗi
+(`=== "chua-co"` và `/^chua/`). Vừa chặt hơn vừa ít luật hơn — và hết cả ca chặn oan.
+
+**Hai chỗ nữa vòng ba nêu, đã sửa:**
+
+- `Audit:` mà **thiếu dấu cách đầu dòng** (` Audit: …`) hoặc `Audit : …` bị bỏ qua → lời khai mất
+  im lặng. Nay khớp `/^\s*audit\s*:/i`.
+- **Lời khuyên SAI:** cổng bảo *"để commit đó nằm lại, đẩy riêng phần còn lại"*. Không làm được:
+  với `origin → A(chưa duyệt) → B`, đẩy tới B là mang cả A. Nay nói đúng — muốn tách thì
+  `cherry-pick` phần độc lập sang nhánh khác rồi chạy lại cổng ở đó.
+- **Một commit MỘT lời khai:** hai dòng `Audit:` khác nhau → `AUDIT_XUNG_DOT`, cùng khuôn
+  `LANE_XUNG_DOT` đã có.
+
+Ghim: khối `Audit:` **8 vế**, nay có **sáu** biến thể fail-open (thêm `pending`, `none`, tên lạ).
+Vế thành công đòi mã thoát 0 **cộng** chuỗi dương; vế từ chối đòi đúng **thông báo của cửa audit**,
+không chỉ mã 1 — mã 1 một mình không phân biệt được nó chết ở cửa nào. Bảy đột biến, mỗi lượt ĐỎ
+đúng vế của nó.
+
+**GIỚI HẠN CÒN NGUYÊN, và audit nói thẳng — đừng nói gọn:** một commit khai tên người duyệt **không
+bị ràng buộc** với khoảng commit thật sự đã soi; nó gỡ theo *thứ tự*, không theo *phạm vi*. Nên cơ
+chế này là *"đưa một lời tự khai tới máy"*, **KHÔNG phải** máy canh *"đã qua audit độc lập"*. Vá
+đúng cần `Y-02`.
+
 ## 1.8.5 — 2026-09-10 — Chính cửa audit vừa dựng có HAI lối fail-open, và audit độc lập bắt được
 
 **Bản 1.8.4 hỏi ngược chiều.** Nó hỏi *"giá trị có đúng bằng `chua-co` không? Không thì coi là tên
