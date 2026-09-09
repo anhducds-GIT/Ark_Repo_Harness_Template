@@ -221,4 +221,49 @@ const kholuu = (kho) => {
   ok("5 · tên file lưu trữ đọc được, lấy từ ngày trong tiêu đề · trùng tên thì THÊM HẬU TỐ, không bao giờ đè");
 }
 
+/* ---- 5. Moc thang o lai FILE SONG, va don chua cho cho luot Log ke tiep ----
+ *
+ * HAI LOI THAT, ca hai bat duoc 09/09 ngay luot chay nhip don dau tien sau khi HANDOFF phinh:
+ *
+ * ⑴ `handoff.mjs` ghi `<!-- HANDOFF-THANG: YYYY-MM -->` o CUOI HANDOFF.md. `don.mjs` doi cac
+ *    khoi cuoi di, nen no CUON LUON moc thang vao kho luu tru. File song mat moc, va phep ghim
+ *    `handoff-smoke` do voi "HANDOFF.md goc da co muc thi PHAI khai thang". Hai co che cung sua
+ *    mot file ma khong biet nhau — cung ho voi chuyen the "Da xong" cua bang doc thang so no.
+ *
+ * ⑵ `don` don toi DUNG tran (600/600). Luat muc 7 bat MOI phien ghi mot dong Log vao file do,
+ *    nen dong Log ke tiep la 601 — do lai ngay. Mot "nhip" phai chay moi luot thi no la thue.
+ */
+{
+  const TRAN = 40;
+  const kho = khoThu({ soNhatKy: TRAN, soPhatHanh: 500 });
+  try {
+    const khoi = (i) => [`## Luot ${i}`, "", `noi dung ${i}`, ""];
+    const goc = ["# HANDOFF", "", "## Log", ""];
+    for (let i = 1; i <= 20; i += 1) goc.push(...khoi(i));
+    goc.push("<!-- HANDOFF-THANG: 2026-09 -->");
+    writeFileSync(join(kho, "HANDOFF.md"), goc.join(NL) + NL, "utf8");
+    writeFileSync(join(kho, "CHANGELOG.md"), ["# CHANGELOG", ""].join(NL) + NL, "utf8");
+
+    chay(kho, "--apply");
+    const sau = docFile(kho, "HANDOFF.md");
+
+    // ⑴ Moc thang PHAI con o file song, va DUNG MOT lan.
+    const soMoc = sau.filter((d) => d.includes("HANDOFF-THANG")).length;
+    assert.equal(soMoc, 1,
+      `moc thang phai o lai file SONG dung mot lan, dang ${soMoc} — mat moc thi handoff-smoke do, con hai moc thi may doc cai nao cung sai`);
+    // Va kho luu tru KHONG duoc mang moc: no khong xoay nua.
+    for (const f of kholuu(kho)) {
+      assert.ok(!readFileSync(join(kho, "docs", "archive", f), "utf8").includes("HANDOFF-THANG"),
+        `kho luu tru khong duoc mang moc thang: ${f}`);
+    }
+
+    // ⑵ Phai chua cho, khong duoc don sat tran. Doi chung nguoc o duoi.
+    assert.ok(sau.length <= TRAN * 0.85,
+      `don phai chua cho cho luot Log ke tiep: con ${sau.length} dong / tran ${TRAN}. Don sat tran thi dong Log sau la do lai ngay`);
+    assert.ok(sau.length > 1,
+      "khong duoc don sach: mot nhat ky rong thi phien sau mu hoan toan");
+    ok(`5 · moc thang o lai file song (kho luu tru khong mang) · don chua cho: ${sau.length}/${TRAN} dong`);
+  } finally { rmSync(kho, { recursive: true, force: true }); }
+}
+
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

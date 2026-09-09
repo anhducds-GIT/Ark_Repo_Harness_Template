@@ -504,3 +504,4 @@ nó gộp *thiếu bộ máy* với *bộ máy bản cũ* thành một mức, n�
 — hết lệch. Chốt chặn còn lại là luật *Cloud Sync Hold* của chính repo đó (mục 8A), vẫn còn.
 
 Bản **1.3.91**. Còn chờ Đức: ngân sách tài liệu · số phép kiểm · `KHUNG-6` · `37` · `40`.
+<!-- HANDOFF-THANG: 2026-09 -->

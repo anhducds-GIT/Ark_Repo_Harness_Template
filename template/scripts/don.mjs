@@ -107,8 +107,21 @@ function chonKhoiGiu(dau, khoi, nganSach, dongThem, moiNhatOTren) {
 const DAU_CHAN = "Phần CŨ hơn đã dời sang kho lưu trữ";
 const TRO = `**${DAU_CHAN}** — [\`${LUU_TRU}/\`](${LUU_TRU}/) · chữ giữ nguyên từng dòng, cắt bằng \`npm run don\`.`;
 
+/* MỐC THÁNG LÀ SIÊU DỮ LIỆU CỦA FILE SỐNG, KHÔNG PHẢI NỘI DUNG — vá 09/09, một lỗi THẬT.
+ *
+ * `handoff.mjs` ghi `<!-- HANDOFF-THANG: YYYY-MM -->` ở CUỐI `HANDOFF.md`; lệnh này dời các khối
+ * cuối đi, nên nó **cuốn luôn mốc tháng vào kho lưu trữ**. Kết quả: file sống mất mốc, và phép
+ * ghim `handoff-smoke` đỏ với *"HANDOFF.md gốc đã có mục thì PHẢI khai tháng"*.
+ *
+ * Đây là hình dạng "hai cơ chế cùng sửa một file mà không biết nhau" — cùng họ với chuyện thẻ
+ * *Đã xong* của bảng đọc thẳng sổ nợ, bắt được cùng ngày. Nên xử cùng cách: gỡ mốc ra trước khi
+ * tính, gắn lại vào file sống sau khi ghép — y như cách `DAU_CHAN` đã làm với dấu chân của chính
+ * lệnh này. Kho lưu trữ KHÔNG cần mốc: nó không xoay nữa. */
+const NHAN_THANG = "<!-- HANDOFF-THANG:";
+const layMocThang = (lines) => lines.find((d) => d.includes(NHAN_THANG)) ?? null;
+
 const goDauChan = (lines) => {
-  const ra = lines.filter((d) => !d.includes(DAU_CHAN));
+  const ra = lines.filter((d) => !d.includes(DAU_CHAN) && !d.includes(NHAN_THANG));
   // Bỏ luôn dải `---` + dòng trống thừa ở đuôi mà dấu chân để lại.
   while (ra.length && (ra[ra.length - 1].trim() === "" || ra[ra.length - 1].trim() === "---")) ra.pop();
   return ra;
@@ -147,6 +160,9 @@ function donMotFile({ ten, nganSach, moiNhatOTren, mocDau, tieuDeLuu, viSao, ten
   const { giu, doi } = chonKhoiGiu(dau, khoi, nganSach, soDongDuoi(moiNhatOTren), moiNhatOTren);
   if (!doi.length) return chua;
   const ra = ghepLai({ dau, giu, tuDong, moiNhatOTren });
+  // Gắn lại mốc tháng vào FILE SỐNG (xem ghi chú ở `goDauChan`). Không có mốc thì gắn gì cả.
+  const mocThang = layMocThang(goc);
+  if (mocThang) ra.push(mocThang);
 
   return {
     ...chua, doi,

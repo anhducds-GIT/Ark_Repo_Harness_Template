@@ -43,7 +43,7 @@
   "tam": {
     "HANDOFF.md": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:29:05.684Z"
+      "luc": "2026-09-09T03:42:58.225Z"
     },
     "docs/archive/HANDOFF-2026-09-3.md": {
       "owner": "harness-loi-01",
@@ -67,7 +67,7 @@
     },
     "scripts/don.mjs": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:26:47.732Z"
+      "luc": "2026-09-09T03:42:58.225Z"
     },
     "docs/archive/HANDOFF-2026-09-4.md": {
       "owner": "harness-loi-01",
@@ -75,19 +75,19 @@
     },
     "package.json": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:26:47.732Z"
+      "luc": "2026-09-09T03:42:58.225Z"
     },
     "RELEASE-LEDGER.json": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:26:47.732Z"
+      "luc": "2026-09-09T03:42:58.225Z"
     },
     "template/README.md": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:26:47.732Z"
+      "luc": "2026-09-09T03:42:58.225Z"
     },
     "template/package.json": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:26:47.732Z"
+      "luc": "2026-09-09T03:42:58.225Z"
     },
     "template/scripts/build-overview.mjs": {
       "owner": "harness-loi-01",
@@ -99,7 +99,11 @@
     },
     "template/scripts/don.mjs": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:26:47.732Z"
+      "luc": "2026-09-09T03:42:58.225Z"
+    },
+    "tests/don-smoke.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:42:58.225Z"
     }
   }
 }
