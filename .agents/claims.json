@@ -40,23 +40,5 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "1dd77d104086187a",
-  "tam": {
-    "scripts/init-repo.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:49:19.168Z"
-    },
-    "scripts/upgrade.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:49:19.168Z"
-    },
-    "tests/template-null-repo.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:49:19.168Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-09T20:53:55.395Z"
-    }
-  }
+  "_fingerprint": "c2525746ba92bf21"
 }

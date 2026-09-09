@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-10.
 
 ## Việc ưu tiên #1
 
-- **_root** — Đọc `docs/ROADMAP-V2.md` mục *Thứ tự việc — bản 10/09* TRƯỚC. Việc kế: `KHUNG-59` (hai lane chung INDEX — `git add` của người này bị `git commit` của người kia cuốn theo, đã xảy ra 2 lần trong một ngày). Hỏi trước khi vá: một `git worktree` riêng cho suite + bộ sinh có đóng được mấy trong bốn mục `KHUNG-59/50/55/51` không — chúng là MỘT bệnh.
+- **_root** — `KHUNG-50` — dấu xác nhận suite không ghi được vì HEAD đổi giữa lượt. Hỏi trước khi vá: một `git worktree` riêng cho suite + bộ sinh đóng được mấy trong ba mục còn lại?
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh ngày 2026-09-10.
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — Bốn mục đắt nhất (`KHUNG-59/50/55/51`) là MỘT bệnh: nhiều lane chung một cây làm việc git — chung đĩa, chung index, chung HEAD
+- [ark-repo-harness](STATUS.md): active — `KHUNG-50/55/51` là MỘT bệnh — nhiều lane chung một cây làm việc git (chung đĩa, chung HEAD)
 
 ## Luật bắt buộc trước khi sửa gì
 
