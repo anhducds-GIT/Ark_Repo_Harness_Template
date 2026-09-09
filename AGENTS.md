@@ -25,8 +25,10 @@ Không được báo "xong" khi cổng chưa xanh. Không được tự sửa c�
 `sửa → commit → sinh lại artifact → commit → npm test → cổng → safe-push`
 
 `npm test` chạy **SAU** commit (dấu xác nhận buộc vào HEAD): đúng thứ tự cổng **22 giây**, sai
-**~9 phút**. Đang làm thì chạy một suite — `node scripts/chay-test.mjs --chi <tên-suite>`; đủ bộ
-chạy **một lần**, ở cuối. Bộ sinh ghi vào sổ có ràng buộc cũng chạy **một lần**, sau khi suite xanh.
+**~9 phút**. **MỖI commit làm hỏng dấu, nên GOM commit** — chia việc thành 4 commit là trả giá 4
+lượt đủ bộ, đo 09/09: **~28 phút**. Đang làm thì chạy một suite — `node scripts/chay-test.mjs
+--chi <tên-suite>`; đủ bộ chạy **một lần**, ở cuối. Bộ sinh ghi vào sổ có ràng buộc cũng chạy
+**một lần**, sau khi suite xanh.
 
 **Push thì KHÔNG dùng `git push`** — nhiều phiên chung một cây git, `git push` của bạn cuốn theo
 commit của mọi phiên khác:

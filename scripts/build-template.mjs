@@ -613,7 +613,7 @@ function phanLuatChung(text) {
  *   liệu" ở năm câu · quyền "vai nào cũng được tìm lỗi ở bất kỳ đâu" · "viết lại đơn giản hơn").
  *   BÀI HỌC: nén văn xuôi làm RỤNG MỆNH LỆNH PHỤ, và người nén không thấy vì họ vẫn nhớ câu gốc.
  *   Vân tay trước: b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be */
-const COMMON_LAW_SHA256 = "3a999a59dee17565d85f9ee4c29272adb8400795343bffc0cb4885cf2c4025b6";
+const COMMON_LAW_SHA256 = "956bd6f139a744ff96062b34f615e9c6a9bc744d4f5211bc07b51ebeb3e438cd";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
