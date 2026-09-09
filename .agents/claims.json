@@ -39,31 +39,5 @@
       "task": "giam token nap",
       "released_at": null
     }
-  },
-  "tam": {
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T08:35:45.784Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T08:35:45.784Z"
-    },
-    "scripts/build-overview.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T08:35:45.784Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T08:35:45.784Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T08:35:45.784Z"
-    },
-    "template/scripts/build-overview.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T08:35:45.784Z"
-    }
   }
 }
