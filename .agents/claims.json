@@ -39,5 +39,15 @@
       "task": "ra soat ORCHESTRATOR",
       "released_at": "2026-09-09T02:33:36.673Z"
     }
+  },
+  "tam": {
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:18:47.698Z"
+    },
+    "docs/archive/HANDOFF-2026-09-3.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:18:47.698Z"
+    }
   }
 }
