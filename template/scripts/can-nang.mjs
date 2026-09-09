@@ -26,7 +26,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { readStructureFromDisk, THU_MUC_LUU_TRU } from "./repo-structure.mjs";
+import { readStructureFromDisk, THU_MUC_DOCS_KHONG_TINH } from "./repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
@@ -112,7 +112,13 @@ const liet = (thuMuc) => {
     try { mucs = fs.readdirSync(path.join(ROOT, d), { withFileTypes: true }); } catch { return; }
     for (const m of mucs) {
       const p = `${d}/${m.name}`;
-      if (m.isDirectory()) { if (m.name !== THU_MUC_LUU_TRU) di(p); }
+      /* TRỪ ĐÚNG BA THƯ MỤC MÀ CỔNG ĐÓNG PHIÊN TRỪ — dùng chung một hằng số, không tự liệt kê.
+         Bản cũ chỉ trừ `archive/`, nên hai phép đo của CÙNG MỘT THỨ trong cùng repo cho hai con
+         số khác nhau: cổng nói 3.185, lệnh này nói 6.012. Nặng hơn: nó đếm cả `docs/adr/`, mà
+         ADR đã Accepted là BẤT BIẾN theo luật — tức mỗi quyết định mới làm con số này đỏ hơn và
+         không có cách nào hợp lệ để hạ xuống. Một thước không bao giờ xanh được thì người ta nói
+         cho xong; đó đúng là điều `.repo-structure.json` đã ghi khi trừ ba thư mục này. */
+      if (m.isDirectory()) { if (!THU_MUC_DOCS_KHONG_TINH.includes(m.name)) di(p); }
       else if (m.name.endsWith(".md")) ra.push(p);
     }
   };

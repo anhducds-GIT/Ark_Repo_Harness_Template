@@ -2200,7 +2200,12 @@ export async function gomDuLieu() {
   const rawMF = doc("docs/protocols/MULTIFLOW.md") || "";
   const coChe = readCoChe(rawMF);
   const batBien = readBatBien(rawMF);
-  const daXong = tachDaXong(doc("BACKLOG.md"));
+  /* ĐỌC CẢ SỔ SỐNG LẪN KHO LƯU TRỮ. Nhịp dọn dời mục đã đóng sang `docs/archive/` để sổ nợ khỏi
+     phình — mà thẻ "Đã xong" lại đọc thẳng sổ nợ, nên dời xong là thẻ RỖNG. Cùng hình dạng mâu
+     thuẫn đã bắt được 08/09: một lệnh bảo dời đi, một phép đo vẫn quét chỗ cũ. Đọc cả hai thì
+     dọn được mà không mất gì. Thiếu file kho thì `doc()` trả rỗng và `tachDaXong` trả [] — không
+     cần điều kiện riêng, và repo chưa từng dọn vẫn chạy đúng. */
+  const daXong = [...tachDaXong(doc("BACKLOG.md")), ...tachDaXong(doc("docs/archive/BACKLOG-da-dong.md"))];
   const workflows = docTaiLieu("docs/workflows");
   const protocols = docTaiLieu("docs/protocols");
   const briefs = docTaiLieu("docs/briefs");

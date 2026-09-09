@@ -69,14 +69,26 @@ function tachKhoi(lines, tuDong = 0) {
    thêm bản mới ở ĐẦU. Bản đầu của hàm này chỉ có một chiều, nên nó định dời **bản 1.3.7 vừa
    phát** vào kho lưu trữ và giữ lại bản 1.3.0 — tức đúng ngược. Lệnh vẫn chạy, vẫn báo thành
    công, và không có gì đỏ. Một lệnh dọn sai chiều thì nó cất đi đúng thứ người ta cần đọc. */
+/* DỌN TỚI 80% TRẦN, KHÔNG TỚI ĐÚNG TRẦN — đo 09/09, và nó làm chính nhịp này vô dụng.
+ *
+ * Bản trước dọn cho tới sát ngân sách: `HANDOFF.md` 1264 → **đúng 600/600**. Nhưng luật mục 7
+ * bắt MỌI phiên ghi một dòng Log vào file đó, nên **ngay dòng Log kế tiếp** là 601/600 — đỏ lại.
+ * Tức muốn giữ xanh thì phải chạy nhịp dọn ở MỖI phiên, và một "nhịp" phải chạy mỗi lượt thì nó
+ * không còn là nhịp, nó là thuế.
+ *
+ * Chừa 20% là chừa chỗ cho khoảng chục lượt bàn giao nữa. Đây KHÔNG phải nới ngân sách: trần
+ * không đổi, chỉ có lượt dọn dời đi nhiều hơn — tức SIẾT về phía an toàn. */
+export const CHUA_CHO = 0.8;
+
 function chonKhoiGiu(dau, khoi, nganSach, dongThem, moiNhatOTren) {
+  const dich = Math.max(1, Math.floor(nganSach * CHUA_CHO));
   let tong = dau.length + dongThem;
   const giu = [];
   const thuTu = moiNhatOTren ? [...khoi.keys()] : [...khoi.keys()].reverse();
   const chon = new Set();
   for (const i of thuTu) {
     const n = khoi[i].dong.length;
-    if (chon.size && tong + n > nganSach) break;
+    if (chon.size && tong + n > dich) break;
     chon.add(i);
     tong += n;
   }

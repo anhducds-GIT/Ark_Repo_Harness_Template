@@ -43,11 +43,63 @@
   "tam": {
     "HANDOFF.md": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:18:47.698Z"
+      "luc": "2026-09-09T03:26:47.732Z"
     },
     "docs/archive/HANDOFF-2026-09-3.md": {
       "owner": "harness-loi-01",
       "luc": "2026-09-09T03:18:47.698Z"
+    },
+    "scripts/build-overview.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "BACKLOG.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "docs/archive/BACKLOG-da-dong.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "scripts/can-nang.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "scripts/don.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "docs/archive/HANDOFF-2026-09-4.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "template/scripts/build-overview.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "template/scripts/can-nang.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
+    },
+    "template/scripts/don.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:26:47.732Z"
     }
   }
 }
