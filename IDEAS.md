@@ -255,3 +255,38 @@ mọi lane thì không.
 **Một chỗ cần người chốt:** `Chrome_Extension_AI_Agentic` không có hồ sơ migrate — bộ khung sinh ra
 **từ đó** rồi mới tách, nên nó chưa từng có một *lượt* migrate. Hoặc cho phép hồ sơ loại *"repo
 nguồn"*, hoặc ma trận khai rõ nó vắng và vì sao.
+
+## Y-12 · ONE LOADING LAW — bảng "việc → file#mục" do MÁY đọc, thay bảng văn xuôi
+
+- **bậc:** ý tưởng
+- **việc kế:** đọc `CONTEXT-COMPILER-V1-PROPOSAL.md` ở repo `Chrome_Extension_AI_Agentic` (619 dòng, đã qua Codex + CC review) **trước khi thiết kế lại bất cứ gì**
+- **chủ:** chưa ai nhận
+- **phạm vi:** `_code` + `_docs`
+
+**nguồn** — đo 09/09 lúc migrate. Repo đó có một bản đề xuất đã cho hai reviewer đập; bộ khung
+thì chỉ có bảng bảy cửa văn xuôi ở `AGENTS.md` mục 6.
+
+**mạnh hơn ta ở ba chỗ:** bảng `việc → file#mục` **máy đọc được** (nên kiểm được, và mục 6 của ta
+thì không) · trần cứng đo bằng **ký tự thật**, không bằng token suy ra · một inspector
+`--viec <thao-tác>` trả lời *"làm việc này thì phải nạp đúng những gì"*.
+
+**vì sao chưa làm ngay** — nó thay một luật đang cưỡng chế (mục 6 + thước `tokenNap`), nên phải
+trả lời năm câu ở [VI-SAO-LUAT](docs/VI-SAO-LUAT.md) trước. Và bài học 09/09 còn nóng: **so theo
+NĂNG LỰC, đừng so theo TÊN** — phải soát xem `rule-compiler.mjs` đã làm được mấy phần trong ba
+chỗ trên, dù gọi tên khác.
+
+## Y-13 · Trần SỐ MỤC cho HANDOFF (`handoffSoMucCapFrom`) — ĐÃ BÁC 09/09
+
+- **bậc:** nghỉ
+- **việc kế:** không có. Giữ mục này để không ai đề xuất lại
+- **chủ:** —
+- **phạm vi:** —
+
+**nguồn** — đề xuất 09/09, cùng lượt với `Y-12`.
+
+**vì sao BÁC:** `HANDOFF.md` **đã có hai thước**: trần byte mỗi mục, và trần dòng cả sổ. Thêm
+trần thứ ba lên **cùng một file** là đúng thứ `AGENTS.md` mục 8 gọi là phình — ba câu trả lời cho
+một câu hỏi *"sổ này đã quá dài chưa"*, và phiên sau bốc trúng câu nào thì tuỳ. Chưa có ca hỏng
+nào mà hai thước cũ để lọt; chưa có ca hỏng thì đừng thêm cơ chế.
+
+**mở lại khi nào:** đo được **một** lượt sổ vượt ngưỡng đọc được mà cả hai thước cũ vẫn xanh.

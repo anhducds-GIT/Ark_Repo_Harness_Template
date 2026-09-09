@@ -647,3 +647,33 @@ này"* — không thành mục thứ 26. Ghim: `khoa-file` **8 → 12 vế**, m�
 dung về → dấu nguyên trở lại, mã 0.
 
 Bản **1.8.0**. ADR-0017. Còn nợ: `handoffSoMucCapFrom` và **ONE LOADING LAW** của họ.
+
+### 2026-09-09 (21) · harness-loi-02 · Cổng thôi đòi khoá VÙNG — và một thước bị lane khác làm đỏ
+
+**Số:** `ROADMAP-V2.md` **108 → 97 dòng** (cắt 71 dòng lịch sử đã có nhà ở `CHANGELOG` +
+`docs/archive/`; thêm thứ tự bốn đợt) · `IDEAS.md` +2 mục (`Y-12` ONE LOADING LAW · `Y-13`
+**bác** trần thứ ba cho HANDOFF) · `cong-do-that.mjs` **14 khối, 0 đỏ**, khối 1 từ 1 → **3 vế**,
+khối 7 → **4 vế**.
+
+**KHUNG-53 — bản vá có trong HEAD, MỤC VẪN MỞ.** Cổng hỏi *"ai đứng tên"* trong bảng khoá VÙNG,
+mà từ 08/09 khoá vùng trả ngay sau commit — nên phiên làm đúng luật mới bị ĐỎ. Nay nhãn `Lane:`
+của **chính phiên đang hỏi** cũng là câu trả lời, y như nhãn người khác. **Nửa mục nợ chưa nêu:**
+`rootSuite` cũng suy từ `myRootAreas`, nên *"Test xanh"* rơi vào **BỎ** — vá luôn, và đó là vế
+SIẾT LẠI: trước bản này, phiên chỉ dùng khoá file thoát cả *Test xanh*, *ghi Log*, và *vùng
+chỉ-thêm* trong im lặng.
+
+**Ba đột biến trên bản chép cách ly, mỗi lượt revert một dòng, mỗi lượt ĐỎ đúng vế của nó:** bỏ
+nhãn khỏi `myRootAreas` → 7(d) *"suite PHẢI chạy, đang BỎ"* · chỉ miễn nhãn người khác → 1⑴
+*"ĐỎ, chưa ai đứng tên _docs"* · coi commit KHÔNG NHÃN là quy thuộc → 1⑶ *"đường lách, XANH"*.
+
+**CHƯA XONG, không phải vì code:** Codex **hết lượt tới 10/09 01:25** → bản vá lõi chưa qua audit
+độc lập. Mục 5 cấm tự ký nghiệm thu, nên `KHUNG-53` để MỞ và **chưa đẩy**. Phiên sau: đừng
+`--carry` commit này trước khi có audit.
+
+**KHUNG-15 kiểm chứng, không sửa:** nửa *"liệt kê toàn dòng ok"* đã đóng nhờ `KHUNG-52`. Nửa còn
+lại **không đo được** — sổ cổng chỉ lưu TÊN phép kiểm: *"Test xanh"* ĐỎ **68/260 lượt** mà không
+lượt nào truy được là đỏ thật hay đỏ oan.
+
+**Còn mở → `KHUNG-55`:** `doKhoChu` lấy danh sách từ `git ls-files` nhưng đọc nội dung từ **ĐĨA**.
+HEAD **3.371** = đúng thước, đĩa **3.398**: phần thêm là `docs/briefs/MIGRATE-REPO.md` **+38** của
+`harness-migrate-3repo` đang sửa dở, phần tôi là **−11**. Một lane sửa dở làm đỏ cổng lane khác.

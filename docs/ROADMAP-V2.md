@@ -4,104 +4,93 @@ status: active
 ttl_days: 120
 ---
 
-# ROADMAP V2 — sau ba bản vá và một lượt pilot
+# ROADMAP V2 — thứ tự việc đang mở
 
 > **Đây là lớp ĐIỀU PHỐI: thứ tự · phân luồng · phụ thuộc · chỗ cần người chốt.** Nội dung từng
-> mục ở [BACKLOG.md](../BACKLOG.md) — file này **không chép lại**, chỉ nói *làm cái nào trước,
-> cái nào chạy cùng lúc được, và vì sao*.
+> mục ở [BACKLOG.md](../BACKLOG.md) và [IDEAS.md](../IDEAS.md) — file này **không chép lại**, chỉ
+> nói *làm cái nào trước, cái nào chạy cùng lúc được, và vì sao*. Bản đồ việc **sống** thì chạy
+> `npm run what-next`: nó giao bảng quyền × sổ nợ × sổ ý tưởng, nên không ôi được.
 >
-> [ROADMAP-V1](archive/ROADMAP-V1.md) là **lịch sử** (bốn khối A→D dẫn tới v1.0, đã xong). File này là
-> việc **đang mở**, sau bản 1.3.1.
+> [ROADMAP-V1](archive/ROADMAP-V1.md) là **lịch sử** (bốn khối A→D dẫn tới v1.0, đã xong). File này
+> là việc **đang mở**, rà lại ở mốc 1.8.0.
 >
 > Luật song song cưỡng chế chỉ một câu ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 2): **hai
 > việc chạy song song được khi và chỉ khi thuộc hai khoá khác nhau và cả hai khoá đang trống.**
 
-## Cập nhật 2026-09-06 — MƯỜI BẢN PHÁT TRONG MỘT NGÀY, và bộ khung đổi chất
+## Bốn luật chi phối THỨ TỰ — vì sao đợt nào đứng trước
 
-> Ngày 06/09 đi từ **1.3.4** tới **1.3.13**. Đây là **trạng thái hiện hành** của lớp điều phối;
-> kế hoạch sáu đợt cũ mà mục này từng phủ lên nay đã dời sang kho lưu trữ (xem cuối file).
+> Lịch sử từng bản ở [CHANGELOG.md](../CHANGELOG.md), từng lượt việc ở
+> [docs/archive/HANDOFF-2026-09-2.md](archive/HANDOFF-2026-09-2.md). Ở đây **chỉ giữ luật còn
+> hiệu lực** — bốn cái, cả bốn sinh ra từ một ca hỏng thật.
 
-### Bộ khung nay có ba thứ nó chưa từng có
+1. **Lỗi chỉ lộ khi chạm dữ liệu thật.** Đo 06/09: năm thứ *"đã viết xong, test xanh"* đều hỏng —
+   ba cái lộ nhờ **đột biến kiểm**, hai cái lộ khi chạy nhịp dọn trên nhật ký thật.
+   → **Một mục nợ chỉ đóng được khi đã chạy trên dữ liệu thật VÀ đã qua đột biến kiểm.**
+   *"Viết xong, test xanh"* không phải điều kiện đủ.
+2. **`npm test` xanh không chứng minh gì về một lớp bảo vệ vừa bị NỚI.** Bản 1.3.5 là cửa hậu do
+   chính 1.3.3 mở ra; cách duy nhất bắt được là **tự tay dựng ca hỏng**. → Mọi lượt nới một cấu
+   hình phải kèm một khối trong `tests/cong-do-that.mjs`.
+3. **Migrate đứng SỚM, không đứng cuối.** Bốn lỗi nặng nhất ngày 05/09 đều do một lượt migrate
+   thật lôi ra, không do đọc lại code — bảy phiên ở nhà trước đó không tìm ra cái nào.
+4. **Phép đo nói dối thì đứng trước phép đo còn thiếu.** Một phép kiểm luôn xanh không làm ai chậm
+   hôm nay, nó làm mọi số đo khác mất giá **đúng lúc ta cần tin chúng**. Đây là lý do đợt 2 đứng
+   trước đợt 3.
 
-| | Trước 06/09 | Sau |
-|---|---|---|
-| **Dọn** | repo phình vô hạn, dọn tay từng lượt | `npm run don` — **nhịp**, đi theo bản trích |
-| **Nhường tên** | ba artifact đóng cứng tên, repo đích phải né | `generated_names` — **bộ khung nhường** |
-| **Nâng cấp tài liệu** | `upgrade.mjs` chỉ đẩy tầng máy | mang cả tài liệu THIẾU, không đụng tài liệu KHÁC |
+Một số vượt trần từ 06/09 tới nay **chưa ai xử**: thời gian chạy trọn bộ phép kiểm. Nhà của nó là
+`Y-06` trong [IDEAS.md](../IDEAS.md), không phải file này — đo bằng `npm run can-nang`.
 
-### Ba repo đã lên chuẩn, và repo thứ ba là ca khó nhất
+## Thứ tự việc — bản 09/09, xếp theo THỨ ĐANG THU THUẾ MỖI PHIÊN
 
-`Project 3 AI Agent Unify` · `n8n-orchestrator` · **`ALL_SKILL_MANAGEMENT`**.
+> Xếp theo **thuế mỗi phiên phải trả**, không theo số mã việc. Nội dung từng mục ở
+> [BACKLOG.md](../BACKLOG.md) và [IDEAS.md](../IDEAS.md) — ở đây **chỉ có thứ tự và vì sao**.
+> Kế hoạch sáu đợt cũ (đợt 0→5) đã dời sang
+> [docs/archive/ROADMAP-V2-dot-0-den-5.md](archive/ROADMAP-V2-dot-0-den-5.md).
 
-Repo thứ ba khó vì nó **đã có sẵn cơ chế hiệp đồng nhiều AI trước khi bộ khung tới**, và điều
-phối AI chính là *nghề* của nó. Đức chốt: **bộ khung thắng**, luật cũ **khai tử nhưng giữ văn
-bản**. Bốn file trùng tên giữ **1824 dòng** — không file nào bị đè.
+### Đợt 1 · TRẢ THUẾ — làm trước, hiệu quả đo được ngay
 
-### Bài học chi phối mọi việc còn lại
-
-**Lỗi chỉ lộ khi chạm dữ liệu thật.** Đếm được trong một ngày:
-
-| Thứ đã viết xong, test xanh | Lộ khi nào |
+| Mã | Vì sao đứng đây |
 |---|---|
-| Vòng lặp hội tụ trong `don.mjs` | đột biến kiểm — nó **chưa từng chạy tới lần nào** |
-| Tên file lưu trữ + ghi đè im lặng | chạy nhịp dọn thật trên nhật ký thật |
-| Cổng KHUNG-25 **bắt oan** dòng dịch chỗ | chạy nhịp dọn thật lần đầu |
-| Vế kiểm thứ tự của KHUNG-29 | đột biến kiểm — dò chuỗi trúng cả **dòng khai báo hàm**, nên LUÔN xanh |
-| Vòng ghi tài liệu của KHUNG-28 | đột biến kiểm — vế đầu chỉ gọi hàm so sánh |
+| `KHUNG-53` | **Đắt nhất.** Luật đã đổi sang khoá FILE từ 08/09, cổng vẫn đòi khoá VÙNG. Đo 09/09: một phiên nhận/trả **4 khoá vùng cho 6 lượt commit**, mỗi lượt chặn lane khác vô ích. Đóng mục này cần kèm **đối chứng ngược** |
+| `KHUNG-50` | Một lane sửa dở **chặn toàn bộ đường phát**. Thuế rơi vào người khác, không rơi vào người gây ra |
+| `KHUNG-15` | **KIỂM CHỨNG TRƯỚC KHI SỬA.** Codex đã sửa vùng dấu suite ở 1.7.1 — có thể mục này đã tự đóng. Đóng một mục đã tự khỏi cũng là việc; làm lại từ đầu thì không |
 
-**Hệ quả cho thứ tự việc:** một mục nợ chỉ đóng được khi **đã chạy trên dữ liệu thật** và **đã
-qua đột biến kiểm**. "Viết xong, test xanh" từ nay không phải điều kiện đủ.
+### Đợt 2 · CHỐNG TỰ DỐI — phép kiểm không phân biệt được hai nhánh là đồ trang trí
 
-### Việc còn mở — KHÔNG liệt kê ở đây nữa
+`KHUNG-9` → `KHUNG-47` → `KHUNG-44` → `KHUNG-4`.
 
-Danh sách tay ở chỗ này đã ôi: đo 09/09, **5 trong 12** mã việc nó gọi là *đang mở* đã đóng hoặc
-đã xoá. Và nó vi phạm chính luật cuối file này — *không nhắc lại nội dung từng mục nợ*.
+Xếp sau đợt 1 vì đây là thuế **tương lai**, không phải thuế mỗi phiên: một phép kiểm luôn xanh
+không làm ai chậm hôm nay, nó chỉ làm mọi số đo mất giá **lúc ta cần tin chúng nhất**. Bốn mục
+độc lập nhau, chạy song song được nếu khác khoá.
 
-**Nguồn sống:** `npm run what-next` — giao bảng quyền × sổ nợ × sổ ý tưởng, nên nó không ôi được.
-Nội dung từng mục: [BACKLOG.md](../BACKLOG.md).
+### Đợt 3 · ĐƯỜNG PHÁT HÀNH
 
-**Thứ tự vẫn còn hiệu lực, và nó là thứ file này ĐƯỢC nói:** làm nhóm *phép đo đang nói dối*
-trước — một phép đo sai làm mọi số đo khác mất giá trị. Rồi tới chỗ hở của bản trích và migrate.
+`KHUNG-7` → `KHUNG-39` → `KHUNG-51`.
 
-**Một con số vượt trần, chưa ai xử:** thời gian chạy trọn bộ phép kiểm **~350/180 giây**. Mỗi bản
-phát lại thêm một suite. Nằm trong `KHUNG-11` nhưng thực chất là việc riêng.
+Cả ba là chỗ hở của bản trích. Đứng sau đợt 2 vì sửa đường phát mà phép kiểm còn đang nói dối
+thì không biết mình đã sửa được hay chưa. `KHUNG-51`: Codex đã cô lập `upgrade-smoke` — **kiểm
+phần còn lại trước khi kết luận**.
 
-## Cập nhật 2026-09-05 — pilot đổi thứ tự ưu tiên
+### Đợt 4 · Việc mới sinh 09/09
 
-Lượt migrate thật `n8n-orchestrator` cộng audit độc lập đã **đóng 8 mục** (KHUNG-1, 2, 5, 12,
-19, 20, 21, và cửa hậu 1.3.5) và **mở 7 mục mới**. Điều đáng nói không phải con số, mà là:
-**bốn lỗi nặng nhất trong ngày đều do migrate lôi ra, không do đọc lại code.**
+`Y-12` (ONE LOADING LAW) → `Y-13` (đã bác, giữ để không ai đề xuất lại).
 
-| Bản | Vá gì | Ai tìm ra |
-|---|---|---|
-| 1.3.1 | bộ đếm đếm luôn sản phẩm của chính bộ sinh | đuổi lỗi ở nhà |
-| 1.3.3 | ba lỗi: trường khai nghề bị từ chối · bảng quyền nổ vì `null` · cổng đóng cứng bản đồ | **pilot migrate** |
-| 1.3.4 | nhịp DỌN + thước cân nặng đi theo bản trích | Đức yêu cầu |
-| 1.3.5 | **cửa hậu do chính 1.3.3 mở ra** | tự dựng ca hỏng + Codex xác nhận |
+`Y-12` có một bản đề xuất 619 dòng **đã qua hai lượt review** ở repo `Chrome_Extension_AI_Agentic`.
+**ĐỌC TRƯỚC KHI THIẾT KẾ LẠI** — đừng phát minh lại thứ họ đã cho reviewer đập.
 
-**Bài học vào roadmap, không chỉ vào changelog:** `npm test` xanh **không** chứng minh gì về một
-lớp bảo vệ vừa bị nới. Cách duy nhất bắt được là **tự tay dựng ca hỏng**. Nên từ nay mọi lượt nới
-một cấu hình đều phải kèm một khối trong `tests/cong-do-that.mjs`.
+### KHÔNG ĐỘNG VÀO — đang chờ Đức chốt
 
-**Thứ tự đổi, CÒN NGUYÊN hiệu lực:** migrate không còn là việc làm sau cùng sau khi dọn xong nợ —
-nó lên **sớm**, vì mỗi lượt migrate tìm ra lỗi mà bảy phiên ở nhà không tìm ra. *(Gốc: "lên đợt 1".)*
+`KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08`.
 
-## Thứ tự việc — đọc ở đâu
-
-Kế hoạch sáu đợt cũ (đợt 0→5) đã được hai khối *Cập nhật* ở trên phủ lên, và **7 trong 13** mã
-việc nó nhắc nay đã đóng. Đã dời nguyên văn sang
-[docs/archive/ROADMAP-V2-dot-0-den-5.md](archive/ROADMAP-V2-dot-0-den-5.md).
-
-**Thứ tự đang có hiệu lực:** mục *Việc còn mở, xếp theo thứ RẺ NHẤT trước* ở trên. Bản đồ việc
-sống, tính từ bảng quyền × sổ nợ × sổ ý tưởng: `npm run what-next`.
+Và: **4 commit ở repo `Chrome_Extension_AI_Agentic` đang nằm local** vì cổng bên đó ĐỎ ở `B12` —
+nợ **có trước** lượt migrate. Đức chưa chốt có đẩy hay không. **Đừng tự đẩy.**
 
 **Luật cắt ngang còn nguyên hiệu lực: GOM BẢN PHÁT.** Mỗi lượt cắt bản là một lần mọi repo đích
 phải nâng — gom nhiều mục vào một bản, đừng cắt một bản cho mỗi mục.
 
 ## Ba thứ roadmap này CỐ Ý không chứa
 
-1. **Không có ngày tháng.** Repo chạy theo phiên, không theo lịch. Gán ngày là tạo một con số sai
-   ngay hôm sau.
+1. **Không gán HẠN.** Repo chạy theo phiên, không theo lịch. Gán hạn là tạo một con số sai ngay
+   hôm sau. Ngày của một lượt rà thì ghi được — nó là **đã đo lúc nào**, không phải **phải xong lúc nào**.
 2. **Không có bản vá kỹ thuật cho từng mục.** Đó là việc của brief giao executor
    ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 4b), và brief kèm sẵn bản vá là điều sổ tay đó cấm.
 3. **Không nhắc lại nội dung từng mục nợ.** Hai nguồn sự thật cho cùng một việc là đúng bệnh mà

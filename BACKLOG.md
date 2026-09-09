@@ -82,6 +82,27 @@ Vùng: `_code`.
 đòi cổng đóng phiên XANH ở mục "Phạm vi trách nhiệm" — kèm đối chứng NGƯỢC: một commit KHÔNG có
 nhãn `Lane:` và không khoá nào thì mục đó vẫn phải ĐỎ.
 
+**BẢN VÁ ĐÃ CÓ TRONG HEAD LOCAL 09/09 — MỤC NÀY VẪN MỞ, vì chưa qua audit độc lập.** Người sửa
+không tự nghiệm thu bản sửa của mình (`AGENTS.md` mục 5). Codex hết lượt dùng tới 10/09 01:25.
+
+Đã làm: `session-check.mjs` suy trách nhiệm từ nhãn `Lane:` của **chính phiên đang hỏi**, không
+chỉ nhãn người khác (`daQuyThuoc`), và `myPackages`/`myRootAreas` nhận cả hai đường đứng tên.
+Nửa thứ hai, mục nợ chưa nêu: `rootSuite` cũng suy từ `myRootAreas`, nên phiên chỉ dùng khoá
+file có mục *"Test xanh"* rơi vào **BỎ** — cùng gốc bệnh, khác chỗ đau.
+
+Đã đo, ba lượt đột biến trên bản chép cách ly, mỗi lượt revert đúng một dòng:
+
+| Đột biến | Phép ghim ĐỎ |
+|---|---|
+| `myRootAreas` bỏ phần nhãn `Lane:` | khối 7 vế (d): *"suite gốc PHẢI chạy, đang: BỎ"* |
+| chỉ miễn cho nhãn NGƯỜI KHÁC (nghĩa cũ) | khối 1 vế ⑴: *"đang: ĐỎ — chưa ai đứng tên: _docs"* |
+| coi commit KHÔNG NHÃN cũng quy thuộc được | khối 1 vế ⑶: *"đường lách, đang: XANH"* |
+
+**còn thiếu để đóng:** một lượt audit độc lập trả lời năm câu — ⑴ bản vá có mở đường lách nào
+không · ⑵ `[].every(Boolean)` trả `true`, ca Set RỖNG có tới được không (fail-OPEN) · ⑶ nới
+`myRootAreas` làm các phép kiểm khác siết lại hay lỏng ra · ⑷ phép ghim có phân biệt được hai
+nhánh · ⑸ có làm cổng đỏ oan một phiên vô tội không.
+
 
 ### KHUNG-14 · Chưa lượt migrate nào đi qua phép thử "assistant onboard"
 
@@ -236,6 +257,21 @@ Ai nhận mục này: **đừng bắt đầu bằng cách chạy lại cho ra đ
 kết quả suite từ đâu, và cái gì khác nhau giữa hai lượt chạy* — thời gian chạy, thứ tự suite,
 trạng thái cây làm việc, hay output bị cắt. Ghi lại lượt nào đỏ lượt nào xanh trước khi đổi
 bất cứ dòng nào.
+
+**KIỂM CHỨNG 09/09 — MỘT NỬA ĐÃ ĐÓNG, NỬA CÒN LẠI KHÔNG ĐO ĐƯỢC BẰNG DỮ LIỆU ĐANG CÓ.**
+
+Nửa đã đóng: chỗ *"liệt kê toàn dòng `ok`"* đúng là dò chuỗi, và `KHUNG-52` đã vá ở 1.7.1 —
+cổng nay bắt theo mẫu `── <suite> (mã N) ──` trên **cả hai luồng**, và khi không bắt được thì
+nói thẳng *"không đọc được TÊN"* thay vì đưa ra ba cái tên trông giống thật. Có phép ghim
+(`cong-do-that.mjs` khối 12).
+
+Nửa còn mở, và đây là dữ kiện mới: **sổ chạy cổng KHÔNG lưu lời nhắn, chỉ lưu tên phép kiểm.**
+Đo trên 260 lượt đã ghi: *"Test xanh"* ĐỎ ở **68 lượt**, trong đó **2 lượt ngày 09/09**. Không
+lượt nào truy được là *đỏ thật* hay *đỏ oan* — sổ không giữ lý do. Nên không thể kết luận mục
+này đã tự khỏi, và cũng không thể dựng lại ca hỏng từ lịch sử.
+
+Ai nhận mục này tiếp: bắt lấy **lượt đỏ kế tiếp lúc nó đang xảy ra** (giữ nguyên cây làm việc,
+chạy lại cổng, so lời nhắn), đừng đi tìm trong sổ — trong sổ không có.
 
 ### KHUNG-22 · Chưa ghim được "collectModel có truyền opts xuống không"
 
@@ -619,3 +655,35 @@ Phiên đã tắt thì không bao giờ chạy cổng, nên không dòng vàng n
 một phép ghim dựng nổi cả hai nhánh — một kho đủ ba điều kiện (**phải** in), một kho thiếu đúng một
 trong ba (**không được** in). Phép ghim phải chạy được ở repo tiêu thụ và soi **hành vi**, không soi
 tên lệnh của nơi phát hành (bài học `KHUNG-47`).
+
+
+### KHUNG-55 · Thước kho chữ đọc từ ĐĨA, nên một lane sửa dở làm ĐỎ cổng của lane khác
+
+**Đo 09/09, không phải giả định.** `doKhoChu` trong `session-check.mjs` lấy **danh sách** file
+bằng `git ls-files docs`, nhưng đọc **nội dung** bằng `fs.readFileSync` — tức từ cây làm việc.
+Cây làm việc thì chung cho mọi lane.
+
+Số đo cùng một lượt:
+
+| | dòng `docs/` (không kể adr/, archive/, migrations/) |
+|---|---|
+| HEAD | **3.371** — đúng bằng thước |
+| ĐĨA | **3.398** → cổng ĐỎ `KHO_CHU_PHINH`, *"thêm 27"* |
+
+Phần thêm không phải của phiên bị chặn: `docs/briefs/MIGRATE-REPO.md` **+38 dòng** của lane
+`harness-migrate-3repo` đang sửa dở. Phần của phiên bị chặn là **−11**. Nên lời nhắn *"phiên này
+đang làm kho chữ to ra"* nói **sai tên người**, và ba cửa ra nó gợi ý (xoá · chuyển sang ADR ·
+nâng thước) **không cửa nào dùng được** — chúng đều đòi phiên này sửa chữ của lane khác.
+
+**Cùng họ `KHUNG-50`** (bộ trích băm CÂY LÀM VIỆC): một cơ chế đọc đĩa trong repo nhiều lane thì
+biến việc đang làm dở của người khác thành lỗi của mình. Khác ở chỗ `KHUNG-50` chặn đường PHÁT,
+mục này chặn đường ĐÓNG PHIÊN — và nó chặn **im lặng theo hướng buộc tội sai**, tệ hơn.
+
+Ba phép kiểm khác trong cùng cổng đã làm đúng: chúng nói rõ *"dựng và so hoàn toàn từ HEAD"* và
+*"việc đang làm dở của bất kỳ phiên nào cũng không được làm đỏ sự thật đã commit"*. Thước kho chữ
+chưa theo. Vùng: `_code`.
+
+**đóng khi:** dựng một kho có hai lane — lane A sửa dở một file `docs/` đã track cho vượt thước,
+lane B **không đụng** `docs/` — rồi đòi cổng của lane B **XANH** ở mục *"Ngân sách trong trần"*,
+kèm đối chứng NGƯỢC: cùng kho đó, khi chính lane B là người làm phình (đã commit) thì mục đó vẫn
+phải **ĐỎ** kèm mã `KHO_CHU_PHINH`.

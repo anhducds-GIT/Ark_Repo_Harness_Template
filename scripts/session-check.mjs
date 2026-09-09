@@ -188,14 +188,29 @@ if (originMainResolves) {
     }
   }
 }
-// "Của lane khác" chỉ đúng khi: không nằm trong cây làm việc của tôi, VÀ mọi nguồn đã chạm nó
-// đều là commit mang nhãn của người khác. Một nguồn không nhãn là đủ để KHÔNG miễn.
-const cuaLaneKhac = (file) => !workingFiles.has(file)
-  && nhanCuaFile.has(file)
-  && [...nhanCuaFile.get(file)].every((nhan) => nhan && nhan !== asLabel);
+/* QUY THUỘC ĐƯỢC = việc này ĐÃ CÓ NGƯỜI ĐỨNG TÊN. Đó là câu duy nhất mục "phạm vi" hỏi.
+ *
+ * KHUNG-53, đo 08/09. Từ 08/09 mặc định là khoá mức FILE, và khoá file trả NGAY sau commit —
+ * nên tới lúc chạy cổng, bảng khoá VÙNG trống một cách hoàn toàn hợp lệ. Cổng cũ đi tìm câu
+ * trả lời trong bảng khoá vùng, nên nó ĐỎ ở đúng con đường Đức vừa chốt: một phiên làm đúng
+ * luật mới phải nhận lại **4 khoá vùng cho 6 lượt commit**, mỗi lượt chặn lane khác vô ích.
+ * `ADR-0012` mục ⑷ nói rõ chỗ mang trách nhiệm truy nguồn là nhãn `Lane:` trong commit, KHÔNG
+ * phải bảng khoá. Cổng đang hỏi bảng khoá một câu mà bảng khoá không còn là chỗ trả lời.
+ *
+ * ĐỔI ĐÚNG MỘT ĐIỀU: nhãn của CHÍNH TÔI cũng là một câu trả lời, y như nhãn của người khác.
+ * Bản cũ chỉ miễn cho nhãn NGƯỜI KHÁC — tức cổng tin lời khai của mọi lane trừ lane đang hỏi.
+ *
+ * KHÔNG PHẢI NỚI, và chiều fail-closed giữ nguyên từng vế:
+ *   · một nguồn KHÔNG nhãn (hoặc nhãn HỎNG) là đủ để KHÔNG quy thuộc được → vẫn ĐỎ;
+ *   · file còn trong CÂY LÀM VIỆC thì chưa commit nào đứng tên nó → vẫn phải có khoá, vẫn ĐỎ.
+ * Cả hai vế có ca hỏng dựng sẵn ở `tests/cong-do-that.mjs` khối 1. */
+const nhanHopLe = (file) => nhanCuaFile.has(file) && [...nhanCuaFile.get(file)].every(Boolean);
+const daQuyThuoc = (file) => !workingFiles.has(file) && nhanHopLe(file);
+// Nhãn của TÔI trên một file đã commit → vùng đó là việc của tôi, dù tôi không giữ khoá vùng nào.
+const nhanCuaToi = (file) => daQuyThuoc(file) && [...nhanCuaFile.get(file)].some((nhan) => nhan === asLabel);
 // Chỉ dùng cho việc dò MỒ CÔI. Các phép kiểm khác vẫn thấy `touched` đầy đủ — thu hẹp phạm vi
 // của chúng là một bản vá khác, và trộn hai việc vào một là cách làm mất dấu cái nào gây ra gì.
-const touchedToiPhaiTraLoi = touched.filter((f) => !cuaLaneKhac(f));
+const touchedToiPhaiTraLoi = touched.filter((f) => !daQuyThuoc(f));
 
 // CÙNG HỌ VỚI FAIL-OPEN VỪA VÁ Ở `safe-push`, khác chỗ. `git()` nuốt lỗi, nên nếu `origin/main`
 // không phân giải được (repo mới dựng từ bộ khung chưa có remote, nhánh mặc định tên khác) thì
@@ -243,7 +258,13 @@ const hasRootTestScript = () => {
   try { return Boolean(JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"))?.scripts?.test); }
   catch { return false; }
 };
-const myPackages = packagesTouched.filter((pkg) => ownedBy(pkg) === asLabel);
+/* HAI ĐƯỜNG ĐỨNG TÊN, không một. Khoá vùng là đường cũ; nhãn `Lane:` của chính tôi trên một
+   commit là đường mới (KHUNG-53) — xem khối `daQuyThuoc` ở trên. Mọi phép kiểm dưới đây suy ra
+   từ `myPackages` / `myRootAreas`, nên nới ở ĐÂY là nới đúng một chỗ: suite gốc chạy, cổng đòi
+   Log HANDOFF, và phép kiểm vùng chỉ-thêm soi việc của tôi — cả ba đều SIẾT LẠI, không lỏng ra.
+   Trước bản này, một phiên chỉ dùng khoá file thoát cả ba trong im lặng. */
+const goiCoNhanCuaToi = new Set(touched.filter(nhanCuaToi).map((f) => areaOf(f, claimPrefixes)).filter((a) => a !== "_root"));
+const myPackages = packagesTouched.filter((pkg) => ownedBy(pkg) === asLabel || goiCoNhanCuaToi.has(pkg));
 const foreignPackages = packagesTouched.filter((pkg) => ownedBy(pkg) && ownedBy(pkg) !== asLabel);
 // Mồ côi = KHÔNG có mục trong bảng, HOẶC có mục nhưng owner = null (vừa được
 // trả quyền). Bản đầu chỉ xét trường hợp thứ nhất, nên một package đã trả
@@ -313,7 +334,10 @@ const keyOf = (f) => stewardOf(f, structure, claimPrefixes);
 // trong repo-structure.mjs. Khoá gốc luôn bắt đầu bằng "_"; vùng chia-theo-gói thì không.
 const keysTouched = ownershipKeys(touched, structure, claimPrefixes, adminFile);
 const rootAreasTouched = keysTouched.filter((k) => k.startsWith("_"));
-const myRootAreas = rootAreasTouched.filter((k) => ownedBy(k) === asLabel);
+const khoaGocCoNhanCuaToi = new Set(
+  ownershipKeys(touched.filter(nhanCuaToi), structure, claimPrefixes, adminFile).filter((k) => k.startsWith("_"))
+);
+const myRootAreas = rootAreasTouched.filter((k) => ownedBy(k) === asLabel || khoaGocCoNhanCuaToi.has(k));
 // Mồ côi xét trên tập ĐÃ TRỪ việc của lane khác (K2-1b). Đây là chỗ 9% lượt "giữ khoá vì chưa
 // push được" biến mất: một phiên nay trả khoá xong vẫn đẩy được sau, mà cổng phiên kế không đỏ oan.
 const orphanRootAreas = ownershipKeys(touchedToiPhaiTraLoi, structure, claimPrefixes, adminFile)

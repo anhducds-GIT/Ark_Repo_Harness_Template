@@ -72,24 +72,53 @@ function docMuc(kho, ten, as = "thu") {
   return { trangThai, chiTiet: dong[i + 1] || "", out };
 }
 
-/* ---- 1. Phạm vi trách nhiệm ---------------------------------------------- */
+/* ---- 1. Phạm vi trách nhiệm — BA VẾ, và hai vế là ĐỐI CHỨNG NGƯỢC ---------
+ *
+ * KHUNG-53. Câu hỏi của mục này là *"việc này có ai đứng tên không"*, và từ 08/09 có HAI đường
+ * đứng tên: khoá vùng, hoặc nhãn `Lane:` trong commit (`ADR-0012` mục ⑷). Ba vế dưới đây khoá
+ * đúng ranh giới đó — thiếu vế nào thì bản vá này biến thành một đường lách:
+ *   ⑴ khoá vùng TRỐNG + commit mang nhãn của tôi  → XANH  (đường Đức chốt 08/09)
+ *   ⑵ khoá vùng TRỐNG + sửa còn trong CÂY LÀM VIỆC → ĐỎ   (chưa commit thì chưa ai đứng tên)
+ *   ⑶ khoá vùng TRỐNG + commit KHÔNG có nhãn       → ĐỎ   (bỏ nhãn không được thành đường lách)
+ *
+ * Vế ⑵ và ⑶ là chỗ chứng minh vế ⑴ không phải "nới cho xanh": cùng một bảng khoá trống, cùng
+ * một file, mà kết quả khác nhau — nên phép kiểm PHÂN BIỆT được hai nhánh, không phải luôn xanh.
+ */
 {
   const { cha, kho, at } = khoNen();
   try {
     // Đối chứng: chưa phá gì thì phải XANH — nếu không, mọi khẳng định "đỏ" dưới đây vô nghĩa.
     assert.equal(docMuc(kho, "Ai đứng tên việc này").trangThai, "XANH", "nen phai xanh truoc da");
-    // Phá: bỏ chủ khỏi mọi vùng, rồi sửa một file. Việc không ai đứng tên.
+
+    // Bỏ chủ khỏi MỌI vùng — đúng trạng thái của một phiên chỉ dùng khoá mức FILE.
     const c = JSON.parse(readFileSync(join(kho, ".agents", "claims.json"), "utf8"));
     for (const k of Object.keys(c.claims)) c.claims[k].owner = null;
     writeFileSync(join(kho, ".agents", "claims.json"), JSON.stringify(c, null, 2) + NL, "utf8");
+
+    // ⑴ commit mang nhãn CỦA TÔI, không khoá vùng nào → phải XANH.
     writeFileSync(join(kho, "docs", "a.md"), "# a doi roi" + NL, "utf8");
     at("add", "-A");
-    at("commit", "-q", "-m", "sua ma khong ai dung ten" + NL + NL + "Lane: thu");
-    const m = docMuc(kho, "Ai đứng tên việc này");
-    assert.equal(m.trangThai, "ĐỎ", `viec khong ai dung ten phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+    at("commit", "-q", "-m", "sua bang nhan Lane, khong khoa vung" + NL + NL + "Lane: thu");
+    let m = docMuc(kho, "Ai đứng tên việc này");
+    assert.equal(m.trangThai, "XANH",
+      `nhan Lane: cua chinh toi PHAI la mot cau tra loi (KHUNG-53), dang: ${m.trangThai} — ${m.chiTiet}`);
+
+    // ⑵ sửa mà CHƯA commit → chưa nhãn nào đứng tên nó → phải ĐỎ.
+    writeFileSync(join(kho, "docs", "a.md"), "# a sua do dang" + NL, "utf8");
+    m = docMuc(kho, "Ai đứng tên việc này");
+    assert.equal(m.trangThai, "ĐỎ",
+      `sua con trong cay lam viec ma khong khoa nao phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
+    assert.match(m.chiTiet, /chưa ai đứng tên|chưa khai chủ/, "phai noi ro vi sao");
+
+    // ⑶ commit KHÔNG nhãn → một nguồn không nhãn là đủ để KHÔNG quy thuộc → vẫn ĐỎ.
+    at("add", "-A");
+    at("commit", "-q", "-m", "commit khong co nhan lane");
+    m = docMuc(kho, "Ai đứng tên việc này");
+    assert.equal(m.trangThai, "ĐỎ",
+      `commit khong nhan khong duoc thanh duong lach, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.match(m.chiTiet, /chưa ai đứng tên|chưa khai chủ/, "phai noi ro vi sao");
   } finally { rmSync(cha, { recursive: true, force: true }); }
-  ok("1 · Phạm vi trách nhiệm ĐỎ được — việc không ai đứng tên");
+  ok("1 · Phạm vi trách nhiệm: nhãn Lane XANH · sửa chưa commit ĐỎ · commit không nhãn ĐỎ");
 }
 
 /* ---- 2. Vùng bằng chứng không bị sửa ------------------------------------- */
@@ -248,7 +277,41 @@ function docMuc(kho, ten, as = "thu") {
       `doi file KHONG phai artifact thi van phai la "chua kiem", khong duoc goi la "khong ap dung": ${m3.chiTiet}`);
     assert.doesNotMatch(m3.chiTiet, /không áp dụng/, "day khong phai ca 'khong ap dung'");
   } finally { rmSync(k2.cha, { recursive: true, force: true }); }
-  ok("7 · chỉ sinh lại artifact → không áp dụng · file nguồn → suite chạy thật · file khác → vẫn 'chưa kiểm'");
+
+  /* (d) KHOA VUNG TRONG + nhan `Lane:` cua toi -> suite VAN PHAI CHAY. KHUNG-53, nua thu hai.
+   *
+   * `rootSuite` suy ra tu `myRootAreas`, va ban cu tinh `myRootAreas` CHI tu bang khoa vung.
+   * Nen mot phien chi dung khoa muc FILE — dung con duong Duc chot 08/09 — co `myRootAreas`
+   * RONG, va muc "Test xanh" roi vao nhanh BO: "doi N file nhung KHONG suite nao chay".
+   * Tuc phien do khong the dong phien, va neu ai coi [BO] la "gan xanh" thi suite goc khong
+   * chay mot lan nao ca. Day la ve SIET LAI cua ban va, khong phai ve noi ra.
+   *
+   * Ve nay phan biet duoc hai nhanh: bo phan nhan `Lane:` khoi `myRootAreas` thi no BO, khong
+   * XANH. */
+  const k3 = khoNen();
+  try {
+    writeFileSync(join(k3.kho, "package.json"),
+      JSON.stringify({ name: "thu", version: "0.0.1", scripts: { test: "node tests/that.mjs" } }, null, 2) + NL, "utf8");
+    writeFileSync(join(k3.kho, "tests", "that.mjs"), "console.log('  ok  mot phep kiem that');" + NL
+      + "console.log('1 passed, 0 failed, 1 total');" + NL, "utf8");
+    writeFileSync(join(k3.kho, "STATUS.md"), "---" + NL + "ten: thu" + NL + "---" + NL + "# thu" + NL, "utf8");
+    k3.at("add", "-A");
+    k3.at("commit", "-q", "-m", "khai suite" + NL + NL + "Lane: thu");
+    k3.at("push", "-q", "origin", "main");
+
+    // Tra HET khoa vung — dung trang thai cua phien chi dung khoa muc FILE.
+    const c3 = JSON.parse(readFileSync(join(k3.kho, ".agents", "claims.json"), "utf8"));
+    for (const k of Object.keys(c3.claims)) c3.claims[k].owner = null;
+    writeFileSync(join(k3.kho, ".agents", "claims.json"), JSON.stringify(c3, null, 2) + NL, "utf8");
+    writeFileSync(join(k3.kho, "docs", "nguon.md"), "# doi mot file nguon" + NL, "utf8");
+    k3.at("add", "-A");
+    k3.at("commit", "-q", "-m", "doi file nguon, khong khoa vung" + NL + NL + "Lane: thu");
+    const m4 = docMuc(k3.kho, "Test xanh");
+    assert.equal(m4.trangThai, "XANH",
+      `khoa vung trong + nhan Lane cua toi thi suite goc PHAI chay (KHUNG-53), dang: ${m4.trangThai} — ${m4.chiTiet}`);
+    assert.match(m4.chiTiet, /passed/, "phai co so that cua suite, khong phai mot cau chung chung");
+  } finally { rmSync(k3.cha, { recursive: true, force: true }); }
+  ok("7 · artifact → không áp dụng · file nguồn → suite chạy · file khác → 'chưa kiểm' · khoá vùng TRỐNG + nhãn Lane → suite VẪN chạy");
 }
 
 /* ---- 8. `docs.file_map` tro vao hu khong PHAI DO ------------------------- */
