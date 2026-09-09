@@ -40,27 +40,27 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "a75ca392c94f0b5a",
+  "_fingerprint": "061ed465a2f629d2",
   "tam": {
     "docs/briefs/MIGRATE-REPO.md": {
       "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T16:21:49.168Z"
-    },
-    "docs/migrations/2026-09-09-nav-platform.md": {
-      "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T16:35:26.419Z"
-    },
-    "docs/migrations/2026-09-09-n8n-orchestrator.md": {
-      "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T16:35:26.419Z"
-    },
-    "docs/migrations/2026-09-09-n8n-local-host.md": {
-      "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T16:35:26.419Z"
+      "luc": "2026-09-09T17:01:47.172Z"
     },
     "HANDOFF.md": {
       "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T16:35:26.419Z"
+      "luc": "2026-09-09T17:01:47.172Z"
+    },
+    "scripts/repo-structure.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T17:20:12.111Z"
+    },
+    "scripts/chay-test.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T17:20:12.111Z"
+    },
+    "scripts/build-dashboard.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T17:20:12.111Z"
     }
   }
 }
