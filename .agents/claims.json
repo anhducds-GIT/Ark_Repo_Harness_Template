@@ -3,21 +3,21 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T11:29:54.805Z",
       "task": "Dinh chinh so nap 3.943 -> 4.002 bang cach THEM vao so",
-      "released_at": null,
+      "released_at": "2026-09-09T11:46:18.131Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T11:29:54.897Z",
       "task": "Dinh chinh so nap 3.943 -> 4.002 bang cach THEM vao so",
-      "released_at": null,
+      "released_at": "2026-09-09T11:46:18.252Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -38,16 +38,6 @@
       "claimed_at": "2026-09-09T10:12:47.769Z",
       "task": "Nen hien phap: luat o Tang 1, ly le sang docs/VI-SAO-LUAT.md; mo phien doc STATUS.md",
       "released_at": "2026-09-09T10:48:34.847Z"
-    }
-  },
-  "tam": {
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T11:29:49.333Z"
-    },
-    "decisions.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T11:29:49.333Z"
     }
   }
 }
