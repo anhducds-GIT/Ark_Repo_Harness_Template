@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-09T05:58:57.344Z",
-      "task": "rule compiler v1",
-      "released_at": "2026-09-09T06:05:29.136Z",
+      "claimed_at": "2026-09-09T06:27:41.363Z",
+      "task": "rule compiler v1 + fixture",
+      "released_at": "2026-09-09T06:35:26.462Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
@@ -15,9 +15,9 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-09T05:58:57.426Z",
-      "task": "rule compiler v1",
-      "released_at": "2026-09-09T06:05:29.265Z",
+      "claimed_at": "2026-09-09T06:27:41.439Z",
+      "task": "rule compiler v1 + fixture",
+      "released_at": "2026-09-09T06:35:26.575Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-09T05:58:57.482Z",
-      "task": "rule compiler v1",
-      "released_at": "2026-09-09T06:05:29.369Z",
+      "claimed_at": "2026-09-09T06:27:41.509Z",
+      "task": "rule compiler v1 + fixture",
+      "released_at": "2026-09-09T06:35:26.694Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-09T05:58:57.555Z",
-      "task": "rule compiler v1",
-      "released_at": "2026-09-09T06:05:29.480Z"
+      "claimed_at": "2026-09-09T06:27:41.586Z",
+      "task": "rule compiler v1 + fixture",
+      "released_at": "2026-09-09T06:35:26.832Z"
     }
   }
 }
