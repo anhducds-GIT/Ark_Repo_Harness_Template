@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T13:57:52.108Z",
       "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
-      "released_at": null,
+      "released_at": "2026-09-09T14:26:56.653Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T13:57:52.173Z",
       "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
-      "released_at": null,
+      "released_at": "2026-09-09T14:26:56.768Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T13:57:52.247Z",
       "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
-      "released_at": null,
+      "released_at": "2026-09-09T14:26:56.876Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T13:57:52.315Z",
       "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
-      "released_at": null
+      "released_at": "2026-09-09T14:26:57.001Z"
     }
   }
 }
