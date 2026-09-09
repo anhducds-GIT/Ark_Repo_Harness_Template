@@ -39,39 +39,5 @@
       "task": "gop phep kiem",
       "released_at": null
     }
-  },
-  "tam": {
-    "docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "docs/protocols/MULTIFLOW.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "template/docs/protocols/MULTIFLOW.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T05:04:00.801Z"
-    }
   }
 }
