@@ -3,41 +3,41 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T04:53:19.397Z",
       "task": "gop phep kiem",
-      "released_at": null,
+      "released_at": "2026-09-09T05:17:19.813Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T04:53:19.487Z",
       "task": "gop phep kiem",
-      "released_at": null,
+      "released_at": "2026-09-09T05:17:19.928Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T04:53:19.588Z",
       "task": "gop phep kiem",
-      "released_at": null,
+      "released_at": "2026-09-09T05:17:20.045Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T04:53:19.664Z",
       "task": "gop phep kiem",
-      "released_at": null
+      "released_at": "2026-09-09T05:17:20.160Z"
     }
   }
 }
