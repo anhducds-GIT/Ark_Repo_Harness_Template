@@ -75,19 +75,19 @@
     },
     "package.json": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:42:58.225Z"
+      "luc": "2026-09-09T03:56:47.503Z"
     },
     "RELEASE-LEDGER.json": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:42:58.225Z"
+      "luc": "2026-09-09T03:56:47.503Z"
     },
     "template/README.md": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:42:58.225Z"
+      "luc": "2026-09-09T03:56:47.503Z"
     },
     "template/package.json": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T03:42:58.225Z"
+      "luc": "2026-09-09T03:56:47.503Z"
     },
     "template/scripts/build-overview.mjs": {
       "owner": "harness-loi-01",
@@ -104,6 +104,10 @@
     "tests/don-smoke.mjs": {
       "owner": "harness-loi-01",
       "luc": "2026-09-09T03:42:58.225Z"
+    },
+    "tests/core-contract.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T03:56:47.503Z"
     }
   }
 }

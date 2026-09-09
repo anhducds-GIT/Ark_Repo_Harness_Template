@@ -668,10 +668,25 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   // --- 3. can-nang: docs/archive/ KHONG tinh vao ngan sach tai lieu ---
   // Mau thuan THAT trong chinh cong cu: no bao "doi sang docs/archive/" trong khi quet de quy
   // ca docs/. Lam dung loi khuyen thi tong tai lieu TANG — nguoi lam dung bi phat.
+  /* VE NAY TUNG KHOA VAO TEN HANG SO, va do la loi cua chinh no — bat duoc 09/09.
+   *
+   * Ban cu doi nguyen van `m.name !== THU_MUC_LUU_TRU`. Khi `can-nang` chuyen sang dung CHUNG
+   * danh sach tru voi cong dong phien (`THU_MUC_DOCS_KHONG_TINH`, gom ca `adr` va `migrations`),
+   * ve nay DO — trong khi hanh vi no muon canh thi CHAT HON truoc, khong long hon. Dung bai hoc
+   * KHUNG-47: ghim HANH VI, dung ghim ten dinh danh.
+   *
+   * Nay hoi hai cau, ca hai la ve NGHIA:
+   *   ⑴ danh sach tru CO chua thu muc luu tru khong (day la dieu ve nay that su muon noi);
+   *   ⑵ `can-nang` co DUNG CHUNG danh sach do khong, thay vi tu liet ke — hai phep do cung mot
+   *      thu ma hai danh sach khac nhau thi som muon chung noi hai con so, va da noi that:
+   *      cong 3.185 / lenh 6.012 truoc khi vá. */
+  const { THU_MUC_DOCS_KHONG_TINH, THU_MUC_LUU_TRU } = await import("../scripts/repo-structure.mjs");
+  assert.ok(THU_MUC_DOCS_KHONG_TINH.includes(THU_MUC_LUU_TRU),
+    "danh sach tru PHAI chua thu muc luu tru — neu khong, loi khuyen 'doi sang archive' phan tac dung");
   const canNang = readFileSync(join(ROOT, "scripts/can-nang.mjs"), "utf8");
-  assert.match(canNang, /THU_MUC_LUU_TRU/,
-    "can-nang phai mien docs/archive — neu khong, loi khuyen cua chinh no phan tac dung");
-  assert.match(canNang, /m\.name !== THU_MUC_LUU_TRU/,
+  assert.match(canNang, /THU_MUC_DOCS_KHONG_TINH/,
+    "can-nang phai dung CHUNG danh sach tru voi cong dong phien, khong tu liet ke rieng");
+  assert.match(canNang, /isDirectory\(\)[\s\S]{0,120}THU_MUC_DOCS_KHONG_TINH/,
     "mien tru phai nam o vong DUYET THU MUC, khong phai o cho khac");
 
   ok("F15 - bang quyen khong la hanh vi; trang bo ma commit va bo luon mien tru; luu tru khong tinh ngan sach");
