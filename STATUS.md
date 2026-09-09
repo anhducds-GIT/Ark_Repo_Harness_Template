@@ -5,11 +5,11 @@ name: Ark Repo Harness
 lifecycle: active
 last_verified: 2026-09-09
 last_verified_commit: 0b3a256ac8719add20d262aca566d2285ac171e6
-last_verified_how: "npm test 22 suite xanh · cổng đóng phiên XANH TOÀN BỘ · bản 1.7.0 đã phát"
+last_verified_how: "npm test 22 suite xanh · cổng đóng phiên XANH TOÀN BỘ · bản 1.7.2 đã phát"
 evidence_ref: HANDOFF.md
 owner: harness-loi-01
 priority_rank: 1
-next_step: "Đức chốt có dời mốc Stable Baseline v1.2.17 sang 1.7.0 không — repo thứ ba trở đi vẫn đang lắp từ mốc cũ, tức vẫn nhận hiến pháp 13.8k token. Xem BACKLOG.md nhóm P0."
+next_step: "Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà."
 version_source: package.json
 current_focus: "Nén luật xong cả hai đầu: repo nhà nạp 4.002 token, repo đích nhận bản trích nạp 4.119. Mọi thứ khác là Tầng 2."
 human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Trường này cố ý không giữ số: bản gõ tay là nguồn sự thật thứ hai, và 07/09 nó đã lệch thật."

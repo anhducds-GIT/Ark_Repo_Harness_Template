@@ -3,41 +3,67 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T13:26:33.606Z",
-      "task": "Phat ban va 1.7.1, ghi changelog va ledger; khong doi luat hay tran",
-      "released_at": "2026-09-09T13:39:05.583Z",
+      "claimed_at": "2026-09-09T13:57:52.108Z",
+      "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T11:50:24.415Z",
-      "task": "Tach muc 6 cua BAN TRICH: repo dich nap 5.634 -> 4.119 token",
-      "released_at": "2026-09-09T12:20:42.214Z",
+      "claimed_at": "2026-09-09T13:57:52.173Z",
+      "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T13:11:50.521Z",
-      "task": "Sua dau suite, bang chung cong cho safe-push va co lap mutation test",
-      "released_at": "2026-09-09T13:39:05.347Z",
+      "claimed_at": "2026-09-09T13:57:52.247Z",
+      "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-loi-01",
       "ai": null,
-      "claimed_at": "2026-09-09T13:26:32.740Z",
-      "task": "Sinh ban va 1.7.1 sau audit doc lap",
-      "released_at": "2026-09-09T13:39:05.470Z"
+      "claimed_at": "2026-09-09T13:57:52.315Z",
+      "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
+      "released_at": null
+    }
+  },
+  "tam": {
+    "scripts/build-template.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T13:56:03.607Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T13:57:52.023Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T13:57:52.023Z"
+    },
+    "STATUS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T13:57:52.023Z"
+    },
+    "README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T13:57:52.023Z"
+    },
+    "decisions.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T13:57:52.023Z"
     }
   }
 }

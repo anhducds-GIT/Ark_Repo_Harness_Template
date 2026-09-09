@@ -729,6 +729,7 @@ function lawForTemplate() {
 |---|---|
 | **Không thấy việc mình ở bảng này** | [docs/BAN-DO-CHI-TIET.md](docs/BAN-DO-CHI-TIET.md) — bản ĐẦY ĐỦ |
 | **Cãi một luật, hay tìm sự cố sinh ra nó** | [docs/VI-SAO-LUAT.md](docs/VI-SAO-LUAT.md) |
+| **Biết repo NẶNG bao nhiêu, một phiên nạp bao nhiêu token** | \`npm run can-nang\` · \`npm run luat -- --nap\` |
 | **Tra nhanh người chốt đã chốt gì, ngày nào** | [decisions.md](decisions.md) |
 | **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) |
@@ -758,10 +759,19 @@ dựng bộ khung: để bảng rỗng thì **4 file** rơi ra ngoài bản đ�
     "```",
     ""
   ].join(XUONG_DONG);
+  /* Câu cũ nói "bộ khung KHÔNG mang công cụ đo" — SAI từ lúc `can-nang.mjs` thành portable:
+     bản trích mang cả nó lẫn `npm run can-nang`. Một dòng luật nói ngược thứ repo thật sự có
+     thì phiên đọc luật sẽ không bao giờ đi đo. Sửa 09/09 khi soát bốn tính năng qua migrate. */
   const CAN_NANG_MOI = [
-    'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu".',
-    "Bộ khung KHÔNG mang công cụ đo, vì ngân sách là con số RIÊNG của repo bạn: chốt vài ngưỡng (số",
-    "luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá thì BỚT, đừng nới.",
+    'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu":',
+    "",
+    "```bash",
+    "npm run can-nang        # kho chữ · sổ nợ · TOKEN mọi phiên phải nạp",
+    "npm run luat -- --nap   # chính xác thứ một phiên phải đọc, và thứ KHÔNG phải đọc",
+    "```",
+    "",
+    "Ngưỡng khai ở `budget` và `docs` trong `.repo-structure.json`, điền sẵn một bộ chạy được.",
+    "**Thước chỉ được SIẾT.** Quá thì BỚT, đừng nới.",
     ""
   ].join(XUONG_DONG);
   const daThay = text.slice(0, start) + replacement + text.slice(end);
@@ -835,7 +845,17 @@ const STRUCTURE_SEED = `{
   "_generated_doc2": "KHÔNG làm yếu lớp bảo vệ: nội dung vẫn bị phép kiểm 'Sự thật máy sinh còn tươi' đối chiếu với HEAD ở MỌI phiên, nên sửa tay một dòng vẫn ĐỎ. Và đừng lẫn với 'generators' (khác một chữ): cái kia là SCRIPT, cái này là FILE. Khai từng file, không khai thư mục.",
   "docs": {
     "_doc": "file_map = BAN DO FILE chinh thuc. Cong doi chieu file moi voi file nay. Bo trong thi mac dinh la AGENTS.md — nhung ban do nam trong hien phap la thu MOI phien phai nap, nen bo khung tach san ra mot file rieng.",
-    "file_map": "docs/BAN-DO-CHI-TIET.md"
+    "file_map": "docs/BAN-DO-CHI-TIET.md",
+    "_doc_thuoc": "THUOC COC cho kho chu, KHONG phai tran ly tuong. Khong ke docs/adr/, docs/archive/, docs/migrations/ — ca ba la ban ghi viec DA XAY RA, chi to len duoc, nen tinh vao thi moi quyet dinh moi lam cong do va nguoi ta se noi con so cho xong. Ban trich mang san 1.456 dong; 2.200 la cho repo ban tu viet them. MOI LUOT XOA THI HA CON SO NAY XUONG — cho da ha khong quay lai duoc.",
+    "tran_dong_khong_ke_adr": 2200
+  },
+  "backlog": {
+    "_doc": "Tran so no. Cong dong phien DO khi so muc MO vuot tran. Khong khai khoi nay = khong co tran va cong van XANH — tuc so no phinh vo hinh. Doi con so phai hoi nguoi chot (ADR-0010).",
+    "tran": 25
+  },
+  "budget": {
+    "_doc_nap": "tokenNap = TRAN TOKEN cho phan MOI phien phai nap (AGENTS.md + STATUS.md). Day la con so DUY NHAT trong file nay nhan theo (so repo x so phien), nen no dat hon moi muc khac. Ban trich vua lap nap ~4.100 token, nen 6.000 cho ban ~31% bien — dung nguyen tac: KHONG nham dat nguong, ma phai o DUOI nguong 30-40%, vi he thong se phinh lai. Do bang DONG la do sai don vi: co luc bao 284/300 dong DAT trong khi that su la ~13.800 token. Do bang: npm run luat -- --nap",
+    "tokenNap": 6000
   },
   "grandfathered": [],
   "_grandfathered_doc": "Đường dẫn cũ được miễn trừ vĩnh viễn. Repo mới để RỖNG. Repo cũ đang migrate thì liệt kê ở đây thay vì đổi tên hàng loạt.",

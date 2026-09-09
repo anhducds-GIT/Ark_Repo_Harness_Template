@@ -588,3 +588,34 @@ Bản **1.7.0**.
 ### 2026-09-09 · codex-harness-hooks · Audit PASS, chuẩn bị bản 1.7.1
 
 Auditor độc lập nghiệm thu mã `e46492a`: **PASS**, tự chạy dấu/cổng **14/14**, upgrade **24/24**, template-null **9/9**; bản thử trong clone khớp **62 file**. Tôi thử ba đột biến (bỏ băm nội dung, dùng dấu suite thay cổng, bỏ so cây trước/sau): cả ba bị ca hành vi bắt. Khi chạy upgrade, **3.117 lần đọc ledger nguồn mỗi 50 ms**, không lần nào thấy nội dung đổi. Bản 1.7.1 giữ nguyên luật, flow compile, trần context và số mục cổng. Suite/cổng cuối là bước sau commit và sinh artifact; chưa tuyên bố đã xanh ở đây.
+
+### 2026-09-09 (19) · harness-loi-01 · SOÁT BỐN TÍNH NĂNG QUA MIGRATE — vá ba lỗ ở hạt giống
+
+**Đức chốt bốn thứ PHẢI sống sót khi migrate:** hai vai AI · khoá mức FILE · bộ nén + giao thức
+nén context · khả năng audit và đưa repo đích lên chuẩn. Tôi soát bằng cách **đọc chính
+`template/`**, không tin trí nhớ. Hai cái đầu ĐỦ. Hai cái sau lộ **ba lỗ**:
+
+**⒜ Bộ nén ship ở trạng thái TẮT.** `template/.repo-structure.json` **không khai một ngân sách
+nào** — không `budget.tokenNap`, không `backlog.tran`, không `docs.tran_dong_khong_ke_adr`. Repo
+đích nhận đủ `rule-compiler.mjs` + `can-nang.mjs`, nhưng cổng báo *"chưa khai thước thì không
+đo"* **và vẫn XANH**. Đây là hình dạng nguy hiểm nhất: máy có, luật có, mà **không có gì bị canh**.
+Nay hạt giống khai sẵn `tokenNap 6000` · `backlog.tran 25` · `docs 2200`.
+
+**⒝ Luật của bản trích nói SAI về chính bản trích.** Mục 8 viết *"Bộ khung KHÔNG mang công cụ
+đo"* — sai từ lúc `can-nang.mjs` thành portable: bản trích mang cả nó lẫn `npm run can-nang`.
+Một phiên đọc luật đó sẽ **không bao giờ đi đo**. Nay mục 8 đưa thẳng hai lệnh.
+
+**⒞ Mục 6 mỏng không có cửa nào cho việc ĐO.** Thêm một hàng.
+
+**Số ở repo đích:** nạp **4.207 / 6.000 token — biên 30%**, đúng nguyên tắc *không nhắm đạt
+ngưỡng, phải ở dưới ngưỡng 30–40%*. Trước lượt tách hạt giống: 5.634.
+
+**Kiểm chứng độc lập bản 1.7.1 của Codex — cả ba điểm ĐÚNG, đã dựng lại ca hỏng:**
+⑴ dấu suite cũ băm `git status --porcelain` (chỉ TÊN + trạng thái), nên **file đã bẩn rồi sửa
+tiếp thì băm KHÔNG đổi** — tôi dựng lại ca đó và xác nhận: băm cũ *không đổi*, băm mới *đổi*.
+⑵ `safe-push` trước đọc **dấu SUITE** để tự `--carry`, trong khi luật mục 2 đòi **cổng XANH TOÀN
+BỘ** — suite xanh ≠ cổng xanh, tức code nới hơn luật; nay có dấu cổng riêng, buộc theo `--as` và
+mốc remote. Gọi thẳng `xetDauCong(null, …)` và `xetDauCong({loai:"suite"}, …)`: **cả hai từ chối**.
+⑶ test phá sổ phát hành nay chạy trong bản sao git riêng, không chạm cây làm việc chung.
+
+Bản **1.7.2**.

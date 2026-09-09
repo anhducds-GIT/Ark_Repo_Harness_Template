@@ -124,6 +124,7 @@ chạy cùng lúc được, nhưng **khác vùng**.
 |---|---|
 | **Không thấy việc mình ở bảng này** | [docs/BAN-DO-CHI-TIET.md](docs/BAN-DO-CHI-TIET.md) — bản ĐẦY ĐỦ |
 | **Cãi một luật, hay tìm sự cố sinh ra nó** | [docs/VI-SAO-LUAT.md](docs/VI-SAO-LUAT.md) |
+| **Biết repo NẶNG bao nhiêu, một phiên nạp bao nhiêu token** | `npm run can-nang` · `npm run luat -- --nap` |
 | **Tra nhanh người chốt đã chốt gì, ngày nào** | [decisions.md](decisions.md) |
 | **Sắp làm cùng lúc với AI khác, hoặc sắp SỬA một trong bốn cơ chế đa phiên** | [docs/protocols/MULTIFLOW.md](docs/protocols/MULTIFLOW.md) |
 | Biết phiên trước làm tới đâu | [HANDOFF.md](HANDOFF.md) |
@@ -157,6 +158,12 @@ một câu hỏi, và phiên sau bốc trúng câu sai. Lịch sử ở `git log
 **Năm câu phải trả lời trước khi thêm một luật, một phép kiểm HAY một tài liệu:**
 [VI-SAO-LUAT](docs/VI-SAO-LUAT.md).
 
-Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu".
-Bộ khung KHÔNG mang công cụ đo, vì ngân sách là con số RIÊNG của repo bạn: chốt vài ngưỡng (số
-luật · số phép kiểm · số tài liệu · số phút đóng phiên) rồi tự đếm. Quá thì BỚT, đừng nới.
+Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu":
+
+```bash
+npm run can-nang        # kho chữ · sổ nợ · TOKEN mọi phiên phải nạp
+npm run luat -- --nap   # chính xác thứ một phiên phải đọc, và thứ KHÔNG phải đọc
+```
+
+Ngưỡng khai ở `budget` và `docs` trong `.repo-structure.json`, điền sẵn một bộ chạy được.
+**Thước chỉ được SIẾT.** Quá thì BỚT, đừng nới.

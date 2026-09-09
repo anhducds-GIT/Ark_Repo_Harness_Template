@@ -735,3 +735,22 @@ số **đóng phiên là 4.002** (`AGENTS.md` 3.432 + `STATUS.md` 570), vì sau 
 
 Ghi bằng cách THÊM chứ không sửa đè: [ADR-0016](docs/adr/0016-hien-phap-mong.md) đã `Accepted`
 nên thân bài bất biến (B12), và `HANDOFF.md` là sổ chỉ-thêm.
+
+## 2026-09-09 · Dời mốc Stable Baseline từ `v1.2.17` sang `v1.7.2`
+
+> **trạng thái:** đã thi hành — `README.md` và `STATUS.md` đã trỏ mốc mới.
+
+**Đức chốt:** *"đóng gói trọn vẹn để ta bắt đầu migrate sang các repo khác"*, kèm bốn tính năng
+phải sống sót: hai vai AI · khoá mức FILE · bộ nén và giao thức nén context · audit và đưa repo
+đích lên chuẩn.
+
+**Vì sao phải dời, không để nguyên:** `v1.2.17` mang hiến pháp **13.799 token**. Toàn bộ việc nén
+hôm nay **không tới được repo nào** chừng nào repo thứ ba trở đi vẫn lắp từ mốc cũ — sửa
+[ADR-0003](docs/adr/0003-dong-bang-stable-baseline.md) ở đúng con số mốc, mọi điều khác của nó
+(chế độ bảo trì, không lắp từ HEAD) giữ nguyên.
+
+**Số ở repo đích:** nạp mỗi phiên **4.207 / 6.000 token — biên 30%**, so với 13.799 của mốc cũ.
+
+**Cái mất:** `v1.2.17` đã chạy thật nhiều ngày; `v1.7.2` mới một ngày tuổi. Đổi lại nó mang bốn
+tính năng trên ở trạng thái **BẬT** — mốc cũ mang bộ nén nhưng **không khai một ngân sách nào**,
+nên cổng ở repo đích không canh được gì mà vẫn báo xanh.

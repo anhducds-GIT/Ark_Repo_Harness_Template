@@ -49,7 +49,17 @@
   "_generated_doc2": "KHÔNG làm yếu lớp bảo vệ: nội dung vẫn bị phép kiểm 'Sự thật máy sinh còn tươi' đối chiếu với HEAD ở MỌI phiên, nên sửa tay một dòng vẫn ĐỎ. Và đừng lẫn với 'generators' (khác một chữ): cái kia là SCRIPT, cái này là FILE. Khai từng file, không khai thư mục.",
   "docs": {
     "_doc": "file_map = BAN DO FILE chinh thuc. Cong doi chieu file moi voi file nay. Bo trong thi mac dinh la AGENTS.md — nhung ban do nam trong hien phap la thu MOI phien phai nap, nen bo khung tach san ra mot file rieng.",
-    "file_map": "docs/BAN-DO-CHI-TIET.md"
+    "file_map": "docs/BAN-DO-CHI-TIET.md",
+    "_doc_thuoc": "THUOC COC cho kho chu, KHONG phai tran ly tuong. Khong ke docs/adr/, docs/archive/, docs/migrations/ — ca ba la ban ghi viec DA XAY RA, chi to len duoc, nen tinh vao thi moi quyet dinh moi lam cong do va nguoi ta se noi con so cho xong. Ban trich mang san 1.456 dong; 2.200 la cho repo ban tu viet them. MOI LUOT XOA THI HA CON SO NAY XUONG — cho da ha khong quay lai duoc.",
+    "tran_dong_khong_ke_adr": 2200
+  },
+  "backlog": {
+    "_doc": "Tran so no. Cong dong phien DO khi so muc MO vuot tran. Khong khai khoi nay = khong co tran va cong van XANH — tuc so no phinh vo hinh. Doi con so phai hoi nguoi chot (ADR-0010).",
+    "tran": 25
+  },
+  "budget": {
+    "_doc_nap": "tokenNap = TRAN TOKEN cho phan MOI phien phai nap (AGENTS.md + STATUS.md). Day la con so DUY NHAT trong file nay nhan theo (so repo x so phien), nen no dat hon moi muc khac. Ban trich vua lap nap ~4.100 token, nen 6.000 cho ban ~31% bien — dung nguyen tac: KHONG nham dat nguong, ma phai o DUOI nguong 30-40%, vi he thong se phinh lai. Do bang DONG la do sai don vi: co luc bao 284/300 dong DAT trong khi that su la ~13.800 token. Do bang: npm run luat -- --nap",
+    "tokenNap": 6000
   },
   "grandfathered": [],
   "_grandfathered_doc": "Đường dẫn cũ được miễn trừ vĩnh viễn. Repo mới để RỖNG. Repo cũ đang migrate thì liệt kê ở đây thay vì đổi tên hàng loạt.",
