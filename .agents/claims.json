@@ -40,7 +40,7 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "061ed465a2f629d2",
+  "_fingerprint": "da75a4678ad83ab6",
   "tam": {
     "docs/briefs/MIGRATE-REPO.md": {
       "owner": "harness-migrate-3repo",
@@ -48,7 +48,7 @@
     },
     "HANDOFF.md": {
       "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T17:01:47.172Z"
+      "luc": "2026-09-09T17:23:34.714Z"
     },
     "scripts/repo-structure.mjs": {
       "owner": "harness-loi-02",
@@ -61,6 +61,14 @@
     "scripts/build-dashboard.mjs": {
       "owner": "harness-loi-02",
       "luc": "2026-09-09T17:20:12.111Z"
+    },
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T17:22:30.222Z"
+    },
+    "tests/dau-suite-smoke.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T17:22:30.222Z"
     }
   }
 }

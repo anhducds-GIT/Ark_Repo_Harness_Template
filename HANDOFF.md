@@ -710,3 +710,29 @@ nhận ra. *"Để rỗng lúc lắp"* chỉ đúng nếu có ai quay lại bậ
 trước, 1 của tôi) — chỉ Đức gỡ được bằng `--carry`. ⑵ `build-overview.mjs` **treo >300s** ở
 `n8n_Local host` (đường dẫn có dấu cách) — chưa ghi được vào `BACKLOG.md` vì lane `harness-loi-02`
 đang giữ khoá file đó.
+
+### 2026-09-09 (22) · harness-migrate-3repo · TÔI COMMIT NHẦM VIỆC ĐANG DỞ CỦA LANE KHÁC — và cách hoàn nguyên không cần sửa lịch sử
+
+Commit `69e0a84` cuốn theo `scripts/build-dashboard.mjs` và `scripts/repo-structure.mjs` — **bản
+đang sửa dở của lane `harness-loi-02`**. Nguyên nhân đúng một dòng: tôi chạy `git add -A` **rồi
+mới** đọc `claim.mjs --soat`. `--soat` đã nói thẳng *"2 file bạn KHÔNG có quyền ghi"*, nhưng tôi
+nối nó vào một chuỗi `&&` sau `tail -2` — nên **mã thoát của nó bị `tail` nuốt** và `git commit`
+vẫn chạy. Lỗi ở cách tôi gọi, không ở công cụ.
+
+**Cách hoàn nguyên, không đụng lịch sử** (`AGENTS.md` mục 2 bắt hỏi trước khi sửa lịch sử):
+
+```bash
+git checkout <HEAD-trước> -- <hai file>     # đưa NỘI DUNG về bản cũ, bằng một commit mới
+git commit                                  # 75449ff
+git restore --source=69e0a84 --worktree -- <hai file>   # trả bản của họ về CÂY LÀM VIỆC
+```
+
+Kết quả đo được: `git diff 69e0a84 -- <hai file>` → **0 dòng** (cây làm việc khớp đúng bản họ
+đang sửa) và `git diff dcb4e4a HEAD -- scripts/` → **0 dòng** (HEAD về đúng trước lúc tôi phạm
+lỗi). Họ **không mất một dòng nào**, và bản của họ còn nguyên trong lịch sử ở `69e0a84`.
+
+**Rút ra, và nó đáng thành luật:** `--soat` là **CỔNG**, không phải bản in. Chạy nó **trước**
+`git add`, đọc bằng mắt, và **đừng bao giờ** nối nó qua `tail`/`head` trong một chuỗi `&&` — làm
+thế là tự tay tắt đúng cái phép kiểm mình vừa gọi.
+
+**Còn mở:** cây làm việc repo nhà đang giữ 4 file sửa dở của `harness-loi-02` — **không đụng**.
