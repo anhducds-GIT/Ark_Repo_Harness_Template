@@ -3,6 +3,42 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.4 — 2026-09-10 — Điều kiện "đã qua audit độc lập" lần đầu có máy canh
+
+**`AGENTS.md` mục 2 cho tự đẩy khi đủ ba, trong đó điều ⑵ là *"cổng XANH TOÀN BỘ, code thì đã qua
+audit độc lập"*.** Vế cổng-xanh có máy canh từ lâu — `safe-push` đọc dấu cổng. Vế **đã-qua-audit**
+thì **không có gì canh**: không cờ, không trường, không phép kiểm. Nửa câu luật là chữ.
+
+**Ca thật, đo được ngày 10/09, và nó xảy ra ~20 phút sau khi lời cảnh báo được ghi ra giấy:** lane
+`harness-loi-02` commit 5 lượt bản vá lõi, ghi rõ trong `HANDOFF.md` *"chưa qua audit — đừng
+`--carry`"*. Lane `harness-migrate-3repo` chạy `safe-push` và cuốn cả 5 lên `origin/main`. **Lane
+đó không làm gì sai:** cổng của họ xanh, mọi commit đều mang nhãn `Lane:` — đủ đúng ba điều kiện mà
+**máy** biết kiểm. Lời cảnh báo nằm ở Tầng 2, và không lane nào phải đọc nhật ký của lane khác
+trước khi đẩy.
+
+**Nhãn `Audit:`** — nhà của nó là `auditFromMessage` trong `repo-structure.mjs`, cạnh
+`laneFromMessage`. `safe-push` từ chối đẩy khi có commit **tự khai** `Audit: chua-co`.
+
+| Quyết định | Tránh cái gì |
+|---|---|
+| KHÔNG khai = KHÔNG chặn | chặn tuốt là khoá repo ngay lượt đầu — đúng bẫy 509 commit cũ không nhãn |
+| `Audit:` **rỗng** = chưa duyệt | gõ nhãn rỗng để qua cửa là biến chính nhãn thành đường lách |
+| `--carry` **KHÔNG** mở được | Đức chốt 09/09 là về **quy thuộc**, không về **duyệt** |
+| Cờ riêng `--duc-duyet-chua-audit` | hai điều kiện khác nhau thì hai cờ khác nhau |
+
+Kèm một dòng **⚠ tự dạy** lúc sắp đẩy code mà không commit nào khai `Audit:` — cùng khuôn với khối
+⚠ nhãn `Lane:`, **không đổi mã thoát**. Một nhãn không ai biết là có thì không ai gõ, và chỗ dạy rẻ
+nhất là đúng lúc người ta sắp đẩy, không phải một dòng thêm vào sổ tay.
+
+**KHÔNG thêm chữ nào vào `AGENTS.md`** — chính hiến pháp nói *"cơ chế nào máy tự chặn và tự giải
+thích lúc hỏng thì không nằm ở đây"*. Lời từ chối tự nói đủ ba đường ra.
+
+Ghim: `dau-suite-smoke.mjs` **17 → 18 vế** (năm vế, kho riêng). Ba đột biến: gỡ cửa · cho `--carry`
+mở cửa · chặn tuốt — mỗi lượt ĐỎ đúng vế của nó.
+
+**GIỚI HẠN:** nhãn do người sửa **TỰ KHAI**. Nó không chứng minh đã có audit; nó làm một lời tự
+khai *"chưa duyệt"* đi được tới máy. Bản chặt hơn là `Y-02`.
+
 ## 1.8.3 — 2026-09-10 — Audit độc lập bắt được một FAIL-OPEN của 1.8.2, và nó chỉ nổ ở repo TIÊU THỤ
 
 **Bản này tồn tại vì audit độc lập làm đúng việc của nó.** 1.8.2 vá chỗ cổng gọi một suite xanh là

@@ -819,3 +819,34 @@ kiểm nếu cây đổi giữa chừng"*.
 
 `KHUNG-15` và `KHUNG-53` vẫn **MỞ**. Bản 1.8.1+1.8.2 đã ở trên `origin/main` (xem lượt 23);
 1.8.3 là bản sửa đè lên đó, không phải bản rút lại.
+
+### 2026-09-10 (25) · harness-loi-02 · Vế "đã qua audit" lần đầu có máy canh — bản 1.8.4
+
+**Đức giao: vá hết để tối ưu mới ổn và được áp dụng từ nay về sau, hook tốt.** Hook đúng chỗ ở
+repo này là `safe-push`, không phải `.git/hooks` — repo chưa từng có hook git nào, và *"gate
+hooks"* ở 1.7.1 là nói về dấu xác nhận.
+
+**Đã vá `KHUNG-56`** — cái lỗ đã làm chính 5 commit của tôi lên `origin/main` khi chưa duyệt.
+Nhãn `Audit:` trong commit; `safe-push` từ chối khi có commit **tự khai** `Audit: chua-co`. Nhà
+của nhãn: `auditFromMessage` cạnh `laneFromMessage` trong `repo-structure.mjs`.
+
+Bốn quyết định, mỗi cái tránh một cách hỏng đã biết: **không khai = không chặn** (chặn tuốt là
+khoá repo, bẫy 509 commit cũ) · **`Audit:` rỗng = chưa duyệt** (không thì gõ rỗng là qua cửa) ·
+**`--carry` KHÔNG mở được** (Đức chốt 09/09 là về *quy thuộc*, không về *duyệt* — dùng lời chốt
+cho việc A để làm việc B là chỗ dễ sai nhất) · **cờ riêng `--duc-duyet-chua-audit`**.
+
+Kèm một dòng **⚠ tự dạy** lúc sắp đẩy code mà không commit nào khai `Audit:`, không đổi mã thoát.
+Nhãn không ai biết là có thì không ai gõ. **KHÔNG thêm chữ vào `AGENTS.md`** — hiến pháp nói cơ
+chế nào máy tự chặn và tự giải thích thì không nằm ở đó; và kho chữ đang **3371/3371**, hết chỗ.
+
+Ghim: `dau-suite-smoke` **17 → 18 vế**. Đột biến: gỡ cửa · cho `--carry` mở · chặn tuốt — mỗi lượt
+ĐỎ đúng vế của nó.
+
+**HAI VIỆC CỐ Ý KHÔNG LÀM, và lý do:**
+
+· `KHUNG-58⒜` (hợp đồng dấu cho repo tiêu thụ) — **năm câu ở `VI-SAO-LUAT` câu 1 nói KHÔNG**:
+  *"đã có chuyện gì xảy ra thật chưa? Chưa thì đừng thêm — viết vào BACKLOG và chờ."* Chưa repo
+  nào viết suite đọc `claims.json`. Nó đã ở trong sổ, để nguyên đó.
+· `KHUNG-50` (suite chạy trong worktree riêng) — đây mới là **nửa còn lại** của bài toán tốc độ,
+  và nó có ca thật (3 lượt hôm nay). Nhưng nó sửa chính bộ chạy tôi vừa vá, ở cuối một phiên dài.
+  Sửa lõi lúc mệt là cách 1.8.2 sinh ra lỗ fail-open. Để nguyên, ưu tiên đầu cho phiên sau.

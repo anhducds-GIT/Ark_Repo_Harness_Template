@@ -363,6 +363,41 @@ export function laneFromMessage(text) {
   return { lane: unique[0], problem: null };
 }
 
+/* NHÃN AUDIT — `KHUNG-56`, và nó vá một lỗ đo được ngày 10/09.
+ *
+ * `AGENTS.md` mục 2 cho tự đẩy khi đủ ba, trong đó điều ⑵ là *"cổng XANH TOÀN BỘ, **code thì đã
+ * qua audit độc lập**"*. Vế cổng-xanh có máy canh: `safe-push` đọc dấu cổng. Vế đã-qua-audit thì
+ * KHÔNG có gì canh — không cờ, không trường, không phép kiểm.
+ *
+ * Ca thật 10/09: lane `harness-loi-02` commit 5 lượt bản vá lõi, ghi rõ trong `HANDOFF.md`
+ * *"chưa qua audit — đừng --carry"*, rồi lane `harness-migrate-3repo` chạy `safe-push` và cuốn cả
+ * 5 lên `origin/main` sau **20 phút**. Lane đó không làm gì sai: cổng của họ xanh, mọi commit đều
+ * có nhãn `Lane:`. Lời cảnh báo nằm ở `HANDOFF.md` — Tầng 2, không nạp mặc định — và không lane
+ * nào phải đọc nhật ký của lane khác trước khi đẩy.
+ *
+ * GIỚI HẠN, nói thẳng để không ai tưởng đây là lớp thép: nhãn này do **người sửa TỰ KHAI**. Nó
+ * không chứng minh đã có audit; nó chỉ làm cho một lời tự khai *"chưa duyệt"* đi được tới máy,
+ * thay vì chết trong một quyển sổ Tầng 2. Bản chặt hơn (dấu cổng mang trường `audit` do một lệnh
+ * nghiệm thu riêng đặt) là `Y-02`, và nó đắt hơn nhiều.
+ *
+ * KHÔNG khai gì = KHÔNG chặn. Chặn mọi commit thiếu nhãn là khoá repo ngay lượt đầu — cùng cái
+ * bẫy `laneFromMessage` đã tránh với 509 commit cũ không nhãn. */
+export const AUDIT_TRAILER = "Audit:";
+export const AUDIT_CHUA_CO = "chua-co";
+
+/** Đọc nhãn `Audit:`. `chuaAudit` chỉ TRUE khi commit TỰ KHAI là chưa duyệt. */
+export function auditFromMessage(text) {
+  const values = String(text ?? "").split("\n")
+    .filter((line) => line.startsWith(AUDIT_TRAILER))
+    .map((line) => line.slice(AUDIT_TRAILER.length).trim().toLowerCase());
+  if (!values.length) return { chuaAudit: false, khai: null };
+  /* RỖNG CŨNG LÀ CHƯA. `Audit:` không có gì sau nó là một lời khai bỏ dở, và hướng an toàn ở đây
+     là coi bỏ dở = chưa duyệt. Ngược lại là biến chính nhãn này thành đường lách: gõ `Audit:` rỗng
+     là qua cửa. */
+  const chuaAudit = values.some((v) => v === AUDIT_CHUA_CO || v === "");
+  return { chuaAudit, khai: values.join(" · ") };
+}
+
 /* BẤT BIẾN BA TẦNG — LAW `steward` ↔ STATE khoá quyền ↔ MÁY một hàm duy nhất.
 
    Yêu cầu bởi audit GPT 02/09, và nó không phải luật di-trú mà là bất biến: A2 đổi tầng LAW

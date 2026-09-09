@@ -753,6 +753,33 @@ Liên quan: `KHUNG-44` (luật bàn giao hai vai chưa cưỡng chế), `Y-02` (
 chạy `safe-push --carry` — rồi đòi `safe-push` **TỪ CHỐI** và nêu đích danh commit chưa duyệt, kèm
 đối chứng NGƯỢC: cùng kho đó, khi commit của A khai *đã qua audit* thì `--carry` phải **cho qua**.
 
+**ĐÃ VÁ 10/09, bản 1.8.4 — mục vẫn MỞ tới khi có audit độc lập cho chính bản vá này.**
+
+Lối ⑴ trong hai lối nêu trên, đúng như đã ghi: nhãn `Audit:` trong commit, `safe-push` từ chối
+đẩy khi có commit **tự khai** `Audit: chua-co`. Nhà của nhãn là `auditFromMessage` trong
+`repo-structure.mjs`, cạnh `laneFromMessage` — một khái niệm một nhà.
+
+Bốn quyết định thiết kế, mỗi cái tránh một cách hỏng đã biết:
+
+| Quyết định | Tránh cái gì |
+|---|---|
+| KHÔNG khai = KHÔNG chặn | chặn tuốt là khoá repo ngay lượt đầu — bẫy 509 commit cũ không nhãn |
+| `Audit:` **rỗng** = chưa duyệt | gõ nhãn rỗng để qua cửa là biến chính nhãn thành đường lách |
+| `--carry` **KHÔNG** mở được cửa này | Đức chốt 09/09 là về **quy thuộc**, không về **duyệt**. Dùng lời chốt cho việc A để làm việc B là chỗ dễ sai nhất |
+| Cờ riêng `--duc-duyet-chua-audit` | hai điều kiện khác nhau thì hai cờ khác nhau |
+
+Kèm một dòng ⚠ **tự dạy** lúc sắp đẩy code mà không commit nào khai `Audit:` — cùng khuôn với
+khối ⚠ nhãn `Lane:`, **không đổi mã thoát**. Nhãn nào không ai biết là có thì không ai gõ.
+
+Ghim: `dau-suite-smoke.mjs` **17 → 18 vế**, năm vế trong một khối, kho RIÊNG. Ba đột biến:
+gỡ cửa → vế ⑵ ĐỎ · cho `--carry` mở cửa → vế ⑶ ĐỎ · chặn tuốt → vế ⑴ ĐỎ.
+
+**GIỚI HẠN, ghi ra để không ai tưởng đây là lớp thép:** nhãn do người sửa **TỰ KHAI**. Nó không
+chứng minh đã có audit — nó chỉ làm một lời tự khai *"chưa duyệt"* đi được tới máy, thay vì chết
+trong một quyển sổ Tầng 2 mà không lane nào phải đọc. Bản chặt hơn là `Y-02`.
+
+**còn thiếu để đóng:** audit độc lập cho chính bản vá này.
+
 ### KHUNG-57 · `can-nang.mjs` chạy **603 giây** — đắt hơn cả bộ test, mà số nó in ra lấy được trong 0 giây
 
 Đo 09/09 trên repo nhà, đồng hồ tường:

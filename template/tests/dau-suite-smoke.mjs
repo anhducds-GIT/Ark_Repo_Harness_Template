@@ -336,9 +336,83 @@ try {
     git("add", "."); git("commit", "-qm", "tra runner ve\n\nLane: fixture");
     ok("cổng: runner LẠ của repo tiêu thụ in dòng tổng 'xanh' rồi FAIL → vẫn ĐỎ (fail-closed)");
   }
+
 } finally {
   assert.ok(path.resolve(fixture).startsWith(path.resolve(os.tmpdir()) + path.sep));
   fs.rmSync(fixture, { recursive: true, force: true });
+}
+
+
+/* ---- KHUNG-56 · NHAN `Audit:` — cua ma `--carry` KHONG mo duoc -------------
+ *
+ * Ca that 10/09: 5 commit ban va loi, `HANDOFF.md` ghi ro "chua qua audit — dung --carry", lane
+ * khac chay `safe-push` va cuon ca 5 len `origin/main` sau HAI MUOI PHUT. Ho khong lam gi sai:
+ * cong cua ho xanh, moi commit deu co nhan `Lane:`. Loi canh bao nam o Tang 2 — may khong doc.
+ *
+ * KHO RIENG, khong dung lai fixture o tren: o day trang thai tich luy (dau cong cu, quyen da
+ * doi) lam `safe-push` tu choi vi LY DO KHAC, va luc do mot ve `doesNotMatch` se XANH ma khong
+ * chung minh gi. Da dinh dung bay do mot lan trong chinh luot viet phep kiem nay. */
+{
+  const chaA = fs.mkdtempSync(path.join(os.tmpdir(), "ark-audit-"));
+  const khoA = path.join(chaA, "kho");
+  const bareA = path.join(chaA, "remote.git");
+  try {
+    fs.mkdirSync(khoA, { recursive: true });
+    fs.cpSync(path.join(ROOT, "scripts"), path.join(khoA, "scripts"), { recursive: true });
+    fs.mkdirSync(path.join(khoA, ".agents"), { recursive: true });
+    const gA = (...a) => execFileSync("git", a, { cwd: khoA, encoding: "utf8" });
+    const wA = (rel, text) => fs.writeFileSync(path.join(khoA, rel), text);
+    execFileSync("git", ["init", "-q", "--bare", bareA]);
+    gA("init", "-q", "-b", "main"); gA("config", "user.name", "t"); gA("config", "user.email", "t@e.invalid");
+    wA(".repo-structure.json", JSON.stringify({ units: { root_dir: null }, areas: { "scripts/": { steward: "_root", ownership_mode: "root" } } }));
+    wA(".agents/claims.json", JSON.stringify({ claims: { _root: { owner: null } } }));
+    wA("package.json", JSON.stringify({ type: "module", scripts: { test: "node scripts/chay-test.mjs" } }));
+    wA("sample.txt", "nen");
+    gA("add", "-A"); gA("commit", "-qm", "nen" + NL + NL + "Lane: fixture");
+    gA("remote", "add", "origin", bareA); gA("push", "-qu", "origin", "main");
+    const dayA = (...co) => spawnSync(process.execPath,
+      [path.join(khoA, "scripts", "safe-push.mjs"), "--as", "fixture", "--dry-run", ...co],
+      { cwd: khoA, encoding: "utf8" });
+
+    // ⑴ KHONG khai gi -> KHONG duoc chan. Chan het la khoa repo ngay luot dau, dung cai bay
+    //    ma `laneFromMessage` da tranh voi 509 commit cu khong nhan.
+    wA("sample.txt", "khong khai");
+    gA("add", "-A"); gA("commit", "-qm", "khong khai gi" + NL + NL + "Lane: fixture");
+    let p = dayA();
+    assert.doesNotMatch(String(p.stdout) + String(p.stderr), /chua qua audit doc lap/,
+      "commit KHONG khai nhan Audit thi khong duoc chan");
+
+    // ⑵ TU KHAI chua duyet -> PHAI tu choi, va phai noi ro vi sao.
+    wA("sample.txt", "chua duyet");
+    gA("add", "-A"); gA("commit", "-qm", "ban va loi" + NL + NL + "Lane: fixture" + NL + "Audit: chua-co");
+    p = dayA();
+    assert.equal(p.status, 1, "commit tu khai chua audit thi safe-push PHAI tu choi");
+    assert.match(String(p.stdout) + String(p.stderr), /chua qua audit doc lap/, "phai noi ro vi sao");
+
+    // ⑶ `--carry` KHONG mo duoc cua nay. Duc chot 09/09 la ve QUY THUOC, khong phai ve DUYET;
+    //    dung mot loi chot cho viec A de lam viec B la cho de lam sai nhat.
+    assert.equal(dayA("--carry").status, 1, "--carry khong duoc mo cua AUDIT");
+
+    // ⑷ DOI CHUNG NGUOC — thieu ve nay thi mot ban va "chan tuot" cung qua duoc ba ve tren.
+    gA("reset", "-q", "--hard", "HEAD~1");
+    wA("sample.txt", "da duyet");
+    gA("add", "-A"); gA("commit", "-qm", "ban va da duyet" + NL + NL + "Lane: fixture" + NL + "Audit: codex-r02");
+    p = dayA();
+    assert.doesNotMatch(String(p.stdout) + String(p.stderr), /chua qua audit doc lap/,
+      "khai DA co nguoi duyet thi phai cho qua — khong thi cua nay khong bao gio mo");
+
+    // ⑸ Co Duc chot thi mo duoc, va phai noi ro la da dung cua do.
+    gA("reset", "-q", "--hard", "HEAD~1");
+    wA("sample.txt", "chua duyet lan hai");
+    gA("add", "-A"); gA("commit", "-qm", "ban va loi" + NL + NL + "Lane: fixture" + NL + "Audit: chua-co");
+    p = dayA("--duc-duyet-chua-audit");
+    assert.notEqual(p.status, 1, "co --duc-duyet-chua-audit thi khong duoc chan o cua audit");
+    assert.match(String(p.stdout), /Duc chot cho day/, "phai noi ro la da dung cua Duc duyet");
+    ok("nhãn Audit: không khai → qua · tự khai chưa duyệt → CHẶN · `--carry` KHÔNG mở được · đã duyệt → qua · Đức chốt → qua");
+  } finally {
+    assert.ok(path.resolve(chaA).startsWith(path.resolve(os.tmpdir()) + path.sep));
+    fs.rmSync(chaA, { recursive: true, force: true });
+  }
 }
 
 console.log(`\n${so} passed, 0 failed, ${so} total`);

@@ -18,7 +18,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
+import { appendOnlyAtEof, AUDIT_CHUA_CO, AUDIT_TRAILER, auditFromMessage, claimPrefixesFrom, laneFromMessage, LANE_TRAILER, loiKhuyenKhiChan, ownershipKeys, readStructureFromDisk } from "./repo-structure.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDauCong, xetDauCong } from "./chay-test.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,6 +26,10 @@ const args = process.argv.slice(2);
 const asLabel = args[args.indexOf("--as") + 1];
 const dryRun = args.includes("--dry-run");
 const carry = args.includes("--carry");
+/* Cua rieng cho vế "da qua audit doc lap" cua AGENTS.md muc 2. KHONG dung chung voi `--carry`:
+   hai dieu kien khac nhau thi phai hai cai co khac nhau, khong thi mot lan chot thanh hai. */
+const ducDuyetChuaAudit = args.includes("--duc-duyet-chua-audit");
+const NL = String.fromCharCode(10);
 
 if (!args.includes("--as") || !asLabel || asLabel.startsWith("--")) {
   console.error("Thiếu --as <nhãn-phiên>. Ví dụ: node scripts/safe-push.mjs --as claude-gemini");
@@ -311,6 +315,47 @@ if (blocked.length && tuDong) {
 }
 if (blocked.length && carry) {
   console.log(`\n--carry: Đức đã duyệt cho đẩy kèm việc của ${[...new Set(blocked.flatMap((r) => r.foreign.map((f) => f.owner)))].join(", ")}.`);
+}
+
+/* TỰ DẠY ĐÚNG LÚC, thay vì thêm một dòng vào sổ tay không ai mở.
+ *
+ * Nhãn `Audit:` chỉ chặn được khi có người GÕ nó, mà không ai gõ một nhãn mình chưa biết là có.
+ * Chỗ dạy rẻ nhất là ngay đây — lúc người ta sắp đẩy code. Cùng khuôn với khối ⚠ nhãn `Lane:`
+ * phía trên: NÊU TÊN, không đổi mã thoát. Bật chặn cho commit thiếu nhãn là khoá repo ngay lượt
+ * đầu, và `AGENTS.md` mục 2 vốn đã đòi audit bằng chữ rồi. */
+const chamCode = rows.filter((row) => {
+  const files = gitQuiet("show", "--name-only", "--format=", row.sha).split(NL).filter(Boolean);
+  return files.some((f) => f.startsWith("scripts/") || f.startsWith("tests/"));
+});
+if (chamCode.length && !chamCode.some((row) => auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha)).khai)) {
+  console.log(`${NL}⚠ ${chamCode.length} commit chạm \`scripts/\` hoặc \`tests/\` mà KHÔNG commit nào khai \`${AUDIT_TRAILER}\`.`);
+  console.log(`  AGENTS.md mục 2 điều ⑵ đòi code phải QUA AUDIT ĐỘC LẬP trước khi đẩy — cổng không đo được điều đó.`);
+  console.log(`  Chưa qua audit thì thêm một dòng cuối thông điệp commit, và cửa này sẽ giữ nó lại:`);
+  console.log(`      ${AUDIT_TRAILER} ${AUDIT_CHUA_CO}`);
+}
+
+/* CỬA AUDIT — `KHUNG-56`. Chạy TRƯỚC `--dry-run` (cùng lý do với phép kiểm nhánh ngay dưới) và
+ * ĐỘC LẬP với `blocked`: đẩy commit chưa duyệt của CHÍNH MÌNH cũng là công bố việc chưa ai duyệt.
+ *
+ * `--carry` KHÔNG mở được cửa này, và đó là chủ ý. Điều Đức chốt 09/09 là *"cuốn theo việc QUY
+ * THUỘC ĐƯỢC"* — một câu về truy nguồn. Nó không nói gì về việc đã duyệt hay chưa. Gộp hai câu
+ * làm một là dùng lời chấp thuận cho việc A để làm việc B. */
+const chuaDuyet = rows
+  .map((row) => ({ ...row, audit: auditFromMessage(gitQuiet("log", "-1", "--format=%B", row.sha)) }))
+  .filter((row) => row.audit.chuaAudit);
+if (chuaDuyet.length && !ducDuyetChuaAudit) {
+  console.error(`${NL}TU CHOI PUSH — ${chuaDuyet.length} commit TU KHAI la chua qua audit doc lap:`);
+  for (const row of chuaDuyet) console.error(`  ${row.sha.slice(0, 7)}  ${row.subject.slice(0, 62)}`);
+  console.error(`${NL}AGENTS.md muc 2 dieu (2): cong XANH TOAN BO, va code thi DA QUA AUDIT DOC LAP.`);
+  console.error(`Cong xanh khong thay duoc audit — do la hai dieu kien, khong phai mot.`);
+  console.error(`${NL}Ba duong ra, khong co duong thu tu:`);
+  console.error(`  · lay audit that, roi commit ban va (neu co) — nhan cu nam lai trong lich su, khong sao`);
+  console.error(`  · Duc chot cho day khi chua duyet:  --duc-duyet-chua-audit`);
+  console.error(`  · de commit do nam lai, day rieng phan con lai${NL}`);
+  process.exit(1);
+}
+if (chuaDuyet.length && ducDuyetChuaAudit) {
+  console.log(`${NL}--duc-duyet-chua-audit: Duc chot cho day ${chuaDuyet.length} commit chua qua audit.`);
 }
 
 /* Phép kiểm nhánh phải chạy TRƯỚC cửa `--dry-run`. Đặt nó sau thì lần chạy thử báo "sẽ đẩy
