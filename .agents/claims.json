@@ -40,16 +40,8 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "da75a4678ad83ab6",
+  "_fingerprint": "e59713a4eb4dfe2a",
   "tam": {
-    "docs/briefs/MIGRATE-REPO.md": {
-      "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T17:01:47.172Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T17:23:34.714Z"
-    },
     "scripts/repo-structure.mjs": {
       "owner": "harness-loi-02",
       "luc": "2026-09-09T17:20:12.111Z"
