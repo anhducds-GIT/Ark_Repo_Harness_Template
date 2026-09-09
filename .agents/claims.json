@@ -5,9 +5,9 @@
     "_root": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T23:09:31.005Z",
-      "task": "chot phien ra soat luat",
-      "released_at": "2026-09-08T23:28:00.925Z",
+      "claimed_at": "2026-09-09T02:27:38.851Z",
+      "task": "ra soat ORCHESTRATOR",
+      "released_at": "2026-09-09T02:33:36.347Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
@@ -15,9 +15,9 @@
     "_docs": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T23:09:31.069Z",
-      "task": "chot phien ra soat luat",
-      "released_at": "2026-09-08T23:28:01.031Z",
+      "claimed_at": "2026-09-09T02:27:38.919Z",
+      "task": "ra soat ORCHESTRATOR",
+      "released_at": "2026-09-09T02:33:36.472Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -25,9 +25,9 @@
     "_code": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T23:09:31.132Z",
-      "task": "chot phien ra soat luat",
-      "released_at": "2026-09-08T23:28:01.144Z",
+      "claimed_at": "2026-09-09T02:27:38.980Z",
+      "task": "ra soat ORCHESTRATOR",
+      "released_at": "2026-09-09T02:33:36.572Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -35,9 +35,9 @@
     "_template": {
       "owner": null,
       "ai": null,
-      "claimed_at": "2026-09-08T23:09:31.197Z",
-      "task": "chot phien ra soat luat",
-      "released_at": "2026-09-08T23:28:01.239Z"
+      "claimed_at": "2026-09-09T02:27:39.051Z",
+      "task": "ra soat ORCHESTRATOR",
+      "released_at": "2026-09-09T02:33:36.673Z"
     }
   }
 }
