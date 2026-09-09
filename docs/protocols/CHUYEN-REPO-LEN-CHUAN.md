@@ -12,14 +12,27 @@ ttl_days: 180
 
 ## Trạng thái của chính quy trình này
 
-**Đã chạy thật 2 lần, cùng ngày 2026-09-03, trên hai repo khác nghề** — bản khung lúc đó là
-`0.3.0`. Hồ sơ từng lượt ở [../migrations/](../migrations/), và **đọc hồ sơ trước khi đọc sáu
-bước dưới đây**: chỗ vấp thật nằm trong hồ sơ, không nằm trong quy trình.
+**Đã chạy thật 4 lượt** — hồ sơ từng lượt ở [../migrations/](../migrations/), và **đọc hồ sơ trước
+khi đọc tám bước dưới đây**: chỗ vấp thật nằm trong hồ sơ, không nằm trong quy trình.
 
-| Repo | Nghề | Mức | Cổng | Lỗi tìm ra |
+| Repo | Ngày | Bản khung lúc đó | Mức | Cổng |
 |---|---|---|---|---|
-| NAV Platform V1 | Node + Python · chứng khoán | 1 → 3 | xanh toàn bộ | 9 |
-| Project 3 AI Agent Unify | Python · điều phối nhiều AI | 1 → 3 | 9 xanh 1 bỏ | 8 |
+| NAV Platform V1 | 03/09 | 0.3.0 | 1 → 3 | xanh |
+| Project 3 AI Agent Unify | 03/09 | 0.3.0 | 1 → 3 | chưa chạy |
+| ALL_SKILL_MANAGEMENT | 06/09 | 1.3.8 | 1 → 3 | XANH TOÀN BỘ |
+| n8n-orchestrator | 08/09 | 1.3.67 | 3 → 3 | XANH TOÀN BỘ |
+
+**ĐÃ ĐO LẠI 09/09** (`npm run assess`, bộ khung 1.3.9x): `n8n-orchestrator` **30/60** file khớp bản
+chuẩn · `ALL_SKILL_MANAGEMENT` **30/60** · `Project 3 AI Agent Unify` **29/60** · NAV Platform
+**không có trên máy này**. Cả ba in `MỨC 1/3`, và đọc con số đó cho ĐÚNG: chúng *có* bộ máy, chỉ
+là **bản cũ** — `assess` so với bản chuẩn hôm nay nên file cũ nào cũng tính là lệch. Chỗ hỏng thật
+là ở `assess`: nó gộp *thiếu bộ máy* với *bộ máy bản cũ* thành một mức. Ghi ở `KHUNG-14`.
+
+**MỤC NÀY ĐÃ SẬP HAI LẦN — đọc kỹ trước khi chạy lượt sau.** Nó sinh ra để chặn đúng một chuyện:
+chạy xong mà không ghi ngược lại vào đây. Lần một: 03/09→05/09 file nói *"chưa từng chạy"* trong
+khi `AGENTS.md` nói đã chạy 2 lần. Lần hai: tới 09/09 file vẫn nói *"2 lần"* trong khi đã có **4**
+hồ sơ. Ghi chỗ vấp **ngay tại đây**, đừng chỉ ghi vào hồ sơ lượt — hồ sơ kể một lượt, mục này là
+thứ người sau đọc.
 
 **Bốn chỗ quy trình này tự mâu thuẫn, cả bốn do hai lượt đó lôi ra:**
 
@@ -34,13 +47,6 @@ bước dưới đây**: chỗ vấp thật nằm trong hồ sơ, không nằm t
    sách **miễn trừ CÓ HẠN** — lý do · người chốt · ngày hết hạn. Không xoá (mất ý định), không
    để đỏ triền miên (người ta thôi đọc suite).
 
-**Chưa đo lại ở bản khung hiện tại.** Hai lượt trên chạy ở `0.3.0`; bộ khung nay đã khác nhiều.
-Lượt migrate thứ ba nên coi bốn điểm trên là *đã biết*, và mọi thứ khác là *chưa kiểm lại*.
-
-Ai chạy lượt sau: ghi chỗ vấp **ngay tại đây**, đừng chỉ ghi vào hồ sơ lượt. Hồ sơ kể một lượt;
-mục này là thứ người sau đọc. Hai lượt đầu ghi hồ sơ đầy đủ nhưng **không ghi ngược lại vào đây**
-— nên suốt từ 03/09 tới 05/09 file này vẫn nói "chưa từng chạy" trong khi `AGENTS.md` ở gốc nói
-"đã chạy thật 2 lần". Đó chính là cái bẫy mục này tồn tại để chặn, và nó đã sập một lần rồi.
 
 ## Migrate là BA việc trong một — Đức chốt 2026-09-05
 
@@ -316,28 +322,10 @@ thật lúc đó: **không ở đâu cả.** Ghi ra đây để không ai phải
 
 ### Cái còn thiếu: ma trận tính năng × repo
 
-Không chỗ nào trả lời được *"tính năng F8.5 đã tới những repo nào"* — mọi phép đo đều
-**theo repo**, không có phép nào **theo tính năng**. Đo thử 08/09 bằng một script tạm: ma trận
-dụng ngay ra hai thứ không thấy được khi đọc từng repo — `F1.4` và `F6.5` **thiếu ở CẢ NĂM repo**
-(tức vấn đề của bộ khung, không phải của repo nào), còn `F6.1` thì `[~]` ở **cả năm**.
-
-**Nguyên tắc thiết kế cho bản tự động — đọc trước khi gõ:** bảng **suỷ hoàn toàn từ HEAD**, cố ý.
-Nên bộ sinh **KHÔNG được đọc đĩa của repo khác** để dựng ma trận — làm thế là bảng đổi byte mỗi
-lượt ai động vào một repo nào đó, và cổng *"Sự thật máy sinh còn tươi"* ĐỎ với mọi phiên.
-Đúng cái hàng rào `KHOA_SONG` của `bang-song/` dựng ra để chặn.
-
-**Nguồn đúng là các khối checklist trong `docs/migrations/`** — chúng đã nằm trong HEAD, đã mang
-**ngày đo** và **bản danh mục**, và luật *"lấy khối CUỐI"* đã có. Bộ sinh chỉ việc đọc chúng rồi
-xếp lại thành **tính năng ở hàng ngang, repo ở hàng dọc**, gom theo khối `F1`…`F9`.
-
-Cái giá của lựa chọn này, nói rõ: ma trận **chỉ tươi bằng lần dán khối cuối**. Đó là đánh đổi
-đúng hướng: một con số hơi cũ mà **truy được ai đo, ngày nào** thì dùng được; một con số luôn mới
-mà làm đỏ cổng của mọi lane thì không.
-
-**Hai repo tiêu thụ không có hồ sơ migrate** nên sẽ không có hàng trong ma trận:
-`Chrome_Extension_AI_Agentic` — bộ khung **sinh ra tứ đó** rồi mới tách ra, nên nó chưa từng có
-một *lượt* migrate nào để ghi hồ sơ. Cần người chốt quyết: hoặc cho phép một hồ sơ loại
-*"repo nguồn"*, hoặc ma trận khai rõ nó vắng và vì sao.
+Không phép đo nào trả lời được *"tính năng F8.5 đã tới những repo nào"* — mọi phép đo đều **theo
+repo**, không có phép nào **theo tính năng**. Bản thiết kế đầy đủ (nguồn dữ liệu · ràng buộc
+suy-từ-HEAD · cái giá · chỗ cần người chốt) đã dời sang [IDEAS.md](../../IDEAS.md) mục `Y-11`
+ngày 09/09 — nó là việc CHƯA LÀM, và quy trình này chỉ chứa việc PHẢI LÀM.
 
 ## Việc KHÔNG thuộc quy trình này
 

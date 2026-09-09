@@ -96,9 +96,9 @@
   "docs": {
     "_doc": "THUOC COC cho kho chu, KHONG phai tran ly tuong. Dat o dung con so cua hom nay: no khong doi ai don, no chi chan PHINH. Moi luot xoa thi HA con so nay xuong — cho da ha khong quay lai duoc.",
     "_tru_adr": "Khong ke docs/adr/: ADR da Accepted la bat bien (ADR-0000) nen thu muc do chi co the to len. Tinh no vao thuoc thi moi quyet dinh moi lam cong do, va nguoi ta se noi con so cho xong.",
-    "_do_that": "2026-09-09 (sau khi doi ke hoach sau dot cu cua ROADMAP-V2 sang kho luu tru): docs/ 25 file = 3.185 dong. Truoc do 08/09 la 3.248. Thuoc nay chi duoc SIET, khong duoc noi. Lenh do lai: git ls-files docs | grep -vE \"^docs/(adr|archive|migrations)/\" | xargs -d \"\n\" cat | wc -l",
+    "_do_that": "2026-09-09 (sau ba luot don: ke hoach sau dot cua ROADMAP-V2, muc thiet ke ma tran sang IDEAS Y-11, va don HOA-GIAI): docs/ 25 file = 3.173 dong. Moc truoc: 3.248 (08/09) -> 3.196 -> 3.185 -> 3.173. Thuoc nay CHI DUOC SIET. Lenh do lai: git ls-files docs | grep -vE \"^docs/(adr|archive|migrations)/\" | xargs -d \"\n\" cat | wc -l",
     "_tru_ba_thu_muc": "Khong ke docs/adr/, docs/archive/, docs/migrations/ — Duc chot 08/09 (hai luot). Ca ba cung MOT hinh dang: ban ghi viec DA XAY RA, chi doc khi tra, va chi co the to len. Ngan sach nay do THU MOI PHIEN PHAI NAP; tinh chung vao thi moi quyet dinh moi / moi luot don / moi luot migrate deu lam cong DO, va mot cong do vi viec DUNG thi bi noi so cho xong. Ca ba deu da xay ra that trong MOT ngay. Danh sach khai o THU_MUC_DOCS_KHONG_TINH cua repo-structure.mjs.",
-    "tran_dong_khong_ke_adr": 3185
+    "tran_dong_khong_ke_adr": 3173
   },
   "bang": {
     "_doc": "Danh sach nhom (tab) cua bang tong quan — HOP DONG, khai o DUNG MOT NOI. Cac suite doc tu day; khong suite nao duoc go cung lai danh sach nay.",

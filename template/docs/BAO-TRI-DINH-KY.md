@@ -117,7 +117,7 @@ liệu tra cứu thì không, vì nó chỉ được đọc khi cần.
 
 | Chỗ | Vì sao tốn | Dọn thế nào |
 |---|---|---|
-| **`HANDOFF.md`** | Phình nhanh nhất cả repo, và **chưa từng có nhịp dọn**. Luật bảo đọc 40 dòng cuối, nhưng phiên AI thường đọc cả file | Chuyển các lượt CŨ sang `docs/archive/HANDOFF-<năm>-<tháng>.md` |
+| **`HANDOFF.md`** | Phình nhanh nhất cả repo. Luật bảo đọc phần CUỐI, nhưng phiên AI thường đọc cả file | `npm run don -- --apply` — dời lượt cũ sang `docs/archive/`, chừa 20% trần cho lượt Log kế tiếp |
 | **`BACKLOG.md`** | Vai điều phối đọc **mỗi lượt**. Nửa sổ là mục đã đóng thì mỗi lượt trả tiền cho phần không còn dùng | Chuyển mục đã gạch mã sang `docs/archive/BACKLOG-da-dong.md` |
 | **`AGENTS.md`** | Nạp **mỗi phiên, mọi repo**. Cắt 30 dòng ở đây đáng hơn cắt 300 dòng ở tài liệu tra cứu | Áp luật mục 8: thêm một luật thì bớt một luật |
 | **`CHANGELOG.md`** | **KHÔNG dọn** — chỉ thêm, theo thiết kế | Không ai nạp nó mỗi phiên; để yên |

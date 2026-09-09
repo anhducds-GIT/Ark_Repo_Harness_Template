@@ -225,3 +225,33 @@ Repo Chrome Extension vẫn là **bản fork cần hợp nhất sau**, không ph
 
 **Hai chỗ hỏng THẬT thì không có trong danh sách trên**, và chỉ lộ ra lúc chạy thật: file `.cmd` thuần LF làm `cmd.exe` ăn mất ký tự đầu dòng · và một repo khác trên cùng máy chiếm cùng cổng mặc định, khiến bản này thoát im lặng. Cả hai đã vá và ghim.
 
+
+## Y-11 · Ma trận tính năng × repo — đọc theo TÍNH NĂNG, không theo repo
+
+- **bậc:** ý tưởng
+- **việc kế:** dựng bộ sinh đọc khối checklist trong `docs/migrations/`, xếp lại thành *tính năng hàng ngang × repo hàng dọc*
+- **chủ:** chưa ai nhận
+- **phạm vi:** `_code` + `_docs`
+
+**nguồn** — dời khỏi `docs/protocols/CHUYEN-REPO-LEN-CHUAN.md` ngày 09/09: nó là **bản thiết kế
+cho việc chưa làm** nằm trong một quy trình mà mọi phiên migrate phải đọc. Luật mục 8 nói rõ chỗ
+của nó là sổ ý tưởng.
+
+**Vì sao đáng làm:** mọi phép đo hiện nay đều **theo repo**, không có phép nào **theo tính năng**,
+nên không ai trả lời được *"tính năng F8.5 đã tới những repo nào"*. Đo thử 08/09 bằng script tạm:
+ma trận lòi ra hai thứ không thấy được khi đọc từng repo — `F1.4` và `F6.5` **thiếu ở CẢ NĂM repo**
+(tức lỗi của bộ khung, không phải của repo nào), và `F6.1` thì `[~]` ở cả năm.
+
+**Ràng buộc thiết kế, đọc trước khi gõ:** bảng suy **hoàn toàn từ HEAD**. Bộ sinh **KHÔNG được đọc
+đĩa của repo khác** — làm thế là bảng đổi byte mỗi lượt ai động vào một repo nào đó, và cổng *"Sự
+thật máy sinh còn tươi"* ĐỎ với mọi phiên. Đúng cái hàng rào `KHOA_SONG` của `bang-song/` chặn.
+Nguồn đúng là **khối checklist trong `docs/migrations/`**: đã nằm trong HEAD, đã mang ngày đo và
+bản danh mục, và luật *lấy khối CUỐI* đã có.
+
+**Cái giá, nói rõ:** ma trận chỉ tươi bằng lần dán khối cuối. Đó là đánh đổi đúng hướng — một con
+số hơi cũ mà **truy được ai đo, ngày nào** thì dùng được; một con số luôn mới mà làm đỏ cổng của
+mọi lane thì không.
+
+**Một chỗ cần người chốt:** `Chrome_Extension_AI_Agentic` không có hồ sơ migrate — bộ khung sinh ra
+**từ đó** rồi mới tách, nên nó chưa từng có một *lượt* migrate. Hoặc cho phép hồ sơ loại *"repo
+nguồn"*, hoặc ma trận khai rõ nó vắng và vì sao.

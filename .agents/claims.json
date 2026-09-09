@@ -39,5 +39,43 @@
       "task": "gop phep kiem",
       "released_at": "2026-09-09T05:17:20.160Z"
     }
+  },
+  "tam": {
+    "docs/protocols/CHUYEN-REPO-LEN-CHUAN.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "IDEAS.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "docs/BAO-TRI-DINH-KY.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "template/docs/BAO-TRI-DINH-KY.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T05:21:18.430Z"
+    }
   }
 }
