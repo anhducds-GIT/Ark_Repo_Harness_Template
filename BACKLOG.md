@@ -258,20 +258,50 @@ kết quả suite từ đâu, và cái gì khác nhau giữa hai lượt chạy*
 trạng thái cây làm việc, hay output bị cắt. Ghi lại lượt nào đỏ lượt nào xanh trước khi đổi
 bất cứ dòng nào.
 
-**KIỂM CHỨNG 09/09 — MỘT NỬA ĐÃ ĐÓNG, NỬA CÒN LẠI KHÔNG ĐO ĐƯỢC BẰNG DỮ LIỆU ĐANG CÓ.**
+**ĐÃ TÌM RA GỐC BỆNH 10/09, VÀ ĐÍNH CHÍNH CHÍNH TÔI.** Lúc 09/09 tôi ghi vào mục này rằng nửa
+thứ hai *"không đo được vì sổ cổng chỉ lưu tên phép kiểm"*. **Câu đó sai.** Không cần sổ — chỉ cần
+bắt đúng lượt đỏ lúc nó đang xảy ra, và lượt đó tới ngay trong phiên sau.
 
-Nửa đã đóng: chỗ *"liệt kê toàn dòng `ok`"* đúng là dò chuỗi, và `KHUNG-52` đã vá ở 1.7.1 —
-cổng nay bắt theo mẫu `── <suite> (mã N) ──` trên **cả hai luồng**, và khi không bắt được thì
-nói thẳng *"không đọc được TÊN"* thay vì đưa ra ba cái tên trông giống thật. Có phép ghim
-(`cong-do-that.mjs` khối 12).
+Nửa đã đóng từ trước: chỗ *"liệt kê toàn dòng `ok`"* là dò chuỗi, `KHUNG-52` vá ở 1.7.1 — cổng nay
+bắt theo mẫu `── <suite> (mã N) ──` trên cả hai luồng. Ghim ở `cong-do-that.mjs` khối 12.
 
-Nửa còn mở, và đây là dữ kiện mới: **sổ chạy cổng KHÔNG lưu lời nhắn, chỉ lưu tên phép kiểm.**
-Đo trên 260 lượt đã ghi: *"Test xanh"* ĐỎ ở **68 lượt**, trong đó **2 lượt ngày 09/09**. Không
-lượt nào truy được là *đỏ thật* hay *đỏ oan* — sổ không giữ lý do. Nên không thể kết luận mục
-này đã tự khỏi, và cũng không thể dựng lại ca hỏng từ lịch sử.
+**Gốc bệnh của nửa còn lại — hai lớp, và cả hai đo được:**
 
-Ai nhận mục này tiếp: bắt lấy **lượt đỏ kế tiếp lúc nó đang xảy ra** (giữ nguyên cây làm việc,
-chạy lại cổng, so lời nhắn), đừng đi tìm trong sổ — trong sổ không có.
+⑴ `dauCay()` băm **`.agents/claims.json`**, mà file đó bị **MỌI lane** ghi lại ở mỗi lượt `--sua` /
+`--xong`. Trong repo có hai lane cùng làm, dấu xác nhận **không bao giờ ghi được**.
+
+⑵ `chay-test.mjs` trả **mã 2** khi không ghi được dấu, dù **22/22 suite xanh**. Cổng gọi `npm test`
+bằng `execSync` — mã ≠ 0 thì ném — rồi báo *"suite gốc repo ĐỎ → không đọc được TÊN suite đỏ"*.
+Không đọc được tên vì **không có suite nào đỏ**.
+
+Số đo trong đúng một phiên (09→10/09), cả ba lượt trên cùng cây làm việc:
+
+| Lượt | Thời gian | Suite | Dấu | Cổng nói |
+|---|---|---|---|---|
+| `npm test` #1 | 514.8s | 22/22 xanh | không ghi được | — |
+| `npm test` #2 | 524.2s | 22/22 xanh | không ghi được | — |
+| cổng đóng phiên | 702s | 22/22 xanh | không ghi được | **"suite gốc repo ĐỎ"** |
+| | **29 phút** | **0 đỏ** | **0 dấu** | **1 kết luận sai** |
+
+Và **chập chờn** giải thích xong: nó phụ thuộc lane khác có gõ trong cửa sổ ~9 phút hay không.
+
+**Đã vá 10/09, hai chỗ, cả hai kèm đối chứng ngược:** `dauCay` bỏ file hành chính khỏi băm — khái
+niệm này repo đã ghim từ trước (`isBehaviourFile(".agents/claims.json") === false`), nay có **một
+nhà** là `FILE_HANH_CHINH` trong `repo-structure.mjs`, dùng chung bởi cả bộ đếm hành vi lẫn bộ
+chạy suite. Và cổng thôi gọi một suite xanh là ĐỎ: nó trả **BỎ** kèm đúng lý do, nên **vẫn không
+được báo xong** (mã 2) — chỉ đổi LỜI, không đổi độ chặt.
+
+Ghim ở `dau-suite-smoke.mjs` (**14 → 16 vế**). Ba lượt đột biến trên bản chép cách ly:
+
+| Đột biến | Vế ĐỎ |
+|---|---|
+| `dauCay` băm cả file hành chính (nghĩa cũ) | *"bảng quyền đổi mà dấu mất hiệu lực"* |
+| bỏ nhánh *"xanh mà thiếu dấu"* (nghĩa cũ) | *"suite XANH mà bị gọi là ĐỎ"* |
+| hạ xuống BỎ **không** đòi dòng tổng xanh (fail-OPEN) | *"suite đỏ THẬT thì phải bị gọi là ĐỎ"* |
+
+**đóng khi:** một lượt audit ĐỘC LẬP xác nhận hai bản vá trên không mở đường lách — cùng lượt với
+`KHUNG-53`. Người sửa không tự ký nghiệm thu (`AGENTS.md` mục 5).
+
 
 ### KHUNG-22 · Chưa ghim được "collectModel có truyền opts xuống không"
 

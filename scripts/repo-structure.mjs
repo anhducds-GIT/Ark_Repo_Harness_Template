@@ -500,6 +500,21 @@ export function behaviourGlobsFrom(parsed) {
    FAIL CLOSED với đầu vào sai: khai `"generated_names": "khac"` mà lặng lẽ lùi về mặc định thì
    người viết tưởng tên riêng đang có hiệu lực, còn bộ sinh vẫn ghi đè file cũ. Đúng cái lỗ
    `budget` đã mắc và đã vá 05/09. */
+/* FILE HÀNH CHÍNH — thao tác quyền, KHÔNG phải hành vi của repo.
+ *
+ * NHÀ DUY NHẤT của khái niệm này. Trước 10/09 nó nằm trong `build-dashboard.mjs` dưới tên
+ * `HANH_CHINH`, nên chỉ bộ đếm hành vi biết tới nó, còn `chay-test.mjs` thì không — và cái
+ * giá đo được ở phiên 09→10/09: dấu xác nhận suite băm CẢ `.agents/claims.json`, mà file đó
+ * bị MỌI lane ghi lại ở mỗi lượt `--sua` / `--xong`. Trong một repo có hai lane cùng làm, dấu
+ * **không bao giờ ghi được**: ba lượt chạy đủ bộ (514.8s + 524.2s + 702s = **29 phút**) không
+ * lượt nào cấp được dấu, và cổng còn báo *"suite gốc repo ĐỎ"* trong khi 22/22 suite xanh.
+ *
+ * Repo này đã có một phép ghim cho đúng ý đó ở `tests/core-contract.mjs`:
+ * `isBehaviourFile(".agents/claims.json") === false`, kèm ca thật 06/09 (commit `fa7e8a7`
+ * chạm đúng một file là `claims.json` và bộ đếm hành vi nhảy 4 → 5). Nên đây không phải luật
+ * mới — nó là luật ĐÃ CÓ, nay được mang tới chỗ thứ hai đang cần nó. */
+export const FILE_HANH_CHINH = Object.freeze([".agents/claims.json"]);
+
 export const TEN_MAY_SINH_MAC_DINH = Object.freeze({
   dashboard: "DASHBOARD.md",
   llms: "llms.txt",

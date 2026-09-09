@@ -44,6 +44,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+/* MỘT IMPORT DUY NHẤT NGOÀI NODE, và nó là cố ý. `session-check.mjs` nhập cả file này lẫn
+   `repo-structure.mjs`, nên hai file vốn đã luôn đi cùng nhau ở mọi bản trích — ràng buộc
+   "đi cùng nhau" không phát sinh thêm. Đổi lại: danh sách file hành chính có ĐÚNG MỘT nhà. */
+import { FILE_HANH_CHINH } from "./repo-structure.mjs";
+
 const MODULE_FILE = path.resolve(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(path.dirname(MODULE_FILE), "..");
 export const TEN_DAU = ".ark-suite-stamp.json";
@@ -55,14 +60,33 @@ export const HAN_MAC_DINH_PHUT = 30;
 export function dauCay(root = ROOT) {
   const git = (...a) => execFileSync("git", a, { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   const head = git("rev-parse", "HEAD").trim();
+  /* BỎ FILE HÀNH CHÍNH RA KHỎI BĂM — `KHUNG-15`, đo ngày 09→10/09.
+   *
+   * `.agents/claims.json` bị MỌI lane ghi lại ở mỗi lượt `--sua` / `--xong`. Nó nằm trong băm
+   * thì ở một repo có hai lane cùng làm, dấu **không bao giờ ghi được**: ba lượt chạy đủ bộ
+   * (514.8s + 524.2s + 702s = **29 phút**) không lượt nào cấp được dấu. Tệ hơn con số: cổng
+   * thấy `npm test` thoát mã ≠ 0 rồi báo *"suite gốc repo ĐỎ"* trong khi **22/22 suite xanh**
+   * — đúng triệu chứng `KHUNG-15`, và chập chờn đúng vì nó phụ thuộc lane khác có gõ trong
+   * cửa sổ 9 phút hay không.
+   *
+   * KHÔNG PHẢI NỚI. Băm trả lời *"có gì ảnh hưởng kết quả test đã đổi chưa"*, và bảng quyền
+   * không ảnh hưởng suite nào: mọi suite tự dựng bảng quyền trong fixture của nó. Repo này đã
+   * ghim đúng ý đó từ trước — `isBehaviourFile(".agents/claims.json") === false` ở
+   * `tests/core-contract.mjs`, kèm ca thật 06/09. Mọi file KHÁC vẫn băm nguyên: sửa một byte ở
+   * một file nguồn vẫn làm dấu mất hiệu lực, và `tests/dau-suite-smoke.mjs` giữ ca hỏng đó.
+   *
+   * FAIL-CLOSED KHI BỊ DÀN: `git add .agents/claims.json` thì nó vào `--cached` ở dòng dưới và
+   * dấu mất hiệu lực y như trước. Chỉ bỏ qua ở trạng thái sửa-dở-chưa-dàn. */
+  const laHanhChinh = (rel) => FILE_HANH_CHINH.includes(String(rel).replaceAll("\\", "/"));
   const hash = crypto.createHash("sha256").update("ark-tree-v2\0");
-  hash.update(git("status", "--porcelain", "-z", "-uall"));
+  hash.update(git("status", "--porcelain", "-z", "-uall")
+    .split("\0").filter(Boolean).filter((rec) => !laHanhChinh(rec.slice(3))).join("\0"));
   // Index và nội dung trên đĩa là hai thứ khác nhau; phải ghim cả hai.
   hash.update(git("diff", "--cached", "--binary", "--no-ext-diff", "--no-textconv", "HEAD"));
   const files = new Set([
     ...git("diff", "--name-only", "-z", "HEAD").split("\0"),
     ...git("ls-files", "--modified", "--others", "--exclude-standard", "-z").split("\0")
-  ].filter(Boolean));
+  ].filter(Boolean).filter((rel) => !laHanhChinh(rel)));
   for (const rel of [...files].sort()) {
     const file = path.join(root, rel);
     hash.update(JSON.stringify(rel));

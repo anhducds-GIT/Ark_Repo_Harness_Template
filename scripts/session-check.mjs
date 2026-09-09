@@ -978,6 +978,29 @@ check("Test xanh", () => {
       const raw = `${String(error.stdout || "")}${String(error.stderr || "")}` || String(error.message);
       const NL2 = String.fromCharCode(10);
       const ten = [...raw.matchAll(/──\s*(.+?)\s*\(mã\s*\d+\)\s*──/g)].map((m) => m[1].trim());
+      /* SUITE XANH MÀ BỘ CHẠY THOÁT MÃ ≠ 0 — KHÔNG được gọi là "suite đỏ". `KHUNG-15`.
+       *
+       * Đo 09→10/09: 22/22 suite xanh, `chay-test.mjs` trả mã 2 vì chưa ghi được dấu, và cổng in
+       * *"suite gốc repo ĐỎ → không đọc được TÊN suite đỏ"*. Không đọc được tên vì **không có
+       * suite nào đỏ**. Đó là kiểu hỏng tệ nhất của một cổng: nó không im lặng, nó nói sai một
+       * cách tự tin — và người đọc đi tìm một suite không tồn tại.
+       *
+       * KHÔNG PHẢI NỚI, vì nó KHÔNG thành XANH: trả `skipped` → cổng thoát mã 2 → *"CHƯA ĐỦ BẰNG
+       * CHỨNG"*, vẫn không được báo xong. Chỉ đổi LỜI: từ một lời buộc tội sai sang đúng lý do.
+       *
+       * FAIL-CLOSED hai lớp: chỉ hạ xuống `skipped` khi (a) KHÔNG bắt được tên suite đỏ nào, VÀ
+       * (b) có dòng tổng xanh tường minh do bộ chạy in ra. Thiếu một trong hai thì giữ ĐỎ như cũ
+       * — không đo được thì nói không đo được, đừng đoán về phía nhẹ hơn. */
+      const xanh = raw.match(/(\d+) passed, 0 failed, \d+ total/);
+      if (!ten.length && xanh) {
+        const viSao = (raw.match(/^[A-Z_]{4,}:.*$/m) || ["bộ chạy không nêu lý do"])[0].trim();
+        return {
+          ok: true,
+          skipped: true,
+          msg: `suite gốc repo XANH (${xanh[1]}/${xanh[1]}, 0 đỏ) nhưng bộ chạy thoát mã ≠ 0 nên KHÔNG có dấu xác nhận → ${viSao}`
+            + NL2 + "Đây KHÔNG phải suite đỏ. Chạy lại trên cây ổn định — hoặc xem lane nào đang ghi cùng lúc.",
+        };
+      }
       const moTa = ten.length
         ? `${ten.length} suite ĐỎ: ${ten.join(" · ")}`
         : `không đọc được TÊN suite đỏ từ bản ghi — đuôi: ${raw.trim().split(NL2).slice(-3).join(" | ")}`;

@@ -19,6 +19,7 @@ import { bamLenh, danhSachSuite, danhSachTuanTu, moiTruongNay, xetDau, TEN_DAU, 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let so = 0;
 const ok = (t) => { so += 1; console.log(`  ok  ${t}`); };
+const NL = String.fromCharCode(10);
 
 const CAY = { head: "a".repeat(40), bam: "b".repeat(32) };
 const LENH = bamLenh(["node tests/x.mjs", "node tests/y.mjs"]);
@@ -245,6 +246,66 @@ try {
   assert.match(gate.stderr, /TREE_CHANGED/);
   assert.equal(docDauCong(repo), null);
   ok("cây đổi trong lúc cổng chạy: không cấp bằng chứng xanh");
+  /* ---- KHUNG-15 ⑴ · BẢNG QUYỀN KHÔNG ĐƯỢC LÀM MẤT HIỆU LỰC DẤU ------------
+   *
+   * `.agents/claims.json` bị MỌI lane ghi lại ở mỗi lượt `--sua` / `--xong`. Nằm trong băm thì
+   * ở repo hai lane, dấu không bao giờ ghi được — đo 09→10/09: 29 phút chạy đủ bộ, 0 dấu.
+   * Hai vế đi liền nhau, và vế thứ hai mới là chỗ chứng minh vế đầu không phải "nới cho tiện". */
+  {
+    const truoc = dauCay(repo);
+    write(".agents/claims.json", JSON.stringify({ claims: { _root: { owner: "lane-khac", task: "dang lam" } } }));
+    assert.equal(dauCay(repo).bam, truoc.bam,
+      "bang quyen doi ma dau mat hieu luc = repo nhieu lane khong bao gio ghi duoc dau");
+    write(".agents/claims.json", JSON.stringify({ claims: { _root: { owner: null } } }));
+    assert.equal(dauCay(repo).bam, truoc.bam, "tra khoa cung khong duoc lam doi bam");
+
+    // ĐỐI CHỨNG NGƯỢC: file nguồn thì VẪN phải làm mất hiệu lực. Thiếu vế này thì một bản vá
+    // "bỏ qua tuốt" cũng qua được vế trên, và dấu thành vô nghĩa.
+    // Đọc nội dung ĐANG CÓ thay vì gõ lại: khối trên vừa chạy bộ sinh của fixture, và nó ghi
+    // vào `sample.txt`. Gõ một giá trị đoán trước là tự dựng một phép kiểm giòn.
+    const gocSample = fs.readFileSync(path.join(repo, "sample.txt"), "utf8");
+    write("sample.txt", gocSample + " + mot byte khac");
+    assert.notEqual(dauCay(repo).bam, truoc.bam, "file nguon doi thi dau PHAI mat hieu luc");
+    write("sample.txt", gocSample);
+    assert.equal(dauCay(repo).bam, truoc.bam, "tra noi dung ve thi bam ve nguyen");
+
+    // ĐỐI CHỨNG THỨ HAI: DÀN bảng quyền vào index thì hết được miễn — fail-closed.
+    write(".agents/claims.json", JSON.stringify({ claims: { _root: { owner: "da-dan" } } }));
+    git("add", ".agents/claims.json");
+    assert.notEqual(dauCay(repo).bam, truoc.bam, "bang quyen DA DAN thi khong con duoc mien");
+    git("reset", "-q", "HEAD", ".agents/claims.json");
+    write(".agents/claims.json", JSON.stringify({ claims: { _root: { owner: null } } }));
+    ok("dấu: bảng quyền KHÔNG làm mất hiệu lực · file nguồn CÓ · bảng quyền đã dàn thì CÓ");
+  }
+
+  /* ---- KHUNG-15 ⑵ · SUITE XANH KHÔNG ĐƯỢC BỊ GỌI LÀ SUITE ĐỎ ---------------
+   *
+   * Đo 09→10/09: 22/22 xanh, bộ chạy trả mã 2 vì chưa ghi được dấu, cổng in *"suite gốc repo
+   * ĐỎ → không đọc được TÊN suite đỏ"*. Không đọc được tên vì không có suite nào đỏ. */
+  {
+    write("tests/fixture.mjs", 'import fs from "node:fs";' + NL
+      + 'console.log("1 passed, 0 failed, 1 total");' + NL
+      + 'fs.writeFileSync("sample.txt", "changed during gate 2");' + NL);
+    git("add", "."); git("commit", "-qm", "xanh nhung cay doi giua luot\n\nLane: fixture");
+    const g = run("scripts/session-check.mjs", "--as", "fixture");
+    const bao = String(g.stdout) + String(g.stderr);
+    assert.doesNotMatch(bao, /suite gốc repo ĐỎ/,
+      "suite XANH ma bi goi la DO — day la loi noi sai mot cach tu tin, KHUNG-15");
+    assert.match(bao, /suite gốc repo XANH/, "phai noi ro suite xanh, va vi sao khong co dau");
+    assert.equal(g.status, 2, "van KHONG duoc bao xong: phai la CHUA DU BANG CHUNG, khong phai xanh");
+    assert.equal(docDauCong(repo), null, "khong duoc cap bang chung xanh");
+
+    // ĐỐI CHỨNG NGƯỢC: suite ĐỎ THẬT thì vẫn phải bị gọi đúng tên là ĐỎ.
+    write("tests/fixture.mjs", 'console.log("0 passed, 1 failed, 1 total");' + NL + 'process.exit(1);' + NL);
+    git("add", "."); git("commit", "-qm", "suite do that\n\nLane: fixture");
+    const gd = run("scripts/session-check.mjs", "--as", "fixture");
+    assert.match(String(gd.stdout) + String(gd.stderr), /suite gốc repo ĐỎ/,
+      "suite do THAT thi phai bi goi la DO — neu khong, ban va tren da bien moi cai do thanh 'bo qua'");
+    assert.equal(gd.status, 1, "suite do that thi cong phai DO, mã 1");
+    write("tests/fixture.mjs", 'console.log("1 passed, 0 failed, 1 total");' + NL);
+    git("add", "."); git("commit", "-qm", "tra fixture ve xanh\n\nLane: fixture");
+    ok("cổng: suite XANH mà thiếu dấu → BỎ đúng lý do · suite ĐỎ thật → vẫn ĐỎ đúng tên");
+  }
 } finally {
   assert.ok(path.resolve(fixture).startsWith(path.resolve(os.tmpdir()) + path.sep));
   fs.rmSync(fixture, { recursive: true, force: true });

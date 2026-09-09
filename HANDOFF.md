@@ -736,3 +736,38 @@ lỗi). Họ **không mất một dòng nào**, và bản của họ còn nguyê
 thế là tự tay tắt đúng cái phép kiểm mình vừa gọi.
 
 **Còn mở:** cây làm việc repo nhà đang giữ 4 file sửa dở của `harness-loi-02` — **không đụng**.
+
+### 2026-09-10 (22) · harness-loi-02 · `KHUNG-15` có gốc: dấu băm cả bảng quyền — bản 1.8.2
+
+**Đức chỉ ra 90 phút là quá dài và yêu cầu đo.** Số tự tố cáo cơ chế:
+
+| Lượt | Thời gian | Suite | Dấu | Cổng nói |
+|---|---|---|---|---|
+| `npm test` #1 | 514.8s | 22/22 xanh | không ghi được | — |
+| `npm test` #2 | 524.2s | 22/22 xanh | không ghi được | — |
+| cổng | 702s | 22/22 xanh | không ghi được | **"suite gốc repo ĐỎ"** |
+| | **29 phút** | **0 đỏ** | **0 dấu** | **1 kết luận sai** |
+
+**Gốc, hai lớp:** ⑴ `dauCay()` băm `.agents/claims.json` — file bị MỌI lane ghi lại mỗi lượt
+`--sua`/`--xong`, nên repo hai lane thì dấu **không bao giờ ghi được**. ⑵ `chay-test.mjs` trả mã 2
+khi thiếu dấu dù suite xanh; cổng thấy mã ≠ 0 rồi báo *"không đọc được TÊN suite đỏ"* — không đọc
+được vì **không có suite nào đỏ**. *Chập chờn* của `KHUNG-15` giải thích xong: phụ thuộc lane khác
+có gõ trong cửa sổ ~9 phút hay không.
+
+**ĐÍNH CHÍNH CHÍNH TÔI:** lượt (21) tôi ghi nửa này *"không đo được vì sổ cổng chỉ lưu tên phép
+kiểm"*. Sai — chỉ cần bắt lượt đỏ lúc nó đang xảy ra, và nó tới ngay phiên sau. Đã sửa `KHUNG-15`.
+
+**Tôi ĐỔI Ý giữa đường, lý do đáng ghi:** đã hứa với Đức *"cho `TREE_CHANGED` thoát mã 0"*. Đọc
+`dau-suite-smoke.mjs` thì **hai vế đã ghim đúng hành vi đó** — cây đổi giữa lượt thì KHÔNG được cấp
+dấu, và đó là chủ ý ĐÚNG. Làm theo lời hứa của tôi là **xoá một lớp bảo vệ**. Vá hẹp lại: sửa BĂM
+(bỏ file hành chính), không sửa mã thoát; cộng sửa **LỜI** của cổng.
+
+**Một nhà cho một khái niệm:** `FILE_HANH_CHINH` vào `repo-structure.mjs`, dùng chung bởi
+`build-dashboard` và `chay-test`. Repo ghim ý này từ 06/09 (`isBehaviourFile` = false) — chỉ bộ
+chạy suite chưa hề nghe.
+
+**Ghim:** `dau-suite-smoke.mjs` **14 → 16 vế**. Ba đột biến, mỗi lượt ĐỎ đúng vế của nó, kể cả
+hướng **fail-OPEN**.
+
+**Bản 1.8.2, đã vào bản trích** — cả 4 file kèm phép ghim. `KHUNG-15` + `KHUNG-53` **chờ audit độc
+lập** (Codex hết lượt tới 01:25), nên **chưa đẩy**.

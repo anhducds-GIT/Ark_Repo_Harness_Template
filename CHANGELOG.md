@@ -3,6 +3,47 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.2 — 2026-09-10 — `KHUNG-15` tìm ra gốc: dấu xác nhận băm cả bảng quyền, nên 29 phút mất trắng
+
+**Đây là bản đáng phát đi nhất trong ngày**, vì cái nó chữa thu thuế ở **mọi** repo có nhiều hơn
+một lane, và nó chữa một chỗ cổng **nói sai**.
+
+`KHUNG-15` mở từ 05/09: *"cổng báo Test xanh ĐỎ trong khi mọi suite exit 0"*, và **chập chờn**.
+Đo trọn trong một phiên 09→10/09, cả ba lượt trên cùng một cây làm việc:
+
+| Lượt | Thời gian | Suite | Dấu | Cổng nói |
+|---|---|---|---|---|
+| `npm test` #1 | 514.8s | 22/22 xanh | không ghi được | — |
+| `npm test` #2 | 524.2s | 22/22 xanh | không ghi được | — |
+| cổng đóng phiên | 702s | 22/22 xanh | không ghi được | **"suite gốc repo ĐỎ"** |
+| | **29 phút** | **0 đỏ** | **0 dấu** | **1 kết luận sai** |
+
+**Gốc bệnh, hai lớp:** ⑴ `dauCay()` băm `.agents/claims.json`, mà file đó bị **MỌI lane** ghi lại ở
+mỗi lượt `--sua` / `--xong` — nên trong repo hai lane, dấu **không bao giờ ghi được**. ⑵
+`chay-test.mjs` trả **mã 2** khi thiếu dấu dù suite xanh; cổng thấy mã ≠ 0 rồi báo *"suite gốc repo
+ĐỎ → không đọc được TÊN suite đỏ"*. Không đọc được tên vì **không có suite nào đỏ**. Và *chập chờn*
+giải thích xong: nó phụ thuộc lane khác có gõ trong cửa sổ ~9 phút hay không.
+
+**Vá ⑴ — băm bỏ FILE HÀNH CHÍNH.** Không phải luật mới: repo đã ghim đúng ý đó từ 06/09 —
+`isBehaviourFile(".agents/claims.json") === false` (`tests/core-contract.mjs`, sau ca thật commit
+`fa7e8a7`). Chỉ là `chay-test.mjs` chưa hề nghe. Nay khái niệm có **một nhà** —
+`FILE_HANH_CHINH` trong `repo-structure.mjs` — dùng chung bởi bộ đếm hành vi và bộ chạy suite, nên
+hai bản không lệch được nữa. Mọi file KHÁC vẫn băm nguyên, và **dàn** bảng quyền vào index thì hết
+được miễn.
+
+**Vá ⑵ — cổng thôi gọi một suite xanh là ĐỎ.** Nó trả **BỎ** kèm đúng lý do, nên **vẫn không được
+báo xong** (mã 2). Chỉ đổi LỜI, không đổi độ chặt. Fail-closed hai lớp: chỉ hạ xuống BỎ khi
+**không** bắt được tên suite đỏ nào **và** có dòng tổng xanh tường minh.
+
+**Ba lớp bảo vệ KHÔNG bị nới, và có ca hỏng chứng minh:** file nguồn đổi giữa lượt vẫn không được
+cấp dấu · cây đổi trong lúc cổng chạy vẫn không được cấp bằng chứng xanh · suite đỏ THẬT vẫn bị
+gọi đúng tên là ĐỎ.
+
+Ghim: `dau-suite-smoke.mjs` **14 → 16 vế**. Ba lượt đột biến trên bản chép cách ly, mỗi lượt revert
+đúng một chỗ, mỗi lượt ĐỎ đúng vế của nó — kể cả hướng **fail-OPEN**.
+
+**CHƯA QUA AUDIT ĐỘC LẬP** (Codex hết lượt tới 01:25). `KHUNG-15` và `KHUNG-53` đều để **MỞ**.
+
 ## 1.8.1 — 2026-09-09 — Cổng thôi đòi khoá VÙNG cho mọi commit; nhãn `Lane:` là câu trả lời
 
 **Vì sao có bản này:** tầng máy đổi thì **buộc** phải tăng số — `build-template.mjs` từ chối phát
