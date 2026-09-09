@@ -40,11 +40,5 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "dcc5a9d0b910315a",
-  "tam": {
-    "docs/migrations/2026-09-09-nav-platform.md": {
-      "owner": "harness-migrate-3repo",
-      "luc": "2026-09-09T17:34:57.553Z"
-    }
-  }
+  "_fingerprint": "c2525746ba92bf21"
 }
