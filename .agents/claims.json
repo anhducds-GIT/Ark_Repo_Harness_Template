@@ -91,7 +91,7 @@
     },
     "template/AGENTS.md": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T09:28:42.703Z"
+      "luc": "2026-09-09T09:53:14.706Z"
     },
     "template/README.md": {
       "owner": "harness-loi-01",
@@ -115,7 +115,15 @@
     },
     "template/docs/VI-SAO-LUAT.md": {
       "owner": "harness-loi-01",
-      "luc": "2026-09-09T09:28:42.703Z"
+      "luc": "2026-09-09T09:53:14.706Z"
+    },
+    "docs/adr/0016-hien-phap-mong.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:35:14.069Z"
+    },
+    "decisions.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T09:35:14.069Z"
     }
   }
 }

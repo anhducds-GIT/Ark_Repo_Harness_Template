@@ -608,8 +608,12 @@ function phanLuatChung(text) {
  *   đầy đủ đã ở `docs/BAN-DO-CHI-TIET.md` từ lượt trước. Và một luật ĐỔI THẬT: mở phiên đọc
  *   `STATUS.md` thay cho phần đuôi `HANDOFF.md` — ghi ở `decisions.md`.
  *   Đo: phần MỌI phiên phải nạp **4.907 → 3.202 token** cho hiến pháp, tổng nạp **5.804 → 3.761**.
+ *   Kiểm chứng độc lập: audit Codex 09/09 nêu BỐN chỗ luật bị làm yếu ở bản nén đầu — kiểm lại
+ *   thì cả bốn đúng, và đã trả lại nguyên văn (đọc luật của vùng sắp đụng · "phép kiểm hay tài
+ *   liệu" ở năm câu · quyền "vai nào cũng được tìm lỗi ở bất kỳ đâu" · "viết lại đơn giản hơn").
+ *   BÀI HỌC: nén văn xuôi làm RỤNG MỆNH LỆNH PHỤ, và người nén không thấy vì họ vẫn nhớ câu gốc.
  *   Vân tay trước: b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be */
-const COMMON_LAW_SHA256 = "e7d9bb9e7caba1c6b0a009af372f6ef3bd9d74e667f55f64c06936ad2958bfc9";
+const COMMON_LAW_SHA256 = "3a999a59dee17565d85f9ee4c29272adb8400795343bffc0cb4885cf2c4025b6";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

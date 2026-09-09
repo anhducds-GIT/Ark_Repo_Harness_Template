@@ -4,7 +4,7 @@ id: ark-repo-harness
 name: Ark Repo Harness
 lifecycle: active
 last_verified: 2026-09-09
-last_verified_commit: 4e7ba1c
+last_verified_commit: 0b3a256ac8719add20d262aca566d2285ac171e6
 last_verified_how: "npm test 22 suite xanh · cổng đóng phiên XANH TOÀN BỘ 25/25 · bản 1.5.3 đã phát"
 evidence_ref: HANDOFF.md
 owner: harness-loi-01
@@ -12,7 +12,7 @@ priority_rank: 1
 next_step: "Giữ token nạp mỗi phiên dưới vạch biên 4.200 — xem BACKLOG.md nhóm P0."
 version_source: package.json
 current_focus: "Nén luật: AGENTS.md + STATUS.md là toàn bộ phần NẠP mặc định, mọi thứ khác là Tầng 2."
-human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Trường này cố ý không giữ số: một bản gõ tay là nguồn sự thật thứ hai, và 07/09 nó đã lệch thật."
+human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Trường này cố ý không giữ số: bản gõ tay là nguồn sự thật thứ hai, và 07/09 nó đã lệch thật."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---

@@ -698,3 +698,29 @@ bản ghi việc đã xong LẪN một nguyên tắc đang sống.** Nên máy c
 **Cưỡng chế:** cổng đóng phiên, gộp vào mục *"Ngân sách trong trần"* — **không** thành mục thứ 26,
 vì thêm một phép kiểm để cưỡng chế luật chống-phình thì tự mâu thuẫn. Ghim ca đỏ thật ở
 `tests/cong-do-that.mjs` vế 14.
+
+## 2026-09-09 · Hiến pháp chỉ giữ LUẬT; mở phiên đọc `STATUS.md`, không đọc đuôi `HANDOFF.md`
+
+> **trạng thái:** đang hiệu lực — hai nguyên tắc dưới đây đang cưỡng chế ở cổng đóng phiên
+> (`budget.tokenNap`) và ở mục 0 của `AGENTS.md`.
+
+**Đức chốt hai điều.**
+
+⑴ **Ngưỡng không phải đích.** *"mục tiêu không phải đạt ngưỡng, mà phải nhỏ hơn ngưỡng margin là
+30-40%, vì sau này sẽ tiếp tục phình ra."* Trần thật giữ **6.000 token**; `budget.tokenNap` siết
+xuống **4.200** — vạch biên 30% — để cổng ĐỎ **sớm**, trước khi chạm trần.
+
+⑵ **Mở phiên đọc `STATUS.md`.** *"mục 1 đổi từ 'đọc cuối HANDOFF.md' sang 'đọc STATUS.md' …
+HANDOFF.md chuyển sang nạp khi cần."* Đuôi `HANDOFF.md` là **một lượt việc**, không phải **trạng
+thái**. Đây là điều **sửa** [ADR-0015](docs/adr/0015-context-compiler.md), ghi ở
+[ADR-0016](docs/adr/0016-hien-phap-mong.md).
+
+⑶ **Uỷ quyền thường trực:** *"tôi ủy quyền cho bạn duy trì tự động cơ chế nén rules, tái tổ chức
+và cấu tạo lại kiến trúc cho phù hợp, đạt ngưỡng đề ra hiện tại."* AI tự nén, tự dời, tự đổi cấu
+trúc — miễn đúng hướng, trong ngân sách, và **không mất nội dung thật**. Sáu việc mục 2 vẫn phải hỏi.
+
+**Số:** tổng nạp mỗi phiên **13.799 → 5.804 → 3.943 token**. Lý lẽ sang `docs/VI-SAO-LUAT.md`,
+ba luật cơ chế khoá sang `docs/protocols/MULTIFLOW.md`, cách lắp repo mới sang `README.md`.
+
+**Cái mất, và audit Codex bắt được:** nén văn xuôi làm **rụng mệnh lệnh phụ** — bốn chỗ bị làm
+yếu ở bản nén đầu, đã trả lại nguyên văn. Chi tiết ở ADR-0016.

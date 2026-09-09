@@ -6,17 +6,19 @@ ttl_days: 365
 
 # VÌ SAO có luật này — bằng chứng, và cách thêm một luật mới
 
-> **File này KHÔNG phát biểu luật.** Luật ở `AGENTS.md`, một bản duy nhất. Đây là **sổ bằng
-> chứng**: sự cố nào, ngày nào, đo được gì, đã mất gì — mở khi bạn định cãi một luật, hoặc khi
-> bạn định thêm một luật mới.
+> **File này có ĐÚNG MỘT luật, và nó là luật về việc THÊM LUẬT** — năm câu ngay dưới đây, và
+> đây là nhà duy nhất của chúng (`AGENTS.md` mục 8 chỉ trỏ sang). Phần còn lại **không phát biểu
+> luật**: nó là **sổ bằng chứng** — sự cố nào, ngày nào, đo được gì, đã mất gì — mở khi bạn định
+> cãi một luật.
 >
 > Tách ra khỏi `AGENTS.md` ngày 09/09: lý lẽ chiếm gần một nửa thứ MỌI phiên phải nạp, ở MỌI
 > repo, trong khi nó chỉ cần đọc **một lần trong đời**, lúc có người muốn đổi luật.
 
-## Năm câu phải trả lời trước khi thêm một luật
+## Năm câu phải trả lời trước khi thêm một luật, một PHÉP KIỂM hay một TÀI LIỆU
 
-Mỗi luật đều hợp lý **lúc thêm vào**. Cộng lại thì không: AI mất nửa phiên chỉ để đọc luật, luật
-mâu thuẫn nhau, đóng phiên lâu tới mức người ta bỏ qua cổng.
+Cả ba thứ, không riêng luật — một phép kiểm thừa và một tài liệu thừa cũng phình y hệt. Mỗi luật
+đều hợp lý **lúc thêm vào**; cộng lại thì không: AI mất nửa phiên chỉ để đọc luật, luật mâu thuẫn
+nhau, đóng phiên lâu tới mức người ta bỏ qua cổng.
 
 1. **Đã có chuyện gì xảy ra thật chưa?** Chưa thì đừng thêm — viết vào `BACKLOG.md` và chờ.
 2. **Nó thay chỗ cái nào?** Không thay được cái nào thì nói rõ vì sao đáng thêm hẳn.
@@ -27,9 +29,9 @@ mâu thuẫn nhau, đóng phiên lâu tới mức người ta bỏ qua cổng.
 
 ## Mục 0b — thứ tự đóng phiên
 
-Đo 08/09: đúng thứ tự cổng chạy **22 giây**, sai thứ tự **~9 phút**. Nguyên nhân: *dấu xác nhận*
-buộc vào HEAD cộng băm cây làm việc, nên cổng không phải chạy lại suite; commit sau khi chạy test
-là đổi cây, dấu hỏng, cổng chạy lại từ đầu.
+Con số đo được 08/09 nằm ở `AGENTS.md` mục 0b — **một con số một chỗ**. Đây là nguyên nhân của
+nó: *dấu xác nhận* buộc vào HEAD cộng băm cây làm việc, nên cổng không phải chạy lại suite;
+commit SAU khi chạy test là đổi cây, dấu hỏng, cổng chạy lại từ đầu.
 
 Cùng ngày, chạy bộ sinh trước khi suite xanh đã **đốt bảy số bản** — sổ phát hành cưỡng chế *một
 số một nội dung*, nên mỗi lần sinh lại là một số mới không thu hồi được.
