@@ -535,3 +535,15 @@ phải cập nhật **hai lần** vì tôi sửa `AGENTS.md` sau khi đã chốt
 chỗ, và phép kiểm *"luật trỏ tới file bản trích không mang"* bắt đúng chỗ đó.
 
 Bản **1.6.0**. `npm test` **22/22 xanh**. Bộ luật: **17 ADR · 6 chủ đề · 0 vi phạm**.
+
+### 2026-09-09 (17) · harness-loi-01 · ĐÍNH CHÍNH số nạp cuối: 3.943 → 4.002
+
+Mục (16) và [ADR-0016](docs/adr/0016-hien-phap-mong.md) ghi **3.943 token** — đúng **lúc chốt**,
+sai **lúc đóng**: sau đó tôi còn ghim thêm luật *GOM COMMIT* vào mục 0b, tốn **59 token**.
+
+**Số cuối, đo trên HEAD:** `AGENTS.md` **3.432** · `STATUS.md` **570** · **tổng nạp 4.002/4.200**.
+So mốc đầu ngày (14.696): **giảm 73%**. So trần thật 6.000 của Đức: **thấp hơn 33%**.
+
+**Không sửa đè lên hai chỗ kia, và đây là lý do đáng ghi:** thân ADR đã `Accepted` là bất biến
+(B12 chặn), `HANDOFF.md` là sổ CHỈ-THÊM. Sửa đè để con số đẹp lên chính là *"làm yếu lớp bảo vệ
+đã có"* — luật vàng 3. Sổ chỉ-thêm đính chính bằng cách **thêm**, không bằng cách tẩy.

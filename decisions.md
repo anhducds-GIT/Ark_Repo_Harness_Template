@@ -724,3 +724,14 @@ ba luật cơ chế khoá sang `docs/protocols/MULTIFLOW.md`, cách lắp repo m
 
 **Cái mất, và audit Codex bắt được:** nén văn xuôi làm **rụng mệnh lệnh phụ** — bốn chỗ bị làm
 yếu ở bản nén đầu, đã trả lại nguyên văn. Chi tiết ở ADR-0016.
+
+## 2026-09-09 · Đính chính số nạp của mục trước: 3.943 → 4.002
+
+> **trạng thái:** đã thi hành — chỉ sửa CON SỐ, không đổi quyết định nào.
+
+Mục *"Hiến pháp chỉ giữ LUẬT"* phía trên ghi tổng nạp **3.943 token**; số đó đúng lúc chốt, còn
+số **đóng phiên là 4.002** (`AGENTS.md` 3.432 + `STATUS.md` 570), vì sau đó có ghim thêm luật
+*GOM COMMIT* vào `AGENTS.md` mục 0b. Trần vẫn **4.200**, vẫn ĐẠT.
+
+Ghi bằng cách THÊM chứ không sửa đè: [ADR-0016](docs/adr/0016-hien-phap-mong.md) đã `Accepted`
+nên thân bài bất biến (B12), và `HANDOFF.md` là sổ chỉ-thêm.
