@@ -3,76 +3,42 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T14:51:16.026Z",
       "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": null,
+      "released_at": "2026-09-09T15:38:07.059Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T14:51:16.103Z",
       "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": null,
+      "released_at": "2026-09-09T15:38:07.193Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T14:51:16.177Z",
       "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": null,
+      "released_at": "2026-09-09T15:38:07.325Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-loi-01",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-09T14:51:16.257Z",
       "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": null
+      "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "tam": {
-    "scripts/claim.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:46:27.375Z"
-    },
-    "scripts/session-check.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:47:10.869Z"
-    },
-    "tests/khoa-file.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:47:10.869Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:49:36.548Z"
-    },
-    "decisions.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:49:36.548Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:49:36.548Z"
-    },
-    "docs/adr/0017-dau-niem-phong-bang-quyen.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T14:49:36.548Z"
-    },
-    "docs/BAN-DO-CHI-TIET.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T15:07:55.666Z"
-    }
-  },
-  "_fingerprint": "e5d39250218b09e2"
+  "_fingerprint": "c2525746ba92bf21"
 }
