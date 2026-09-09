@@ -55,6 +55,9 @@ SOM HON cua no.
 Cua chi thay thu **da khai vao bang quyen**: hai lane deu khong nhan khoa thi khong lop nao biet
 cua ai. **Phan nap con 6 token du** — co che tiep theo khong ghi them duoc vao `AGENTS.md`.
 
+**Viec ke da doi trong `ROADMAP-V2.md`:** `KHUNG-59` sang trang thai *da va, cho audit sach*;
+`KHUNG-50` len dau Dot 1. Sua tai cho, kho chu 3117/3117 khong doi.
+
 **`KHUNG-50` vua xay ra truoc mat:** lane khac commit `c3a85a3` TRONG LUC suite toi chay -> HEAD
 doi -> `TREE_CHANGED`, mat dau xac nhan sau 461 giay xanh. Do la viec ke.
 
