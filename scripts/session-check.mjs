@@ -97,6 +97,26 @@ const check = (name, fn) => {
   catch (error) { results.push({ name, ok: false, msg: `Phép kiểm lỗi: ${error.message}` }); }
 };
 
+/* GỘP NHIỀU PHÉP ĐO THÀNH MỘT MỤC CỔNG — Đức chốt 09/09: *"xếp hạng lại phép kiểm, giảm xuống 25,
+ * giữ trần 32"*.
+ *
+ * VÌ SAO GỘP CHỨ KHÔNG XOÁ: bỏ một phép đo là **nới một lớp bảo vệ**, và luật vàng số 3 cấm.
+ * Nhưng bốn cặp dưới đây trả lời CÙNG MỘT CÂU HỎI bằng hai mục riêng — đó là trùng lặp ở lớp
+ * BÁO CÁO, không phải hai lớp bảo vệ. Gộp lại thì số mục xuống mà **không mất một khẳng định nào**:
+ * phép đo con nào đỏ vẫn được nêu đích danh trong lời nhắn.
+ *
+ * BẤT BIẾN CỦA HÀM NÀY, và nó là chỗ dễ làm hỏng nhất: **một con đỏ thì cả mục ĐỎ**. Viết thành
+ * "đa số thắng" hay "đỏ mềm" là biến bốn lớp bảo vệ thành một lớp yếu hơn cả bốn. `skipped` chỉ
+ * giữ khi MỌI con đều skip — một con chạy thật thì mục đã có nội dung để nói. */
+const ghepKiem = (name, ...phepDo) => check(name, () => {
+  const kq = phepDo.map(([nhan, fn]) => ({ nhan, ...fn() }));
+  const do_ = kq.filter((k) => !k.ok);
+  const noiDung = (ds) => ds.map((k) => `${k.nhan}: ${k.msg}`).join(" · ");
+  if (do_.length) return { ok: false, msg: noiDung(do_) };
+  if (kq.every((k) => k.skipped)) return { ok: true, skipped: true, msg: noiDung(kq) };
+  return { ok: true, msg: noiDung(kq) };
+});
+
 /* ---- những gì đã thay đổi trong phiên này ------------------------------- */
 // "Phiên này" = mọi thứ chưa có trên origin/main: commit chưa push + working tree.
 // `--untracked-files=all` bắt Git liệt kê FILE thật. Mặc định Git co cả thư mục mới thành
@@ -298,7 +318,7 @@ const mine = (file) => myPackages.some((pkg) => file.startsWith(`${pkg}/`))
   || (areaOf(file, claimPrefixes) === "_root" && myRootAreas.includes(keyOf(file)));
 
 /* ---- 0b. Khoá mức FILE đã trả hết --------------------------------------- */
-check("Khoá file đã trả hết", () => {
+const doKhoaFile = () => {
   /* MỐC LÀ *HẾT PHIÊN*, KHÔNG PHẢI *ĐÃ ĐẨY* — và đây là chỗ khác khoá vùng, đừng lẫn.
    *
    * Khoá vùng trả SAU khi đẩy, vì commit chưa đẩy nằm trong một vùng vô chủ để lại một mục đỏ
@@ -323,10 +343,10 @@ check("Khoá file đã trả hết", () => {
       + NL1 + "Mốc là HẾT PHIÊN, không phải ĐÃ ĐẨY — nó không mang trách nhiệm truy nguồn, nhãn `Lane:` mang."
       + NL1 + `Trả hết: node scripts/claim.mjs --xong --het --as ${asLabel}`,
   };
-});
+};
 
 /* ---- 1. Chủ sở hữu ------------------------------------------------------ */
-check("Phạm vi trách nhiệm", () => {
+const doPhamVi = () => {
   if (!CLAIMS) return { ok: false, msg: "Thiếu (hoặc hỏng) .agents/claims.json — xem AGENTS.md mục 1." };
   // Package chưa khai chủ mà có thay đổi = việc mồ côi, không ai chịu trách
   // nhiệm. Đây mới là thứ cổng chặn được thật.
@@ -352,10 +372,10 @@ check("Phạm vi trách nhiệm", () => {
   const yoursList = [...myPackages, ...myRootAreas];
   const yours = yoursList.length ? yoursList.join(", ") : "(không đụng vùng nào)";
   return { ok: true, msg: `Phần của bạn: ${yours}${note}` };
-});
+};
 
 /* ---- 2. Vùng bằng chứng ------------------------------------------------- */
-check("Vùng bằng chứng không bị sửa", () => {
+const doBangChung = () => {
   // Nguồn sự thật là `.repo-structure.json`, không phải tên thư mục mà code đoán. Một repo
   // khai `records/` append-only thì `records/` phải được bảo vệ y như `evidence/`.
   const appendOnlyPrefixes = Object.entries(structure?.areas ?? {})
@@ -366,7 +386,7 @@ check("Vùng bằng chứng không bị sửa", () => {
   const violations = sessionChanges.filter((c) => mine(c.file) && inAppendOnlyArea(c.file) && /[MDR]/.test(c.code));
   if (violations.length) return { ok: false, msg: `Sửa/xoá bằng chứng vận hành: ${violations.map((v) => v.file).join(", ")}. Chỉ được THÊM mới.` };
   return { ok: true, msg: "Bằng chứng cũ nguyên vẹn." };
-});
+};
 
 /* HÀNG GIẢ TRONG FIXTURE KHÔNG PHẢI SECRET.
  *
@@ -724,7 +744,7 @@ const coDongMoi = (rel) => {
   };
 };
 
-check("HANDOFF đã ghi Log phiên này", () => {
+const doGhiLog = () => {
   const thieu = [];
   const chiSuaChoCu = [];
   let daDoiCho = 0;
@@ -762,7 +782,7 @@ check("HANDOFF đã ghi Log phiên này", () => {
     return { ok: true, msg: `Đã ghi Log, và ${daDoiCho} dòng cũ được DỜI sang kho lưu trữ (đã đối chiếu khớp byte, không dòng nào mất).` };
   }
   return { ok: true, msg: coViec ? "Đã ghi Log." : "Không có gì phải ghi." };
-});
+};
 
 /* ---- 5b. Sổ quyết định: dời chỗ thì được, XOÁ thì không ------------------
  *
@@ -780,7 +800,7 @@ check("HANDOFF đã ghi Log phiên này", () => {
  *
  * (Đừng viết mẫu đường dẫn kho lưu trữ vào khối chú thích này: dấu sao-gạch trong đó ĐÓNG luôn
  *  khối chú thích, và cả file chết ngay lúc nạp. Đã vấp thật ở lượt viết phép kiểm này.) */
-check("Sổ quyết định chỉ THÊM hoặc DỜI", () => {
+const doSoQuyetDinh = () => {
   const SO = "decisions.md";
   if (!touched.includes(SO)) return { ok: true, msg: "Phiên này không đụng sổ quyết định." };
   const so = doThemXoa(SO);
@@ -797,7 +817,7 @@ check("Sổ quyết định chỉ THÊM hoặc DỜI", () => {
     msg: `xoá ${so.xoa} dòng khỏi ${SO} mà ${thieu.length} dòng KHÔNG có bản khớp byte trong kho lưu trữ (\`*/archive/*\`)`
       + `, ví dụ: "${mau}". Quyết định cũ thì DỜI đi, đừng xoá — lượt sau còn tra được luật hiện hành đến từ đâu.`
   };
-});
+};
 
 /* ---- 6. Test ------------------------------------------------------------ */
 check("Test xanh", () => {
@@ -1170,7 +1190,7 @@ check("Nhãn lane trong commit", () => {
  * Repo chưa khai `handoff.tran_byte_moi_muc` thì phép kiểm **BỎ** (không xanh, không đỏ): nó
  * chưa kiểm được gì, và nói "xanh" ở đó là nói dối. Khác hẳn trần sổ nợ ngay dưới — ở đó không
  * khai là một lựa chọn hợp lệ, còn ở đây file nhật ký vẫn đang bị chạm mà ta không đo nổi. */
-check("HANDOFF: mục mới trong trần, file đúng tháng", () => {
+const doTranHandoff = () => {
   const files = touched.filter((f) => /(^|\/)HANDOFF\.md$/.test(f));
   if (!files.length) return { ok: true, msg: "Phiên này không chạm HANDOFF.md nào." };
   const tran = handoffCapFrom(structure);
@@ -1239,7 +1259,7 @@ check("HANDOFF: mục mới trong trần, file đúng tháng", () => {
   if (loi.length) return { ok: false, msg: loi.join(" ") };
   if (nhatKy === 0) return { ok: true, msg: `${files.length} file tên HANDOFF.md nhưng không quyển nào có phần \`## Log\` — không phải nhật ký, không kiểm.` };
   return { ok: true, msg: `${nhatKy} quyển nhật ký, ${neo} mục, mọi mục mới đều dưới trần ${tran} byte và đúng tháng.` };
-});
+};
 
 /* KHO CHỮ KHÔNG ĐƯỢC PHÌNH — THƯỚC CÓC, không phải trần lý tưởng.
  *
@@ -1266,7 +1286,7 @@ check("HANDOFF: mục mới trong trần, file đúng tháng", () => {
  * Và nó KHÔNG làm yếu lớp bảo vệ: bỏ lưu trữ ra thì con số thật là **4.001**, tức thước mới
  * CHẶT HƠN 5.744 cũ. Tên khoá giữ nguyên `tran_dong_khong_ke_adr` — đổi tên là repo đã lắp mất
  * thước trong im lặng, tệ hơn một cái tên kể thiếu. Câu in ra thì nói đủ cả hai chỗ trừ. */
-check("Kho chữ không phình", () => {
+const doKhoChu = () => {
   const tran = structure?.docs?.tran_dong_khong_ke_adr;
   if (typeof tran !== "number") {
     return { ok: true, msg: "Repo chưa khai `docs.tran_dong_khong_ke_adr` — không có thước thì không đo." };
@@ -1295,7 +1315,7 @@ check("Kho chữ không phình", () => {
       + "Ba cửa ra: xoá/gộp cho về dưới thước · chuyển phần dài sang một ADR (ADR không tính vào thước) · "
       + "nếu phần thêm là cần thiết thật thì nâng `docs.tran_dong_khong_ke_adr` VÀ nói vì sao trong nhật ký phiên."
   };
-});
+};
 
 /* TRẦN SỔ NỢ — một con số không có máy canh thì nó vỡ trong im lặng.
  *
@@ -1317,7 +1337,7 @@ check("Kho chữ không phình", () => {
  * chép một DANH SÁCH script cố định sang thư mục tạm — thiếu file này thì cổng ném lúc nạp
  * module, và test báo một câu trỏ sai chỗ ("không thấy phép kiểm HANDOFF"). Thêm kho thử mới
  * mà chép `session-check.mjs` thì chép cả `what-next.mjs`. */
-check("Sổ nợ dưới trần", () => {
+const doSoNo = () => {
   const tran = structure?.backlog?.tran;
   if (typeof tran !== "number") {
     return { ok: true, msg: "Repo chưa khai `backlog.tran` trong .repo-structure.json — không có trần thì không có gì để canh." };
@@ -1332,7 +1352,7 @@ check("Sổ nợ dưới trần", () => {
       + `ĐÓNG một mục (gạch mã: \`### ~~MÃ~~ · …\`) là cổng xanh lại; đừng nâng trần để đi tiếp. `
       + `Thấy trần thật sự quá chặt thì HỎI ĐỨC, và sửa \`backlog.tran\` trong .repo-structure.json, không sửa script.`
   };
-});
+};
 
 /* ---- chống tự tháo cổng ------------------------------------------------- */
 // Cách dễ nhất để "làm cho cổng xanh" là lặng lẽ xoá bớt một phép kiểm.
@@ -1361,7 +1381,14 @@ check("Mọi lệnh git đọc được", () => {
 // 2026-09-08, phiên claude-cua-kiem: 11 → 12. Thêm "Sổ nợ dưới trần". Đức uỷ quyền chọn con số
 // và cách cưỡng chế; lý do ở ADR-0010. Trần khai trong `.repo-structure.json`, repo không khai
 // thì phép kiểm xanh — nên bản khung phát đi không tự đặt trần cho repo nào.
-const EXPECTED_CHECKS = 16;
+/* BỐN MỤC GỘP — mỗi mục một CÂU HỎI, không phải một phép đo. Xem ghi chú ở `ghepKiem`.
+   Thứ tự trong mỗi mục là thứ tự đọc: cái chặn nặng nhất đứng trước. */
+ghepKiem("Ai đứng tên việc này", ["khoá file", doKhoaFile], ["phạm vi", doPhamVi]);
+ghepKiem("Vùng CHỈ-THÊM không bị viết lại", ["bằng chứng", doBangChung], ["sổ quyết định", doSoQuyetDinh]);
+ghepKiem("HANDOFF đã ghi Log, đúng trần, đúng tháng", ["ghi Log", doGhiLog], ["trần/tháng", doTranHandoff]);
+ghepKiem("Ngân sách trong trần", ["kho chữ", doKhoChu], ["sổ nợ", doSoNo]);
+
+const EXPECTED_CHECKS = 12;
 if (results.length !== EXPECTED_CHECKS) {
   console.error(`\nCỔNG BỊ SỬA: đang có ${results.length} phép kiểm, phải có ${EXPECTED_CHECKS}.`);
   console.error("Ai đó đã bớt (hoặc thêm) phép kiểm mà không cập nhật EXPECTED_CHECKS. Xem lại scripts/session-check.mjs.\n");

@@ -39,5 +39,39 @@
       "task": "dong cac khung",
       "released_at": "2026-09-09T04:10:21.130Z"
     }
+  },
+  "tam": {
+    "BACKLOG.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    "docs/protocols/MULTIFLOW.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    "scripts/check-bootstrap.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    "tests/cong-do-that.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    "tests/core-contract.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    },
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T04:32:31.293Z"
+    }
   }
 }

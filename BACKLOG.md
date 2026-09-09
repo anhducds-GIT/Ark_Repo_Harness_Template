@@ -126,7 +126,13 @@ cả ba **chưa có phép kiểm nào canh**. Ở repo sinh ra sổ này, một 
 được viết nhưng chưa đi theo bộ khung**. `AGENTS.md` mục 7: *luật nào máy không kiểm được thì
 sớm muộn cũng bị bỏ qua* — nên ba mục đó hiện là quy ước, không phải chốt. Vùng: `_code`.
 
-### KHUNG-6 · Danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin lời khai
+### ~~KHUNG-6~~ · ĐÓNG 09/09 · Danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin lời khai
+
+**Đức chốt 09/09: GHI RÕ GIỚI HẠN, không siết bằng chữ ký.** Đã thêm mục *"Giới hạn: bốn cơ chế
+này KHÔNG phải một lớp bảo mật"* vào `docs/protocols/MULTIFLOW.md` — nói thẳng cả bốn lớp (trả
+quyền · nhãn `Lane:` · commit thiếu nhãn · báo cáo năm dòng) đều chỉ so chuỗi, và đối tượng đe
+doạ là **nhầm lẫn**, không phải kẻ tấn công. Cái hại thật mục này chặn được là **ai đó đọc bốn
+cơ chế kia như một lớp bảo mật** — tức tin vào thứ không bảo vệ mình.
 
 > `@Đức:chốt` — chọn một: (a) chỉ GHI RÕ giới hạn vào sổ tay, hay (b) siết thật bằng chữ ký. Hai lối khác hẳn nhau về quy mô.
 
@@ -241,7 +247,13 @@ XANH**. Tức vế "bộ sinh có thật sự dùng lớp đó không" chưa có
 Ghim được vế này cần một bộ `deps` giả đầy đủ cho `collectModel` — chưa có helper nào trong
 `tests/`, nên là một lượt riêng. Ghi ra thay vì để người sau tưởng F13 đã phủ. Vùng: `_code`.
 
-### KHUNG-30 · `Project 3 AI Agent Unify` chưa nâng được — luật của CHÍNH REPO ĐÓ chặn
+### ~~KHUNG-30~~ · ĐÓNG 09/09 · `Project 3 AI Agent Unify` chưa nâng được — luật của CHÍNH REPO ĐÓ chặn
+
+**Đức chốt 09/09: ĐỂ NGUYÊN, không nâng.** Đo lại cùng ngày: nhánh **thôi lệch** (trước *5 sau /
+48 trước*, nay **0 sau / 63 trước**), nhưng luật *Cloud Sync Hold* (mục 8A của chính repo đó) vẫn
+còn. Phiên AI ở đó **DỪNG đúng luật của nó** — đó là hành vi ĐÚNG, không phải thất bại, và bộ
+khung dựng lên chính để luật repo đích không bị bỏ qua khi bất tiện. Repo này **cố ý đứng ngoài
+nhịp nâng**. Muốn nâng thì Đức gỡ 8A ở repo đó trước; AI không sửa luật của repo khác.
 
 > **CHỜ NGƯỜI CHỐT:** `@Đức:chốt` — nhánh đang lệch `origin/main` **5 sau / 48 trước**. Nâng bộ khung trên một
 > nhánh lệch xa như thế là quyết định của Đức, không phải của AI.
@@ -349,6 +361,23 @@ là quyết cái nào phổ quát (vào bộ khung) và cái nào chỉ đúng �
 | ③ | chốt máy cưỡng chế được | **26** (11 cổng đóng phiên + 15 cấu trúc) · 16 file test | |
 | ④ | tài liệu | **8.672 dòng** (12.329 kể cả bản trích + lưu trữ) | trần đang khai 2.200 → **vượt 3,9×** |
 | ⑤ | sổ nợ đang mở | **15** mục / 39 tổng | 62% quyển sổ là việc đã đóng |
+
+**ĐO LẠI 2026-09-09 — số cũ ở bảng trên là của 07/09 và đã ôi. Đây là số để chốt:**
+
+| # | Đo gì | 07/09 | **09/09** |
+|---|---|---|---|
+| ① | commit 7 ngày chỉ chạm giấy tờ | 69% | **67%** (303/447) |
+| ② | luật-là-chữ | 1.254 dòng | **1.305** (AGENTS 243 + 4 protocol 1.062) |
+| ③ | chốt máy cưỡng chế | 26 · 16 file test | **32** (16 cổng phiên + 16 cấu trúc) · **21** file test |
+| ④ | tài liệu | 8.672 / trần 2.200 = **3,9×** | **3.602 / 2.200 = 1,6×** |
+| ⑤ | sổ nợ đang mở | 15 / 39 tổng (62% đã đóng) | **20 / 20** (0% đã đóng — đã dời sang kho) |
+
+**Tỉ lệ luật/chốt: 1.305 ÷ 32 = 41 dòng văn mỗi cơ chế** (trước 48). Số ④ tụt 3,9× → 1,6× KHÔNG
+phải vì cắt chữ, mà vì `can-nang` trước đó đếm cả `docs/adr/` — thứ luật bắt BẤT BIẾN, tức nó
+đếm một khoản nợ không ai được phép trả. Đã dùng chung danh sách trừ với cổng.
+
+**Ba trong năm số nay ĐẠT hoặc gần đạt.** Còn đúng hai chỗ cần Đức đặt số: **④ tài liệu**
+(3.602 / 2.200) và **③ số phép kiểm** (32 / 30). Cả hai là *đổi luật an toàn* — mục 2 hàng 6.
 
 **Tỉ lệ luật/chốt: 1.254 ÷ 26 = 48 dòng văn cho mỗi cơ chế thật.** Repo tiêu thụ là 71. Cùng một
 hình dạng bệnh, nhẹ hơn — nhưng 69% commit chỉ chạm giấy tờ thì bộ khung **không được miễn**.

@@ -257,9 +257,12 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   /* DANH SACH NAY GO CUNG LA CO Y: them mot ma vao `bootstrap.blocking` la SIET mot lop bao ve,
      va bot mot ma la NOI. Ca hai deu phai la hanh dong co y thuc, khong duoc troi qua trong mot
      luot sua khac. Doi danh sach thi doi luon o day, kem mot dong noi vi sao.
+     09/09 (2): B5 va B7 GOP vao B2 — ba ma cu la cung mot ham goi ba lan tren cung mot bo kiem
+     tra STATUS. Khong bot lop bao ve nao: moi finding van giu tag rieng. Cai MAT: `blocking` nay
+     chi bat/tat duoc ca cum.
      09/09: them B16 (bo bien dich luat) — thieu `chu_de` hay chu de khong co dau moi thi CHAN,
      khong chi canh bao. Ly do o ADR-0014: mot canh bao ve luat thi bon ngay nua khong ai doc. */
-  const CHAN = ["B1", "B2", "B3", "B4", "B5", "B7", "B10", "B12", "B16"];
+  const CHAN = ["B1", "B2", "B3", "B4", "B10", "B12", "B16"];
   const dangChan = [...blockingCodes(createBootstrapDeps(ROOT))];
   assert.deepEqual(dangChan.sort(), [...CHAN].sort(),
     "repo nha PHAI bat dung tam ma chan — danh sach rong nghia la CI khong the do vi cau truc");

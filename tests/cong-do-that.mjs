@@ -71,7 +71,7 @@ function docMuc(kho, ten, as = "thu") {
   const { cha, kho, at } = khoNen();
   try {
     // Đối chứng: chưa phá gì thì phải XANH — nếu không, mọi khẳng định "đỏ" dưới đây vô nghĩa.
-    assert.equal(docMuc(kho, "Phạm vi trách nhiệm").trangThai, "XANH", "nen phai xanh truoc da");
+    assert.equal(docMuc(kho, "Ai đứng tên việc này").trangThai, "XANH", "nen phai xanh truoc da");
     // Phá: bỏ chủ khỏi mọi vùng, rồi sửa một file. Việc không ai đứng tên.
     const c = JSON.parse(readFileSync(join(kho, ".agents", "claims.json"), "utf8"));
     for (const k of Object.keys(c.claims)) c.claims[k].owner = null;
@@ -79,7 +79,7 @@ function docMuc(kho, ten, as = "thu") {
     writeFileSync(join(kho, "docs", "a.md"), "# a doi roi" + NL, "utf8");
     at("add", "-A");
     at("commit", "-q", "-m", "sua ma khong ai dung ten" + NL + NL + "Lane: thu");
-    const m = docMuc(kho, "Phạm vi trách nhiệm");
+    const m = docMuc(kho, "Ai đứng tên việc này");
     assert.equal(m.trangThai, "ĐỎ", `viec khong ai dung ten phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.match(m.chiTiet, /chưa ai đứng tên|chưa khai chủ/, "phai noi ro vi sao");
   } finally { rmSync(cha, { recursive: true, force: true }); }
@@ -90,19 +90,19 @@ function docMuc(kho, ten, as = "thu") {
 {
   const { cha, kho, at } = khoNen();
   try {
-    assert.equal(docMuc(kho, "Vùng bằng chứng").trangThai, "XANH", "nen phai xanh truoc da");
+    assert.equal(docMuc(kho, "Vùng CHỈ-THÊM").trangThai, "XANH", "nen phai xanh truoc da");
     // THÊM file vào vùng chỉ-thêm là HỢP LỆ. Không có vế này thì một phép kiểm chặn tuốt cũng
     // qua được khối dưới, và ta sẽ tưởng nó đúng.
     writeFileSync(join(kho, "evidence", "moi.txt"), "them moi thi hop le" + NL, "utf8");
     at("add", "-A");
     at("commit", "-q", "-m", "them bang chung moi" + NL + NL + "Lane: thu");
-    assert.equal(docMuc(kho, "Vùng bằng chứng").trangThai, "XANH",
+    assert.equal(docMuc(kho, "Vùng CHỈ-THÊM").trangThai, "XANH",
       "THEM file vao vung chi-them la hop le — chan cai nay la chan oan");
 
     writeFileSync(join(kho, "evidence", "cu.txt"), "da bi sua" + NL, "utf8");
     at("add", "-A");
     at("commit", "-q", "-m", "sua bang chung cu" + NL + NL + "Lane: thu");
-    const m = docMuc(kho, "Vùng bằng chứng");
+    const m = docMuc(kho, "Vùng CHỈ-THÊM");
     assert.equal(m.trangThai, "ĐỎ", `sua file trong vung chi-them phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.match(m.chiTiet, /cu\.txt/, "phai ke dung file bi sua");
   } finally { rmSync(cha, { recursive: true, force: true }); }
@@ -318,7 +318,7 @@ function docMuc(kho, ten, as = "thu") {
     catVaGhiLog();
     at("add", "-A");
     at("commit", "-q", "-m", "cat nhat ky, khong luu tru" + NL + NL + "Lane: thu");
-    let m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    let m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "ĐỎ",
       `xoa dong ma khong co ban luu tru phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.match(m.chiTiet, /kho lưu trữ/,
@@ -333,7 +333,7 @@ function docMuc(kho, ten, as = "thu") {
       nhatKy(CU.slice(0, 10).map((d, i) => i === 3 ? d.replace("chu", "chU") : d)), "utf8");
     at("add", "-A");
     at("commit", "-q", "-m", "luu tru lech mot ky tu" + NL + NL + "Lane: thu");
-    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "ĐỎ",
       `ban luu tru lech MOT KY TU phai van DO, dang: ${m.trangThai} — ${m.chiTiet}`);
 
@@ -341,7 +341,7 @@ function docMuc(kho, ten, as = "thu") {
     writeFileSync(join(kho, "docs", "archive", "cu.md"), nhatKy(CU.slice(0, 10)), "utf8");
     at("add", "-A");
     at("commit", "-q", "-m", "luu tru khop byte" + NL + NL + "Lane: thu");
-    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "XANH",
       `doi cho co doi chieu khop byte phai XANH, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.match(m.chiTiet, /DỜI/,
@@ -359,7 +359,7 @@ function docMuc(kho, ten, as = "thu") {
     chamViec();
     at("add", "-A");
     at("commit", "-q", "-m", "sua dong cu tai cho" + NL + NL + "Lane: thu");
-    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "ĐỎ",
       `sua dong CU tai cho van phai DO — ban va KHUNG-25 khong duoc lam mat phep kiem goc, dang: ${m.chiTiet}`);
 
@@ -370,7 +370,7 @@ function docMuc(kho, ten, as = "thu") {
     chamViec();
     at("add", "-A");
     at("commit", "-q", "-m", "xoa sach khong them gi" + NL + NL + "Lane: thu");
-    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "ĐỎ", `khong them dong nao phai DO, dang: ${m.chiTiet}`);
     assert.match(m.chiTiet, /KHÔNG thêm dòng nào/,
       "phai noi dung ly do: chua ghi Log — khac han ly do 'xoa mat chu'");
@@ -394,7 +394,7 @@ function docMuc(kho, ten, as = "thu") {
     chamViec();
     at("add", "-A");
     at("commit", "-q", "-m", "dich cho mot dong" + NL + NL + "Lane: thu");
-    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "XANH",
       `dong DICH CHO trong cung file KHONG phai dong bi xoa — cong khong duoc bat oan, dang: ${m.chiTiet}`);
 
@@ -404,7 +404,7 @@ function docMuc(kho, ten, as = "thu") {
     chamViec();
     at("add", "-A");
     at("commit", "-q", "-m", "xoa han dong do" + NL + NL + "Lane: thu");
-    m = docMuc(kho, "HANDOFF đã ghi Log phiên này");
+    m = docMuc(kho, "HANDOFF đã ghi Log");
     assert.equal(m.trangThai, "ĐỎ",
       `xoa HAN mot dong (khong con trong file, khong co trong kho) VAN phai DO, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
@@ -435,20 +435,20 @@ function docMuc(kho, ten, as = "thu") {
     writeFileSync(join(kho, "BACKLOG.md"), soNo(["### KHUNG-1 · a", "### KHUNG-2 · b", "### KHUNG-3 · c"]), "utf8");
     datTran(5);
     luot("so no ba muc");
-    let m = docMuc(kho, "Sổ nợ dưới trần");
+    let m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH", `3 muc / tran 5 phai XANH, dang: ${m.chiTiet}`);
 
     // ⑴ Hạ trần xuống 2 → ĐỎ. Phá đúng một thứ: con số, không đụng sổ.
     datTran(2);
     luot("ha tran xuong 2");
-    m = docMuc(kho, "Sổ nợ dưới trần");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "ĐỎ", `3 muc / tran 2 phai DO, dang: ${m.chiTiet}`);
     assert.ok(m.chiTiet.includes("SO_NO_VUOT_TRAN"), `thieu ma loi SO_NO_VUOT_TRAN: ${m.chiTiet}`);
 
     // ⑵ Đóng một mục đúng quy ước sổ (gạch mã) → XANH lại, KHÔNG phải nâng trần.
     writeFileSync(join(kho, "BACKLOG.md"), soNo(["### ~~KHUNG-1~~ · a", "### KHUNG-2 · b", "### KHUNG-3 · c"]), "utf8");
     luot("dong KHUNG-1 dung quy uoc");
-    m = docMuc(kho, "Sổ nợ dưới trần");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH",
       `dong mot muc bang cach GACH MA phai lam cong xanh lai — neu khong, cua ra bi bit va nguoi ta se thao cong. Dang: ${m.chiTiet}`);
 
@@ -456,7 +456,7 @@ function docMuc(kho, ten, as = "thu") {
     writeFileSync(join(kho, "BACKLOG.md"), soNo(["### KHUNG-1 · a", "### KHUNG-2 · b", "### KHUNG-3 · c"]), "utf8");
     datTran(null);
     luot("bo khai tran");
-    m = docMuc(kho, "Sổ nợ dưới trần");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH", `khong khai backlog.tran thi phai XANH, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("10 · trần sổ nợ: vượt trần ĐỎ · gạch mã một mục XANH lại · repo không khai trần XANH");
@@ -483,26 +483,26 @@ function docMuc(kho, ten, as = "thu") {
     viet("docs/mot.md", 20);
     datThuoc(100);
     luot("kho chu 20 dong");
-    let m = docMuc(kho, "Kho chữ không phình");
+    let m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH", `20 dong / thuoc 100 phai XANH, dang: ${m.chiTiet}`);
 
     // ⑴ Vượt thước → ĐỎ.
     viet("docs/hai.md", 200);
     luot("them 200 dong van xuoi");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "ĐỎ", `220 dong / thuoc 100 phai DO, dang: ${m.chiTiet}`);
     assert.ok(m.chiTiet.includes("KHO_CHU_PHINH"), `thieu ma loi KHO_CHU_PHINH: ${m.chiTiet}`);
 
     // ⑵ Xoá cho về dưới thước → XANH lại. Cửa ra phải mở, nếu không cổng sẽ bị tháo.
     at("rm", "-q", "-f", "docs/hai.md");
     luot("xoa bot");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH", `xoa cho ve duoi thuoc phai XANH lai, dang: ${m.chiTiet}`);
 
     // ⑶ ADR KHÔNG tính — thêm 500 dòng ADR vẫn phải XANH.
     viet("docs/adr/0001-mot-quyet-dinh.md", 500);
     luot("them mot ADR dai");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH",
       `ADR la bat bien nen KHONG duoc tinh vao thuoc — neu tinh, moi quyet dinh moi lam cong do. Dang: ${m.chiTiet}`);
 
@@ -518,12 +518,12 @@ function docMuc(kho, ten, as = "thu") {
     viet("docs/dai.md", 300);
     datThuoc(100);
     luot("them 300 dong lam vuot thuoc");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "ĐỎ", `320 dong / thuoc 100 phai DO truoc khi doi, dang: ${m.chiTiet}`);
     mkdirSync(join(kho, "docs", "archive"), { recursive: true });
     at("mv", "docs/dai.md", "docs/archive/dai.md");
     luot("DON: doi sang luu tru, khong xoa mot chu nao");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH",
       `doi chu sang docs/archive/ la nhip DON ma repo BAT lam — cong khong duoc DO vi no. Dang: ${m.chiTiet}`);
 
@@ -534,7 +534,7 @@ function docMuc(kho, ten, as = "thu") {
      * ngay sau lượt vá cho lưu trữ. Ba thư mục, một luật, khai ở `THU_MUC_DOCS_KHONG_TINH`. */
     viet("docs/migrations/2026-01-01-mot-luot.md", 400);
     luot("them mot ho so migrate dai");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH",
       `ho so migrate la ban ghi chi-them, khong duoc tinh vao thuoc. Dang: ${m.chiTiet}`);
 
@@ -542,7 +542,7 @@ function docMuc(kho, ten, as = "thu") {
     viet("docs/ba.md", 900);
     datThuoc(null);
     luot("bo khai thuoc");
-    m = docMuc(kho, "Kho chữ không phình");
+    m = docMuc(kho, "Ngân sách trong trần");
     assert.equal(m.trangThai, "XANH", `khong khai thuoc thi phai XANH, dang: ${m.chiTiet}`);
   } finally { rmSync(cha, { recursive: true, force: true }); }
   ok("11 · thước cóc kho chữ: phình ĐỎ · xoá XANH lại · ADR/lưu-trữ/hồ-sơ-migrate KHÔNG tính · DỜI sang lưu trữ XANH lại · không khai thước XANH");
@@ -610,13 +610,13 @@ function docMuc(kho, ten, as = "thu") {
     // Doi chung: chi THEM -> XANH. Chua xanh o day thi moi khang dinh duoi la vo nghia.
     writeFileSync(join(kho, "decisions.md"), so(["## 2026-02-02 · quyet dinh moi", "", "Duc chot: doi."]), "utf8");
     luot("them mot quyet dinh");
-    let m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    let m = docMuc(kho, "Vùng CHỈ-THÊM");
     assert.equal(m.trangThai, "XANH", `chi THEM phai XANH, dang: ${m.chiTiet}`);
 
     // ⑴ Xoa han quyet dinh cu, KHONG co kho luu tru nao -> phai DO.
     writeFileSync(join(kho, "decisions.md"), ["# Quyet dinh", "", "## 2026-02-02 · quyet dinh moi", "", "Duc chot: doi."].join(NL) + NL, "utf8");
     luot("xoa quyet dinh cu, khong luu tru");
-    m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    m = docMuc(kho, "Vùng CHỈ-THÊM");
     assert.equal(m.trangThai, "ĐỎ", `xoa ma khong luu tru phai DO, dang: ${m.trangThai} — ${m.chiTiet}`);
     assert.ok(/kho lưu trữ/.test(m.chiTiet),
       `loi nhan phai chi dung cho phai sua (kho luu tru), khong noi chung chung: ${m.chiTiet}`);
@@ -626,14 +626,14 @@ function docMuc(kho, ten, as = "thu") {
     writeFileSync(join(kho, "docs", "archive", "qd-cu.md"),
       BA_DONG.join(NL).replace("giu nguyen", "giu nguyenX") + NL, "utf8");
     luot("luu tru lech mot ky tu");
-    m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    m = docMuc(kho, "Vùng CHỈ-THÊM");
     assert.equal(m.trangThai, "ĐỎ",
       `ban luu tru LECH MOT KY TU van phai DO — khong thi ai cung lach bang mot file rong. Dang: ${m.chiTiet}`);
 
     // ⑶ Sua cho khop byte -> XANH lai. Cua ra phai mo, khong thi khong ai dam don so.
     writeFileSync(join(kho, "docs", "archive", "qd-cu.md"), BA_DONG.join(NL) + NL, "utf8");
     luot("luu tru khop byte");
-    m = docMuc(kho, "Sổ quyết định chỉ THÊM hoặc DỜI");
+    m = docMuc(kho, "Vùng CHỈ-THÊM");
     assert.equal(m.trangThai, "XANH",
       `doi dung chu (khop byte) phai XANH lai — cong chan ca luot don dung luat thi luat tu chet. Dang: ${m.chiTiet}`);
     ok("13 · sổ quyết định: chỉ thêm XANH · xoá mất hẳn ĐỎ · lưu trữ lệch một ký tự vẫn ĐỎ · dời khớp byte XANH lại");
