@@ -135,7 +135,7 @@ Rồi ghi **đúng một việc kế** vào `STATUS.md` (hoặc chỗ repo này 
 2. **Không sửa cổng kiểm cho nó xanh.** Cổng đỏ là thông tin. Sửa bug được; gỡ bảo vệ thì không.
 3. **Không xoá file, không sửa dữ liệu gốc, không đụng vùng khai `append-only`.**
 4. **Không tạo automation tự chạy** khi người chốt chưa duyệt tường minh.
-5. **Không đẩy kèm commit của phiên khác** (`--carry`) — phải hỏi người chốt.
+5. **`--carry` (đẩy kèm commit phiên khác): điều kiện ở `AGENTS.md` mục 2 hàng 2 của repo đích, đọc ở đó.** Đừng nhớ theo câu này — luật đó đã đổi một lần và bản chép ở đây sai mất bốn ngày.
 
 Ngoài năm việc này, tự làm. Nguyên tắc phía sau: **tự do trong phạm vi làm repo tốt lên và lùi lại
 được. Cái gì không lùi lại được, hoặc chạm việc người khác, thì hỏi.**

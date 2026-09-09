@@ -31,19 +31,16 @@ thẳng cái gì đang có răng và cái gì chưa:
 | Mục 4 — luật nạp báo cáo năm mục | **chưa có** |
 | Mục 5b — không dừng vì chuyện commit | **không kiểm được** — xem ghi chú dưới mục đó |
 
-Ở repo nơi sổ này sinh ra, một phép kiểm cho firewall **đã được viết** nhưng **chưa đi theo bộ
-khung**. Nên ở đây ba mục trên là **quy ước có lý do**, không phải chốt tự chặn. Đừng đọc chúng
-như thể máy đang canh — và nếu repo bạn dựa vào chúng thật thì việc đầu tiên đáng làm là viết
-phép kiểm cho chúng.
+Ba mục ghi **chưa có** là **quy ước có lý do**, không phải chốt tự chặn — đừng đọc chúng như thể
+máy đang canh. Repo nào dựa vào chúng thật thì việc đầu tiên đáng làm là viết phép kiểm cho chúng.
 
-**Hai lệnh ở mục 1b ĐÃ đi theo bản trích `template/` từ bản 1.3.0** — cả hai file lệnh, cả hai
-dòng khai trong `package.json`, và phép ghim `tests/assistant-smoke.mjs`. Repo dựng từ bản trích
-chạy được ngay, không phải sửa gì.
-Câu ở chỗ này trước đây nói ngược lại và **đã sai kể từ 1.3.0**; nó được sửa ngày 05/09 sau khi
-đo lại bản trích. Ghi ra vì đó là bài học lặp: một dòng cảnh báo đúng lúc viết sẽ tự hoá thành
-lời nói dối khi thứ nó cảnh báo được vá — mà không ai đi sửa lại lời cảnh báo.
-Luật vẫn giữ: chạy thử trước khi dạy người khác chạy. Một sổ tay trỏ tới một lệnh không chạy
-được thì nó không phải luật, nó là chữ.
+**Hai lệnh ở mục 1b ĐÃ đi theo bản trích `template/` từ bản 1.3.0** — cả hai file lệnh, dòng khai
+trong `package.json`, và phép ghim `tests/assistant-smoke.mjs`. Repo dựng từ bản trích chạy ngay.
+
+**Bài học lặp — file này đã mắc BA lần**, và cả ba đều là bản CHÉP của một luật có nhà ở
+`AGENTS.md`: ⑴ câu ngay chỗ này từng nói ngược, sai từ 1.3.0 · ⑵ mục 5b khẳng định *"`--carry`
+phải hỏi"*, sai từ 09/09 · ⑶ mục 2 viết luật song song dạng *"khi và chỉ khi"*, hẹp hơn luật thật
+từ 08/09. Một câu đúng lúc viết tự hoá thành lời nói dối khi thứ nó mô tả được vá. **Trỏ sang, đừng chép.**
 
 ## 0. Vai này là gì, và không là gì
 
@@ -133,8 +130,10 @@ tầng xử, và đừng lấy attention của người chốt.
 
 ## 2. Luật song song — một câu, không suy diễn thêm
 
-> **Hai việc chạy song song được KHI VÀ CHỈ KHI chúng thuộc hai khoá khác nhau, và cả hai khoá
-> đang trống.**
+> **Hai khoá khác nhau và cả hai đang trống → chắc chắn song song được.** Đó là điều `what-next`
+> cưỡng chế, và nó **hẹp hơn** luật thật: từ 08/09 mặc định là khoá mức FILE nên hai việc **cùng
+> vùng mà khác file** cũng song song được (đo: **57%** lượt chặn theo vùng là chặn oan). Bản đồ
+> không biết trước một việc sẽ đụng file nào, nên nó trả lời **an toàn**, không trả lời **đủ**.
 
 Vùng của một việc **suy từ đường dẫn**, không ai khai tay: một mục nợ nằm trong sổ nợ của đơn vị
 nào thì thuộc khoá của đơn vị đó, theo khối `areas` trong `.repo-structure.json`. Bảng quyền chia
@@ -149,8 +148,9 @@ hai lần.
 
 Ba điều KHÔNG được làm khi chia luồng:
 
-1. **Đừng hứa song song trên một khoá.** Hai việc cùng khoá thì phải xếp hàng, kể cả khi chúng
-   đụng hai file khác nhau — `AGENTS.md` mục 1: một khoá một phiên.
+1. **Đừng hứa song song dựa trên bản đồ khi hai việc cùng khoá.** Chúng *có thể* song song bằng
+   khoá file, nhưng bản đồ không chứng minh được điều đó — nói "được" là hứa hộ một phép đo chưa
+   ai làm. Muốn chắc thì đọc hai việc, xem chúng đụng file nào.
 2. **Đừng đọc trường phạm vi của sổ ý tưởng như bằng chứng.** Nó là văn xuôi người viết, nên bảng
    in nó kèm nhãn "dò". Dò theo tên trong một repo đã cho kết luận sai bốn lần trong một ngày.
 3. **Đừng coi vùng trống là việc.** Trống cộng không việc mở bằng không có gì để giao.
@@ -352,11 +352,11 @@ việc đang chạy.
 là đẩy khi chưa đọc kết quả cổng. `AGENTS.md` mục 2 vẫn đòi **XANH TOÀN BỘ** trước lượt đẩy, và
 việc **dở dang** thì vẫn không đẩy. Mục này gỡ cái **chờ vô ích**, không gỡ cái **chốt**.
 
-**Một điều KHÔNG kéo về, dù bản gốc có.** Repo đã sinh ra luật này còn cho `--carry` khỏi phải
-hỏi, dựa trên một quyết định thường trực của người chốt bên đó. Bộ khung **giữ nguyên** `AGENTS.md`
-mục 2 hàng 2: đẩy kèm commit của phiên khác thì **phải hỏi**. Quyết định thường trực là của một
-người ở một repo, không đi theo bộ khung — chép nó sang là bộ khung tự cho mình một cái phép mà
-người chốt của repo này chưa hề cho.
+**`--carry` — đừng đọc mục này, đọc `AGENTS.md` mục 2 hàng 2.** Bản trước ở đây khẳng định *"đẩy
+kèm commit của phiên khác thì **phải hỏi**"*, và câu đó **đã sai từ 09/09**: người chốt của repo
+này chốt cho `--carry` tự làm khi cổng XANH TOÀN BỘ và mọi commit quy thuộc được. Sổ tay này giữ
+một bản chép của luật đó nên nó **trôi lệch trong im lặng** — đúng thứ luật mục 2 cấm: *bản duy
+nhất, file khác chỉ được trỏ sang*.
 
 **Vì sao vai này nghiêm hơn mọi vai khác:** mọi việc đi qua một cửa. Executor dừng thì một lane
 dừng; **điều phối dừng thì cả hàng dừng**.

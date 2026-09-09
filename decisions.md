@@ -679,3 +679,28 @@ thôi mang số); ⑵ ghim **F21** ở `core-contract` — mọi khẳng định
 vế"* là khẳng định đó **rơi ra khỏi tập đo** và phép kiểm vẫn xanh — mà *"chín vế"* đúng là một
 trong sáu con số sai. **Một phép kiểm chừa ca hỏng của chính nó là đồ trang trí.** Nới ra đọc cả
 số viết bằng chữ thì nó bắt ngay con số sai **thứ sáu** mà tôi chưa hề biết.
+
+## 2026-09-09 · Sổ tay vai điều phối chép luật, và bản chép trôi lệch ba lần
+
+**Rà `ORCHESTRATOR.md`** (464 dòng, file tài liệu lớn nhất) theo đúng luật vừa dựng. Không tìm lỗi
+diễn đạt — tìm **bản chép của luật có nhà ở nơi khác**.
+
+**Ba chỗ, đều là bản chép, đều đã sai:**
+
+1. **Mục 5b** khẳng định *"đẩy kèm commit của phiên khác thì **phải hỏi**"* — sai từ 09/09, khi
+   Đức chốt cho `--carry` tự làm nếu cổng XANH TOÀN BỘ và mọi commit quy thuộc được.
+2. **Mục 2** viết luật song song dạng *"KHI VÀ CHỈ KHI hai khoá khác nhau"* — **hẹp hơn luật thật**
+   từ 08/09: mặc định là khoá mức FILE nên hai việc cùng vùng khác file cũng song song được.
+   Bản đồ việc trả lời **an toàn**, không trả lời **đủ** — và câu cũ đọc thành "cùng vùng thì cấm".
+3. **Khối cảnh báo đầu file** từng nói ngược về hai lệnh của vai này, sai từ 1.3.0 tới 05/09.
+
+**Và ca thứ tư ở file khác:** `docs/briefs/ONBOARD-AI-REPO-DICH.md` — **đề bài giao cho AI ở repo
+đích** — cũng chép luật `--carry` cũ. Hai trong bốn ca nằm trong **đề bài giao cho AI khác**, tức
+chỗ bản chép sai lan xa nhất.
+
+**Chốt:** cả bốn chỗ **thôi chép, chỉ trỏ**. Ghim mở rộng **F20**: một **đoạn văn** nhắc `--carry`
+thì phải nhắc cả `AGENTS.md` — phát biểu luật một mình là không được.
+
+**Bài học về phép đo, lặp lại lần thứ ba trong ngày:** bản đầu đo theo **dòng** và báo lệch hai chỗ
+lành (một bảng đối chiếu kỹ thuật, một dòng NỐI của đoạn đã trỏ đúng). Đo theo **đoạn** thì sạch.
+Phép đo chặt hơn thực tế cũng nguy như phép đo lỏng hơn — người ta sẽ tắt nó.

@@ -1237,3 +1237,27 @@ luật phải khớp thực tế) · `tests/rule-compiler.mjs` 8 vế + `B16`.
 
 **Còn mở:** sổ nợ 20 mục, **6 chờ Đức** (`KHUNG-6` · `11` · `14` · `30` · `37` · `40`).
 `ORCHESTRATOR.md` chưa rà sâu — vấn đề của nó đã có mục nợ `KHUNG-4` nên không mở mục mới.
+
+### 2026-09-09 (9) · harness-loi-01 · Rà ORCHESTRATOR.md — ba bản chép luật đều đã sai
+
+**Làm gì:** rà file tài liệu lớn nhất (464 dòng) theo luật vừa dựng — không tìm lỗi diễn đạt, tìm
+**bản chép của luật có nhà ở nơi khác**.
+
+**Số — ba chỗ, cộng một chỗ ở file khác:** ⑴ mục 5b nói *"`--carry` phải hỏi"*, sai từ 09/09;
+⑵ mục 2 viết luật song song dạng *"khi và chỉ khi"*, **hẹp hơn luật thật** từ 08/09 (khoá file cho
+phép hai việc cùng vùng khác file chạy song song); ⑶ khối cảnh báo đầu file từng nói ngược, sai
+1.3.0→05/09; ⑷ `docs/briefs/ONBOARD-AI-REPO-DICH.md` cũng chép luật `--carry` cũ. **Hai trong bốn
+ca nằm trong ĐỀ BÀI GIAO CHO AI KHÁC** — chỗ bản chép sai lan xa nhất.
+
+**Ghim:** mở rộng **F20** — một **đoạn văn** nhắc `--carry` phải nhắc cả `AGENTS.md`. Đang đo 4
+đoạn. Một đột biến đã chạy: trả `ONBOARD` về câu cũ → F20 nêu đúng tên file.
+
+**Bài học về phép đo, lần thứ ba trong ngày:** bản đầu của vế này đo theo DÒNG và báo lệch hai chỗ
+LÀNH (một bảng đối chiếu kỹ thuật, một dòng NỐI của đoạn đã trỏ đúng). Đo theo ĐOẠN thì sạch. Phép
+đo **chặt hơn** thực tế cũng nguy như **lỏng hơn** — người ta sẽ tắt nó.
+
+**Trả giá đúng luật mục 8:** kho chữ giữ nguyên **3.185/3.185**. Phần thêm ở `ORCHESTRATOR.md`
+được trả bằng cách nén hai khối cũ trong chính file đó. Bản **1.3.90**.
+
+**KHÔNG mở mục nợ mới:** ba luật của vai này vẫn chưa có phép kiểm máy — đó là `KHUNG-4`, đã có
+mục, không nhân thêm. Bảng "có răng chưa" ở đầu file vẫn đúng: **1 trong 5** mục có phép kiểm.

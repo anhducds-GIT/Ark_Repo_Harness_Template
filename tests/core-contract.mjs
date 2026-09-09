@@ -11,7 +11,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, cpSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync, cpSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -970,7 +970,37 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   const neuRa = Object.keys(gia).filter((f) => NHAC(gia[f]).cu && !NHAC(gia[f]).moi);
   assert.deepEqual(neuRa, ["gia/a.md"],
     "phep loc phai neu file day mot nua VA khong bao oan file day ca hai");
-  ok(`F20 - ${mocPhai.length} file nhac khoa vung, ca ${mocPhai.length} deu nhac ca khoa file (mac dinh)`);
+  /* VE THU HAI CUA F20, tu ca thu BA va THU TU cung mot ngay.
+   *
+   * Luat `--carry` doi 09/09 (thoi phai hoi khi cong da XANH TOAN BO va moi commit quy thuoc
+   * duoc). Do lai ca kho tai lieu thi thay HAI ban chep con day luat CU:
+   *   · ORCHESTRATOR.md muc 5b — "day kem commit cua phien khac thi PHAI HOI"
+   *   · docs/briefs/ONBOARD-AI-REPO-DICH.md — cung cau, va no la DE BAI GIAO CHO AI KHAC
+   * Cong voi hai ca khoa (--take/--sua) o ve tren la BON ban chep troi lech trong mot ngay.
+   *
+   * BAT BIEN DO DUOC: mot DOAN VAN nhac `--carry` thi phai nhac ca `AGENTS.md` — tuc phai TRO
+   * SANG ban duy nhat, khong duoc phat bieu luat mot minh. Do theo DOAN chu khong theo DONG:
+   * ban dau toi do theo dong va no bao lech hai cho lanh (mot bang doi chieu ky thuat, mot dong
+   * NOI cua doan da tro dung). Phep do chat hon thuc te thi nguoi ta se tat no. */
+  const doanNhac = [];
+  const quetDoc = (thuMuc) => {
+    for (const e of readdirSync(join(ROOT, thuMuc), { withFileTypes: true })) {
+      const rel = `${thuMuc}/${e.name}`;
+      if (e.isDirectory()) { if (!/archive|adr|migrations/.test(e.name)) quetDoc(rel); continue; }
+      if (!e.name.endsWith(".md")) continue;
+      for (const doan of readFileSync(join(ROOT, rel), "utf8").split(NL + NL)) {
+        if (doan.includes("--carry")) doanNhac.push({ rel, doan });
+      }
+    }
+  };
+  quetDoc("docs");
+  assert.ok(doanNhac.length >= 2,
+    `ve nay MAT DOI TUONG DO: chi ${doanNhac.length} doan trong docs/ nhac \`--carry\``);
+  const khongTro = doanNhac.filter((x) => !x.doan.includes("AGENTS.md")).map((x) => x.rel);
+  assert.deepEqual([...new Set(khongTro)], [],
+    `doan van phat bieu luat \`--carry\` ma khong tro ve AGENTS.md: ${[...new Set(khongTro)].join(", ")}`
+    + " — luat do da doi mot lan, va hai ban chep sai mat bon ngay");
+  ok(`F20 - ${mocPhai.length} file nhac khoa vung deu nhac ca khoa file · ${doanNhac.length} doan nhac --carry deu tro ve AGENTS.md`);
 }
 
 /* ---- F21. Con so trong luat phai KHOP thuc te -----------------------------
