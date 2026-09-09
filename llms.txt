@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Việc ưu tiên #1
 
-- **_root** — Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà.
+- **_root** — Audit ĐỘC LẬP bản vá KHUNG-53 rồi mới đẩy — Codex hết lượt tới 10/09 01:25, và mục 5 cấm người sửa tự ký nghiệm thu. Xong thì KHUNG-50, hết đợt 1.
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh ngày 2026-09-09.
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — Nén luật xong cả hai đầu: repo nhà nạp 4.002 token, repo đích nhận bản trích nạp 4.119
+- [ark-repo-harness](STATUS.md): active — Trả thứ đang thu thuế mỗi phiên: cổng thôi đòi khoá VÙNG cho mọi commit
 
 ## Luật bắt buộc trước khi sửa gì
 

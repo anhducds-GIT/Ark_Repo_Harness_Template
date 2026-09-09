@@ -35,21 +35,21 @@
       "path": ".",
       "lifecycle": "active",
       "status_md": "STATUS.md",
-      "owner": "harness-loi-01",
-      "next_step": "Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà.",
+      "owner": "harness-loi-02",
+      "next_step": "Audit ĐỘC LẬP bản vá KHUNG-53 rồi mới đẩy — Codex hết lượt tới 10/09 01:25, và mục 5 cấm người sửa tự ký nghiệm thu. Xong thì KHUNG-50, hết đợt 1.",
       "human_action": "CÓ — bảng tự đếm, xem nhóm \\\"Công việc\\\". Trường này cố ý không giữ số: bản gõ tay là nguồn sự thật thứ hai, và 07/09 nó đã lệch thật.",
       "priority_rank": 1,
       "superseded_by": null,
       "last_verified": "2026-09-09",
-      "last_verified_commit": "0b3a256ac8719add20d262aca566d2285ac171e6",
-      "open_item": "Nén luật xong cả hai đầu: repo nhà nạp 4.002 token, repo đích nhận bản trích nạp 4.119. Mọi thứ khác là Tầng 2."
+      "last_verified_commit": "d6da6a0290bbb58c1837be86f2dfaf6e0982a852",
+      "open_item": "Trả thứ đang thu thuế mỗi phiên: cổng thôi đòi khoá VÙNG cho mọi commit. Thứ tự việc ở docs/ROADMAP-V2.md; bản đồ sống là `npm run what-next`."
     }
   ],
   "active_work": [
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Migrate repo đích đầu tiên từ mốc v1.7.2 và mang chỗ vấp về thành mục sổ nợ — đây là lần đầu bốn tính năng (hai vai · khoá file · bộ nén · audit) chạy ở một repo không phải nhà.",
+      "title": "Audit ĐỘC LẬP bản vá KHUNG-53 rồi mới đẩy — Codex hết lượt tới 10/09 01:25, và mục 5 cấm người sửa tự ký nghiệm thu. Xong thì KHUNG-50, hết đợt 1.",
       "rank": 1,
       "claim": null
     }
