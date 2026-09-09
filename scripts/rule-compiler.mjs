@@ -206,7 +206,229 @@ export function chuDeKhaiTu(parsed) {
   return new Map(Object.entries(raw).map(([k, v]) => [k, String(v)]));
 }
 
+/* --- SỔ CÁI: mọi luật từng ghi, ở mọi nhà --------------------------------- */
+
+/* Một mục sổ quyết định. Quy ước: `## <ngày> · <tiêu đề>`. Cố ý KHÔNG đọc thân — sổ cái chỉ cần
+   biết CÓ GÌ và Ở ĐÂU; đọc thân là việc của người mở file. */
+export function docSoCai(root = ROOT) {
+  const mot = (rel, nhan) => {
+    let text;
+    try { text = fs.readFileSync(path.join(root, rel), "utf8"); } catch { return []; }
+    return [...text.replace(/\r\n?/g, NL).matchAll(/^##\s+(.+)$/gm)]
+      .map((m) => ({ nhan, file: rel, tieuDe: m[1].trim() }));
+  };
+  const song = mot(SO_QUYET_DINH, "sống");
+  const kho = [];
+  const thuMucKho = path.join(root, "docs", "archive");
+  try {
+    for (const f of fs.readdirSync(thuMucKho)) {
+      if (/^DECISIONS-/.test(f)) kho.push(...mot(`docs/archive/${f}`, "đã cắt"));
+    }
+  } catch { /* chưa có kho lưu trữ — repo mới, hợp lệ */ }
+  return { song, kho };
+}
+
+/* --- TRIM: KHAI BÁO quyết định, máy KHÔNG tự suy ------------------------
+ *
+ * BA LƯỢT BẮT OAN LIÊN TIẾP 09/09 đã dạy đúng một điều, và nó là điều quan trọng nhất của cả bộ
+ * biên dịch: **một mục sổ quyết định thường chứa CẢ HAI — bản ghi một việc đã xong, VÀ một nguyên
+ * tắc vẫn đang sống.** Nên không tín hiệu máy nào cắt an toàn được:
+ *   ⑴ *"Trần sổ nợ giữ 25"* — chỉ nhắc việc đã đóng, mà **trần 25 vẫn đang cưỡng chế**.
+ *   ⑵ *"Migrate là BA việc trong một"* — là **định nghĩa** một quy trình đang dùng.
+ *   ⑶ *"Cơ chế suite song song phải thành MỘT MỤC trong danh mục"* — chứa nguyên tắc *mọi cơ chế
+ *      phải có một mục trong `features.json`*, và nguyên tắc đó vừa được áp lại hôm nay.
+ *
+ * NÊN: máy KHÔNG đề xuất cắt dựa trên suy diễn. Nó chỉ cắt thứ **ĐÃ KHAI** là đã thi hành, và
+ * **NÊU** những mục chưa khai kèm bằng chứng để người đọc khai. Đúng điều Đức chốt: *AI đề xuất,
+ * khai báo tường minh mới làm đổi bộ luật.*
+ *
+ * Khai bằng một dòng trong thân mục:  `> **trạng thái:** đã thi hành`
+ * (giá trị khác: `đang hiệu lực` — mục mang một luật vẫn đang chạy, KHÔNG bao giờ cắt).
+ */
+export const NHAN_TRANG_THAI = /^>\s*\*\*trạng thái:\*\*\s*(.+)$/m;
+
+/* Tín hiệu HỖ TRỢ, không phải lệnh cắt: dùng để xếp thứ tự đọc cho người khai.
+ *
+ *
+ * Một tín hiệu duy nhất, và nó là tín hiệu đã bắt được ca thật hôm 09/09: **mục chỉ nhắc tới
+ * những mã việc đã ĐÓNG hết**. Một quyết định về việc nay đã xong thì nó là lịch sử — vẫn tra
+ * được ở kho, nhưng không cần nằm trong thứ mọi phiên đọc.
+ *
+ * VÀ MỘT VẾ NGƯỢC, thêm sau khi tín hiệu trên bắt oan ngay lượt chạy đầu: **mục nào trỏ tới một
+ * ADR CÒN HIỆU LỰC thì GIỮ.** Ca thật 09/09 — mục *"Trần sổ nợ giữ 25 — đóng một mục, không nâng
+ * trần"* chỉ nhắc `KHUNG-48` (đã đóng) nên tín hiệu nổ, trong khi **trần 25 vẫn đang cưỡng chế**
+ * và mục đó là chỗ duy nhất ghi VÌ SAO. Cắt nó là mất lý do của một luật đang chạy.
+ *
+ * Vì sao vế ngược đó đúng chứ không phải một miếng vá: ADR là tầng LÝ LẼ. Một quyết định còn trỏ
+ * tới ADR đang hiệu lực nghĩa là nó vẫn đang đỡ cho một luật sống — khác hẳn một quyết định chỉ
+ * nhắc tới mấy mã việc đã xong.
+ *
+ * CỐ Ý HẸP. Máy không hiểu nghĩa, nên nó chỉ được nêu chỗ có bằng chứng ĐẾM ĐƯỢC; mọi tín hiệu
+ * "nghe có vẻ cũ" đều bị bỏ. Đây là ĐỀ XUẤT — người quyết, và cách thi hành là DỜI sang kho, không
+ * phải xoá. */
+export function deXuatTrim(root = ROOT) {
+  // ADR còn hiệu lực = không mang `status: superseded`. Dùng lại đúng bộ đọc của bước chuẩn hoá.
+  const adrSong = new Set((docAdr(root) ?? []).filter(CON_HIEU_LUC).map((a) => `ADR-${a.ma}`));
+
+  /* VẾ NGƯỢC THỨ HAI, thêm sau khi vế một vẫn bắt oan: **còn được một tài liệu SỐNG trỏ tới thì
+     GIỮ.** Ca thật 09/09 — mục *"Migrate là BA việc trong một"* chỉ nhắc `KHUNG-2` (đã đóng) nên
+     hai tín hiệu trước đều cho cắt, trong khi `CHUYEN-REPO-LEN-CHUAN.md` có hẳn một mục MANG ĐÚNG
+     TÊN ĐÓ. Nó không phải lịch sử, nó là **định nghĩa đang được dùng**.
+     Gom chữ của mọi tài liệu sống MỘT LẦN — quét lại cho từng mục là chậm và dễ lệch. */
+  let chuSong = "";
+  const gom = (d) => {
+    let ms;
+    try { ms = fs.readdirSync(path.join(root, d), { withFileTypes: true }); } catch { return; }
+    for (const m of ms) {
+      const p2 = `${d}/${m.name}`;
+      if (m.isDirectory()) { if (!/archive/.test(m.name)) gom(p2); }
+      else if (m.name.endsWith(".md")) { try { chuSong += fs.readFileSync(path.join(root, p2), "utf8"); } catch { /* nt */ } }
+    }
+  };
+  gom("docs");
+  for (const f of ["AGENTS.md", "BACKLOG.md", "IDEAS.md", "README.md"]) {
+    try { chuSong += fs.readFileSync(path.join(root, f), "utf8"); } catch { /* nt */ }
+  }
+  let bl = "";
+  let khoNo = "";
+  try { bl = fs.readFileSync(path.join(root, "BACKLOG.md"), "utf8"); } catch { /* nt */ }
+  try { khoNo = fs.readFileSync(path.join(root, "docs/archive/BACKLOG-da-dong.md"), "utf8"); } catch { /* nt */ }
+  const daDong = new Set([...`${bl}${NL}${khoNo}`.matchAll(/^###\s+~~([A-Za-z0-9]+-\d+)~~/gm)].map((m) => m[1]));
+  const conMo = new Set([...bl.matchAll(/^###\s+(?!~~)([A-Za-z0-9]+-\d+)/gm)].map((m) => m[1]));
+  if (!daDong.size) return [];
+
+  let text = "";
+  try { text = fs.readFileSync(path.join(root, SO_QUYET_DINH), "utf8"); } catch { return []; }
+  const dong = text.replace(/\r\n?/g, NL).split(NL);
+  const moc = dong.map((d, i) => (/^##\s/.test(d) ? i : -1)).filter((i) => i >= 0);
+  const ra = [];
+  for (let k = 0; k < moc.length; k += 1) {
+    const dau = moc[k];
+    const cuoi = k + 1 < moc.length ? moc[k + 1] : dong.length;
+    const than = dong.slice(dau, cuoi).join(NL);
+    const ma = [...new Set([...than.matchAll(/([A-Za-z0-9]+-\d+)/g)].map((m) => m[1]))]
+      .filter((x) => daDong.has(x) || conMo.has(x));
+    if (!ma.length) continue;                       // không nhắc mã nào → không có tín hiệu, bỏ qua
+    if (ma.some((x) => conMo.has(x))) continue;     // còn nhắc việc đang mở → GIỮ
+    // VẾ NGƯỢC: còn trỏ tới một ADR đang hiệu lực → đây là quyết định SỐNG, giữ. Xem ghi chú trên.
+    const adr = [...new Set([...than.matchAll(/ADR-(\d{4})/g)].map((m) => `ADR-${m[1]}`))];
+    if (adr.some((x) => adrSong.has(x))) continue;
+    const tieuDe = dong[dau].replace(/^##\s+/, "");
+    /* Lấy phần ĐẶC TRƯNG của tiêu đề: bỏ ngày, rồi cắt ở dấu gạch dài **và dấu phẩy** — phần sau
+       cả hai đều là lời giải thích, không phải tên. Bản đầu chỉ cắt ở gạch dài nên nó trượt ca
+       thật: sổ ghi *"…trong một, không phải chuẩn hoá cấu trúc"* còn tài liệu ghi *"…trong một —
+       Đức chốt 05/09"*. Hai chuỗi không khớp, và mục đang SỐNG bị đề xuất cắt.
+       Ngắn quá thì bỏ qua vế này — một chuỗi 8 ký tự khớp mọi nơi và sẽ giữ lại tất cả. */
+    const dacTrung = tieuDe.replace(/^\S+\s*(\([^)]*\)\s*)?·\s*/, "").split(/ — |, /)[0].trim();
+    if (dacTrung.length >= 12 && chuSong.includes(dacTrung)) continue;
+    const khai = (than.match(NHAN_TRANG_THAI) || [])[1];
+    /* Chỉ lấy GIÁ TRỊ, bỏ phần giải thích sau dấu gạch dài — người khai gần như luôn viết thêm
+       lý do, và bản đầu so bằng nguyên dòng nên khai đúng vẫn không được nhận. */
+    const trangThai = khai ? khai.split(/ — |\. /)[0].trim().toLowerCase() : null;
+    if (trangThai === "đang hiệu lực") continue;          // đã khai là luật sống → không bao giờ cắt
+    ra.push({ tieuDe, dong: cuoi - dau, ma, daKhai: trangThai === "đã thi hành" });
+  }
+  return ra;
+}
+
+/* --- NẠP: Context Compiler — thứ một phiên THẬT SỰ phải đọc ---------------
+ *
+ * Đây là bước ⑹ *compile + sort* của vòng đời luật, và là lý do cả bộ này tồn tại: **sổ cái phình
+ * vô hạn, thứ NẠP thì không được phình.** Không có bước này thì "biên dịch" chỉ là một bảng đẹp,
+ * còn phiên AI vẫn nạp mọi thứ nó tìm thấy.
+ *
+ * BA TẦNG, đúng thứ tự đọc:
+ *   NHÂN      — `AGENTS.md`: luật chung, mọi phiên nạp trước tiên, không có ngoại lệ.
+ *   TRẠNG THÁI— phần CUỐI `HANDOFF.md`: phiên trước làm tới đâu.
+ *   THEO VIỆC — mở khi cần, theo bảng mục 6. **KHÔNG nạp trước.**
+ *
+ * Con số quan trọng nhất mà lệnh này in ra không phải tổng đã nạp, mà là **tổng KHÔNG nạp**: nó
+ * cho thấy bảng mục 6 đang tiết kiệm bao nhiêu. Bảng đó mất tác dụng thì con số kia tụt, và ta
+ * thấy ngay. */
+export function napContext(root = ROOT, tran = 300) {
+  const dem = (rel, gioiHan) => {
+    try {
+      const d = fs.readFileSync(path.join(root, rel), "utf8").replace(/\r\n?/g, NL).split(NL);
+      return Number.isFinite(gioiHan) ? Math.min(d.length, gioiHan) : d.length;
+    } catch { return 0; }
+  };
+  const nhan = [
+    { tang: "NHÂN", file: "AGENTS.md", dong: dem("AGENTS.md"), vi: "luật chung — mọi phiên, không ngoại lệ" },
+    { tang: "TRẠNG THÁI", file: "HANDOFF.md (40 dòng cuối)", dong: dem("HANDOFF.md", 40), vi: "phiên trước làm tới đâu" }
+  ];
+  const napDong = nhan.reduce((a, b) => a + b.dong, 0);
+
+  // Tầng hai: đo nhưng KHÔNG nạp. Đây là phần bảng mục 6 tiết kiệm được.
+  const khiCan = [];
+  const di = (d) => {
+    let ms;
+    try { ms = fs.readdirSync(path.join(root, d), { withFileTypes: true }); } catch { return; }
+    for (const m of ms) {
+      const p2 = `${d}/${m.name}`;
+      if (m.isDirectory()) { if (!/archive|migrations/.test(m.name)) di(p2); }
+      else if (m.name.endsWith(".md")) khiCan.push({ file: p2, dong: dem(p2) });
+    }
+  };
+  di("docs");
+  const khongNap = khiCan.reduce((a, b) => a + b.dong, 0);
+  return { nhan, napDong, tran, khiCan, khongNap, dat: napDong <= tran };
+}
+
 function main() {
+  /* --- Ba lệnh của vòng đời luật, tách khỏi lệnh biên dịch ADR ở dưới ---
+     `--so-cai` xem SỔ CÁI (append) · `--trim` nêu mục đáng cắt · `--nap` là CONTEXT COMPILER. */
+  if (process.argv.includes("--so-cai")) {
+    const { song, kho } = docSoCai(ROOT);
+    console.log(`# SỔ CÁI LUẬT — ${song.length + kho.length} quyết định từng ghi${NL}`);
+    console.log(`**Đang ở sổ sống** (\`${SO_QUYET_DINH}\`): ${song.length}`);
+    console.log(`**Đã cắt sang kho** (\`docs/archive/DECISIONS-*\`): ${kho.length}${NL}`);
+    for (const m of song) console.log(`  · ${m.tieuDe}`);
+    if (kho.length) {
+      console.log(`${NL}## Đã cắt — vẫn tra được, không nạp mỗi lượt`);
+      for (const m of kho) console.log(`  · ${m.tieuDe}   [${m.file}]`);
+    }
+    return EXIT.OK;
+  }
+  if (process.argv.includes("--trim")) {
+    const ds = deXuatTrim(ROOT);
+    const catDuoc = ds.filter((m) => m.daKhai);
+    const chuaKhai = ds.filter((m) => !m.daKhai);
+    console.log("# CẮT — máy chỉ cắt thứ ĐÃ KHAI, không tự suy" + NL);
+    if (catDuoc.length) {
+      console.log("## Cắt được ngay (" + catDuoc.length + ") — đã khai `trạng thái: đã thi hành`");
+      console.log("Thi hành bằng cách DỜI sang `docs/archive/DECISIONS-*.md` giữ nguyên byte, KHÔNG xoá." + NL);
+      for (const m of catDuoc) console.log("  · " + m.tieuDe + "   [" + m.dong + " dòng]");
+      console.log("");
+    }
+    if (chuaKhai.length) {
+      console.log("## Chưa khai trạng thái (" + chuaKhai.length + ") — ĐỌC rồi khai, đừng cắt theo tín hiệu");
+      console.log("Ba lượt bắt oan 09/09 cho thấy một mục thường chứa CẢ bản ghi việc đã xong LẪN một");
+      console.log("nguyên tắc vẫn đang sống. Khai bằng một dòng trong thân mục:" + NL);
+      console.log("    > **trạng thái:** đã thi hành      (hoặc: đang hiệu lực)" + NL);
+      for (const m of chuaKhai) console.log("  · " + m.tieuDe + NL + "      " + m.dong + " dòng · chỉ còn nhắc việc đã đóng: " + m.ma.join(", "));
+    }
+    if (!ds.length) console.log("Không mục nào có tín hiệu — mọi quyết định trong sổ sống đều còn nhắc việc đang mở, trỏ tới ADR sống, hoặc được một tài liệu sống nhắc lại.");
+    return EXIT.OK;
+  }
+  if (process.argv.includes("--nap")) {
+    let tran = 300;
+    try { tran = readStructureFromDisk(ROOT)?.budget?.docBatBuoc ?? 300; } catch { /* dùng mặc định */ }
+    const kq = napContext(ROOT, tran);
+    console.log(`# NẠP — thứ một phiên THẬT SỰ phải đọc${NL}`);
+    for (const t of kq.nhan) console.log(`  ${t.tang.padEnd(11)} ${String(t.dong).padStart(4)} dòng  ${t.file}${NL}${" ".repeat(18)}${t.vi}`);
+    console.log(`${NL}  TỔNG NẠP: **${kq.napDong}/${kq.tran} dòng** — ${kq.dat ? "ĐẠT" : "VƯỢT TRẦN"}`);
+    console.log(`  KHÔNG nạp: **${kq.khongNap} dòng** trong ${kq.khiCan.length} file \`docs/\` — mở khi cần, theo bảng mục 6.`);
+    console.log(`${NL}  Tỉ lệ tiết kiệm: nạp ${kq.napDong} / tổng ${kq.napDong + kq.khongNap} = ${Math.round(kq.napDong * 100 / (kq.napDong + kq.khongNap))}%.`);
+    console.log(`  Con số đáng nhìn KHÔNG phải tổng đã nạp, mà là tổng KHÔNG nạp: nó đo bảng mục 6`);
+    console.log("  đang tiết kiệm bao nhiêu. Bảng đó mất tác dụng thì con số này tụt, và thấy ngay.");
+    if (!kq.dat) {
+      console.error(`${NL}VI_PHAM: phần NẠP vượt trần \`budget.docBatBuoc\`. Bớt ở NHÂN, đừng nới trần —`);
+      console.error("nới trần ở đây là cho phép mọi phiên ở mọi repo tốn thêm, nhân theo (số repo × số phiên).");
+      return EXIT.VI_PHAM;
+    }
+    return EXIT.OK;
+  }
+
   const chiKiem = process.argv.includes("--check");
   const chiDeXuat = process.argv.includes("--de-xuat");
 

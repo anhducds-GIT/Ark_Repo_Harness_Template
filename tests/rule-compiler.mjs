@@ -4,7 +4,7 @@
  * hơn không có răng, vì nó làm người ta yên tâm. Nên mọi vế dưới đây đều phải dựng nổi CẢ HAI
  * nhánh — khai đúng thì xanh, khai sai thì đỏ — chứ không chỉ chạy cho xanh.
  *
- * SÁU ĐỘT BIẾN ĐÃ CHẠY 09/09, ghi ở cuối file kèm cái SỐNG SÓT.
+ * TÁM ĐỘT BIẾN ĐÃ CHẠY 09/09, ghi ở cuối file kèm HAI cái SỐNG SÓT.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -13,7 +13,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
-import { bienDich, chuanHoaAdr, chuDeKhaiTu, deXuat, docAdr, docFrontmatter, soatLuat } from "../scripts/rule-compiler.mjs";
+import { bienDich, chuanHoaAdr, chuDeKhaiTu, deXuat, deXuatTrim, docAdr, docFrontmatter, napContext, soatLuat } from "../scripts/rule-compiler.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
@@ -207,11 +207,97 @@ const maLoi = (ds) => ds.map((v) => v.ma).sort();
  *   ⑶ `bienDich` thôi xếp đầu-mối-trước            → SỐNG SÓT lượt đầu, xem ngay dưới
  *   ⑷ `chuanHoaAdr` lấy mã từ TÊN FILE             → chết ở vế 1
  *   ⑸ B16 trả `skip` khi repo không khai chủ đề    → chết ở vế 8, nhánh ⑴
+ *   ⑹ bỏ vế `đang hiệu lực` ở bước CẮT             → chết ở vế 9
+ *   ⑺ `napContext` luôn trả `dat: true`            → chết ở vế 10
+ *   ⑻ bỏ vế `còn trỏ tới ADR sống thì GIỮ`         → SỐNG SÓT lượt đầu, xem dưới
+ *
+ * CÁI SỐNG SÓT THỨ HAI, và nó lặp đúng bài học của cái thứ nhất: fixture vế 9 dựng thư mục
+ * `docs/adr/` nhưng để RỖNG, nên `adrSong` luôn rỗng và vế *trỏ tới ADR sống thì giữ* không bao
+ * giờ chạy tới. Phá nó đi mà không gì đỏ. Đã thêm một ADR thật và một mục sổ trỏ tới nó.
  *
  * CÁI SỐNG SÓT dạy nhiều nhất: fixture đầu đặt đầu mối là ADR-0012 và thành viên là ADR-0013,
  * nên đầu mối TÌNH CỜ cũng là mã nhỏ nhất và ngày sớm nhất — xếp-theo-mã và xếp-theo-đầu-mối cho
  * CÙNG một kết quả. Vế 5 khi đó chỉ đang xác nhận một sự trùng hợp. Đảo lại (đầu mối 0013, thành
  * viên 0011) là đột biến chết ngay. Cùng bài học đã ghi ở `luu-do-smoke.mjs`: một vế đo KẾT QUẢ
  * CHUNG của nhiều cơ chế thì nó không ghim cơ chế nào. */
+
+/* ---- 9. CẮT: may KHONG tu suy, chi cat thu DA KHAI -----------------------
+ *
+ * VE NAY GHIM BAI HOC DAT NHAT CUA CA BO. Ban dau `--trim` de xuat cat theo TIN HIEU do duoc
+ * ("muc chi con nhac ma viec da dong"), va no bat oan BA LUOT LIEN TIEP 09/09:
+ *   ⑴ "Tran so no giu 25"        — tran 25 VAN dang cuong che hom nay
+ *   ⑵ "Migrate la BA viec trong mot" — la DINH NGHIA mot quy trinh dang dung
+ *   ⑶ "Co che suite song song..."    — chua nguyen tac "moi co che phai co mot muc trong
+ *      features.json", va nguyen tac do vua duoc ap lai cung ngay
+ *
+ * Ket luan, va no la thu dang ghim: **mot muc so quyet dinh thuong chua CA bang chung mot viec
+ * da xong LAN mot nguyen tac van dang song.** Nen may khong duoc suy — no chi cat thu da KHAI,
+ * dung dieu Duc chot: *AI de xuat, khai bao tuong minh moi lam doi bo luat.* */
+{
+  const cha = mkdtempSync(path.join(tmpdir(), "trim-"));
+  try {
+    const ghiSo = (muc) => writeFileSync(path.join(cha, "decisions.md"), ["# Quyet dinh", "", ...muc].join(NL) + NL, "utf8");
+    mkdirSync(path.join(cha, "docs", "adr"), { recursive: true });
+    /* MOT ADR CON HIEU LUC, de dung nen cho ve ⑸ ben duoi. Thieu file nay thi `adrSong` rong va
+       ve "tro toi ADR song thi GIU" khong bao gio chay toi — dot bien DB-C da SONG SOT dung vi
+       fixture ban dau khong co ADR nao. Fixture thieu mot ca thi phep kiem mu o dung ca do. */
+    writeFileSync(path.join(cha, "docs", "adr", "0001-x.md"),
+      ["---", "status: Accepted", "adr: 0001", "chu_de: x", "dau_moi: true", "---", "", "# ADR-0001 — x"].join(NL) + NL, "utf8");
+    writeFileSync(path.join(cha, "BACKLOG.md"),
+      ["# BACKLOG", "", "## P1", "", "### ~~KHUNG-1~~ · da dong", "", "### KHUNG-2 · con mo", ""].join(NL) + NL, "utf8");
+
+    const muc = (ten, than) => [`## ${ten}`, "", ...than, ""];
+    ghiSo([
+      ...muc("2026-01-01 · chi nhac viec da dong", ["Lam xong KHUNG-1."]),
+      ...muc("2026-01-02 · khai da thi hanh", ["> **trạng thái:** đã thi hành — ban ghi mot luot.", "", "KHUNG-1 xong."]),
+      ...muc("2026-01-03 · khai dang hieu luc", ["> **trạng thái:** đang hiệu lực — nguyen tac con ap.", "", "KHUNG-1 xong nhung luat con."]),
+      ...muc("2026-01-04 · con nhac viec dang mo", ["KHUNG-1 xong, KHUNG-2 chua."]),
+      ...muc("2026-01-05 · tro toi ADR con hieu luc", ["KHUNG-1 xong. Ly le day du: ADR-0001."])
+    ]);
+
+    const ds = deXuatTrim(cha);
+    const ten = (x) => x.tieuDe;
+    // ⑴ Muc con nhac viec DANG MO → khong bao gio duoc neu.
+    assert.ok(!ds.some((m) => /con nhac viec dang mo/.test(ten(m))),
+      "muc con nhac viec dang mo phai duoc GIU, khong duoc neu");
+    // ⑵ Muc khai "dang hieu luc" → khong bao gio duoc neu, du moi tin hieu deu chi ve phia cat.
+    assert.ok(!ds.some((m) => /khai dang hieu luc/.test(ten(m))),
+      "khai `dang hieu luc` PHAI thang moi tin hieu — day la ve chan ba lan bat oan 09/09");
+    /* ⑸ Muc con tro toi mot ADR DANG HIEU LUC → GIU, du no chi nhac viec da dong. ADR la tang
+       LY LE: con tro toi mot ADR song nghia la quyet dinh do van dang do cho mot luat song.
+       Ve nay them sau khi dot bien "bo ve ADR song" SONG SOT — fixture cu khong co ADR nao. */
+    assert.ok(!ds.some((m) => /tro toi ADR con hieu luc/.test(ten(m))),
+      "muc tro toi ADR CON HIEU LUC phai duoc GIU — ve nay chan ca 'Tran so no giu 25' hom 09/09");
+    // ⑶ Muc khai "da thi hanh" → neu ra VA danh dau cat duoc ngay.
+    const daKhai = ds.filter((m) => m.daKhai);
+    assert.equal(daKhai.length, 1, `dung mot muc duoc phep cat, dang: ${JSON.stringify(ds.map(ten))}`);
+    assert.match(daKhai[0].tieuDe, /khai da thi hanh/);
+    // ⑷ Muc CHUA KHAI ma co tin hieu → van duoc NEU, nhung KHONG duoc danh dau cat duoc.
+    const chuaKhai = ds.filter((m) => !m.daKhai);
+    assert.equal(chuaKhai.length, 1, `dung mot muc chua khai, dang: ${JSON.stringify(chuaKhai.map(ten))}`);
+    assert.match(chuaKhai[0].tieuDe, /chi nhac viec da dong/);
+    ok("9 · cắt: khai `đang hiệu lực` thắng mọi tín hiệu · chỉ `đã thi hành` mới cắt được · chưa khai thì NÊU chứ không cắt");
+  } finally { rmSync(cha, { recursive: true, force: true }); }
+}
+
+/* ---- 10. NẠP (Context Compiler): thứ nạp phải nhỏ, và đo được -------------
+ *
+ * Buoc ⑹ *compile + sort* cua vong doi luat. So cai duoc phep phinh vo han; thu NAP thi khong.
+ * Con so dang nhin nhat khong phai tong da nap, ma la tong KHONG nap — no do bang muc 6 dang
+ * tiet kiem bao nhieu. Bang do mat tac dung thi con so kia tut, va thay ngay. */
+{
+  const kq = napContext(ROOT, 300);
+  assert.ok(kq.nhan.length >= 2, "phan NAP phai co it nhat NHAN + TRANG THAI");
+  assert.ok(kq.nhan.some((t) => t.file === "AGENTS.md"), "AGENTS.md PHAI nam trong phan nap — no la nhan");
+  assert.ok(kq.napDong > 0 && kq.napDong <= kq.tran,
+    `phan nap phai duoi tran: ${kq.napDong}/${kq.tran}`);
+  assert.equal(kq.dat, true);
+  // Doi chung: vuot tran thi `dat` phai FALSE. Khong co ve nay thi `dat` co the luon true.
+  assert.equal(napContext(ROOT, 10).dat, false, "tran 10 dong thi phai bao VUOT — neu khong, co le `dat` luon true");
+  // Va phan KHONG nap phai lon hon han phan nap, khong thi bang muc 6 dang vo dung.
+  assert.ok(kq.khongNap > kq.napDong * 3,
+    `phan KHONG nap (${kq.khongNap}) phai lon hon han phan nap (${kq.napDong}) — neu khong, tai lieu tang hai dang bi nap het`);
+  ok(`10 · nạp: ${kq.napDong}/${kq.tran} dòng · không nạp ${kq.khongNap} dòng (${Math.round(kq.napDong * 100 / (kq.napDong + kq.khongNap))}% nạp)`);
+}
 
 console.log(`${NL}${passed} passed, 0 failed, ${passed} total`);

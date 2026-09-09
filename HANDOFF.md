@@ -536,3 +536,35 @@ ADR-0011 vào; `canDayTruocKhiTra` ghi *"nhận sau"* — đã nhận 07/09. Kho
 **Còn chờ Đức:** ngân sách tài liệu (3.602/2.200) — anh muốn xem bản xếp hạng trước khi quyết.
 `KHUNG-37` (giết tiến trình nền, 22 tiến trình `node`, cũ nhất 10,1h) · `KHUNG-14` (mở một phiên AI
 ở repo đã migrate) · `KHUNG-40` (số đã đo lại, chờ anh đặt trần).
+
+### 2026-09-09 (12) · harness-loi-01 · RULE COMPILER V1 đủ vòng đời + CONTEXT COMPILER
+
+**Đức giao quyền lead, không dừng hỏi.** Chốt thiết kế V1: `append → merge → supersede → trim →
+compile`, rồi gắn vào Context Compiler. Nay đủ **năm lệnh**:
+
+| Lệnh | Bước | Làm gì |
+|---|---|---|
+| `--so-cai` | append | 35 quyết định từng ghi: **30 sống · 5 đã cắt** |
+| `--de-xuat` | merge | nêu ADR chưa khai quan hệ với đầu mối |
+| (frontmatter) | supersede | `sua:` · `bo_sung:` · `thuoc:` — khai báo, không suy diễn |
+| `--trim` | trim | **chỉ cắt thứ ĐÃ KHAI**; chưa khai thì NÊU kèm bằng chứng |
+| `--nap` | compile | **CONTEXT COMPILER** |
+
+**Con số của `--nap`, và nó là câu trả lời cho lo ngại "tài liệu 3.602/2.200":** một phiên nạp
+**284/300 dòng** (`AGENTS.md` + 40 dòng cuối `HANDOFF.md`). Phần **KHÔNG nạp: 4.499 dòng** trong
+39 file `docs/`. Tức **6% nạp, 94% để dành** — kho tài liệu không phải chi phí ngữ cảnh, nó là
+thư viện tra cứu. Thứ phải giữ nhỏ là **phần NẠP**, và nó đang trong trần.
+
+**BÀI HỌC ĐẮT NHẤT CỦA CẢ BỘ — ba lượt bắt oan liên tiếp.** `--trim` bản đầu đề xuất cắt theo tín
+hiệu *"mục chỉ còn nhắc mã việc đã đóng"*, và cả ba lần đều sai: ⑴ *Trần sổ nợ giữ 25* — trần vẫn
+đang cưỡng chế; ⑵ *Migrate là BA việc trong một* — là ĐỊNH NGHĨA đang dùng; ⑶ *Cơ chế suite song
+song…* — chứa nguyên tắc *mọi cơ chế phải có một mục trong `features.json`*, mà tôi vừa áp lại
+sáng nay. **Kết luận: một mục sổ quyết định thường chứa CẢ bản ghi việc đã xong LẪN một nguyên
+tắc đang sống — nên không tín hiệu máy nào cắt an toàn được.** Máy nay chỉ cắt thứ đã KHAI.
+
+**Ghim:** `tests/rule-compiler.mjs` **8 → 10 vế**, **8 đột biến đã chạy, HAI cái sống sót lượt
+đầu** — và cả hai cùng một bệnh fixture: cái đầu đặt đầu mối trùng luôn là mã nhỏ nhất; cái sau
+dựng `docs/adr/` nhưng để RỖNG nên vế *"trỏ tới ADR sống thì giữ"* không bao giờ chạy tới.
+
+**Đã cắt thật 1 mục** (`KHUNG-23 đã THI HÀNH`, 37 dòng) sang `docs/archive/DECISIONS-da-thi-hanh-2026-09.md`,
+đối chiếu byte 0 dòng mất. Sổ quyết định **31 → 30**. Bản **1.3.98**.
