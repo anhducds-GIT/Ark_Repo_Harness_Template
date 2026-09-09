@@ -557,3 +557,26 @@ Audit mã tại `1b3dee8bca0c8bc2a1c3037cef047350f1d0703d`; HEAD sau đó `d15da
 **Nợ còn sống qua đọc code:** KHUNG-51: test sửa ledger ngay cây nguồn; KHUNG-53: khoá FILE chưa nối đầy đủ vào cổng. **P2:** init không ghi pin, nên file máy đổi ở bản sau thành CHƯA GHIM (đã thử builder + upgrade planner); thứ tự đóng ở AGENTS 0b và mở phiên ở docs/SO-TAY-AGENT còn mâu thuẫn.
 
 **Verdict:** giữ kiến trúc, bảo trì có mục tiêu; chưa chứng nhận ổn định để nhân rộng mặc định. Ưu tiên tính đúng bằng chứng suite/cổng và cô lập mutation test; nối hết đường khoá file, init/upgrade. Không thêm Context Router. Không suy ổn định downstream từ số suite xanh. Chi tiết/ca phản chứng trong báo cáo audit gửi Đức; chờ Đức quyết thứ tự giao sửa, audit này không implement.
+
+### 2026-09-09 (18) · harness-loi-01 · BẢN TRÍCH cũng nén: repo đích nạp 5.634 → 4.119 token
+
+**Lỗ tìm ra khi Đức hỏi "đã sẵn sàng migrate chưa".** Đo thử thứ một repo ĐÍCH thật sự nhận:
+`template/AGENTS.md` **5.225 token — NẶNG HƠN bản nhà (3.432)**. Nguyên nhân: **mục 6 của bản
+trích 2.193 token, 42%** — đúng căn bệnh vừa chữa ở nhà, còn nguyên trong thứ đi migrate.
+
+**Việc làm:** áp cùng kiến trúc cho hạt giống. Mục 6 của bản trích còn **10 cửa mỏng**; **18 mục
+văn xuôi** sang hạt giống `docs/BAN-DO-CHI-TIET.md`, và `.repo-structure.json` hạt giống nay khai
+`docs.file_map` trỏ vào đó — nên repo mới dựng lên là **đã đúng kiến trúc ngay từ commit đầu**,
+không phải chờ ai nén hộ.
+
+**Hàng phụ lục nghề CỐ Ý ở lại `AGENTS.md`:** `init-repo.mjs` xoá dòng trỏ tới phụ lục khi người
+dựng không giữ nó, và nó **chỉ soi `AGENTS.md`**. Để hàng đó ở hai chỗ là để lại một liên kết chết
+ở repo vừa dựng — ấn tượng đầu tiên tệ nhất có thể.
+
+**Số:** `template/AGENTS.md` **5.225 → 3.710** · nạp mỗi phiên ở repo đích **5.634 → 4.119**.
+Dấu vân tay luật chung **KHÔNG đổi** — mục 6 vốn không thuộc phần luật chung, đúng như thiết kế.
+
+**Đính chính đã ghi bằng cách THÊM** (mục 17): số nạp cuối của repo nhà là **4.002**, không phải
+3.943. Thân ADR đã `Accepted` bất biến (B12), sổ chỉ-thêm đính chính bằng cách thêm.
+
+Bản **1.7.0**.
