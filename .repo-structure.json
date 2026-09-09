@@ -26,7 +26,13 @@
       "ownership_mode": "root",
       "note": "tài liệu bốn tầng: studies, briefs, archive, adr"
     },
-    "scripts/": {
+    ".githooks/": {
+    "steward": "_code",
+    "mutability": "rw",
+    "ownership_mode": "root",
+    "note": "CUA INDEX (KHUNG-59): commit-msg tu choi khi commit cuon theo file lane khac. Bat bang `git config core.hooksPath .githooks` — `claim.mjs --sua` tu bat, cong dong phien DO neu tat."
+  },
+  "scripts/": {
       "steward": "_code",
       "mutability": "rw",
       "ownership_mode": "root",

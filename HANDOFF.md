@@ -21,6 +21,43 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 · harness-loi-02 · KHUNG-59: cua INDEX — `git commit` thoi cuon duoc viec lane khac
+
+**Da va, CHUA GACH MA** (muc 5: nguoi sua khong tu nghiem thu). Ban 1.8.8.
+
+`.githooks/commit-msg` doc nhan `Lane:` roi goi `claim.mjs --cua-index`; cua tu choi khi me sap
+vao commit co duong dan ma **chu khong phai lane do**. `--sua` tu bat `core.hooksPath`; cong DO
+`CUA_INDEX_TAT` neu tat. Ban trich 62 -> **64 file**.
+
+| Do | So |
+|---|---|
+| hook thay gi o `commit --only` va `-a` | DUNG me sap commit — git dat `GIT_INDEX_FILE` sang index TAM |
+| hook thoat != 0 | commit BI HUY · HEAD khong doi · me cua lane kia con nguyen trong index |
+| thao cua ra | ca hong KHUNG-59 **quay lai** (ve 3e) |
+| phan nap | 4.161 -> **4.194/4.200** token · kho chu **3.117/3.117** khong doi |
+
+### HAI CHO VAP, deu do LOP BAO VE CUA REPO BAT, khong do toi doc lai code
+
+⑴ **Fixture loi ra loi trong chinh ban va cua toi.** Cua suy goc repo tu **vi tri module**, nen
+doc index tam cua cay dang commit bang goc khac -> `fatal: unable to read <oid>`, va cua
+fail-closed se **chan MOI commit**. Va bang `--goc` do hook truyen vao. Cho nay se va that o
+`KHUNG-50`: mot `git worktree` rieng co goc khac goc module.
+
+⑵ **Toi NEN muc 0b cho vua tran token, va lam RUNG BA MENH LENH PHU** — `node scripts/` bien mat
+khoi lenh chay mot suite (lenh khong con chay duoc), *"ghi vao so co rang buoc"* va *"sau khi
+suite xanh"* bien mat khoi luat bo sinh. **`COMMON_LAW_SHA256` cua bo trich chan lai.** Dung bai
+hoc da ghi 09/09 trong chinh file do, lan thu sau cung hinh dang. Cach xu dung: tra lai nguyen
+van, roi got token o cho TRUNG THAT — `STATUS.md` co hai truong noi cung mot cau *"MOT benh"*.
+
+**Bai hoc mang di:** nen van xuoi de vua ngan sach la doi mot lop bao ve lay may token. Got o
+cho TRUNG, dung got o cho NGAN.
+
+### Con ho, mang theo ca ve nay
+
+Cua chi thay thu **da khai vao bang quyen**. Hai lane deu khong nhan khoa thi khong lop nao biet
+cua ai. Va **phan nap con 6 token du** — co che tiep theo khong ghi them duoc vao `AGENTS.md`.
+
+
 ## 2026-09-09 · harness-phat-01 · Phat 1.3.76 ra 3 repo — 1 xanh, 2 BI CHINH LUAT CUA BO KHUNG CHAN
 
 **Ket qua:** `n8n-orchestrator` 1.3.67 -> 1.3.76 xong tron, cong XANH TOAN BO, da day, da tra khoa.

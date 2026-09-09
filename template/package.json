@@ -1,6 +1,6 @@
 {
   "name": "repo-harness",
-  "version": "1.8.7",
+  "version": "1.8.8",
   "private": true,
   "type": "module",
   "description": "Bộ khung repo: cổng vào máy đọc, cổng kiểm cấu trúc, cổng đóng phiên, đẩy an toàn.",
@@ -20,6 +20,6 @@
     "features": "node scripts/features.mjs",
     "handoff": "node scripts/handoff.mjs",
     "test": "node scripts/chay-test.mjs",
-    "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-file.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
+    "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-file.mjs && node tests/cua-index.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
   }
 }

@@ -160,6 +160,13 @@ const VERBATIM = [
    * phép ghim của nó là phát một lời hứa. Suite này tự dựng kho git riêng và đọc `areas` của
    * repo đích, nên nó chạy được cả ở repo khai khối `areas` rỗng. */
   ["tests/khoa-dau-vet.mjs", "tests/khoa-dau-vet.mjs"],
+  /* CỬA INDEX + phép ghim của nó. ĐI THEO BẢN TRÍCH, và không có lựa chọn nào khác: luật chung
+   * mục 0b GỌI TÊN `.githooks/commit-msg`, nên repo đích không nhận nó là nhận một luật trỏ tới
+   * thứ không tồn tại — đúng bẫy đã bắt được năm lần ở sổ này. Bệnh nó vá là bệnh CỦA MỌI repo
+   * nhiều lane: một cây làm việc có đúng một index. Phép ghim tự dựng kho git riêng và tự khai
+   * `areas`, nên nó chạy ở repo đích y như ở đây. */
+  [".githooks/commit-msg", ".githooks/commit-msg"],
+  ["tests/cua-index.mjs", "tests/cua-index.mjs"],
   /* BẢNG SỐNG — ba cửa, một lõi. Đi theo bản trích vì chỗ hỏng nó vá là chỗ MỌI repo dựng từ bộ
    * khung đều có: bảng suy từ HEAD trả lời câu về QUÁ KHỨ, mà câu người chốt hỏi là câu về BÂY
    * GIỜ. Đo ở repo nhà 06/09 — bốn khoá một phiên giữ suốt lượt làm việc nằm trong 0/6 commit.
@@ -612,8 +619,30 @@ function phanLuatChung(text) {
  *   thì cả bốn đúng, và đã trả lại nguyên văn (đọc luật của vùng sắp đụng · "phép kiểm hay tài
  *   liệu" ở năm câu · quyền "vai nào cũng được tìm lỗi ở bất kỳ đâu" · "viết lại đơn giản hơn").
  *   BÀI HỌC: nén văn xuôi làm RỤNG MỆNH LỆNH PHỤ, và người nén không thấy vì họ vẫn nhớ câu gốc.
- *   Vân tay trước: b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be */
-const COMMON_LAW_SHA256 = "956bd6f139a744ff96062b34f615e9c6a9bc744d4f5211bc07b51ebeb3e438cd";
+ *   Vân tay trước: b539c11a59872c42325963bc9dd6a778d9e70f5658ed7eaa63f95380f405f8be
+ *
+ * ĐỔI 10/09 — CỬA INDEX, mục 0b. Đức giao *"chạy KHUNG-59"*, và điều kiện `đóng khi:` của mục
+ *   đó (viết từ trước, ở `BACKLOG.md`) đòi đúng chữ này: *"`AGENTS.md` mục 0b nêu cách gọi git đã
+ *   chốt"*. Nên lượt đổi luật này nằm TRONG việc được giao, không phải ngoài lề nó.
+ *
+ *   THÊM, KHÔNG BỚT — đã soi từng mệnh lệnh bằng `diff`: cả bốn câu cũ của mục 0b còn nguyên văn
+ *   (thứ tự đóng phiên · `npm test` SAU commit với 22 giây/9 phút/28 phút · một suite lúc đang
+ *   làm, đủ bộ một lần ở cuối · bộ sinh sau khi suite xanh · KHÔNG `git push`). Thêm hai điều:
+ *   `git commit --only <đường dẫn>` và cửa `.githooks/commit-msg`.
+ *
+ *   BẪY CŨ BẮT ĐƯỢC LẦN THỨ SÁU, ngay lượt này: bản chữ đầu của tôi NÉN mục 0b cho vừa trần
+ *   token, và làm rụng ba mệnh lệnh phụ — `node scripts/` biến mất khỏi lệnh chạy một suite (lệnh
+ *   không còn chạy được), *"ghi vào sổ có ràng buộc"* và *"sau khi suite xanh"* biến mất khỏi luật
+ *   bộ sinh. Chính dấu vân tay này chặn lại. Đúng bài học ghi ở lượt 09/09 phía trên: **nén văn
+ *   xuôi làm rụng mệnh lệnh phụ, và người nén không thấy vì họ vẫn nhớ câu gốc.** Trả lại nguyên
+ *   văn, rồi gọt token ở chỗ TRÙNG THẬT: `STATUS.md` có hai trường nói cùng một câu.
+ *   Đo: phần nạp **4.161 → 4.194/4.200 token** — còn 6 token dư, mục 0b không nhận thêm được gì.
+ *
+ *   LUẬT CHUNG GỌI TÊN MỘT FILE, nên file đó PHẢI đi theo bản trích: `.githooks/commit-msg` và
+ *   `tests/cua-index.mjs` vào danh sách ngay lượt này. Bẫy *"luật trỏ tới thứ chỉ nơi phát hành
+ *   mới có"* đã bắt được năm lần ở sổ này; lần này chặn trước khi phát.
+ *   Vân tay trước: 956bd6f139a744ff96062b34f615e9c6a9bc744d4f5211bc07b51ebeb3e438cd */
+const COMMON_LAW_SHA256 = "6cce53b34852abf0920f1dd3acc7834d0252f7aa52633eb8c73313b97db1339c";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -1097,7 +1126,7 @@ function packageJson(version) {
       // Repo đích nhận cả hai, nên nó có đường nhanh ngay từ ngày đầu — và vẫn còn đường tuần tự
       // để so khi nghi ngờ tranh chấp.
       test: "node scripts/chay-test.mjs",
-      "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-file.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
+      "test:tuan-tu": "node tests/harness-smoke.mjs && node tests/assistant-smoke.mjs && node tests/handoff-smoke.mjs && node tests/dau-suite-smoke.mjs && node tests/overview-doc-smoke.mjs && node tests/luu-do-smoke.mjs && node tests/khoa-file.mjs && node tests/cua-index.mjs && node tests/khoa-dau-vet.mjs && node tests/bang-song.mjs && node tests/features-smoke.mjs"
     }
   }, null, 2) + "\n";
 }

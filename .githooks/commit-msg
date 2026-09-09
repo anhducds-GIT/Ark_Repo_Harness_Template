@@ -1,0 +1,17 @@
+#!/bin/sh
+# CỬA INDEX — chặn KHUNG-59: một cây làm việc có ĐÚNG MỘT index, nên `git commit` của lane này
+# cuốn trọn thứ lane kia vừa `git add`. Xảy ra HAI LẦN ngày 10/09, hai chiều, hai lane.
+#
+# VÌ SAO Ở `commit-msg` CHỨ KHÔNG `pre-commit`: cửa cần biết AI đang commit, và câu trả lời duy
+# nhất máy đọc được là nhãn `Lane:` trong lời nhắn — chỉ `commit-msg` mới thấy lời nhắn.
+#
+# ĐO 10/09 (bốn ca, cùng một fixture): git đặt `GIT_INDEX_FILE` sang index TẠM cho cả
+# `commit --only` và `commit -a`, nên `git diff --cached` trong hook thấy ĐÚNG mẻ sắp vào commit,
+# không thấy phần lane khác đang dàn. Hook thoát khác 0 thì commit bị huỷ và index còn nguyên.
+set -e
+goc=$(git rev-parse --show-toplevel) || exit 0
+lane=$(sed -n 's/^[Ll]ane:[[:space:]]*//p' "$1" | head -1 | tr -d '\r')
+# Nhãn thiếu: KHÔNG chặn ở đây. Cửa đó là phép kiểm "Nhãn lane trong commit" của cổng đóng phiên
+# và của `safe-push` — hai cửa cùng canh một điều là hai câu trả lời cho một câu hỏi.
+[ -n "$lane" ] || exit 0
+exec node "$goc/scripts/claim.mjs" --cua-index --goc "$goc" --as "$lane"

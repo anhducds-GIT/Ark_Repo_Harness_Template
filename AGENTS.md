@@ -30,12 +30,17 @@ lượt đủ bộ, đo 09/09: **~28 phút**. Đang làm thì chạy một suite
 --chi <tên-suite>`; đủ bộ chạy **một lần**, ở cuối. Bộ sinh ghi vào sổ có ràng buộc cũng chạy
 **một lần**, sau khi suite xanh.
 
-**Push thì KHÔNG dùng `git push`** — nhiều phiên chung một cây git, `git push` của bạn cuốn theo
-commit của mọi phiên khác:
+Một cây làm việc có ĐÚNG MỘT index, nên mẻ `git add` của lane khác nằm trong commit của bạn
+(10/09: hai lần, hai chiều). **Commit thì nêu ĐƯỜNG DẪN; push thì KHÔNG dùng `git push`** — nó
+cuốn theo commit của mọi phiên khác:
 
 ```bash
+git commit --only <đường dẫn>… -m "…"                # chỉ phần của bạn
 node scripts/safe-push.mjs --as <tên-phiên-của-bạn>
 ```
+
+Cửa `.githooks/commit-msg` từ chối lượt cuốn theo file lane khác **đang khoá** — nó chỉ thấy thứ
+đã khai vào bảng quyền. `--sua` tự bật cửa, cổng ĐỎ nếu tắt.
 
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
@@ -48,7 +53,7 @@ trả ngay trước và sau lượt ghi. **Chỉ đọc thì không cần khoá.
 ```bash
 node scripts/claim.mjs --sua <file>… --as <phiên>   # NGAY TRƯỚC lượt ghi · nhận cả mẻ
 node scripts/claim.mjs --xong --het --as <phiên>    # NGAY SAU khi COMMIT · cổng ĐỎ nếu treo
-node scripts/claim.mjs --soat --as <phiên>          # TRƯỚC `git commit` · là LỆNH, không phải cổng
+node scripts/claim.mjs --soat --as <phiên>          # index đang có gì của ai (rộng hơn cửa)
 node scripts/claim.mjs --list                       # ai đang giữ gì
 node scripts/claim.mjs --take|--release <khoá> --as <phiên> --task "một câu"   # cả VÙNG
 ```

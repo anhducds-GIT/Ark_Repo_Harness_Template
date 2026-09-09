@@ -357,6 +357,43 @@ export function soatDanHang({ daDan, tam, claims, as, mienKhoa, maySinh, vungCua
   return { la, soChung };
 }
 
+/* ---- CỬA INDEX — HẸP HƠN `--soat`, cố ý -----------------------------------
+ *
+ * `--soat` từ chối mọi file bạn KHÔNG CÓ QUYỀN GHI, kể cả file vô chủ không ai khoá. Đúng cho
+ * một LỆNH người tự gọi. SAI cho một cửa chạy ở MỌI commit của MỌI lane: nó sẽ chặn cả lượt
+ * commit hợp lệ của lane quên nhận khoá, và một cửa chặn oan thì trong một ngày sẽ có người
+ * mở `--no-verify` cho mọi lượt.
+ *
+ * KHUNG-59 mất gì? **TRUY NGUỒN** — việc của lane A vào commit dưới tên lane B. Nên cửa này
+ * chỉ soi đúng điều đó: đường dẫn nào đang có CHỦ, và chủ đó KHÔNG PHẢI TÔI. File vô chủ vẫn
+ * qua; kỷ luật khoá là việc của `--soat` và của cổng đóng phiên, không phải của cửa này.
+ *
+ * MANG THEO CẢ VẾ NÀY: hai lane đều không nhận khoá thì cửa này KHÔNG thấy gì. Bảng quyền là
+ * bằng chứng duy nhất máy có về "của ai", và không ai khai thì không có gì để so. */
+export function cuaIndex(doiSo) {
+  const { la } = soatDanHang(doiSo);
+  return la.filter((x) => (x.chuFile && x.chuFile !== doiSo.as) || (x.chuVung && x.chuVung !== doiSo.as));
+}
+
+/* Bật cửa index cho bản sao repo này. `core.hooksPath` là cấu hình MỖI BẢN SAO, không theo git
+   được — nên nó phải được bật bởi một lệnh mà mọi lane đều chạy trước lượt ghi đầu tiên, và
+   `--sua` đúng là lệnh đó. Có người đã trỏ hooksPath đi nơi khác thì KHÔNG giành: nêu tên, để
+   cổng đóng phiên nói tiếp. */
+export function napCuaIndex(root = ROOT) {
+  const doc = (args) => {
+    try { return execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+    catch { return ""; }
+  };
+  if (!fs.existsSync(path.join(root, ".githooks", "commit-msg"))) return { trangThai: "khong-co-cua" };
+  const dang = doc(["config", "--get", "core.hooksPath"]);
+  if (dang === ".githooks") return { trangThai: "da-bat" };
+  if (dang) return { trangThai: "tro-noi-khac", dang };
+  try {
+    execFileSync("git", ["config", "core.hooksPath", ".githooks"], { cwd: root, stdio: "ignore" });
+    return { trangThai: "vua-bat" };
+  } catch (e) { return { trangThai: "bat-khong-duoc", loi: String(e.message).split(String.fromCharCode(10))[0] }; }
+}
+
 /* Quyết định THUẦN — tách khỏi việc đọc/ghi để kiểm được mọi nhánh mà không cần đĩa. */
 export function decide(claims, { action, key, as, today, ai, ducDuyet, dirty, chuaDay, duBiet }) {
   if (!Object.prototype.hasOwnProperty.call(claims, key)) {
@@ -738,6 +775,61 @@ async function main() {
     process.exit(EXIT.OK);
   }
 
+  /* ---- --cua-index : CỬA gọi bởi hook `commit-msg` ----------------------
+   *
+   * Chỗ DUY NHẤT thấy đúng mẻ sắp vào commit. `--soat` là một LỆNH người nhớ gọi, và cửa sổ
+   * nguy hiểm nằm SAU nó (KHUNG-59). Cửa này nằm trong chính `git commit`. */
+  if (flag("cua-index")) {
+    if (typeof as !== "string") {
+      console.error("CUA_INDEX_THIEU_LANE: hook phải truyền `--as <lane đọc từ nhãn Lane:>`.");
+      process.exit(EXIT.MISUSE);
+    }
+    /* GỐC LÀ THỨ HOOK TRUYỀN VÀO, không phải đường dẫn của file này.
+     *
+     * ĐO ĐƯỢC 10/09, chính fixture của phép ghim lôi ra: `claim.mjs` suy gốc repo từ vị trí
+     * module nó. Ở cây làm việc chính hai thứ đó trùng nhau nên không ai thấy. Nhưng hook chạy
+     * với `GIT_INDEX_FILE` trỏ index TẠM của cây đang commit — đọc index đó bằng cây khác thì
+     * git nổ `fatal: unable to read <oid>`, và cửa fail-closed sẽ CHẶN MỌI COMMIT.
+     *
+     * Chỗ này sẽ va thật ở `KHUNG-50`: một `git worktree` riêng có gốc khác gốc module. */
+    const goc = typeof flag("goc") === "string" ? path.resolve(flag("goc")) : ROOT;
+    try { parsed = readClaims(path.join(goc, ".agents", "claims.json")); }
+    catch (e) { console.error(`CUA_INDEX_KHONG_DOC_DUOC_BANG: ${String(e.message).split(String.fromCharCode(10))[0]}`); process.exit(EXIT.REFUSED); }
+    let daDan = [];
+    try {
+      daDan = execFileSync("git", ["diff", "--cached", "--name-only"], { cwd: goc, encoding: "utf8" })
+        .split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean);
+    } catch (e) {
+      /* FAIL-CLOSED. Không đọc được index thì không biết mình đang commit gì của ai — và đúng
+         thứ mục này chữa là commit mù. Cửa ra là `git commit --no-verify`, thấy được và có chủ ý. */
+      console.error(`CUA_INDEX_KHONG_DOC_DUOC: ${String(e.message).split(String.fromCharCode(10))[0]}`);
+      process.exit(EXIT.REFUSED);
+    }
+    if (!daDan.length) process.exit(EXIT.OK);
+    const cauTruc = readStructureFromDisk(goc);
+    const tienTo = claimPrefixesFrom(cauTruc);
+    const la = cuaIndex({
+      daDan,
+      tam: parsed.tam,
+      claims: parsed.claims,
+      as,
+      mienKhoa: MIEN_KHOA,
+      maySinh: [...generatedFrom(cauTruc), ".agents/claims.json"],
+      vungCua: (d) => vungBaoNgoai(d, cauTruc, tienTo),
+    });
+    if (!la.length) process.exit(EXIT.OK);
+    console.error(`CUA_INDEX_CUON_VIEC_LANE_KHAC: commit dưới nhãn "${as}" đang mang ${la.length} đường dẫn của lane khác.`);
+    for (const x of la) {
+      const chu = x.chuFile ? `file do "${x.chuFile}" khoá` : `vùng ${x.vung} do "${x.chuVung}" giữ`;
+      console.error(`  ✗ ${x.duongDan} — ${chu}`);
+    }
+    console.error("");
+    console.error("Một cây làm việc có ĐÚNG MỘT index, nên `git add` của họ nằm trong mẻ commit của bạn.");
+    console.error(`Cách xử: commit đúng phần của mình — git commit --only ${la.length ? "<đường dẫn của bạn>" : ""}`);
+    console.error("Hoặc bỏ phần của họ ra: git restore --staged <đường dẫn ✗>  (KHÔNG xoá nội dung của họ)");
+    process.exit(EXIT.REFUSED);
+  }
+
   /* ---- --soat : file đã DÀN mà bạn không có quyền ghi -------------------
    *
    * Phải chạy TRƯỚC `git commit`, và nó không thay được cổng nào: cổng đóng phiên chạy lúc
@@ -839,6 +931,18 @@ async function main() {
     if (boQua.length) console.log(`bỏ qua (artifact máy sinh, không đòi khoá nào): ${boQua.join(" · ")}`);
     if (ten) console.log(`${suaCo ? "đã khoá để sửa" : "đã trả"}: ${ten}${suaCo ? ` → ${as}` : ""}`);
     if (suaCo) console.log(`Trả NGAY sau khi ghi xong: node scripts/claim.mjs --xong --het --as ${as}`);
+    /* BẬT CỬA INDEX Ở ĐÂY, không ở một lệnh riêng. `core.hooksPath` là cấu hình mỗi BẢN SAO nên
+       không theo git được; một lệnh riêng thì bản sao mới nào cũng chạy phiên đầu mà cửa chưa
+       bật — đúng chỗ KHUNG-59 nổ. `--sua` là lệnh MỌI lane phải chạy trước lượt ghi đầu tiên. */
+    if (suaCo) {
+      const cua = napCuaIndex();
+      if (cua.trangThai === "vua-bat") console.log("đã bật CỬA INDEX cho bản sao này (core.hooksPath = .githooks).");
+      if (cua.trangThai === "tro-noi-khac") {
+        console.log(`⚠ core.hooksPath đang trỏ "${cua.dang}", KHÔNG phải .githooks — cửa index KHÔNG chạy.`);
+        console.log("  Không tự đổi hộ: có thể là chủ ý của người khác. Cổng đóng phiên sẽ ĐỎ tới khi xử.");
+      }
+      if (cua.trangThai === "bat-khong-duoc") console.log(`⚠ không bật được cửa index: ${cua.loi}`);
+    }
     process.exit(EXIT.OK);
   }
 

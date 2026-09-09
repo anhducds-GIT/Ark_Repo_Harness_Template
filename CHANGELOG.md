@@ -3,6 +3,48 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.8 — 2026-09-10 — CỬA INDEX: `git commit` của bạn thôi cuốn được việc lane khác (KHUNG-59)
+
+**Ca hỏng thật, hai lượt trong một ngày, hai chiều, hai lane.** Một cây làm việc git có ĐÚNG MỘT
+index, nên giữa `git add` và `git commit` của lane A, bất kỳ `git commit` nào của lane B cũng gom
+trọn mẻ của A. Không mất nội dung — **mất truy nguồn**, đúng thứ nhãn `Lane:` sinh ra để giữ. Cả
+hai lượt hồi phục được **vì có mắt người nhìn thấy**; cơ chế không bắt gì.
+
+`.githooks/commit-msg` đọc nhãn `Lane:` rồi gọi `claim.mjs --cua-index`, và từ chối khi mẻ sắp
+vào commit có đường dẫn mà chủ không phải lane đó. `claim.mjs --sua` tự bật `core.hooksPath`
+(cấu hình mỗi bản sao, không theo git được); cổng đóng phiên ĐỎ `CUA_INDEX_TAT` nếu nó tắt.
+
+| Đo trên fixture rời | Kết quả |
+|---|---|
+| hook thấy gì ở `commit --only` và `commit -a` | ĐÚNG mẻ sắp commit — git đặt `GIT_INDEX_FILE` sang index TẠM |
+| hook thoát ≠ 0 | commit BỊ HUỶ · HEAD không đổi · **mẻ của lane kia còn nguyên trong index** |
+| `git commit --only <đường dẫn>` | không cuốn file lane khác, kể cả khi họ đã `git add` |
+| tháo cửa ra | ca hỏng KHUNG-59 **quay lại** — vế 3e của phép ghim |
+
+**Cửa HẸP HƠN `--soat`, cố ý.** `--soat` chặn cả file vô chủ; cửa chỉ chặn file **có chủ khác**.
+Cửa này chạy ở MỌI commit của MỌI lane, và một cửa chặn oan sẽ bị mở `--no-verify` trong một
+ngày. Cái MẤT nói thẳng: lane quên nhận khoá vẫn commit được.
+
+**Ở `commit-msg`, không `pre-commit`:** cửa cần biết AI nào đang commit, và chỉ `commit-msg` thấy
+lời nhắn. Nên **thiếu nhãn `Lane:` thì cửa im lặng** — cửa đó đã có (phép kiểm nhãn lane của cổng
+và của `safe-push`), và hai cửa canh một điều là hai câu trả lời cho một câu hỏi.
+
+**Fixture lôi ra một lỗi trong chính bản vá này:** cửa suy gốc repo từ vị trí module, nên đọc
+index tạm của cây đang commit bằng gốc khác → `fatal: unable to read <oid>`, và cửa fail-closed
+sẽ chặn MỌI commit. Vá bằng `--goc` hook truyền vào — sẽ va thật ở `KHUNG-50` (`git worktree`
+riêng có gốc khác gốc module). Đây là lần thứ hai trong hai phiên fixture bắt lỗi mà đọc code
+không thấy.
+
+**Ngân sách:** phần nạp 4.161 → **4.169/4.200 token** cho cả một cơ chế mới, nhờ gộp hai đoạn
+trùng nhau trong `STATUS.md` (`next_step` và `current_focus` nói cùng một câu *"MỘT bệnh"*). Kho
+chữ **3.117/3.117**, không đổi — mục bản đồ file nối vào dòng `ADR-0012` sẵn có thay vì thêm dòng.
+
+`tests/cua-index.mjs`: **8 vế** trên fixture git thật, **5 đột biến đã chạy** (cửa luôn cho qua ·
+cửa rộng bằng `--soat` · hook rỗng · hook thiếu `--goc` · `hooksPath` tắt). Suite 22 → **23**.
+
+**CÒN HỞ:** cửa chỉ thấy thứ đã khai vào bảng quyền — hai lane đều không nhận khoá thì không lớp
+nào biết của ai. **`KHUNG-59` chưa gạch mã:** chờ audit độc lập, mục 5.
+
 ## 1.8.7 — 2026-09-10 — Vòng audit 4 nói *"logic ĐẠT"*, và một chỗ fail-SILENT cuối
 
 **Vòng audit độc lập thứ tư kết luận: *"Logic bản vá: ĐẠT. Không xác định được lỗi bắt buộc sửa

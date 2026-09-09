@@ -916,6 +916,40 @@ người quyết kiến trúc trước. Ba hướng đã nghĩ tới, chưa cái
 bỏ qua index dùng chung · mỗi lane một `git worktree` riêng · một khoá INDEX giữ trong khoảnh khắc
 `add`→`commit`.
 
+**ĐÃ VÁ 10/09 — bản 1.8.8, CHỜ AUDIT ĐỘC LẬP RỒI MỚI GẠCH MÃ** (mục 5: người sửa không tự
+nghiệm thu). Cơ chế: `.githooks/commit-msg` đọc nhãn `Lane:` rồi gọi `claim.mjs --cua-index`;
+cửa từ chối khi mẻ sắp vào commit có đường dẫn mà **chủ không phải lane đó**.
+
+Ba điều ĐO ĐƯỢC, không suy từ tài liệu git — fixture rời, bốn ca:
+
+| Đo | Số |
+|---|---|
+| `commit-msg` thấy đúng mẻ sắp commit ở cả `--only` và `-a` | git đặt `GIT_INDEX_FILE` sang index TẠM |
+| hook thoát ≠ 0 | commit BỊ HUỶ, HEAD không đổi, **index của lane kia còn nguyên** |
+| `git commit --only <đường dẫn>` | không cuốn file lane khác, kể cả khi họ đã `git add` |
+
+**Ba quyết định phải soi khi audit, không phải ba dòng code:**
+
+⑴ **Cửa HẸP HƠN `--soat`, cố ý.** `--soat` chặn cả file **vô chủ**; cửa chỉ chặn file **có chủ
+khác**. Vì cửa chạy ở MỌI commit của MỌI lane: chặn oan một lượt hợp lệ là dạy người ta mở
+`--no-verify` cho mọi lượt. Cái MẤT: lane quên nhận khoá vẫn commit được — kỷ luật khoá vẫn là
+việc của `--soat` và của cổng.
+
+⑵ **Ở `commit-msg`, không ở `pre-commit`.** Cửa cần biết AI ĐANG COMMIT, và câu trả lời duy nhất
+máy đọc được là nhãn `Lane:` — chỉ `commit-msg` thấy lời nhắn. Hệ quả: **thiếu nhãn thì cửa im
+lặng**, cố ý — cửa đó là phép kiểm "Nhãn lane trong commit" của cổng và của `safe-push`.
+
+⑶ **`core.hooksPath` không theo git được** (cấu hình mỗi bản sao). Nên `claim.mjs --sua` tự bật
+nó, và cổng đóng phiên ĐỎ `CUA_INDEX_TAT` nếu tắt. Đã trỏ nơi khác thì **nêu tên, không ghi đè**.
+
+**Chính fixture lôi ra một lỗi trong bản vá:** cửa suy gốc repo từ **vị trí module**, nên đọc
+index tạm của cây đang commit bằng gốc repo khác → `fatal: unable to read <oid>`, và cửa
+fail-closed sẽ **chặn mọi commit**. Vá bằng `--goc` do hook truyền vào. Chỗ này sẽ va thật ở
+`KHUNG-50`: một `git worktree` riêng có gốc khác gốc module.
+
+**CÒN HỞ, mang theo cả vế này:** cửa chỉ thấy thứ **đã khai vào bảng quyền**. Hai lane đều không
+nhận khoá thì không lớp nào biết của ai — bảng quyền là bằng chứng duy nhất máy có.
+
 **đóng khi:** hai lane cùng chạy trên một cây **không thể** commit chéo việc của nhau — dựng được
 ca hỏng bằng một phép ghim (lane A `add`, lane B `commit`, và B **không** nuốt file của A), phép
 ghim đó ĐỎ trên bản hôm nay, và `AGENTS.md` mục 0b nêu cách gọi git đã chốt. Không đóng bằng một

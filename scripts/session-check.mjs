@@ -1472,7 +1472,27 @@ const doNiemPhong = () => {
   return { ok: true, msg: "dấu niêm phong còn nguyên" };
 };
 
-ghepKiem("Ai đứng tên việc này", ["khoá file", doKhoaFile], ["phạm vi", doPhamVi], ["niêm phong", doNiemPhong]);
+/* CỬA INDEX đã bật chưa — KHUNG-59, 10/09.
+   Cơ chế nằm ở `.githooks/commit-msg`, nhưng `core.hooksPath` là cấu hình MỖI BẢN SAO nên nó
+   KHÔNG theo git. Không kiểm thì bản sao nào quên bật sẽ chạy cả phiên với cửa tắt, và triệu
+   chứng y hệt lúc chưa có cửa: việc lane A vào commit dưới tên lane B, chỉ mắt người bắt được.
+   Gộp vào mục QUYỀN, không thành mục thứ 26 — cùng câu hỏi *"ai đứng tên việc này"*. */
+const doCuaIndex = () => {
+  if (!fs.existsSync(path.join(ROOT, ".githooks", "commit-msg"))) {
+    return { ok: true, skipped: true, msg: "repo này chưa có `.githooks/commit-msg` — không có cửa thì không đo." };
+  }
+  const dang = gitLoiLaBinhThuong("config", "--get", "core.hooksPath").trim();
+  if (dang === ".githooks") return { ok: true, msg: "cửa index đang bật" };
+  return {
+    ok: false,
+    msg: `CUA_INDEX_TAT: core.hooksPath ${dang ? `đang trỏ "${dang}"` : "chưa đặt"}, nên \`.githooks/commit-msg\` KHÔNG chạy.`
+      + " Cửa đó là thứ duy nhất chặn `git commit` của bạn cuốn theo file lane khác vừa `git add` (KHUNG-59)."
+      + " Bật: git config core.hooksPath .githooks"
+      + (dang ? " — đang trỏ nơi khác thì HỎI người đặt trước, đừng ghi đè." : ""),
+  };
+};
+
+ghepKiem("Ai đứng tên việc này", ["khoá file", doKhoaFile], ["phạm vi", doPhamVi], ["niêm phong", doNiemPhong], ["cửa index", doCuaIndex]);
 ghepKiem("Vùng CHỈ-THÊM không bị viết lại", ["bằng chứng", doBangChung], ["sổ quyết định", doSoQuyetDinh]);
 ghepKiem("HANDOFF đã ghi Log, đúng trần, đúng tháng", ["ghi Log", doGhiLog], ["trần/tháng", doTranHandoff]);
 /* PHẦN NẠP — CONTEXT COMPILER, gắn vào cổng ở ĐÂY chứ không thành một mục riêng.

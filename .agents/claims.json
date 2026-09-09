@@ -40,15 +40,91 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "616172417bf691ad",
+  "_fingerprint": "d32af58c4f68eb80",
   "tam": {
-    "docs/ROADMAP-V2.md": {
+    ".githooks/commit-msg": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T19:20:37.383Z"
+      "luc": "2026-09-09T20:03:59.416Z"
+    },
+    "scripts/claim.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:03:59.416Z"
+    },
+    "scripts/session-check.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:03:59.416Z"
+    },
+    "tests/cua-index.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:03:59.416Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:03:59.416Z"
+    },
+    "AGENTS.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:03:59.416Z"
+    },
+    ".repo-structure.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:11:33.521Z"
+    },
+    "docs/BAN-DO-CHI-TIET.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:11:33.521Z"
+    },
+    "BACKLOG.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:11:33.521Z"
+    },
+    "CHANGELOG.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:11:33.521Z"
     },
     "STATUS.md": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T19:20:37.383Z"
+      "luc": "2026-09-09T20:13:43.874Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:13:43.874Z"
+    },
+    "scripts/build-template.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:17:18.982Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/AGENTS.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/scripts/claim.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/scripts/session-check.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/tests/cua-index.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
+    },
+    "template/.githooks/commit-msg": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-09T20:19:22.459Z"
     }
   }
 }
