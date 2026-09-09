@@ -547,3 +547,13 @@ So mốc đầu ngày (14.696): **giảm 73%**. So trần thật 6.000 của Đ�
 **Không sửa đè lên hai chỗ kia, và đây là lý do đáng ghi:** thân ADR đã `Accepted` là bất biến
 (B12 chặn), `HANDOFF.md` là sổ CHỈ-THÊM. Sửa đè để con số đẹp lên chính là *"làm yếu lớp bảo vệ
 đã có"* — luật vàng 3. Sổ chỉ-thêm đính chính bằng cách **thêm**, không bằng cách tẩy.
+
+### 2026-09-09 · codex-audit-architecture · Audit độc lập kiến trúc Harness 1.6.0
+
+Audit mã tại `1b3dee8bca0c8bc2a1c3037cef047350f1d0703d`; HEAD sau đó `d15da7fc` chỉ đổi claims, sổ và dashboard. Không sửa code, luật hoặc proposal. `npm test` chạy trong clone cô lập: **22/22 pass, 602 giây**. Bộ trích: **61 file khớp**; Rule Compiler: **17 ADR, 6 chủ đề, 0 vi phạm**. Đây không phải chứng nhận cổng cuối của cây dùng chung hay các repo tiêu thụ.
+
+**P1, đã tái hiện:** `scripts/chay-test.mjs:54` băm trạng thái/tên file, không băm nội dung: file đã bẩn đổi A sang B vẫn được `xetDau` chấp nhận. `scripts/safe-push.mjs:262` dùng dấu SUITE làm bằng chứng CỔNG: fixture chỉ chạy suite, không có session-check, vẫn tự cho carry commit lane khác trong dry-run (exit 0). Không đẩy fixture ra ngoài máy.
+
+**Nợ còn sống qua đọc code:** KHUNG-51: test sửa ledger ngay cây nguồn; KHUNG-53: khoá FILE chưa nối đầy đủ vào cổng. **P2:** init không ghi pin, nên file máy đổi ở bản sau thành CHƯA GHIM (đã thử builder + upgrade planner); thứ tự đóng ở AGENTS 0b và mở phiên ở docs/SO-TAY-AGENT còn mâu thuẫn.
+
+**Verdict:** giữ kiến trúc, bảo trì có mục tiêu; chưa chứng nhận ổn định để nhân rộng mặc định. Ưu tiên tính đúng bằng chứng suite/cổng và cô lập mutation test; nối hết đường khoá file, init/upgrade. Không thêm Context Router. Không suy ổn định downstream từ số suite xanh. Chi tiết/ca phản chứng trong báo cáo audit gửi Đức; chờ Đức quyết thứ tự giao sửa, audit này không implement.
