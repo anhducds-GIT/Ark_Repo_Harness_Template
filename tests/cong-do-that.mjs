@@ -13,7 +13,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,7 +22,13 @@ let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const NL = String.fromCharCode(10);
-const SCRIPTS = ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"];
+/* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — 09/09, sau một lỗi thật.
+   Danh sách gõ tay ở đây từng thiếu `rule-compiler.mjs` ngay hôm `check-bootstrap.mjs` bắt đầu
+   `import` nó. Kết quả: cổng kiểm cấu trúc CHẾT lúc nạp (`ERR_MODULE_NOT_FOUND`) trong mọi
+   fixture, suốt cả ngày, **mà toàn bộ suite vẫn XANH** — vì không vế nào đòi cổng đó chạy được.
+   Một lớp bảo vệ không bao giờ đỏ vì nó không bao giờ CHẠY là hình dạng lỗi tệ nhất ở đây.
+   Chép cả thư mục thì lớp lỗi này biến mất theo cấu trúc, không cần ai nhớ. */
+const SCRIPTS = readdirSync(join(ROOT, "scripts")).filter((f) => f.endsWith(".mjs"));
 
 /* Kho nền: đủ để cổng chạy tới được mọi phép kiểm. Mỗi khối tự phá phần của mình. */
 function khoNen({ chuKhoa = "thu" } = {}) {

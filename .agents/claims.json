@@ -39,5 +39,51 @@
       "task": "rule compiler v1",
       "released_at": "2026-09-09T06:05:29.480Z"
     }
+  },
+  "tam": {
+    "tests/cong-do-that.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "tests/core-contract.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "tests/harness-smoke.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "tests/khoa-dau-vet.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "HANDOFF.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "template/tests/harness-smoke.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    },
+    "template/tests/khoa-dau-vet.mjs": {
+      "owner": "harness-loi-01",
+      "luc": "2026-09-09T06:19:17.932Z"
+    }
   }
 }

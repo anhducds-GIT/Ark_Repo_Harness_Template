@@ -568,3 +568,26 @@ dựng `docs/adr/` nhưng để RỖNG nên vế *"trỏ tới ADR sống thì g
 
 **Đã cắt thật 1 mục** (`KHUNG-23 đã THI HÀNH`, 37 dòng) sang `docs/archive/DECISIONS-da-thi-hanh-2026-09.md`,
 đối chiếu byte 0 dòng mất. Sổ quyết định **31 → 30**. Bản **1.3.98**.
+
+### 2026-09-09 (13) · harness-loi-01 · Cổng cấu trúc đã CHẾT trong fixture cả ngày — không ai thấy
+
+**Lỗ này HANDOFF đã ghi là "chưa có phép kiểm", và hôm nay nó cắn thật.**
+
+Sáng nay tôi thêm `import ... from "./rule-compiler.mjs"` vào `check-bootstrap.mjs`. **Năm chỗ**
+trong `tests/` chép một DANH SÁCH SCRIPT GÕ TAY sang thư mục tạm, và không chỗ nào có file đó.
+Kết quả: trong mọi fixture, `check-bootstrap.mjs` chết ngay lúc NẠP với `ERR_MODULE_NOT_FOUND` —
+tức **cổng kiểm cấu trúc đã chết trong fixture suốt cả ngày** — và **toàn bộ 22 suite vẫn XANH**,
+vì không vế nào đòi cổng đó phải CHẠY ĐƯỢC.
+
+**Một lớp bảo vệ không bao giờ đỏ VÌ NÓ KHÔNG BAO GIỜ CHẠY** là hình dạng lỗi tệ nhất ở repo này,
+và nó không bao giờ tự lộ ra.
+
+**Chữa ở GỐC, không ở chỗ đỏ:** bỏ danh sách gõ tay ở cả **5 chỗ**, chép cả thư mục `scripts/`.
+Lớp lỗi biến mất theo cấu trúc, không cần ai nhớ.
+
+**Ghim `F22`** — cấm gõ tay danh sách script trong fixture. Đo hai hình dạng: dùng ngay tại chỗ,
+và **đặt tên rồi dùng ở dòng khác** (hình dạng thứ hai làm đột biến SỐNG SÓT lượt đầu — cửa sổ
+ngữ cảnh 200 ký tự không với tới `copyFileSync`). Và nó từng báo oan `khoa-dau-vet.mjs`, nơi mảng
+đó dùng để QUÉT MÃ NGUỒN chứ không chép — đã thu hẹp về đúng ngữ cảnh `copyFileSync`.
+
+Bản **1.4.1**.

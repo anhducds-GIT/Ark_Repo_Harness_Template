@@ -111,7 +111,10 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     // đúng cái bẫy đã ghi ở khối 1 của suite hạt giống.
     mkdirSync(join(root, "scripts"), { recursive: true });
     mkdirSync(join(root, ".agents"), { recursive: true });
-    for (const f of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"]) {
+    /* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — xem ghi chú ở `tests/cong-do-that.mjs`: một danh
+       sách gõ tay từng thiếu một import mới, và cổng cấu trúc CHẾT trong fixture suốt cả ngày mà
+       suite vẫn xanh. Chép cả thư mục thì lớp lỗi đó biến mất theo cấu trúc. */
+    for (const f of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       cpSync(join(ROOT, "scripts", f), join(root, "scripts", f));
     }
     cpSync(join(ROOT, ".repo-structure.json"), join(root, ".repo-structure.json"));
@@ -1085,6 +1088,57 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     assert.equal(khaiGia, 999, "phep loc phai doc dung con so trong van ban, khong doc nham cai khac");
   }
   ok(`F21 - ${soDo} khang dinh "<N> ve" trong luat, ca ${soDo} deu khop so ve thuc te`);
+}
+
+/* ---- F22. Fixture KHONG duoc go tay danh sach script -------------------
+ *
+ * LO NAY DA GHI TRONG HANDOFF LA "CHUA CO PHEP KIEM", va hom nay no can that.
+ *
+ * 09/09 toi them mot `import ... from "./rule-compiler.mjs"` vao `check-bootstrap.mjs`. Nam cho
+ * trong `tests/` chep MOT DANH SACH SCRIPT GO TAY sang thu muc tam, va khong cho nao co file do.
+ * Ket qua: trong moi fixture, `check-bootstrap.mjs` chet ngay luc NAP voi `ERR_MODULE_NOT_FOUND`
+ * — tuc **cong kiem cau truc da chet trong fixture suot ca ngay** — va **toan bo suite van XANH**,
+ * vi khong ve nao doi cong do phai CHAY DUOC.
+ *
+ * Mot lop bao ve khong bao gio do VI NO KHONG BAO GIO CHAY la hinh dang loi te nhat o day, va no
+ * khong bao gio tu lo ra.
+ *
+ * CHUA O GOC: bo danh sach go tay, chep CA thu muc `scripts/`. Ve nay chi con canh dung mot dieu
+ * — khong ai go lai danh sach do. Do bang chinh ma nguon test, vi day la luat ve CACH VIET TEST. */
+{
+  const dsTest = readdirSync(join(ROOT, "tests")).filter((f) => f.endsWith(".mjs"));
+  const goTay = [];
+  let soChep = 0;
+  for (const f of dsTest) {
+    const src = readFileSync(join(ROOT, "tests", f), "utf8");
+    /* Danh sach go tay = mang chua TU HAI ten script tro len. Mot ten don le la duong dan, khong
+       phai danh sach chep — phan biet duoc bang so luong, khong can hieu ngu canh. */
+    for (const m of src.matchAll(/\[([^\]]*\.mjs"[^\]]*)\]/g)) {
+      const ten = [...m[1].matchAll(/"([a-z0-9-]+\.mjs)"/g)].map((x) => x[1]);
+      /* CHI tinh danh sach dung de CHEP. Ban dau ve nay bao oan `tests/khoa-dau-vet.mjs` — mang o
+         do liet ke hai file de QUET MA NGUON, khong chep di dau. Mot phep kiem bao oan thi nguoi
+         ta tat no, va luc do no khong con canh gi. Xet ngu canh 200 ky tu sau mang. */
+      /* HAI HINH DANG, va bo sot hinh dang thu hai la dot bien SONG SOT luot dau:
+           ⑴ dung ngay tai cho:  for (const x of ["a.mjs", ...]) copyFileSync(...)
+           ⑵ dat ten roi dung o dong khac:  const SCRIPTS = [...]  ... for (const f of SCRIPTS) copyFileSync
+         Cua so 200 ky tu chi voi toi hinh dang ⑴. Voi ⑵ phai lan theo TEN BIEN. */
+      const nguCanh = src.slice(m.index, m.index + 200);
+      const truoc = src.slice(Math.max(0, m.index - 60), m.index);
+      const tenBien = (truoc.match(/const\s+([A-Za-z_$][\w$]*)\s*=\s*$/) || [])[1];
+      const dungDeChep = /copyFileSync/.test(nguCanh)
+        || (tenBien && src.split(NL).some((d) => d.includes(tenBien) && d.includes("copyFileSync")));
+      if (ten.length >= 2 && ten.includes("session-check.mjs") && dungDeChep) {
+        goTay.push(`tests/${f}: ${ten.slice(0, 3).join(", ")}…`);
+      }
+    }
+    if (/readdirSync\(join\(ROOT, "scripts"\)\)/.test(src)) soChep += 1;
+  }
+  assert.ok(soChep >= 3,
+    `ve nay MAT DOI TUONG DO: chi ${soChep} file test chep ca thu muc scripts/ — doi cach dung fixture thi sua ve nay cho dung`);
+  assert.deepEqual(goTay, [],
+    `fixture go tay danh sach script: ${goTay.join(" · ")} — them mot import moi la danh sach do thieu,`
+    + " script chet luc NAP, va suite van xanh. Chep ca thu muc thay vi go tung ten.");
+  ok(`F22 - ${soChep} file test chep CA thu muc scripts/, 0 danh sach go tay`);
 }
 
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

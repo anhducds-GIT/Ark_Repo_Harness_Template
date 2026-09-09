@@ -15,7 +15,7 @@
 
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -294,7 +294,10 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(fx, "scripts"), { recursive: true });
     mkdirSync(join(fx, ".agents"), { recursive: true });
-    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"]) {
+    /* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — xem ghi chú ở `tests/cong-do-that.mjs`: một danh
+       sách gõ tay từng thiếu một import mới, và cổng cấu trúc CHẾT trong fixture suốt cả ngày mà
+       suite vẫn xanh. Chép cả thư mục thì lớp lỗi đó biến mất theo cấu trúc. */
+    for (const n of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
@@ -362,7 +365,10 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(fx, "scripts"), { recursive: true });
     mkdirSync(join(fx, ".agents"), { recursive: true });
-    for (const n of ["session-check.mjs", "repo-structure.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "claim.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"]) {
+    /* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — xem ghi chú ở `tests/cong-do-that.mjs`: một danh
+       sách gõ tay từng thiếu một import mới, và cổng cấu trúc CHẾT trong fixture suốt cả ngày mà
+       suite vẫn xanh. Chép cả thư mục thì lớp lỗi đó biến mất theo cấu trúc. */
+    for (const n of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", n), join(fx, "scripts", n));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(fx, ".repo-structure.json"));
@@ -430,7 +436,10 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(temp, "scripts"), { recursive: true });
     mkdirSync(join(temp, ".agents"), { recursive: true });
-    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"]) {
+    /* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — xem ghi chú ở `tests/cong-do-that.mjs`: một danh
+       sách gõ tay từng thiếu một import mới, và cổng cấu trúc CHẾT trong fixture suốt cả ngày mà
+       suite vẫn xanh. Chép cả thư mục thì lớp lỗi đó biến mất theo cấu trúc. */
+    for (const name of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", name), join(temp, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(temp, ".repo-structure.json"));
@@ -587,7 +596,10 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(kho, "scripts"), { recursive: true });
     mkdirSync(join(kho, ".agents"), { recursive: true });
-    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"]) {
+    /* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — xem ghi chú ở `tests/cong-do-that.mjs`: một danh
+       sách gõ tay từng thiếu một import mới, và cổng cấu trúc CHẾT trong fixture suốt cả ngày mà
+       suite vẫn xanh. Chép cả thư mục thì lớp lỗi đó biến mất theo cấu trúc. */
+    for (const name of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
@@ -650,7 +662,10 @@ const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
     at("config", "user.name", "t"); at("config", "user.email", "t@e.invalid");
     mkdirSync(join(kho, "scripts"), { recursive: true });
     mkdirSync(join(kho, ".agents"), { recursive: true });
-    for (const name of ["session-check.mjs", "repo-structure.mjs", "claim.mjs", "check-bootstrap.mjs", "build-dashboard.mjs", "what-next.mjs", "handoff.mjs", "chay-test.mjs"]) {
+    /* CHÉP CẢ `scripts/`, KHÔNG gõ danh sách — xem ghi chú ở `tests/cong-do-that.mjs`: một danh
+       sách gõ tay từng thiếu một import mới, và cổng cấu trúc CHẾT trong fixture suốt cả ngày mà
+       suite vẫn xanh. Chép cả thư mục thì lớp lỗi đó biến mất theo cấu trúc. */
+    for (const name of readdirSync(join(ROOT, "scripts")).filter((x) => x.endsWith(".mjs"))) {
       copyFileSync(join(ROOT, "scripts", name), join(kho, "scripts", name));
     }
     copyFileSync(join(ROOT, ".repo-structure.json"), join(kho, ".repo-structure.json"));
