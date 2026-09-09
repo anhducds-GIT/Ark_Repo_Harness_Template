@@ -39,31 +39,5 @@
       "task": "Dong goi migrate: va ba lo hat giong, doi moc Stable Baseline",
       "released_at": null
     }
-  },
-  "tam": {
-    "scripts/build-template.mjs": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T13:56:03.607Z"
-    },
-    "package.json": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T13:57:52.023Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T13:57:52.023Z"
-    },
-    "STATUS.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T13:57:52.023Z"
-    },
-    "README.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T13:57:52.023Z"
-    },
-    "decisions.md": {
-      "owner": "harness-loi-01",
-      "luc": "2026-09-09T13:57:52.023Z"
-    }
   }
 }
