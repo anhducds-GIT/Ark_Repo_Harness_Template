@@ -64,7 +64,7 @@ bản mẫu [docs/_TEMPLATE-adr.md](docs/_TEMPLATE-adr.md) · luật [docs/adr/0
 
 ### Muốn biết bộ khung và một repo đã lắp nó đang LỆCH nhau ở đâu
 
-[docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md](docs/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md) — đo 06/09, mỗi khối lệch rơi vào **đúng một** trong ba ô: `KÉO XUỐNG` · `ĐẨY LÊN` · `CỐ Ý KHÁC`. Ô thứ ba là ô hay bị bỏ sót nhất: repo tiêu thụ lớn hơn vì nó **phản ứng với sự cố thật của riêng nó**, không vì nó tốt hơn — chép mù bản của nó là nhập cả những luật chỉ đúng ở đó
+**ĐÃ LƯU KHO 09/09** (đo ở bản 1.3.19, việc hoà giải đã xong): [docs/archive/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md](docs/archive/HOA-GIAI-BO-KHUNG-VS-TIEU-THU.md) — đo 06/09, mỗi khối lệch rơi vào **đúng một** trong ba ô: `KÉO XUỐNG` · `ĐẨY LÊN` · `CỐ Ý KHÁC`. Ô thứ ba là ô hay bị bỏ sót nhất: repo tiêu thụ lớn hơn vì nó **phản ứng với sự cố thật của riêng nó**, không vì nó tốt hơn — chép mù bản của nó là nhập cả những luật chỉ đúng ở đó
 
 ### Biết phiên trước làm tới đâu
 
@@ -108,7 +108,7 @@ chạy `npm run bootstrap`
 
 ### Nhờ một AI khác brainstorm cho repo này
 
-[docs/briefs/BRAINSTORM-GPT-V1.md](docs/briefs/BRAINSTORM-GPT-V1.md) — dán trọn, đừng tóm tắt hộ
+**ĐÃ LƯU KHO 09/09** (đề bài đưa bộ khung tới v1.0; nay đã 1.6.0): [docs/archive/BRAINSTORM-GPT-V1.md](docs/archive/BRAINSTORM-GPT-V1.md) — dán trọn, đừng tóm tắt hộ
 
 ### Việc lặp lại — làm theo danh sách kiểm, đừng tự nghĩ lại
 
