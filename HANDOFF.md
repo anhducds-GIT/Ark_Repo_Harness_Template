@@ -478,3 +478,29 @@ LÀNH (một bảng đối chiếu kỹ thuật, một dòng NỐI của đoạn
 
 **KHÔNG mở mục nợ mới:** ba luật của vai này vẫn chưa có phép kiểm máy — đó là `KHUNG-4`, đã có
 mục, không nhân thêm. Bảng "có răng chưa" ở đầu file vẫn đúng: **1 trong 5** mục có phép kiểm.
+
+### 2026-09-09 (10) · harness-loi-01 · Ba trong bốn chỗ vượt ngân sách: đóng bằng cơ chế sẵn có
+
+**`KHUNG-11` — làm được phần không cần Đức:** ⑴ `HANDOFF.md` **1264 → 480**/600 bằng nhịp dọn;
+⑵ mục nợ đã đóng **64% → 0%**, dời 35/55 mục (922 dòng) sang kho, `BACKLOG.md` **1496 → 574**;
+⑶ tổng tài liệu **6012 → 3602** — không phải cắt chữ, mà vì `can-nang` chỉ trừ `archive/` trong
+khi cổng trừ cả `adr/` và `migrations/`. **Hai phép đo cùng một thứ, hai kết quả** (3.185 vs
+6.012), và nó đếm cả `docs/adr/` là thứ luật bắt BẤT BIẾN — tức mỗi ADR mới làm nó đỏ hơn và
+không có đường hợp lệ nào hạ xuống. Nay dùng chung `THU_MUC_DOCS_KHONG_TINH`.
+
+**Trước khi dời mục đã đóng, phải dạy bộ sinh đọc cả kho:** thẻ *"Đã xong"* của bảng đọc thẳng
+`BACKLOG.md`. Dời đi mà không sửa là thẻ RỖNG. Đã kiểm sau khi dời: vẫn **35 việc**.
+
+**Một lỗi của chính nhịp dọn:** nó dọn tới **đúng trần** (600/600), nên dòng Log kế tiếp là 601 —
+đỏ lại ngay. Một "nhịp" phải chạy mỗi lượt thì nó là thuế. Nay chừa **20%**; trần không đổi.
+
+**`KHUNG-14` — nửa ĐO đã xong:** `npm run assess` chạy thật. `n8n-orchestrator` 30/60 (thiếu 1,
+lệch 12) · `ALL_SKILL_MANAGEMENT` 30/60 · `Project 3 AI Agent Unify` 29/60 · `nav_platform_main`
+**không có trên máy này**. **Suýt báo sai:** cả ba in `MỨC 1/3` trong khi hồ sơ khai `muc_sau: 3`
+— không phải hồ sơ khai vống, mà là ba repo tụt lại **24 bản khung**. Chỗ hỏng thật nằm ở `assess`:
+nó gộp *thiếu bộ máy* với *bộ máy bản cũ* thành một mức, nên repo đứng yên vẫn tụt hạng.
+
+**`KHUNG-30` đổi trạng thái:** nhánh repo đích trước lệch *5 sau/48 trước*, nay **0 sau/63 trước**
+— hết lệch. Chốt chặn còn lại là luật *Cloud Sync Hold* của chính repo đó (mục 8A), vẫn còn.
+
+Bản **1.3.91**. Còn chờ Đức: ngân sách tài liệu · số phép kiểm · `KHUNG-6` · `37` · `40`.

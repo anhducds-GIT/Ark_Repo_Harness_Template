@@ -94,7 +94,26 @@ Hai lượt 03/09 (`nav_platform_main`, `Project 3 AI Agent Unify`) đều **d�
 tức theo định nghĩa mới thì **cả hai chưa xong việc thứ ba**. Ba phép thử đã viết trong quy trình
 migrate; chưa lượt nào chạy chúng. Vùng: *(chạy ở repo đích, không đòi khoá của bộ khung)*.
 
-**NHẬN THÊM KHUNG-3 (gộp 09/09) — nửa ĐO của cùng lượt mở máy.** Hai repo trên migrate 03/09 ở
+**NHẬN THÊM KHUNG-3 (gộp 09/09) — nửa ĐO của cùng lượt mở máy.**
+**NỬA ĐO ĐÃ XONG 09/09 — `npm run assess` chạy thật trên từng repo:**
+
+| Repo | Khớp bản chuẩn | Thiếu | Lệch tầng máy |
+|---|---|---|---|
+| `n8n-orchestrator` | 30/60 | 1 (`rule-compiler.mjs`) | 12 file |
+| `ALL_SKILL_MANAGEMENT` | 30/60 | — | — |
+| `Project 3 AI Agent Unify` | 29/60 | — | — |
+| `nav_platform_main` | **không có trên máy này** | | |
+
+**Đọc con số cho ĐÚNG — suýt báo sai:** cả ba đều in `MỨC 1/3 — có luật, chưa có bộ máy`, và
+cả bốn hồ sơ migrate đều khai `muc_sau: 3`. Nhìn thế thì tưởng hồ sơ khai vống. **Không phải.**
+Ba repo đó *có* bộ máy, chỉ là **bản cũ**: hồ sơ n8n đo ở bộ khung **1.3.67**, nay là **1.3.91**
+— 24 bản. `assess` so với bản CHUẨN HÔM NAY nên mọi file cũ đều tính là *lệch*.
+
+**Nhưng đó là một chỗ hỏng THẬT của `assess`, ghi vào đây chứ không mở mục mới:** nó gộp *thiếu
+bộ máy* với *bộ máy bản cũ* thành cùng một mức. Một repo đứng yên tụt từ MỨC 3 xuống MỨC 1 chỉ
+vì bộ khung đi tiếp — và Đức là người đọc con số đó. **đóng khi:** `assess` phân biệt được hai ca
+(thiếu file ≠ lệch bản), và một ca dựng repo đủ file nhưng bản cũ thì KHÔNG bị gọi là *chưa có bộ máy*.
+ Hai repo trên migrate 03/09 ở
 bản **0.3.0**; nay là **1.3.x**, không ai biết chúng đã trôi bao xa. Đo rẻ, **chỉ đọc, không đòi
 khoá nào**: `npm run assess -- <đường-dẫn-repo>` cho từng repo, rồi so với `muc_sau` ghi trong hồ
 sơ `docs/migrations/`. Làm phép đo này TRƯỚC phép thử onboard: nếu repo đã trôi xa thì phiên AI ở
