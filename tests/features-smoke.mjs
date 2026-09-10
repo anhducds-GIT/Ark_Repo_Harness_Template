@@ -371,6 +371,17 @@ if (!laNoiPhatHanh(ROOT)) {
 
   const doAgents = danhMuc.blocks.flatMap((b) => b.muc.flatMap((m) => (m.can?.trong_file ?? [])
     .filter((t) => t.file === "AGENTS.md").map((t) => ({ ma: m.ma, chuoi: t.chuoi ?? [] }))));
+  /* PHÉP DÒ MẤT MỤC TIÊU = ĐỎ. `F4.7` đo tầng luật bằng BA CHUỖI; lượt gộp 9 mục → 6 ngày 10/09
+     bỏ đúng cái bảng chứa chuỗi thứ ba, nên nó khớp **0 mục** — và vế này VẪN XANH, vì mục đó lúc
+     ấy còn một lời miễn. Một phép dò không trỏ vào đâu thì nó đang đo số 0, không phải đang dò.
+     Chỗ này bịt đúng chiều đó: mọi phép dò vào `AGENTS.md` phải khớp ÍT NHẤT MỘT mục. */
+  const doMatMucTieu = [...new Set(doAgents
+    .filter((x) => !(x.chuoi.length > 0 && khuc.some((k) => x.chuoi.every((c) => k.than.includes(c)))))
+    .map((x) => x.ma))];
+  assert.deepEqual(doMatMucTieu, [],
+    `phép dò \`trong_file\` vào AGENTS.md KHỚP 0 MỤC: ${doMatMucTieu.join(" · ")}`
+    + " — chuỗi nó đo đã biến mất khỏi luật, nên nó không còn dò gì. Sửa chuỗi, hoặc trả câu luật về.");
+
   const mien = danhMuc.luat_nha?.mien ?? {};
 
   const hoDoi = [];

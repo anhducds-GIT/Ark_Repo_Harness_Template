@@ -22,6 +22,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { MOC_BAN_DO, MOC_SAU_BAN_DO } from "./repo-structure.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = "template";
@@ -510,9 +511,9 @@ function phanLuatChung(text) {
   /* MỐC CUỐI LÀ `## 8.`, KHÔNG PHẢI `## 7.` — lượt gộp 10/09 nhập mục 7 vào mục 0, nên mục sau
      bản đồ file nay là mục 8. Số mục cố ý KHÔNG liền nhau: ~250 chỗ trong mã và tài liệu trỏ vào
      các mục theo SỐ, đánh số lại là tạo hàng trăm con trỏ chết. */
-  const moc = (so) => String.fromCharCode(10) + "## " + so + ".";
-  const dau = text.indexOf(moc(6));
-  const cuoi = text.indexOf(moc(8));
+  const NL_MOC = String.fromCharCode(10);
+  const dau = text.indexOf(NL_MOC + MOC_BAN_DO);
+  const cuoi = text.indexOf(NL_MOC + MOC_SAU_BAN_DO);
   if (dau < 0 || cuoi < 0 || cuoi <= dau) return text;
   return text.slice(0, dau) + text.slice(cuoi);
 }
@@ -802,8 +803,8 @@ function lawForTemplate() {
   // Thứ tự có lý do: tách luật-nghề TRƯỚC, cắt mục 6 SAU. Cắt trước thì các mốc chỉ số dời đi
   // và mọi phép thay phải tính lại — thừa một cơ hội sai mà không đổi lại được gì.
   const text = stripNghe(read("AGENTS.md"));
-  const start = soleHeadingIndex(text, "## 6.").index;
-  const end = soleHeadingIndex(text, "## 8.").index;   // mục 7 đã gộp vào mục 0 — lượt 10/09
+  const start = soleHeadingIndex(text, MOC_BAN_DO).index;
+  const end = soleHeadingIndex(text, MOC_SAU_BAN_DO).index;
   if (start < 0 || end < 0 || end <= start) {
     throw new Error(
       "TRICH_HONG: không tìm thấy mốc `## 6.` và `## 8.` trong AGENTS.md. Bộ trích cắt theo tiêu đề mục; " +

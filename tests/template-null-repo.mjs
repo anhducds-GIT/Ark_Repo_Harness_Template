@@ -31,6 +31,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { buildTemplateFiles, leakedNames, soleHeadingIndex, stripNghe, TEMPLATE_VERSION } from "../scripts/build-template.mjs";
+import { MOC_BAN_DO, MOC_SAU_BAN_DO } from "../scripts/repo-structure.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -71,7 +72,7 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
       /* MOC LA `## 8.` TU 10/09 (muc 7 da gop vao muc 0). Va phai DOI moc co that:
          `replace` khong khop la KHONG-LAM-GI, nen fixture thieu dung may dong vua dinh them
          va ca ve chay tren nen rong — xanh ma do so 0. */
-      const MOC8 = String.fromCharCode(10) + "## 8.";
+      const MOC8 = String.fromCharCode(10) + MOC_SAU_BAN_DO;
       if (banDo === "AGENTS.md") {
         assert.ok(cu.includes(MOC8), "fixture AGENTS.md phai co moc ## 8. de chen bang ban do");
         fixture.set(banDo, cu.replace(MOC8, String.fromCharCode(10) + rows + MOC8));
@@ -312,7 +313,7 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
 
   // Chỉ nhận dòng BẮT ĐẦU bằng mốc. Nhắc trong trích dẫn hay giữa câu thì không tính.
   const trichDan = "# Luat\n\n> muc `## 6.` noi rang ...\n\nvan xuoi nhac ## 6. o giua cau\n\n## 6. So tay\n\nthan\n";
-  const hit = f(trichDan, "## 6.");
+  const hit = f(trichDan, MOC_BAN_DO);
   assert.equal(hit.hits.length, 1, "chi duoc tinh dong BAT DAU bang moc, khong tinh nhac trong trich dan hay giua cau");
   assert.equal(trichDan.slice(hit.index, hit.index + 12), "## 6. So tay", "phai tro dung tieu de THAT");
 
@@ -335,7 +336,7 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
      đồ file là mục 8. Ghim đúng CẶP mà `lawForTemplate()` đang dùng: ghim sai cặp thì phép kiểm
      này xanh trong khi bộ trích cắt sai, tức nó ghim số 0. */
   const luatThat = readFileSync(new URL("../AGENTS.md", import.meta.url), "utf8");
-  for (const moc of ["## 6.", "## 8."]) {
+  for (const moc of [MOC_BAN_DO, MOC_SAU_BAN_DO]) {
     assert.equal(f(luatThat, moc).hits.length, 1, `AGENTS.md that phai co DUNG MOT dong bat dau bang \`${moc}\``);
   }
   ok("moc cat muc 6 la tieu de THAT va DUY NHAT; hai moc thi FAIL CLOSED kem so dong");
@@ -404,9 +405,9 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
   // trong đó không tính. Bản đầu soi cả file và báo động nhầm 4 dòng — tất cả đều ở mục 6.
   /* MOC SAU BAN DO LA ## 8. tu 10/09. Ghim sai moc thi split(...)[1] la undefined, || rong
      bien no thanh chuoi rong, va phep soi nay BO QUA moi muc sau ban do ma van xanh. */
-  const sauBanDo = daChung.split("## 8.");
+  const sauBanDo = daChung.split(MOC_SAU_BAN_DO);
   assert.equal(sauBanDo.length, 2, "AGENTS.md phai co dung mot moc ## 8. — ghim sai moc la soi thieu ca mot muc");
-  const phanChung = daChung.split("## 6.")[0] + sauBanDo[1];
+  const phanChung = daChung.split(MOC_BAN_DO)[0] + sauBanDo[1];
   assert.ok(!/selector|dom_probe|innerHTML/.test(phanChung),
     "tach xong thi phan luat chung phai sach tu vung nghe");
   assert.doesNotThrow(() => stripNghe(daChung), "luat da o dang chung thi tach lai phai la khong-lam-gi");

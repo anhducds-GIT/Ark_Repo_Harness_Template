@@ -21,6 +21,26 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-11 · harness-loi-02 — chặn typo từ GỐC: 8 chỗ gõ tay → 1 nhà
+
+**Đức hỏi:** *"có cách nào tránh được lỗi typo không? … làm drift và miss direction ngay từ gốc."*
+
+**Trả lời bằng số đo, không bằng lời khuyên:** cả **6** ca drift hôm qua đều là **một sự thật viết
+ở hai chỗ**; typo chỉ bật công tắc. Không ca nào là "gõ sai chữ".
+
+**Vá ⑴** `MOC_BAN_DO`/`MOC_SAU_BAN_DO` export từ `repo-structure.mjs` — **8 chỗ gõ tay → 1**. Gõ
+sai tên hằng nay là `ReferenceError`, không phải phép kiểm im lặng.
+**Vá ⑵** vế `5e` đòi mọi phép dò `trong_file` khớp **≥1 mục**. Vế 5 kiểm chuỗi có trong **FILE**,
+nên chuỗi rải ra **hai mục** thì nó xanh mà phép dò không chứng nhận mục nào — đột biến dựng đúng
+ca đó, ĐỎ.
+
+**RƠI VÀO CÙNG BẪY LẦN THỨ HAI:** hai đột biến đầu **chết ở cửa khác** (dấu vân tay chặn trước khi
+tới `5e`). Phải hoà giải cửa đó rồi mới đo. Nếp: **sau mỗi đột biến, kiểm xem nó có tới được đúng
+phép kiểm mình đang thử hay không** — đỏ ở chỗ khác không phải bằng chứng.
+
+**Chỗ máy không làm được:** máy bắt **con trỏ đứt**, không bắt **câu sai**. Mốc thứ ba hôm qua là
+câu sai, và thứ tìm ra nó là **Đức đọc output của máy**. Giảm câu sai = giảm số CHỖ có thể sai.
+
 ## 2026-09-10 (tiep 12) · harness-loi-02 — Đức bắt MỐC THỨ BA, nằm trong output của máy
 
 **Đức đọc thông điệp cổng** `KHOA_FILE_CON_TREO` và thấy nó nêu mốc là *cuối phiên*, trong khi

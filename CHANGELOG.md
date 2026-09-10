@@ -3,6 +3,40 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.39 — 2026-09-11 — Đức hỏi cách chặn typo từ gốc: 8 chỗ gõ tay → 1 nhà
+
+**Câu hỏi của Đức:** *"có cách nào tránh được lỗi typo không? từ issue nhỏ thành issue lớn, làm
+drift và miss direction ngay từ gốc."*
+
+**Đo trước khi trả lời — cả sáu ca drift hôm qua đều là MỘT SỰ THẬT VIẾT Ở HAI CHỖ**, typo chỉ là
+cái bật công tắc:
+
+| Đã hỏng | Gốc thật |
+|---|---|
+| 4 con trỏ chết vào `## 7.` | mốc tiêu đề **gõ tay 8 chỗ** |
+| 2 phép kiểm xanh mà đo số 0 | `replace`/`split` không khớp = **không-làm-gì** |
+| `F4.7` mất mục tiêu | phép dò khớp **0 mục** vẫn xanh |
+| mốc thứ ba trong output cổng | một luật, **5 chỗ phát biểu** |
+
+**VÁ ⑴ — MỘT NHÀ cho hai mốc tiêu đề.** `MOC_BAN_DO` · `MOC_SAU_BAN_DO` nay `export` từ
+`repo-structure.mjs`; `build-template`, `build-overview` và `template-null-repo` đều **nhập**.
+Đo: **8 chỗ gõ tay → 1**. Đổi số mục nay là sửa một dòng, và gõ sai tên hằng là `ReferenceError`
+ngay, chứ không phải một phép kiểm im lặng đi qua. Đây là mục 8 (*mỗi luật một nhà*) áp cho
+**HẰNG SỐ**. Ba chuỗi `"## 6."` còn lại là **fixture tổng hợp** — đầu vào của phép kiểm, cố ý literal.
+
+**VÁ ⑵ — phép dò MẤT MỤC TIÊU là ĐỎ.** Vế `5e` nay đòi mọi `trong_file` vào `AGENTS.md` khớp **ít
+nhất một mục**. Đây là chỗ vế 5 KHÔNG thấy: vế 5 kiểm chuỗi có mặt trong **FILE**, nên chuỗi rải ra
+**hai mục khác nhau** thì nó xanh trong khi phép dò không còn chứng nhận mục nào. Đột biến dựng
+đúng ca đó (chuỗi rời mục 3 sang cuối file) → **ĐỎ**.
+
+**BÀI HỌC LẶP LẠI LẦN THỨ HAI trong hai lượt:** cả hai đột biến đầu **chết ở cửa khác** — dấu vân
+tay luật chung chặn trước khi tới `5e`. Phải **hoà giải cửa đó** rồi mới đo. *Một phép ghim chỉ đỏ
+nhờ cửa khác thì nó chưa được thử* — nay đã ghi hai lần, vì tôi rơi vào nó hai lần.
+
+**CHỖ MÁY KHÔNG LÀM ĐƯỢC, nói thẳng:** máy bắt được **con trỏ đứt**; nó không bắt được **câu sai**.
+Mốc thứ ba hôm qua là một câu sai, và thứ tìm ra nó là **Đức đọc output của máy**. Cách duy nhất
+giảm số câu sai là giảm số CHỖ có thể sai — từ 5 xuống 1.
+
 ## 1.9.38 — 2026-09-10 — Đức đọc OUTPUT của cổng và bắt được MỐC THỨ BA
 
 **Đức chốt hai việc** (`decisions.md`): khoá FILE **chỉ sống trong đúng lượt ghi**, và **giữ** quyền

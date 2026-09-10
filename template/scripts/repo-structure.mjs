@@ -607,6 +607,18 @@ export function behaviourGlobsFrom(parsed) {
  * `isBehaviourFile(".agents/claims.json") === false`, kèm ca thật 06/09 (commit `fa7e8a7`
  * chạm đúng một file là `claims.json` và bộ đếm hành vi nhảy 4 → 5). Nên đây không phải luật
  * mới — nó là luật ĐÃ CÓ, nay được mang tới chỗ thứ hai đang cần nó. */
+/* HAI MỐC TIÊU ĐỀ CỦA `AGENTS.md` — MỘT NHÀ, vì gõ tay chúng là cả một LỚP lỗi.
+ *
+ * Bộ trích cắt bản đồ file ra khỏi luật chung bằng cặp mốc này; trang tổng quan đọc bảng mục 6
+ * bằng đúng cặp đó; ba phép ghim đo lại cặp đó. Trước 11/09 mỗi chỗ GÕ TAY, tức 8 chỗ có thể
+ * lệch — và lượt gộp 9 mục → 6 làm lệch thật **4 chỗ**, trong đó **2 chỗ khiến phép kiểm XANH mà
+ * đo số 0** (`replace` không khớp là không-làm-gì; `split(...)[1]` là `undefined`).
+ *
+ * Đổi số mục nay là sửa ĐÚNG MỘT dòng ở đây. Gõ sai tên hằng số là `ReferenceError` ngay, chứ
+ * không phải một phép kiểm im lặng đi qua. Đây là mục 8 (*mỗi luật một nhà*) áp cho HẰNG SỐ. */
+export const MOC_BAN_DO = "## 6.";
+export const MOC_SAU_BAN_DO = "## 8.";
+
 export const FILE_HANH_CHINH = Object.freeze([".agents/claims.json"]);
 
 export const TEN_MAY_SINH_MAC_DINH = Object.freeze({
