@@ -15,7 +15,7 @@ Trang được sinh ngày 2026-09-10. Đây là lúc sinh trang, **KHÔNG phải
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.8.11 | active | 0 | 23 | 2026-09-10 @ `d6da6a0` — 23 suite · cổng đóng phiên XANH TOÀN BỘ · bản 1.8.10 (xem CHANGELOG) ([bằng chứng](HANDOFF.md)) | CÓ (18 commit) | `KHUNG-50/55/51` là MỘT bệnh — nhiều lane chung một cây làm việc git (chung đĩa, chung HEAD). Đừng vá ba lần. `KHUNG-59` (chung INDEX) đã đóng 10/09 bằng cửa `.githooks/commit-msg`. Thứ tự ở docs/ROADMAP-V2.md; bản đồ sống `npm run what-next`. | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.8.12 | active | 0 | 23 | 2026-09-10 @ `d6da6a0` — 23 suite · cổng đóng phiên XANH TOÀN BỘ · bản 1.8.10 (xem CHANGELOG) ([bằng chứng](HANDOFF.md)) | CÓ (19 commit) | `KHUNG-50/55/51` là MỘT bệnh — nhiều lane chung một cây làm việc git (chung đĩa, chung HEAD). Đừng vá ba lần. `KHUNG-59` (chung INDEX) đã đóng 10/09 bằng cửa `.githooks/commit-msg`. Thứ tự ở docs/ROADMAP-V2.md; bản đồ sống `npm run what-next`. | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 
