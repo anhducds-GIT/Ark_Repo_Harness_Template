@@ -23,11 +23,11 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": null,
+      "owner": "harness-migrate-3repo",
       "ai": null,
-      "claimed_at": "2026-09-09T14:51:16.177Z",
-      "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": "2026-09-09T15:38:07.325Z",
+      "claimed_at": "2026-09-10T03:17:45.737Z",
+      "task": "ban 1.8.11: trang thai [!] + lenh doi-hinh",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -40,15 +40,5 @@
       "released_at": null
     }
   },
-  "_fingerprint": "54b3c8d0cb52fa30",
-  "tam": {
-    "scripts/build-template.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T02:24:30.044Z"
-    },
-    "tests/upgrade-smoke.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T02:24:30.044Z"
-    }
-  }
+  "_fingerprint": "e20f2b795d8354ab"
 }

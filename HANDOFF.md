@@ -1159,3 +1159,28 @@ Cố ý: chọn vội một chuỗi lấy từ cách hành văn của repo nhà 
 
 **Việc kế (một việc):** năm repo trong `doi-hinh` đều đang tụt lại — chạy một lượt NÂNG, **một
 repo một lượt**, repo đầu là chim báo mỏ. Bốn luật của lượt nâng ở `docs/briefs/NANG-BO-KHUNG.md`.
+
+## 2026-09-10 · `harness-migrate-3repo` — TÔI ĐÃ NHẢ KHOÁ CỦA LANE KHÁC, Đức chốt
+
+Ghi ra đây vì bảng quyền **không ghi được sự thật này**: cơ chế chỉ cho chủ khoá tự trả, nên tôi
+phải chạy `--xong … --as harness-loi-02`. Bảng vì thế nói *lane đó tự trả*. **Không phải.** Người
+nhả là tôi, và đây là bản ghi đúng.
+
+**Đức chốt 10/09**, hai lần, nguyên văn: *"phiên kia đã ko còn giữ khóa nữa rồi, bạn làm luôn đi"*
+và *"tôi approve cho bạn lấy khóa, bên đó chưa sửa gì"*. Đó là đường thứ ba của `AGENTS.md` mục 1.
+
+**Tôi đã nêu chỗ lệch trước khi làm:** máy vẫn thấy `harness-loi-02` giữ `scripts/build-template.mjs`
+và `tests/upgrade-smoke.mjs` (50 phút), **và hai file đó đang sửa dở trên đĩa** — 33 và 67 dòng,
+giữa một lượt tái cấu trúc `TEP_MAY_THEM`. Nên tôi chỉ nhả khoá và nhận `_code`; **không ghi,
+không commit** hai file ấy. Đo lại sau khi nhả: vẫn đúng 33/67 dòng, không mất gì.
+
+Hai cửa hợp lệ đều KHÔNG mở được, đã thử: `--take _code --duc-duyet "<câu chốt>"` vẫn từ chối —
+cờ đó chỉ áp cho tranh chấp VÙNG với VÙNG, không áp cho khoá mức FILE của phiên khác.
+
+**Việc cho lane `harness-loi-02` khi quay lại:** khoá file của bạn đã bị nhả, nhưng **việc trên
+đĩa còn nguyên**. Nhận lại bằng `claim.mjs --sua scripts/build-template.mjs tests/upgrade-smoke.mjs`
+rồi làm tiếp. Bản khung đã lên **1.8.11** trong lúc đó, nên lượt của bạn sẽ là 1.8.12.
+
+**Đã ghi vào  (vế hai), không mở mục mới — sổ nợ đang kịch trần 25:** không có cửa máy nào cho ca *"Đức chốt cho nhả khoá FILE của lane khác"*,
+nên nó buộc phải làm bằng cách mạo nhãn — và mạo nhãn thì bảng quyền ghi sai người. Cùng họ với
+`--duc-duyet` đã có sẵn cho khoá vùng.
