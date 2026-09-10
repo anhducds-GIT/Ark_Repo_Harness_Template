@@ -41,5 +41,39 @@
       "released_at": "2026-09-10T04:14:40.426Z"
     }
   },
-  "_fingerprint": "950991619fd8fdb8"
+  "_fingerprint": "dc00270f2f02be58",
+  "tam": {
+    "scripts/build-overview.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:24:08.497Z"
+    },
+    "tests/khoa-dau-vet.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:24:47.372Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:26:55.306Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:27:18.681Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:27:18.681Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:27:18.681Z"
+    },
+    "template/scripts/build-overview.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:27:18.681Z"
+    },
+    "template/tests/khoa-dau-vet.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T04:27:18.681Z"
+    }
+  }
 }

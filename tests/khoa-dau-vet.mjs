@@ -224,6 +224,39 @@ const SCRIPTS = readdirSync(join(ROOT, "scripts")).filter((f) => f.endsWith(".mj
   ok("8 · bảng: đúng vùng được gắn nhãn, cùng một câu, và mọi dòng đều dễ đổi");
 }
 
+/* ---- 12. `KHUNG-63` — CÙNG HEAD, CÙNG bảng quyền thì trang phải RA Y HỆT --
+ *
+ * CA HỎNG THẬT, 10/09, và nó là một VÒNG KHÔNG LỐI RA — không phải một ô hiển thị xấu:
+ *   cổng đòi trang tươi → sinh lại rồi commit → commit làm mất hiệu lực dấu xác nhận →
+ *   suite chạy ~19 phút → 19 phút sau con số phút đã đổi → trang lại cũ → quay lại đầu.
+ * Lane nào giữ khoá VÙNG thì không bao giờ đóng được phiên, trong khi luật lại bắt giữ khoá cho
+ * tới khi ĐÃ ĐẨY. Lỗi này đã có tên sẵn ở đầu `build-so-migrate.mjs` — *"bộ sinh nhìn ĐỒNG HỒ
+ * thì bản sinh lại lệch bản đã commit dù không một dữ liệu nào đổi"* — và file đó đã chữa bằng
+ * `mocHEAD()`. Cùng một bài học, hai file, một file chưa học.
+ *
+ * VẾ NÀY GHIM CÁI VÒNG, KHÔNG GHIM MỘT CHUỖI: sinh hai lần với hai "bây giờ" cách nhau 19 phút,
+ * và đòi hai bản RA Y HỆT. Một vế chỉ so chuỗi "giữ 44 phút" sẽ xanh cả khi bệnh còn nguyên. */
+{
+  const khoa = [{ khoa: "_code", owner: "lane-a", task: "giu suot luot lam viec", tu: MOC }];
+  const mocA = new Date(Date.parse(MOC) + 44 * 60000);
+  const mocB = new Date(Date.parse(MOC) + 63 * 60000);   // 19 phút sau — đúng một lượt suite
+
+  const a = khoiDangLamGi(khoa, "2026-09-06", new Map(), mocA);
+  const b = khoiDangLamGi(khoa, "2026-09-06", new Map(), mocB);
+  assert.notEqual(a, b, "hai moc KHAC nhau ma trang giong nhau thi ve duoi khong chung minh gi");
+
+  const lai = khoiDangLamGi(khoa, "2026-09-06", new Map(), mocA);
+  assert.equal(lai, a, "CUNG mot moc phai ra Y HET — do la dieu kien de trang tat dinh tu HEAD");
+  assert.match(a, /giữ 44 phút/, "moc truyen vao phai duoc DUNG that, khong phai bi bo qua");
+
+  /* VÀ MẶC ĐỊNH PHẢI LÀ ĐỒNG HỒ — bảng sống (`--khoa-song`) đọc đĩa nên nó HỎI VỀ BÂY GIỜ, và
+     đó là chủ ý ghi từ 06/09. Bỏ vế này thì có người "sửa" bằng cách đóng cứng mốc HEAD cho cả
+     hai bản ra, và bảng sống thôi nói được câu duy nhất nó sinh ra để nói. */
+  const macDinh = khoiDangLamGi(khoa, "2026-09-06", new Map());
+  assert.notEqual(macDinh, a, "mac dinh phai la DONG HO bay gio, khong phai moc HEAD dong cung");
+  ok("12 · KHUNG-63: cùng mốc ra y hệt · khác mốc thì khác · mặc định vẫn là đồng hồ cho bảng sống");
+}
+
 /* ---- 9. CON SỐ MA: mốc chỉ có NGÀY không được báo giờ ------------------
  *
  * ĐO ĐƯỢC 06/09, Đức nhìn thấy trước: bảng quyền báo ba khoá *"giữ 16h ⚠ quá 6h"* trong khi cả
