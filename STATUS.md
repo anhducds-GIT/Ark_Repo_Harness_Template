@@ -9,7 +9,7 @@ last_verified_how: "23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHAN
 evidence_ref: HANDOFF.md
 owner: harness-loi-02
 priority_rank: 1
-next_step: "`T1`·`T2`·`T3`·`R6` ĐÓNG. Hiến pháp **6 mục** (từ 9), **43** mục luật (từ 111), **9** máy canh đo được. Đức chốt 10/09: giữ **bypass** · khoá FILE chỉ sống trong **đúng lượt ghi**. Việc kế: `R4`/`R5`."
+next_step: "**ĐÓNG GÓI — ba bước còn lại, đọc `docs/ROADMAP-V2.md` (TỰ CHỨA).** Nhà bản **1.9.39**; 5 repo đích còn ghim **1.9.29**, mỗi repo 7 file tầng máy cũ. Ngân sách **sát trần cả ba** — thêm gì phải BỎ trước."
 version_source: package.json
 current_focus: "ĐÓNG GÓI, không hoàn thiện. `R3` ĐÓNG BĂNG: cấm THÊM tính năng · phép kiểm · luật · tài liệu; chỉ được BỎ và GỘP. Số đo 7 ngày ở `docs/ROADMAP-V2.md`."
 human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật."

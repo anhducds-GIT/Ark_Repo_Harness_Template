@@ -21,6 +21,25 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-11 · harness-loi-02 — ROADMAP viết lại TỰ CHỨA, để compact không mất hướng
+
+Đức: *"hãy tạo roadmap, tôi sẽ compact."* Nên `docs/ROADMAP-V2.md` viết lại **tại chỗ** — KHÔNG
+đổi tên file, vì `decisions.md` (chỉ-thêm) đang trỏ tới đúng đường dẫn đó và đổi tên là tạo một
+con trỏ chết trong sổ không sửa được.
+
+**File nay TỰ CHỨA:** đọc đúng nó là đi được, không cần lịch sử chat. Nó có: số đo chỗ đang đứng ·
+ba bước còn lại kèm **lệnh thật và 5 đường dẫn repo đích** · ba thứ chặn *5/5 xanh* và ai gỡ được ·
+bốn thứ chờ Đức · và **6 NẾP BẮT BUỘC** rút từ hai ngày, mỗi nếp đã cắn thật.
+
+**Số đo để phiên sau khỏi đo lại:** nhà bản **1.9.39**; 5 repo đích còn ghim **1.9.29**, mỗi repo
+**7 file** tầng máy đã cũ (`upgrade --plan` đọc ra). Migrate đo được: **7 giây** lệnh + **~3 phút**
+tay mỗi repo.
+
+**Nói thẳng một kỳ vọng KHÔNG thành:** `R6` bỏ luật được kỳ vọng trả lại dư ngân sách. Không.
+Hiến pháp còn 6 mục và 43 mục luật nhưng token **+0,5%** — 68 mục bị cắt phần lớn là *mệnh đề
+trong câu*, và lượt đó thêm ~200 token nói chỗ máy KHÔNG canh. Nên ba trần vẫn **sát**: nạp
+4196/4200 · kho chữ 3110/3117 · nợ 30/30. Phiên sau muốn thêm gì thì phải **BỎ** trước.
+
 ## 2026-09-11 · harness-loi-02 — chặn typo từ GỐC: 8 chỗ gõ tay → 1 nhà
 
 **Đức hỏi:** *"có cách nào tránh được lỗi typo không? … làm drift và miss direction ngay từ gốc."*

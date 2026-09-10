@@ -4,80 +4,87 @@ status: active
 ttl_days: 120
 ---
 
-# ROADMAP V2 — đường ĐÓNG GÓI, bản 10/09
+# ROADMAP — đường ĐÓNG GÓI, bản 11/09
 
-> **Mục tiêu: ĐÓNG GÓI XONG HÔM NAY** một bộ lõi *đủ dùng, vừa phải*. Đức: *"một tuần rồi không
-> đóng gói xong… lean, không over engineer, không kiểm quá nhiều."*
->
-> Lớp ĐIỀU PHỐI: thứ tự · chỗ cần người chốt. Nội dung ở [BACKLOG](../BACKLOG.md) ·
-> [IDEAS](../IDEAS.md); bản đồ sống `npm run what-next`. Bản trước: [V1](archive/ROADMAP-V1.md).
+> **File này TỰ CHỨA.** Phiên sau đọc đúng nó là đi được, không cần lịch sử chat.
+> Lớp ĐIỀU PHỐI: còn gì phải làm · chỗ nào cần Đức. Nội dung ở [BACKLOG](../BACKLOG.md) ·
+> [IDEAS](../IDEAS.md). Bản trước: [V1](archive/ROADMAP-V1.md).
 
-## R0 · VẠCH ĐÍCH — Đức chốt 10/09, và nó CHẶN mọi đợt dưới
+## Đang đứng ở đâu — số đo, không phải cảm tính
 
-**Vế A — LÀM ĐƯỢC.** Một repo mới, sau migrate, làm được **bốn việc**: nhận khoá · commit không
-cuốn việc lane khác · cổng xanh · đẩy an toàn. Khác đi là tuỳ chọn.
+| | |
+|---|---|
+| Repo nhà | bản **1.9.39** · hiến pháp **6 mục** (từ 9) · **43** mục luật Tầng 1 (từ 111) |
+| Máy canh được ĐO | **9** đường dẫn · **6/6** mục luật còn phần KHÔNG máy nào canh, đã nói ra |
+| Suite · cổng | **24/24 xanh** ≈ **445s** · cổng đóng phiên **12 mục**, 3,0s |
+| 5 repo đích | ghim bản **1.9.29** — chậm **10 bản** so với nhà, mỗi repo **7 file** tầng máy đã cũ |
+| Ngân sách | nạp **4195/4200** · kho chữ **3103/3117** · nợ **30/30** — **sát trần cả ba** |
 
-**Vế B — CÂN NẶNG.** Chưa đủ bảng này thì chưa xong; **đủ rồi thì DỪNG**, không gọn thêm.
+## Việc còn lại để ĐÓNG GÓI XONG — ba bước, đúng thứ tự
 
-| Đo | Đầu ngày 10/09 | Nay | Vạch |
-|---|---|---|---|
-| `scripts/` · phần lõi | 16.533 dòng · lõi **22%** | — | **≤ 6.000** · lõi **≥ 60%** |
-| Suite · thời gian · cổng | 24 · **14,2 phút** · 12 mục | **7,5 phút** (cổng 3,0s) | ≤ 12 · **≤ 3 phút** · ≤ 8 mục |
-| `AGENTS.md` · `docs/` | 9 mục · 23 file | **6 mục** ✔ · 23 file | **≤ 6 mục** · ≤ 30 file |
-| Trần token nạp | 4.195 / 4.200 | **4.099** — gọn 2%, vì thêm ~200 token nói chỗ máy KHÔNG canh | hạ trần **3.000** · chưa đạt |
-| Luật không có máy canh | **7/9** — đếm từ `mien`, *sai câu hỏi* | **6/6** còn phần hở · **1** mục cố ý không máy (mục 2) | phần hở **đo được** = 0 |
-| Hook | **1** (`commit-msg`) | **2** · bật thật ở **5/5** repo đích | **2** (+ `post-commit`), mỗi cái 1 test ghim |
-| Bộ sinh BẢNG | 3 bộ · **37% commit** | **0 commit** | **1** bộ · 0 commit |
-| Một vòng sửa → đẩy | **14,2 phút** | **7,4 phút** | **≤ 5 phút** |
-| Migrate một repo | chưa đo | **7s** lệnh + **~3 phút** ba bước tay · 5/5 tại `1.9.29` | đo rồi — **đạt** |
+**Đ1 · Nâng 5 repo đích lên `1.9.39`.** Mỗi repo, chạy TỪ repo nhà:
 
-**Đã xong 10/09:** `R1` bảng thôi bị cổng đòi khớp HEAD — bỏ **37% commit**, qua **6 vòng audit
-độc lập, 20 lỗi** · `R2` một bản cho một ĐỢT VIỆC đã đóng · `R3` **ĐÓNG BĂNG**: cấm THÊM tính
-năng · phép kiểm · luật · tài liệu; được **BỎ** và **GỘP**. Lý do ở [decisions](../decisions.md).
+```bash
+node scripts/upgrade.mjs --plan  "<đường-dẫn-repo-đích>"   # xem trước, không ghi gì
+node scripts/upgrade.mjs --apply "<đường-dẫn-repo-đích>"
+```
 
-## HÔM NAY — ba việc đã XONG cả ba. Việc kế: `R6` (Đức chốt thứ tự 10/09)
+Năm đường dẫn: `C:\WORKING ZONE\n8n-orchestrator` · `C:\WORKING ZONE\n8n_Local host` ·
+`C:\WORKING ZONE\ALL_SKILL_MANAGEMENT` · `C:\WORKING ZONE\Project 3 AI Agent Unify` ·
+`C:\WORKING ZONE\Chrome_Extension_AI_Agentic`.
 
-| # | Việc | Vì sao đúng thứ tự đó | Xong khi |
-|---|---|---|---|
-| `T1` | **Cắt suite còn ≤ 3 phút** (`R7`) | mọi việc dưới trả thuế này TỪNG LƯỢT — riêng `R1` hôm nay tiêu 6 lượt suite ≈ **75 phút chờ** | `npm test` ≤ **180s**, 24/24 xanh, **không bỏ vế kiểm nào** |
-| `T2` | **Hook: trả khoá + ĐO hiệu quả** (`R9`) | Đức đòi hai lần *"khoá nhả ngay khi hết sửa, hook tốt vào"*; và `commit-msg` **chưa ai đo nó chặn thật ở repo đích** | `post-commit` tự trả khoá file · **một ca thật ở repo đích** chứng minh cửa index chặn · 2 test ghim |
-| ~~`T3`~~ | ~~**Đóng gói** (`R11`)~~ | **ĐÓNG** | 5/5 tại `1.9.29`, hook sống 5/5, cổng **2/5 XANH**. Ba repo còn lại chặn bởi **nợ sấn của chính chúng** (lịch sử không nhãn · file lane khác đang sửa · 7 mục ở `Chrome_Extension`), không phải lượt nâng. **Lôi ra 9 lỗi lõi** — xem `CHANGELOG` 1.9.20→1.9.29 |
+Rồi **BA BƯỚC TAY ở repo đích** — chính `--apply` in ra tên ba bước, làm đúng chúng, và **gộp cả
+ba vào MỘT commit**: ① khai đường dẫn mới vào Bản đồ file của repo đó (đọc `docs.file_map` của
+CHÍNH nó, mỗi repo một chỗ khác nhau) · ② sinh lại artifact · ③ ghi một dòng Log vào `HANDOFF.md`.
+Sau đó tại repo đích: `npm test` → cổng đóng phiên → `safe-push`.
 
-**`T1` có số đo sẵn, không phải đi tìm.** Bốn suite nặng dựng lại CÙNG MỘT fixture:
-`cong-do-that` 462s · `init-repo-smoke` 251s · `harness-smoke` 237s · `upgrade-smoke` 216s (riêng
-nó **26 tiến trình con**). Dựng một lần rồi dùng chung — **cắt thời gian, giữ răng**. Nhát đầu đã
-làm: `template-null-repo` 505s → 179s bằng cách bỏ một lượt **suite lồng** không vế nào đọc.
+Đo được 10/09: **7 giây** lệnh + **~3 phút** tay mỗi repo. Đức chốt ba bước này **làm TAY**, không
+tự động hoá ([decisions](../decisions.md)).
 
-## `R6` ĐÓNG cả hai nhát — Đức uỷ quyền AI chốt (10/09)
+**Đ2 · Ghi kết quả THẬT.** Một mục `HANDOFF.md` ở repo nhà, bảng từng repo: bản · cổng xanh/đỏ ·
+đỏ vì gì. Không làm tròn. Cập nhật hồ sơ tương ứng ở `docs/migrations/`.
 
-**Nhát ĐO:** `luat_nha.canh` + vế `5e` — **9 máy khai · 6/6 mục còn phần KHÔNG máy nào canh**. Số
-`7/9` cũ lấy từ `mien`, thứ đo *luật có tới repo đích hay không*. Lôi ra **2 lỗ máy thật**
-(`KHUNG-56`: `--carry` gõ tay và lượt đẩy phần của mình đều KHÔNG đọc dấu cổng — nên điều CẤM ở
-`AGENTS.md` mục 2 hiện chỉ có phiên tự cưỡng chế).
+**Đ3 · Chốt.** `STATUS.md` → `next_step` nói ĐÓNG GÓI xong; mục "Việc còn lại" của file này gạch bỏ.
 
-**Nhát CẮT:** bản rà **111 mục** của Đức+GPT → giữ **43** ở Tầng 1, `AGENTS.md` **9 mục → 6**.
-Quyết định từng mục và cái MẤT: [ADR-0018](adr/0018-ra-lai-111-muc-luat.md); sáu chỗ lượt thi
-hành dạy lại: [ADR-0019](adr/0019-sua-bay-cho-cua-adr-0018.md). **CHƯA ĐẨY** — `codex exec` hỏng
-sandbox trên máy này, nên commit mang `Audit: chua-co` và `safe-push` từ chối, đúng thiết kế.
+## BA thứ chặn "5/5 cổng xanh" — và chúng KHÔNG phải việc của lượt nâng
 
-## HOÃN CÓ TÊN — không làm hôm nay, và đây là lý do
+Đo 10/09 ở bản `1.9.29`: **2/5 xanh toàn bộ**. Ba repo còn lại đỏ vì **nợ sẵn của chính chúng**:
 
-`R4` bảng LUẬT đánh số · `R5` bảng SỔ NỢ giữ·gộp·bỏ → **dụng cụ để Đức rà**, không phải điều kiện
-đóng gói. `R8` gộp
-ba bộ sinh còn một → `R1` đã cắt phần lớn cái giá của chúng. `R10` `--as` là lời tự khai → là
-**thiết kế danh tính thật, đừng vá vội**.
+| Repo | Chặn bởi | Ai gỡ được |
+|---|---|---|
+| `ALL_SKILL_MANAGEMENT` | commit `b742625` (revert 09/09) không nhãn `Lane:` | **Đức** — sửa là **sửa lịch sử**, mục 2 bắt hỏi |
+| `Project 3 AI Agent Unify` | `dashboard/dashboard_state.js` đang sửa dở **của lane khác** | lane đó, hoặc Đức chốt — cả hệ khoá tồn tại để ngăn việc commit hộ |
+| `Chrome_Extension_AI_Agentic` | 7 mục: **nghi token thật** · dãy B 44 chỗ · kho chữ 9830/9340 · `KHUNG-66` | **Đức** phán token thật/giả; phần còn lại là nợ repo đó |
 
-**KHÔNG ĐỘNG — chờ Đức chốt:** `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08`.
+**Đừng "sửa" ba thứ này để cổng xanh.** Cả ba là chỗ luật cố ý bắt người quyết.
 
-## Nợ mới sinh trong ngày
+## Chờ Đức chốt — không tự làm
 
-`KHUNG-64` **[FAIL-OPEN]** miễn suite cho file không bộ sinh nào kiểm — kiểm toán **bác** cách tôi
-xếp loại nhẹ · `KHUNG-65` mục `###` lách trần byte, **và chặn oan lane khác**.
+- Sửa lịch sử `ALL_SKILL_MANAGEMENT` để vá nhãn lane cho `b742625`.
+- Token bị nghi trong `Chrome_Extension_AI_Agentic` (`workers/duc-auto-chatgpt/v0.1.0/tests/`).
+- Ngưỡng kho chữ của repo đó: đang **9830/9340**.
+- `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08` — vẫn KHÔNG ĐỘNG.
 
-## Bốn luật làm việc, rút từ 10/09 — áp cho MỌI mục trên
+## Ngân sách: sát trần cả ba, và `R6` KHÔNG lấy lại dư
 
-1. **Một phép ghim chỉ đúng nhờ nền đang hỏng thì nó đang ghim SỐ 0.** Bốn cái thuộc loại đó trong
-   một ngày; cái thứ ba chỉ lộ ra vì `R1` **tình cờ** làm nền xanh lên.
-2. **Đừng tin mình đã phá.** Gọi thẳng hàm hoặc `grep` xác nhận ĐÃ hỏng, rồi mới chạy phép ghim.
-3. **Bỏ cơ chế, đừng vá từng lần.** `new RegExp("…")` mất một dấu gạch chéo là cả một lớp lỗi.
-4. **Audit TRƯỚC, cổng SAU, đúng một lượt.** Audit đổi mã; cổng chỉ có nghĩa trên mã cuối.
+Kỳ vọng là `R6` bỏ luật sẽ trả lại chỗ. **Đo thật: không.** Hiến pháp còn 6 mục và 43 mục luật,
+nhưng token **+0,5%** — vì 68 mục bị cắt phần lớn là *mệnh đề trong câu*, và lượt đó **thêm ~200
+token** nói thẳng chỗ máy KHÔNG canh. Đánh đổi cố ý: **trung thực về chỗ hở đắt hơn gọn**.
+
+**Hệ quả cho phiên sau:** muốn thêm bất cứ gì thì phải **BỎ** trước. Muốn nạp xuống 3.000 thì phải
+cắt **LUẬT**, không cắt lời thú nhận — và đó là đánh đổi của Đức.
+
+## NẾP BẮT BUỘC — phiên sau không tự biết, và mỗi cái đây đã cắn thật
+
+1. **Sinh bản trích SAU CÙNG.** Sửa tầng máy sau khi `build-template.mjs` chạy là `SO_PHAT_HANH_LECH`.
+2. **Không sửa cây làm việc khi `npm test` đang chạy** — dấu vân tay lệch giữa lượt, cả lượt suite bỏ.
+3. **Đột biến phải TỚI ĐƯỢC phép kiểm mình đang thử.** Đỏ ở cửa khác **không phải bằng chứng** —
+   dấu vân tay luật chung và sổ phát hành chặn trước; phải hoà giải chúng rồi mới đo. Vấp 2 lần.
+4. **Gọi Codex CLI qua `stdin`, KHÔNG dùng `-C`:**
+   `cd <bản-copy> && cat <đề-bài> | codex exec -s workspace-write -`. Cờ `-C` tạo hai gốc ghi và
+   sandbox từ chối. Đề bài **phải mang theo danh sách luật CỐ Ý bỏ**, không thì auditor báo dương
+   tính giả.
+5. **Một sự thật viết hai chỗ sẽ trôi.** Hằng số dùng chung thì `export` một nhà
+   (`MOC_BAN_DO`/`MOC_SAU_BAN_DO`); số đo thì để máy in, đừng gõ vào sổ.
+6. **Máy bắt con trỏ ĐỨT, không bắt câu SAI.** Câu sai nặng nhất 10/09 nằm trong **output của
+   cổng**, và thứ tìm ra nó là **Đức đọc cái máy in ra**.
