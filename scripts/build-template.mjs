@@ -709,7 +709,7 @@ function phanLuatChung(text) {
  *   muộn cũng bị bỏ qua"* — ba mục `BACKLOG.md` đang trích nó như một câu CỦA hiến pháp, nên bỏ
  *   nó là làm chết ba con trỏ. Đúng bài học 09/09: nén văn xuôi làm rụng mệnh lệnh phụ.
  *   Vân tay trước: 9e08b9265e7353a39794261d210588385f932807aef20261adecce39a46b83ff */
-const COMMON_LAW_SHA256 = "5e54beb1ae1514a78c00128c59c5110c516b0f2e83b875a3cd76e3c759b092fe";
+const COMMON_LAW_SHA256 = "6284c1230dd77bd0c0b0c510b55a6355569917ba73fa18f2794a885a3b1373ec";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

@@ -3,11 +3,9 @@
 > **Tầng 1: LUẬT, không phải lý lẽ.** Ở đây chỉ giữ thứ **máy không kịp nói cho bạn** — cơ chế nào
 > máy tự chặn và tự giải thích lúc hỏng thì không nằm ở đây. Bằng chứng, số đo, và năm câu phải
 > trả lời trước khi THÊM một luật: [VI-SAO-LUAT](docs/VI-SAO-LUAT.md).
-> **Máy nào đang canh mục nào — và mục nào KHÔNG có máy:** `features.json` → `luat_nha.canh`. Đọc
-> kèm hai câu, cả hai đo được: **CÓ MẶT ≠ ĐANG BẬT** · **CHẶN ≠ BÁO**.
-> **SỐ MỤC CÓ CHỖ TRỐNG (4 · 5 · 7) và đó là cố ý** — lượt gộp 10/09 nhập chúng vào mục 2 · 3 · 0,
-> nhưng **~250 chỗ trong mã và tài liệu trỏ vào các mục theo SỐ**, nên đánh số lại là tạo hàng
-> trăm con trỏ chết. Số giữ nguyên; nội dung gộp lại.
+> **Máy nào canh mục nào, mục nào KHÔNG có máy:** `features.json` → `luat_nha.canh`. Hai câu đo
+> được đi kèm nó: **CÓ MẶT ≠ ĐANG BẬT** · **CHẶN ≠ BÁO**.
+> **Trống mục 4 · 5 · 7 là CỐ Ý** — gộp vào mục 2 · 3 · 0; ~250 chỗ trỏ vào mục theo SỐ.
 > Chủ dự án là **Đức** (non-tech, tiếng Việt, câu ngắn), người chốt duy nhất.
 
 ## 0. Ba việc phải làm, theo đúng thứ tự
@@ -26,8 +24,7 @@ node scripts/session-check.mjs --as <tên-phiên-của-bạn>
 **Không được BÁO "xong" khi cổng chưa xanh** — và đây là chỗ không máy nào đỡ được bạn: cổng biết
 nó đỏ, nhưng không có gì ngăn một phiên gõ chữ *"xong"*. Cũng không được tự sửa cổng cho nó xanh.
 
-> Luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua. Đó là lý do có cổng kiểm — và là
-> lý do mỗi mục luật phải khai được **máy nào đang canh nó**.
+> Luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua. Đó là lý do có cổng kiểm.
 
 **Đóng phiên ghi lại ba thứ** *(mục 7 cũ)*: một dòng Log vào `HANDOFF.md` — làm gì · kết quả SỐ ·
 còn gì mở; trạng thái đổi thì sửa `STATUS.md`; quyết định mới của Đức → `decisions.md`; lỗi mới ở
@@ -49,34 +46,38 @@ chỉ chặn được file lane khác **ĐANG KHOÁ**, việc chưa khoá thì k
 hook nào chặn**, và nó cuốn theo commit của mọi phiên khác.
 
 ```bash
-git commit --only <đường dẫn>… -m "…"                # chỉ phần của bạn
+git commit --only <đường dẫn>… -m "…"     # chỉ ĐƯỜNG DẪN bạn nêu — KHÔNG lọc theo tác giả
 node scripts/safe-push.mjs --as <tên-phiên-của-bạn>
 ```
+
+Sửa dở của lane khác **trong chính file bạn nêu** vẫn bị cuốn — nên soát index trước khi commit:
+`node scripts/claim.mjs --soat --as <phiên>` (rộng hơn cửa index).
 
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
 Bảng chủ sở hữu là `.agents/claims.json`; nhận và trả **bằng lệnh**, không sửa tay.
 **MẶC ĐỊNH LÀ KHOÁ MỨC FILE, khoá vùng để dành:** giữ khoá đúng ở file mình đang sửa, nhận **ngay
-trước** lượt ghi và trả **ngay sau**, đừng giữ rộng hơn mẻ ghi. **Chỉ đọc thì không cần khoá.**
+trước** lượt ghi, đừng giữ rộng hơn mẻ ghi. **Chỉ đọc thì không cần khoá.**
 
 ```bash
 node scripts/claim.mjs --sua <file>… --as <phiên>   # NGAY TRƯỚC lượt ghi · nhận cả mẻ
 node scripts/claim.mjs --xong --het --as <phiên>    # NGAY SAU khi COMMIT · cổng ĐỎ nếu treo
+node scripts/claim.mjs --list                       # ai đang giữ gì
 node scripts/claim.mjs --take|--release <khoá> --as <phiên> --task "một câu"   # cả VÙNG
 ```
 
-**MỘT mốc trả, không có mốc thứ hai:** khoá **file** trả NGAY SAU commit chứa lượt ghi · khoá
-**vùng** trả sau khi ĐÃ ĐẨY. Cổng ĐỎ khi khoá file còn treo là **lưới đỡ**, không phải hạn chót —
+**MỖI LOẠI KHOÁ ĐÚNG MỘT MỐC TRẢ** — hai loại, hai mốc, và không loại nào có mốc thứ hai: khoá
+**file** trả NGAY SAU commit chứa lượt ghi · khoá **vùng** trả sau khi ĐÃ ĐẨY. Cổng ĐỎ khi khoá file còn treo là **lưới đỡ**, không phải hạn chót —
 còn khoá VÙNG treo thì **không mục cổng nào đỏ**, nên mốc đó chỉ có bạn giữ.
 
-**Giành vùng phiên khác đang giữ: đúng BA đường, không có đường thứ tư** — chính lane đó trả · lane
-đó đã kết thúc · **Đức chốt**. Tín hiệu *"repo chưa thấy dấu vết"* nói repo chưa thấy gì, **không**
+**KHÔNG nhả khoá của LANE KHÁC, và không giành vùng lane khác đang giữ — đúng BA đường, không có
+đường thứ tư:** chính lane đó trả · lane đó đã kết thúc · **Đức chốt**. Tín hiệu *"repo chưa thấy dấu vết"* nói repo chưa thấy gì, **không**
 nói lane kia rảnh; quá 30 phút thì máy chỉ NÊU TÊN lane đang giữ, nó không tự nhả.
 
 Ba luật cơ chế còn lại — chứa nhau hai chiều · chia gốc repo thành nhiều khoá · hai file được miễn —
 máy tự chặn và tự nêu tên khoá thiếu: [MULTIFLOW](docs/protocols/MULTIFLOW.md).
 
-## 2. Điều CẤM · và BA việc phải hỏi Đức
+## 2. Điều CẤM · BA việc phải hỏi Đức — mọi việc khác AI tự quyết
 
 > **BẢN DUY NHẤT của danh sách này trong cả repo.** File khác chỉ được trỏ sang đây, không chép lại.
 
@@ -86,13 +87,13 @@ máy tự chặn và tự nêu tên khoá thiếu: [MULTIFLOW](docs/protocols/MU
 | 2 | Gửi bất cứ gì ra ngoài (mail, tin nhắn, đăng công khai) | Ra rồi thì không rút về |
 | 3 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
 
-**Vẫn phải hỏi, nhưng là loại khác — thao tác không lùi lại được trên lịch sử git:** force-push ·
-sửa lịch sử · merge vào `main`.
+**BA thao tác nữa cũng phải hỏi, và chúng KHÔNG thuộc bảng trên** — loại khác: không lùi lại
+được trên lịch sử git. Force-push · sửa lịch sử · merge vào `main`.
 
-**Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI.** Đức chốt 10/09, sáu cửa xuống ba; số đo và cái MẤT
-(**quyền phủ quyết TRƯỚC hành động**) ở [decisions](decisions.md).
+**Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI.** Sáu cửa xuống ba (10/09); cái MẤT là **quyền phủ
+quyết TRƯỚC** — [decisions](decisions.md).
 
-**Điều CẤM** *(mục 4 cũ)* — không phải câu hỏi, và không xin phép được:
+**Điều CẤM** *(mục 4 cũ)* — không phải câu hỏi, và **không xin phép được**:
 
 - `--carry` khi cổng chưa XANH TOÀN BỘ, hoặc có commit không quy thuộc được. `--carry` gõ tay
   **không máy nào chặn** (`KHUNG-56`) — điều cấm này hiện chỉ có bạn cưỡng chế.
@@ -100,14 +101,16 @@ sửa lịch sử · merge vào `main`.
   **không chạy trong CI** và `git push` trần đi qua được nó.
 - Sửa thư mục bằng chứng khai `"mutability": "append-only"` — **chỉ được THÊM**, không sửa, không
   xoá, không tạo lại.
-- Điều cấm riêng của nghề repo bạn: `docs/ANNEX-*.md`. **Phụ lục chỉ được THÊM việc phải hỏi,
-  không được bớt** — và không máy nào kiểm chiều đó.
+
+**Phụ lục nghề** — `docs/ANNEX-*.md`, KHÔNG phải điều cấm mà là nguồn **THÊM** việc phải hỏi: nó
+chỉ được thêm, không được bớt, và không máy nào kiểm chiều đó. Chưa có phụ lục thì bỏ đoạn này.
 
 **Đổi luật an toàn: AI tự quyết** — đủ ba: audit độc lập sạch · `decisions.md` nói cái **MẤT** ·
 không làm yếu lớp bảo vệ mà không **gọi tên** thứ mất đi.
 
 **Commit và push tự làm** khi đủ ba: (1) việc hoàn tất trọn vẹn; (2) cổng XANH TOÀN BỘ, code thì
-đã qua audit độc lập; (3) đẩy bằng `safe-push.mjs`.
+đã qua audit độc lập; (3) đẩy bằng `safe-push.mjs`. Đủ ba đó thì **`--carry` cũng tự làm**, miễn
+mọi commit quy thuộc được.
 
 ## 3. Năm luật vàng — và ai nghiệm thu
 
@@ -149,10 +152,10 @@ số đo và có **cái MẤT** → `docs/adr/` · thứ đang HỎNG → `BACKL
 sinh ra một luật đã có → `docs/VI-SAO-LUAT.md` · việc lặp lại hay hướng đi → sổ riêng.
 
 **Luật mới phủ luật cũ thì XOÁ luật cũ ngay lượt đó** — hai bản cạnh nhau là hai câu trả lời cho
-một câu hỏi, và phiên sau bốc trúng câu sai. Máy canh được *mỗi luật một nhà*; nó **KHÔNG** canh
-được việc bản cũ đã bị xoá. Lịch sử ở `git log` và ADR, không ở chỗ đang cưỡng chế.
+một câu hỏi, và phiên sau bốc trúng câu sai. Máy chỉ canh được **chỗ KHAI** (mỗi chủ đề một đầu
+mối, `CLAUDE.md` không chứa luật lạ); nó **KHÔNG** đọc được rằng bản cũ đã bị xoá. Lịch sử ở `git log` và ADR, không ở chỗ đang cưỡng chế.
 
-**Năm câu phải trả lời trước khi thêm một luật, một phép kiểm HAY một tài liệu:**
+**CÃI một luật, hay THÊM một luật · một phép kiểm · một tài liệu — năm câu phải trả lời trước:**
 [VI-SAO-LUAT](docs/VI-SAO-LUAT.md) · bộ biên dịch luật: `npm run luat`.
 Cân nặng được ĐO, không để cảm tính:
 

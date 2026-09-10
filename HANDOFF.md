@@ -21,6 +21,32 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 9) · harness-loi-02 — audit Codex qua stdin, và phép so của tôi bỏ sót 9/9
+
+**Đức chốt hai lần:** *"cần audit độc lập bạn gọi Codex CLI"* → *"codex cli hãy dùng stdin"*.
+
+**Sandbox `codex exec` HỎNG trên máy này** — `apply deny-read ACLs`, thử `read-only` ·
+`workspace-write` · `disk-full-read-access`, và `codex update` lên `0.154.0`: vẫn hỏng. `codex
+doctor` chỉ đúng chỗ: *"elevated Windows sandbox provisioning failed"* + cần **Defender exclusion**
+cho `codex-windows-sandbox-setup.exe` (cần admin — việc của Đức). **Đường đi được: `stdin`.**
+
+| Vòng | Codex bác | Đúng | Vá |
+|---|---:|---:|---:|
+| 1 | 10 | **9** | 9 |
+| 2 | 7/9 ĐỦ + 2 mới + 5 giả | **2** | 2 |
+
+**BÀI HỌC, và nó về TÔI:** phép so của tôi bỏ sót **cả 9** chỗ vòng một. Tôi so **TỪ VỰNG**, Codex
+so **NGHĨA**. Một câu có thể còn nguyên chữ ở chỗ khác mà **nghĩa vụ đã mất hiệu lực** — ví dụ tôi
+gộp *"KHÔNG nhả khoá lane khác"* vào câu *"giành vùng"*, nhưng nhả khoá hộ mà không giành vùng thì
+câu mới không phủ, và việc đó **đã xảy ra thật** (`KHUNG-62`).
+
+**NẾP MỚI cho đề bài audit:** phải mang theo **danh sách luật CỐ Ý bỏ**. Vòng hai tôi quên, nên 5
+trong 7 phát hiện của nó là dương tính giả — auditor tốn lượt vào chỗ đã quyết.
+
+**Codex sai một chỗ và tôi bác lại có bằng chứng:** nó đọc *"MỘT mốc trả"* thành một mốc cho CẢ
+HAI loại khoá; gộp lại là trả khoá VÙNG trước khi đẩy (`KHUNG-63`). Giữ hai mốc, sửa lời thành
+**MỖI LOẠI KHOÁ ĐÚNG MỘT MỐC**. Luật vàng 4 không phải là *"tin auditor"* — là **tự kiểm lại**.
+
 ## 2026-09-10 (tiep 8) · harness-loi-02 — hiến pháp 9 mục → 6; audit độc lập CHƯA chạy được
 
 **Đức uỷ quyền AI chốt** bản rà 111 mục của Đức+GPT. Quyết định `ADR-0018`, sáu chỗ thi hành dạy

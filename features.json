@@ -779,7 +779,7 @@
         "canh_gi": "Sửa tay bảng quyền → `DAU_VO`. Nhả khoá lane khác → từ chối. Nhận vùng lane khác đang giữ → từ chối, nêu tên người giữ. Cửa index chặn commit cuốn file đang khoá. `post-commit` tự trả khoá file. Cổng đỏ khi khoá FILE còn treo, khi niêm phong vỡ, khi cửa index tắt.",
         "khong": "BA vế, audit độc lập 10/09 dựng lại được cả ba: ⑴ \"nhận khoá NGAY TRƯỚC lượt ghi\" — ghi trước rồi khoá sau, `--sua` vẫn nhận, không một lời; ⑵ khoá VÙNG treo cuối phiên KHÔNG mục nào đỏ — cổng chỉ đọc khoá FILE, nên mốc \"khoá vùng trả sau khi ĐÃ ĐẨY\" không có máy cưỡng chế; ⑶ \"MẶC ĐỊNH LÀ KHOÁ MỨC FILE\" — không ai đo bạn dùng mức nào."
       },
-      "2. Điều CẤM · và BA việc phải hỏi Đức": {
+      "2. Điều CẤM · BA việc phải hỏi Đức — mọi việc khác AI tự quyết": {
         "may": [
           "scripts/claim.mjs",
           "scripts/safe-push.mjs",

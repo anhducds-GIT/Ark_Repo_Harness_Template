@@ -3,6 +3,38 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.34 — 2026-09-10 — Audit Codex qua `stdin`: hai vòng, bác 12 chỗ, vá 11
+
+**Đức chốt:** *"cần audit độc lập bạn gọi Codex CLI"*, rồi *"codex cli hãy dùng stdin"*. Sandbox
+của `codex exec` hỏng trên máy này (`apply deny-read ACLs`; thử `read-only` ·`workspace-write` ·
+`disk-full-read-access`, và `codex update` lên `0.154.0` — vẫn hỏng), nên nó **không chạy được
+lệnh nào**. Đường đi được: **đưa cả bản cũ và bản mới của `AGENTS.md` vào thẳng prompt qua `stdin`**
+(23 KB). Nó soi được CHỮ; **không** dựng được đột biến — phần đó vẫn là tôi.
+
+| Vòng | Codex bác | Tôi kiểm lại | Đã vá |
+|---|---:|---|---:|
+| 1 | **10** | đúng **9** | 9 |
+| 2 | **7/9 bản vá ĐỦ** + 2 chỗ mới + 5 dương tính giả | đúng **2** | 2 |
+
+**PHÉP SO CỦA TÔI BỎ SÓT CẢ 9 CHỖ VÒNG MỘT — và đây là bài học của lượt này.** Tôi so **TỪ VỰNG**
+(câu nào mất chữ), Codex so **NGHĨA** (nghĩa vụ nào mất hiệu lực). Ba cái nặng nhất tôi tự cho là
+"đã gộp" nhưng thật ra đã rụng: lệnh cấm **nhả khoá của LANE KHÁC** (đã xảy ra thật —`KHUNG-62`) ·
+quyền **tự dùng `--carry` khi đủ ba** · **"mọi việc khác AI tự quyết"**. Và hai chỗ tôi **nói quá**:
+`git commit --only` không lọc theo TÁC GIẢ, và máy chỉ canh **CHỖ KHAI** chứ không đọc được rằng
+bản luật cũ đã bị xoá.
+
+**VÒNG HAI: CODEX SAI MỘT CHỖ, và tôi bác lại có bằng chứng.** Nó đọc *"MỘT mốc trả"* thành *một
+mốc cho CẢ HAI loại khoá* rồi đề nghị gộp — gộp lại là trả khoá VÙNG **trước khi đẩy**, đúng ca
+`KHUNG-63`. Giữ hai mốc, nhưng sửa lời: **MỖI LOẠI KHOÁ ĐÚNG MỘT MỐC TRẢ**.
+
+**NĂM MỤC VÒNG HAI LÀ DƯƠNG TÍNH GIẢ DO LỖI CỦA TÔI:** vòng hai tôi **không nhắc lại** danh sách
+luật CỐ Ý rời Tầng 1, nên nó báo rụng năm cái đã có máy hoặc đã bỏ có lý do. Nếp: **đề bài audit
+phải mang theo danh sách đã-cố-ý-bỏ**, không thì auditor tốn lượt vào chỗ đã quyết.
+
+**Một chỗ cũng đã sửa: mâu thuẫn CÓ SẴN từ bản cũ** — khoá file có HAI mốc trả (*"trả ngay sau
+lượt ghi"* và *"ngay sau commit"*); ghi xong không phải commit xong. Đúng bệnh ba-mốc mà bộ biên
+dịch luật sinh ra để chặn, và nó nằm trong hiến pháp suốt từ đó.
+
 ## 1.9.31 — 2026-09-10 — Hiến pháp 9 mục → 6, và 111 mục luật rà lại còn 43
 
 **Đức uỷ quyền AI chốt** bản rà 111 mục do Đức và GPT lập: *"đó chỉ là proposal thôi, bạn review
