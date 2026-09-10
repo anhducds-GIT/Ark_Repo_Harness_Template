@@ -165,7 +165,9 @@ export function docBanDo(luat) {
   const dong = luat.split(CR).join("").split(NL);
   const dau = dong.findIndex((l) => l.startsWith("## 6."));
   if (dau < 0) return [];
-  const het = dong.findIndex((l, i) => i > dau && l.startsWith("## 7."));
+  // MOC CUOI ## 8. — muc 7 da gop vao muc 0 (10/09). Ghim ## 7. thi khong tim thay moc ket,
+  // ham lay toi HET FILE va boc theo moi dong | cua cac muc sau ban do.
+  const het = dong.findIndex((l, i) => i > dau && l.startsWith("## 8."));
   return dong.slice(dau, het < 0 ? dong.length : het)
     .filter((l) => l.startsWith("|") && !/^\|[\s:|-]+\|?\s*$/.test(l) && !/^\|\s*Khi bạn sắp/.test(l))
     .map((l) => l.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()))

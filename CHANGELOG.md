@@ -3,6 +3,30 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.35 — 2026-09-10 — BỐN con trỏ chết vào `## 7.` trong MÃ, hai cái làm phép kiểm mất răng
+
+Lượt gộp 9 mục → 6 bỏ mục 7 (nhập vào mục 0). Tôi đã sửa **17** chỗ nói *"AGENTS.md mục N"* bằng
+chữ, nhưng bỏ sót **bốn** chỗ ghim vào **mốc tiêu đề** `## 7.` trong mã. Hai trong bốn cái đó
+không làm đỏ gì — chúng làm phép kiểm **xanh mà đo số 0**:
+
+| Chỗ | Ghim `## 7.` gây ra gì |
+|---|---|
+| `tests/template-null-repo.mjs` fixture | `replace` không khớp → **KHÔNG-LÀM-GÌ**, nên fixture thiếu đúng mấy dòng bản đồ nó vừa định thêm, và vế chạy trên nền rỗng |
+| `tests/template-null-repo.mjs` `phanChung` | `split(...)[1]` là `undefined` → `|| ""` → phép soi từ vựng nghề **BỎ QUA cả mục 8** mà vẫn xanh |
+| `tests/template-null-repo.mjs` vế mốc cắt | ghim CẶP mốc sai → xanh trong khi bộ trích cắt sai |
+| `scripts/build-overview.mjs` `docBanDo` | không thấy mốc kết → lấy tới **HẾT FILE**, bốc theo mọi dòng `\|` của các mục sau bản đồ |
+
+Cả bốn nay dùng mốc `## 8.` và **ĐÒI mốc có thật** (`assert` trước khi dùng), chứ không để
+`replace`/`split` không-khớp đi qua im lặng.
+
+**Một hệ quả cố ý, ghi ra để không ai tưởng là lỗi:** mục 6 của repo NHÀ nay là một đoạn trỏ,
+không còn bảng, nên `docBanDo` trả **0 dòng ở nhà** — bảng cho Đức mất 7 dòng cửa-nhanh, phần
+bản đồ đầy đủ vẫn còn (`docBanDoChiTiet`). Ở **repo đích** thì bản trích vẫn phát mục 6 CÓ bảng,
+và `docBanDo` đọc được **11 dòng** — đã đo trên `template/AGENTS.md`.
+
+**Đây là loại lỗi mà audit CHỮ không thể thấy:** Codex chỉ được đưa văn bản `AGENTS.md`, nên nó
+không đọc được bộ sinh và các phép ghim đang trỏ vào mốc nào. Chỗ hở của vòng audit này, nói rõ.
+
 ## 1.9.34 — 2026-09-10 — Audit Codex qua `stdin`: hai vòng, bác 12 chỗ, vá 11
 
 **Đức chốt:** *"cần audit độc lập bạn gọi Codex CLI"*, rồi *"codex cli hãy dùng stdin"*. Sandbox

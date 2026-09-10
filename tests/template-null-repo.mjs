@@ -68,9 +68,16 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
       const rows = declared.map((rel) => `| Fixture Khoi A | \`${rel}\` |`).join("\n");
       const cu = fixture.get(banDo);
       assert.ok(cu, `fixture thieu file ban do da khai: ${banDo}`);
-      fixture.set(banDo, banDo === "AGENTS.md"
-        ? cu.replace("\n## 7.", `\n${rows}\n\n## 7.`)
-        : `${cu}\n${rows}\n`);
+      /* MOC LA `## 8.` TU 10/09 (muc 7 da gop vao muc 0). Va phai DOI moc co that:
+         `replace` khong khop la KHONG-LAM-GI, nen fixture thieu dung may dong vua dinh them
+         va ca ve chay tren nen rong — xanh ma do so 0. */
+      const MOC8 = String.fromCharCode(10) + "## 8.";
+      if (banDo === "AGENTS.md") {
+        assert.ok(cu.includes(MOC8), "fixture AGENTS.md phai co moc ## 8. de chen bang ban do");
+        fixture.set(banDo, cu.replace(MOC8, String.fromCharCode(10) + rows + MOC8));
+      } else {
+        fixture.set(banDo, cu + String.fromCharCode(10) + rows + String.fromCharCode(10));
+      }
     }
     for (const [rel, content] of fixture) {
       const abs = join(tempRoot, ...rel.split("/"));
@@ -324,8 +331,11 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
 
   // Và trên AGENTS.md THẬT: mỗi mốc đúng một dòng. Nếu repo này vi phạm thì bộ trích phải đỏ
   // ở đây trước khi nó kịp sinh ra một bản trích bị cắt sai.
+  /* MỐC CUỐI LÀ `## 8.` TỪ 10/09 — lượt gộp 9 mục → 6 nhập mục 7 vào mục 0, nên mục ngay sau bản
+     đồ file là mục 8. Ghim đúng CẶP mà `lawForTemplate()` đang dùng: ghim sai cặp thì phép kiểm
+     này xanh trong khi bộ trích cắt sai, tức nó ghim số 0. */
   const luatThat = readFileSync(new URL("../AGENTS.md", import.meta.url), "utf8");
-  for (const moc of ["## 6.", "## 7."]) {
+  for (const moc of ["## 6.", "## 8."]) {
     assert.equal(f(luatThat, moc).hits.length, 1, `AGENTS.md that phai co DUNG MOT dong bat dau bang \`${moc}\``);
   }
   ok("moc cat muc 6 la tieu de THAT va DUY NHAT; hai moc thi FAIL CLOSED kem so dong");
@@ -392,7 +402,11 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
   const daChung = stripNghe(luatGoc);
   // Chỉ soi PHẦN LUẬT CHUNG: mục 6 là bản đồ địa phương, bị cắt ở bước sau, nên từ vựng nghề
   // trong đó không tính. Bản đầu soi cả file và báo động nhầm 4 dòng — tất cả đều ở mục 6.
-  const phanChung = daChung.split("## 6.")[0] + (daChung.split("## 7.")[1] || "");
+  /* MOC SAU BAN DO LA ## 8. tu 10/09. Ghim sai moc thi split(...)[1] la undefined, || rong
+     bien no thanh chuoi rong, va phep soi nay BO QUA moi muc sau ban do ma van xanh. */
+  const sauBanDo = daChung.split("## 8.");
+  assert.equal(sauBanDo.length, 2, "AGENTS.md phai co dung mot moc ## 8. — ghim sai moc la soi thieu ca mot muc");
+  const phanChung = daChung.split("## 6.")[0] + sauBanDo[1];
   assert.ok(!/selector|dom_probe|innerHTML/.test(phanChung),
     "tach xong thi phan luat chung phai sach tu vung nghe");
   assert.doesNotThrow(() => stripNghe(daChung), "luat da o dang chung thi tach lai phai la khong-lam-gi");
