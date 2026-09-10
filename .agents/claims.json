@@ -41,19 +41,5 @@
       "released_at": "2026-09-10T04:14:40.426Z"
     }
   },
-  "_fingerprint": "39be3a6cd9ffa66f",
-  "tam": {
-    "docs/ROADMAP-V2.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:33:35.569Z"
-    },
-    "STATUS.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:34:48.765Z"
-    },
-    "HANDOFF.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:34:48.765Z"
-    }
-  }
+  "_fingerprint": "950991619fd8fdb8"
 }

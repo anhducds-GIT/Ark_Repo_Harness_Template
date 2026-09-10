@@ -6,7 +6,7 @@ Trang được sinh ngày 2026-09-10. Đây là lúc sinh trang, **KHÔNG phải
 
 ## A · Bắt đầu từ đâu
 
-1. **Việc ưu tiên #1** — **_root** — `KHUNG-50` — dấu xác nhận suite không ghi được vì HEAD đổi giữa lượt. Hỏi trước khi vá: một `git worktree` riêng cho suite + bộ sinh đóng được mấy trong ba mục còn lại? · [STATUS](STATUS.md)
+1. **Việc ưu tiên #1** — **_root** — Đọc `docs/ROADMAP-V2.md` TRƯỚC. `R0` — Đức chốt VẠCH ĐÍCH, nó chặn mọi đợt. Rồi `R1` thôi commit bảng (bỏ 37% commit). `KHUNG-63` đã vá 1.8.12 nhưng CHƯA chạy suite, CHƯA đẩy — làm nốt trước. · [STATUS](STATUS.md)
 2. **Phiên gần nhất** — 2026-09-10 · [HANDOFF.md](HANDOFF.md)
 3. **Luật phải đọc trước khi sửa gì** — [AGENTS.md](AGENTS.md) · cổng vào cho AI: [llms.txt](llms.txt)
 4. **Ai đang giữ package nào** — `.agents/claims.json` (trạng thái sống, cố tình KHÔNG chép vào trang này để trang không mục theo từng lần nhận/trả quyền)
@@ -15,7 +15,7 @@ Trang được sinh ngày 2026-09-10. Đây là lúc sinh trang, **KHÔNG phải
 
 | Đơn vị | Version [ĐO] | Lifecycle [KHAI] | Method Bridge [ĐO] | File test [ĐO] | Kiểm chứng cuối (ngày @ commit 7 ký tự, cách kiểm) [KHAI + bằng chứng] | Code đã commit đổi sau kiểm chứng? [ĐO] | Việc đang mở | Đọc sâu (link STATUS) |
 |---|---:|---|---:|---:|---|---|---|---|
-| ark-repo-harness | 1.8.12 | active | 0 | 23 | 2026-09-10 @ `d6da6a0` — 23 suite · cổng đóng phiên XANH TOÀN BỘ · bản 1.8.10 (xem CHANGELOG) ([bằng chứng](HANDOFF.md)) | CÓ (19 commit) | `KHUNG-50/55/51` là MỘT bệnh — nhiều lane chung một cây làm việc git (chung đĩa, chung HEAD). Đừng vá ba lần. `KHUNG-59` (chung INDEX) đã đóng 10/09 bằng cửa `.githooks/commit-msg`. Thứ tự ở docs/ROADMAP-V2.md; bản đồ sống `npm run what-next`. | [STATUS](STATUS.md) |
+| ark-repo-harness | 1.8.12 | active | 0 | 23 | 2026-09-10 @ `d6da6a0` — 23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHANGELOG) ([bằng chứng](HANDOFF.md)) | CÓ (19 commit) | ĐÓNG GÓI, không hoàn thiện. Đo 7 ngày: 522 commit · 191 (37%) chỉ sinh bảng · 78 lần cắt bản · lõi chỉ 22% mã. ĐÓNG BĂNG tính năng và phép kiểm tới khi 5 repo đích cùng bản, cùng xanh. | [STATUS](STATUS.md) |
 
 ## D · Sức khoẻ điều hướng [ĐO]
 

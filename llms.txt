@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-10.
 
 ## Việc ưu tiên #1
 
-- **_root** — `KHUNG-50` — dấu xác nhận suite không ghi được vì HEAD đổi giữa lượt. Hỏi trước khi vá: một `git worktree` riêng cho suite + bộ sinh đóng được mấy trong ba mục còn lại?
+- **_root** — Đọc `docs/ROADMAP-V2.md` TRƯỚC. `R0` — Đức chốt VẠCH ĐÍCH, nó chặn mọi đợt. Rồi `R1` thôi commit bảng (bỏ 37% commit). `KHUNG-63` đã vá 1.8.12 nhưng CHƯA chạy suite, CHƯA đẩy — làm nốt trước.
 
 ## Đọc theo thứ tự này
 
@@ -19,7 +19,7 @@ Trang được sinh ngày 2026-09-10.
 
 ## Từng extension
 
-- [ark-repo-harness](STATUS.md): active — `KHUNG-50/55/51` là MỘT bệnh — nhiều lane chung một cây làm việc git (chung đĩa, chung HEAD)
+- [ark-repo-harness](STATUS.md): active — ĐÓNG GÓI, không hoàn thiện
 
 ## Luật bắt buộc trước khi sửa gì
 
