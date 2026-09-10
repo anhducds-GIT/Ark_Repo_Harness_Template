@@ -29,7 +29,7 @@ cuốn việc lane khác · cổng xanh · đẩy an toàn. Khác đi là tuỳ 
 | Hook | **1** (`commit-msg`) | **2** · bật thật ở **5/5** repo đích | **2** (+ `post-commit`), mỗi cái 1 test ghim |
 | Bộ sinh BẢNG | 3 bộ · **37% commit** | **0 commit** | **1** bộ · 0 commit |
 | Một vòng sửa → đẩy | **14,2 phút** | **7,4 phút** | **≤ 5 phút** |
-| Migrate một repo | chưa đo | **8s** · 5/5 repo tại `1.9.20` | đo rồi — **đạt** |
+| Migrate một repo | chưa đo | **7s** lệnh + **~3 phút** ba bước tay · 5/5 tại `1.9.29` | đo rồi — **đạt** |
 
 **Đã xong 10/09:** `R1` bảng thôi bị cổng đòi khớp HEAD — bỏ **37% commit**, qua **6 vòng audit
 độc lập, 20 lỗi** · `R2` một bản cho một ĐỢT VIỆC đã đóng · `R3` **ĐÓNG BĂNG**: cấm THÊM tính
@@ -41,7 +41,7 @@ năng · phép kiểm · luật · tài liệu; được **BỎ** và **GỘP**.
 |---|---|---|---|
 | `T1` | **Cắt suite còn ≤ 3 phút** (`R7`) | mọi việc dưới trả thuế này TỪNG LƯỢT — riêng `R1` hôm nay tiêu 6 lượt suite ≈ **75 phút chờ** | `npm test` ≤ **180s**, 24/24 xanh, **không bỏ vế kiểm nào** |
 | `T2` | **Hook: trả khoá + ĐO hiệu quả** (`R9`) | Đức đòi hai lần *"khoá nhả ngay khi hết sửa, hook tốt vào"*; và `commit-msg` **chưa ai đo nó chặn thật ở repo đích** | `post-commit` tự trả khoá file · **một ca thật ở repo đích** chứng minh cửa index chặn · 2 test ghim |
-| ~~`T3`~~ | ~~**Đóng gói** (`R11`)~~ | **XONG** | 5/5 tại `1.9.20`, **8s/repo**, 5/5 sinh được trang, 5/5 cửa index bật. Còn: `KHUNG-66` ở một repo đích |
+| ~~`T3`~~ | ~~**Đóng gói** (`R11`)~~ | **ĐÓNG** | 5/5 tại `1.9.29`, hook sống 5/5, cổng **2/5 XANH**. Ba repo còn lại chặn bởi **nợ sấn của chính chúng** (lịch sử không nhãn · file lane khác đang sửa · 7 mục ở `Chrome_Extension`), không phải lượt nâng. **Lôi ra 9 lỗi lõi** — xem `CHANGELOG` 1.9.20→1.9.29 |
 
 **`T1` có số đo sẵn, không phải đi tìm.** Bốn suite nặng dựng lại CÙNG MỘT fixture:
 `cong-do-that` 462s · `init-repo-smoke` 251s · `harness-smoke` 237s · `upgrade-smoke` 216s (riêng

@@ -21,6 +21,33 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 6) · harness-loi-02 — `T3` ĐÓNG: 5 repo tại 1.9.29, **2/5 xanh**
+
+**KẾT QUẢ THẬT, không làm tròn.**
+
+| Repo | Cổng | Chặn bởi |
+|---|---|---|
+| `n8n-orchestrator` | **XANH TOÀN BỘ** | — |
+| `n8n_Local host` | **XANH TOÀN BỘ** | — |
+| `ALL_SKILL_MANAGEMENT` | 0 đỏ, **1 không kiểm được** | commit `b742625` (revert, 01:20 09/09) không nhãn lane — sửa = **sửa lịch sử**, phải hỏi Đức |
+| `Project 3 AI Agent Unify` | **1 đỏ** | `dashboard/dashboard_state.js` đang sửa dở **của lane khác**, có trước lượt này |
+| `Chrome_Extension_AI_Agentic` | **7 đỏ** | **toàn bộ nợ sấn**: nghi token thật · dãy B **44 chỗ** · kho chữ **9830/9340** · `KHUNG-66` |
+
+**5/5** cùng bản `1.9.29`, **5/5** có `core.hooksPath=.githooks` ở **tầng local**, hai file hook đủ.
+
+**BA THỨ TÔI CỐ TÍNH KHÔNG TỰ LÀM** — và phiên sau cũng đừng:
+1. **Sửa lịch sử** để vá nhãn lane cho một commit cũ — mục 2 bắt hỏi Đức.
+2. **Commit hộ file đang sửa dở của lane khác** — đúng cái cả hệ khoá tồn tại để ngăn.
+3. **Phán một token là thật hay giả** trong dự liệu của Đức — cần mắt người.
+
+**GIÁ THẬT CỦA MỘT LƯỢT MIGRATE (đo được, 5 repo):** `upgrade --apply` **7 giây**; ba bước tay
+**~3 phút/repo**. Và lượt đóng phải là **HAI commit**: ① `scripts/ tests/ .githooks/` (là *code
+đổi*, làm tăng bộ đếm) · ② `.md` + 3 file máy sinh (được miễn, nên không làm bảng lệch lại).
+**Gộp một commit là cổng đỏ ngay một nhịp** — tôi đã gộp một lần và trả giá một lượt cổng.
+
+**TỔNG NGÀY: 9 lỗi lõi, 0 do phép kiểm ở nhà tìm ra.** Mỗi lỗi một phép ghim, mỗi ghim đột biến
+hai chiều. Nặng nhất: `md()` treo, **65.765 giây CPU** trong đêm.
+
 ## 2026-09-10 (tiep 5) · harness-loi-02 — lỗi 9, và luật cho cả lớp lỗi này
 
 **Lỗi 9.** `handoff-smoke` đòi *"mục dài nhất lịch sử phải vượt trần"* — một tính chất **DỮ LIỆU**.
