@@ -712,7 +712,14 @@ export function collectModel(deps = createDefaultDeps(), { tolerant = false } = 
     // Danh tính repo. Đóng cứng ở đây là mọi repo dùng bộ khung đều sinh ra một trang tự nhận
     // là repo gốc — audit độc lập bắt đúng chỗ này 2026-09-02.
     repo,
-    profile
+    profile,
+    /* `runDashboard` doc bien nay o PHAM VI KHAC noi no duoc khai (day, trong `collectModel`),
+       nen cau canh bao "co file .js sua do" nem `behaviourOpts is not defined` va giet ca luot
+       sinh trang. Nhanh do chi chay khi co it nhat MOT VUNG KHAC `_root` dang ban, nen o repo
+       nay (rows chi co `_root`) no NAM NGU — va no da no that o mot repo dich 10/09, dung luc
+       dang co viec do. Dat vao model theo dung luat file nay tu dat cho ten artifact: mot
+       nguon, doc lai chu khong dung lai. */
+    behaviourOpts
   };
   model.gatewayLinks = gatewayLinks(model, deps);
   model.health = {
@@ -1404,7 +1411,7 @@ export function runDashboard({ check = false, deps = createDefaultDeps(), output
         output.log(`Nợ điều hướng [ĐO]: chưa khai STATUS ${model.health.units_without_status} · link chết ${model.health.dead_links} · thư mục chưa khai chủ ${model.health.undeclared_dirs} · tài liệu quá hạn ${model.health.draft_debt}. Chi tiết ở Khối D của ${model.ten.dashboard}.`);
       }
       for (const row of model.rows.filter((item) => item.key !== "_root")) {
-        const dirtyCount = (deps.git.dirtyFiles?.(row.key) ?? []).filter((f) => isBehaviourFile(f, behaviourOpts)).length;
+        const dirtyCount = (deps.git.dirtyFiles?.(row.key) ?? []).filter((f) => isBehaviourFile(f, model.behaviourOpts)).length;
         if (dirtyCount > 0) {
           output.log(`CẢNH BÁO: ${row.key} đang có ${dirtyCount} file .js sửa dở chưa commit. Trang này dựng HOÀN TOÀN TỪ HEAD, nên phần đang sửa KHÔNG có ở đây — commit trước rồi sinh lại.`);
         }

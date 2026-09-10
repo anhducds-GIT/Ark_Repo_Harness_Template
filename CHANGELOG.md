@@ -3,6 +3,43 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.20 — 2026-09-10 — T1+T2+T3: cổng 12,2→3,0s · hai cửa máy · 5 repo lên một bản
+
+| Việc | Đầu ngày | Nay |
+|---|---|---|
+| Cổng đóng phiên | 12,2s | **3,0s** |
+| Suite đủ bộ | 850,7s | **451,1s** |
+| `check-bootstrap` | 11035ms | **2162ms** |
+| `B6` điều hướng | 4370ms | **40ms** |
+| Repo ở cùng một bản | 0/5 (3 bản khác nhau) | **5/5 tại 1.9.20** |
+| Migrate một repo | chưa đo | **8s** |
+| `core.hooksPath` ở repo đích | 0/5 | **5/5** |
+
+**T1** — `createHeadDeps` đọc cả cây bằng một lệnh mỗi đường: kiểu ← `ls-tree -r -t`, nội dung
+← `cat-file --batch` (**kiểm số byte và LF cuối**, thiếu thì bỏ cả bản đọc một-lượt), ngày ← một
+lượt `log --name-only`. Ghim: `bang-song` vế 13/13b — đối chiếu 212 file/ngày, **0 sai lệch**,
+kể cả tên có dấu cách và tiếng Việt.
+
+**T2** — hai cửa máy cho luật mà trường hợp nào cũng chỉ là chữ: cửa tầng máy trong `--cua-index`
+(chặn commit sửa tầng máy mà chưa cắt bản — chặn thật một commit trong **0,2s**) và `post-commit`
+tự trả khoá file (trả thật **8 khoá**, giữ khoá của file chưa commit). `post-commit` được chọn vì
+**mã thoát của nó không thể ảnh hưởng `git commit`** — đo được: hook thoát 7, `git` thoát 0.
+
+**T3** — và chính lượt đóng gói lôi ra hai lỗi đã ẩn trong lõi nhiều ngày:
+
+1. `upgrade.mjs` dùng `execFileSync` mà **không import**. `try/catch` biến `ReferenceError` thành
+   một dòng cảnh báo, nên **cửa index chưa từng bật ở bất kỳ repo nào đã nâng cấp** — một cơ
+   chế đã tắt có triệu chứng y hệt lúc chưa mang gì. Ghim: `upgrade-smoke` vế 25, **đo
+   `core.hooksPath`** chứ không đọc chữ in ra — vì chính chữ in ra đã nói dối một cách êm ái.
+2. `runDashboard` đọc `behaviourOpts` ngoài phạm vi → **chết cả bộ sinh trang** khi có vùng khác
+   `_root` đang bẩn. Repo này khai `units.root_dir: null` nên `rows` chỉ có `_root` và lỗi **nằm
+   ngủ** ở nhà, trong khi nó đã **nổ thật** ở một repo đích. Ghim: `bang-song` vế 14 — phải **tự
+   dựng repo có vùng con**; đo trên repo này thì vế xanh mà không kiểm được gì.
+
+**Một lỗi của chính tôi, lượt T1:** tôi dán vế 13/13b **sau** dòng tổng kết của `bang-song`, nên
+nó in **12** trong khi chạy **14** — và tài liệu khai theo con số in ra. Phép kiểm *"số vế khai =
+số vế chạy"* không bắt được vì nó **không đo file này**. Đã đưa tổng kết về cuối file, doc → 15.
+
 ## 1.9.6 — 2026-09-10 — R1 + R7: cổng thôi đòi bảng khớp HEAD; suite 850s → 445s
 
 Đo 7 ngày trước khi sửa: **522 commit, 191 (37%) không làm việc gì** — chỉ sinh lại bảng. Gốc là

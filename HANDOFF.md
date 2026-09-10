@@ -21,6 +21,38 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep) · harness-loi-02 · T3 ĐÓNG GÓI: 5 repo lên 1.9.20, 8 giây/repo
+
+**Số đo.** 5 repo từ 3 bản (`1.3.75`·`1.3.76`·`1.8.0`×3) lên cùng `1.9.20`. **8s mỗi repo**,
+5/5 sinh được trang, 5/5 có `core.hooksPath=.githooks`.
+
+**Hai lỗi thật do chính lượt đóng gói lôi ra, cả hai đã ẨN Ở LÕI nhiều ngày:**
+
+1. `upgrade.mjs` dùng `execFileSync` mà **không import**. `try/catch` nuốt `ReferenceError` thành
+   một dòng cảnh báo → **cửa index chưa từng bật ở bất kỳ repo nào đã nâng cấp**. Đúng cái khối
+   chú thích ngay trên nó cảnh báo: *cơ chế đã tắt có triệu chứng y hệt lúc chưa mang gì.*
+   Ghim: `upgrade-smoke` vế 25 — **đo `core.hooksPath`, không đọc chữ in ra**.
+2. `runDashboard` đọc `behaviourOpts` ngoài phạm vi → **chết cả bộ sinh trang** khi có vùng khác
+   `_root` đang bẩn. Repo này `root_dir: null` nên `rows` chỉ có `_root`, lỗi **nằm ngủ**; nó đã
+   **nổ thật** ở `Chrome_Extension_AI_Agentic`. Sửa ở **LÕI** rồi `--force` ghi đè bản vá tay của
+   họ, sau khi đối chiếu **đúng 2 hunk, +8/-2**, trùng nội dung. Ghim: `bang-song` vế 14 — phải
+   **tự dựng repo có vùng con**, đo trên repo này thì xanh mà không kiểm được gì.
+
+**VẤP:**
+
+- `bang-song` in **12 vế** mà chạy **14** — lượt T1 tôi dán vế 13/13b **sau** dòng tổng kết, doc
+  khai theo con số IN RA nên sai theo. Đã đưa tổng kết về cuối file, doc → 15.
+- Phép kiểm *"số vế khai = số chạy"* **không đo `bang-song`**: vùng quét dừng ở `
+
+`, và một
+  lượt ghi bằng Python đổi doc sang **CRLF** → số file đo được về **0**. Lưới `soDo >= 3` bắt
+  đúng ca đó — giữ. **Python ghi file phải `newline=""`.**
+- Cắt **hai** số bản một mẻ vì sinh bản trích **trước** khi vá xong tầng máy; sổ chỉ-thêm nên
+  `1.9.19` thành số chết. **Sinh bản trích CUỐI CÙNG.**
+
+**Còn mở:** `KHUNG-66` · sổ nợ **30/30**, doc **3114/3117**, nạp **4200/4200** — hết dư cả ba.
+Việc kế: `R6` bỏ luật không có máy canh (Đức chốt: T3 trước, rồi R6, không phải R4/R5).
+
 ## 2026-09-10 (tiep) · harness-loi-02 · Doi huong: DONG GOI, khong hoan thien — ban 1.8.12
 
 Duc chot huong moi: *"mot tuan roi khong dong goi xong… he thong lean, du dung, khong over

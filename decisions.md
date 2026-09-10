@@ -12,6 +12,26 @@
 
 ---
 
+## 2026-09-10 · Thứ tự sau đóng gói: `T3` → `R6`, không phải `R4`/`R5`
+
+**Đức chốt.** Đóng gói cái đang có trước (`T3`), rồi **bỏ luật không có máy canh** (`R6`).
+Hai bảng điều khiển luật/nợ (`R4`/`R5`) **hoãn**.
+
+**Vì sao:** tôi đề xuất thứ tự này sau khi đo được giá của một mắt nối: thêm một file vào bộ
+khung buộc nối đúng **5 chỗ**, và mỗi mắt bỏ sót chỉ lộ ra sau một lượt cổng 7 phút — riêng việc
+phát hiện tuần tự chúng tiêu **~35 phút**. **Bớt mắt nối đáng hơn thêm dụng cụ để nhìn mắt nối.**
+Đức đọc và chốt đúng thứ tự đó.
+
+## 2026-09-10 · Ghi đè bản vá tay của repo đích — AI tự quyết, sau khi sửa ở LÕI
+
+**AI tự quyết** (mục 2 — không thuộc ba việc phải hỏi Đức). `Chrome_Extension_AI_Agentic` tự vá
+`scripts/build-dashboard.mjs` (lỗi `behaviourOpts` sai phạm vi). Tôi **sửa cùng lỗi ở LÕI**, ghim
+bằng `bang-song` vế 14, rồi `upgrade --force` ghi đè bản của họ.
+
+**Cái MẤT:** bản vá tại chỗ của lane khác bị xoá — họ không được hỏi. Điều kiện tôi tự đặt để
+cho phép mình làm: đối chiếu **đúng 2 hunk, +8/-2**, nội dung trùng với bản vá ở lõi. **Không
+trùng thì không được `--force`** — lúc đó là xoá việc của người khác, không phải đồng bộ hoá.
+
 ## 2026-09-05 · Migrate là BA việc trong một, không phải chuẩn hoá cấu trúc
 
 **Đức chốt.** Đưa một repo lên chuẩn gồm ba việc, làm cùng lượt:

@@ -946,5 +946,36 @@ const dungRepo = (ghiSoGhim) => {
   ok(`dữ liệu máy: ${TEP_MAY_THEM.length} file khai đều có thật · ${TEP_CUA_REPO_DICH.length} file của repo đích đều bị loại · bộ đo đi cùng thứ nó đo · dấu vân tay phủ được`);
 }
 
+/* VE 25 — CUA INDEX PHAI BAT THAT O REPO DICH, khong chi in ra mot cau.
+ * `core.hooksPath` la cau hinh MOI BAN SAO: mang `.githooks/commit-msg` sang ma khong bat la
+ * mang mot co che DA TAT, va trieu chung y het luc chua mang gi. Ca that 10/09: `upgrade.mjs`
+ * dung `execFileSync` ma KHONG import no; `catch` quanh cho nuot `ReferenceError` thanh mot
+ * dong canh bao, nen cua nay chua tung bat o BAT KY repo nao da nang cap. Lop `try/catch` mem
+ * bien mot loi cu phap thanh mot cai nhun vai — nen ve nay do CHINH CAU HINH, khong doc chu in.
+ */
+{
+  const rieng = mkdtempSync(join(tmpdir(), "ark-cua-index-"));
+  try {
+    execFileSync("git", ["init", "--quiet"], { cwd: rieng, stdio: "pipe" });
+    const ra = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), rieng, "--apply"],
+      { encoding: "utf8" });
+    assert.equal(ra.status, 0, `--apply phai xong: ${ra.stdout}${ra.stderr}`);
+    assert.ok(existsSync(join(rieng, ".githooks", "commit-msg")),
+      "phai mang duoc .githooks/commit-msg sang, khong co no thi ve nay do rong");
+    // `git config --get` THOAT 1 khi khoa chua dat. Khong bat thi ve nay do bang stack trace,
+    // va Duc doc mot dong "Command failed" thay vi biet cua nao chua bat.
+    let troToi = "(chưa đặt)";
+    try {
+      troToi = execFileSync("git", ["config", "--get", "core.hooksPath"],
+        { cwd: rieng, encoding: "utf8" }).trim();
+    } catch { /* chua dat — de nguyen nhan de cau ĐỎ noi duoc */ }
+    assert.equal(troToi, ".githooks",
+      `core.hooksPath phai bang ".githooks" o repo dich, dang "${troToi}" — cua index chua bat`);
+    assert.ok(!/không bật được/.test(ra.stdout),
+      `--apply in ra canh bao khong bat duoc cua: ${ra.stdout}`);
+  } finally { rmSync(rieng, { recursive: true, force: true }); }
+  ok("cửa index BẬT THẬT ở repo đích — đo `core.hooksPath`, không đọc chữ in");
+}
+
 console.log(`
 ${passed} passed, 0 failed, ${passed} total`);

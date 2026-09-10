@@ -136,7 +136,7 @@ khai `generated_names` trong `.repo-structure.json` — từ bản 1.3.11 ba tê
 
 ### Sắp sửa `bang-song/` — thêm một đường vào máy chủ, hay nới chốt an toàn
 
-[tests/bang-song.mjs](tests/bang-song.mjs) — 12 vế; vế **8b** ghim R1 (`generators: []` hợp lệ mà vắng khoá vẫn dùng mặc định · trang HTML ngoài cây HEAD · ba file text **ở lại** vì `llms.txt` là gốc điều hướng của B6). Vế 7 canh **hàng rào `KHOA_SONG`**: gỡ nó là bản commit ở gốc repo cũng đọc bảng quyền từ đĩa, và lúc đó cổng *"Sự thật máy sinh còn tươi"* ĐỎ với MỌI phiên mỗi lượt có ai nhận khoá — một tiến trình trên máy Đức chặn push cả repo. Đầu file ghi bảy đột biến đã chạy, **kèm cái SỐNG SÓT lượt đầu**: vế 1 từng lặp qua chính danh sách nó phải canh
+[tests/bang-song.mjs](tests/bang-song.mjs) — 15 vế; vế **14** ghim ca thật 10/09 ở repo đích: câu cảnh báo *"có file .js sửa dở"* đọc `behaviourOpts` sai phạm vi nên **giết cả bộ sinh trang**, và nó chỉ nổ khi có vùng KHÁC `_root` đang bẩn — repo này `root_dir: null` nên lỗi NẰM NGỦ, vế phải tự dựng repo có vùng con; vế **8b** ghim R1 (`generators: []` hợp lệ mà vắng khoá vẫn dùng mặc định · trang HTML ngoài cây HEAD · ba file text **ở lại** vì `llms.txt` là gốc điều hướng của B6). Vế 7 canh **hàng rào `KHOA_SONG`**: gỡ nó là bản commit ở gốc repo cũng đọc bảng quyền từ đĩa, và lúc đó cổng *"Sự thật máy sinh còn tươi"* ĐỎ với MỌI phiên mỗi lượt có ai nhận khoá — một tiến trình trên máy Đức chặn push cả repo. Đầu file ghi bảy đột biến đã chạy, **kèm cái SỐNG SÓT lượt đầu**: vế 1 từng lặp qua chính danh sách nó phải canh
 
 ### Sắp thêm một lưu đồ vào tài liệu, hay thấy lưu đồ trên bảng hiện ra là CHỮ
 

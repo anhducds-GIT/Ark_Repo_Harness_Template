@@ -20,6 +20,7 @@
  * CHỈ ĐỌC khi `--plan`. Không ghi một byte nào.
  */
 
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

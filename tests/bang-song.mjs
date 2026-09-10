@@ -42,7 +42,7 @@ import { fileURLToPath } from "node:url";
 import { canSinh, chenBang, khoaChanSinhFrom, KHOA_CHAN_SINH, NHAN_BANG, xetChot } from "../bang-song/loi.mjs";
 import { DUONG, PHUONG_THUC, xuLy } from "../bang-song/may-chu.mjs";
 import { generatorsFrom } from "../scripts/repo-structure.mjs";
-import { createHeadDeps } from "../scripts/build-dashboard.mjs";
+import { collectModel, createHeadDeps, runDashboard } from "../scripts/build-dashboard.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -347,7 +347,6 @@ const bang = (khoa) => JSON.stringify({ claims: khoa });
   ok(`11 · ${cmds.length} file lệnh Windows đều là CRLF thật trên đĩa`);
 }
 
-console.log(`bang-song: ${passed} vế xanh`);
 
 /* VẾ 13 — T1: BỘ ĐỌC HEAD MỘT-LƯỢT PHẢI KHỚP TỪNG-FILE, KHÔNG CHỈ NHANH HƠN.
  *
@@ -423,3 +422,49 @@ console.log(`bang-song: ${passed} vế xanh`);
     }
   }
 }
+
+/* VẾ 14 — CÂU CẢNH BÁO "có file .js sửa dở" KHÔNG ĐƯỢC GIẾT CẢ LƯỢT SINH.
+ * Ca thật 10/09 ở một repo đích: `runDashboard` đọc `behaviourOpts` ở PHẠM VI KHÁC nơi nó được
+ * khai (`collectModel`), nên nhánh cảnh báo ném `behaviourOpts is not defined` và cả bộ sinh
+ * chết. Nhánh đó chỉ chạy khi có **ít nhất một vùng KHÁC `_root` đang bẩn** — repo này khai
+ * `units.root_dir: null` nên `rows` chỉ có `_root`, và lỗi NẰM NGỦ ở đây suốt. Vế này vì thế
+ * phải DỰNG một repo có vùng con; đo trên repo thật thì nó xanh mà không kiểm được gì.
+ * Đột biến đã chạy: đổi `model.behaviourOpts` về `behaviourOpts` → mã trả 1 (trước: 0).
+ */
+{
+  const kh = mkdtempSync(join(tmpdir(), "ark-vung-con-"));
+  const gk = (...a) => execFileSync("git", a, { cwd: kh, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  try {
+    gk("init", "-q", "."); gk("config", "user.email", "t@t"); gk("config", "user.name", "t");
+    const ghi = (rel, noi) => {
+      const abs = join(kh, rel);
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, noi, "utf8");
+    };
+    ghi(".repo-structure.json", JSON.stringify({
+      units: { root_dir: "goi", marker: "package.json", depth: 1, ten: "Gói" },
+      areas: { _root: { dirs: [] }, _goi: { dirs: ["goi"] } }
+    }, null, 1));
+    ghi("package.json", JSON.stringify({ name: "thu", version: "0.0.1" }));
+    ghi(".agents/claims.json", JSON.stringify({ version: 1, claims: {}, tam: {} }, null, 1));
+    ghi("goi/mot/package.json", JSON.stringify({ name: "mot", version: "0.0.1" }));
+    gk("add", "-A"); gk("commit", "-q", "-m", "dung vung con");
+
+    const deps = createHeadDeps(kh);
+    const khoa = collectModel(deps, { tolerant: true }).rows.map((r) => r.key);
+    assert.ok(khoa.some((k) => k !== "_root"),
+      `fixture phai co it nhat mot vung KHAC _root, khong thi ve nay do rong — dang: ${khoa.join("|")}`);
+
+    // Thay ĐÚNG MỘT công tắc: vùng con báo có một file .js sửa dở.
+    const loi = [];
+    const ma = runDashboard({
+      deps: { ...deps, writeFile: () => {}, git: { ...deps.git, dirtyFiles: () => ["goi/mot/a.js"] } },
+      output: { log() {}, error(...a) { loi.push(a.join(" ")); } }
+    });
+    assert.equal(ma, 0,
+      `vung con ban -> ca luot sinh trang phai VAN xong: ${loi.join(" / ").slice(0, 300)}`);
+  } finally { rmSync(kh, { recursive: true, force: true }); }
+  ok("14 · vùng con đang bẩn: câu cảnh báo `.js` sửa dở KHÔNG giết lượt sinh (`behaviourOpts` sai phạm vi)");
+}
+
+console.log(`bang-song: ${passed} vế xanh`);

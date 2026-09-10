@@ -22,26 +22,26 @@ cuốn việc lane khác · cổng xanh · đẩy an toàn. Khác đi là tuỳ 
 | Đo | Đầu ngày 10/09 | Nay | Vạch |
 |---|---|---|---|
 | `scripts/` · phần lõi | 16.533 dòng · lõi **22%** | — | **≤ 6.000** · lõi **≥ 60%** |
-| Suite · thời gian · cổng | 24 · **14,2 phút** · 12 mục | **7,4 phút** | ≤ 12 · **≤ 3 phút** · ≤ 8 mục |
+| Suite · thời gian · cổng | 24 · **14,2 phút** · 12 mục | **7,5 phút** (cổng 3,0s) | ≤ 12 · **≤ 3 phút** · ≤ 8 mục |
 | `AGENTS.md` · `docs/` | 9 mục · 23 file | — | **≤ 6 mục** · ≤ 30 file |
 | Trần token nạp | 4.195 / 4.200 | — | hạ trần **3.000** |
 | Luật không có máy canh | **7/9 mục** MIỄN | — | **0** |
-| Hook | **1** (`commit-msg`) | — | **2** (+ `post-commit`), mỗi cái 1 test ghim |
+| Hook | **1** (`commit-msg`) | **2** · bật thật ở **5/5** repo đích | **2** (+ `post-commit`), mỗi cái 1 test ghim |
 | Bộ sinh BẢNG | 3 bộ · **37% commit** | **0 commit** | **1** bộ · 0 commit |
 | Một vòng sửa → đẩy | **14,2 phút** | **7,4 phút** | **≤ 5 phút** |
-| Migrate một repo | chưa đo | — | bấm giờ ở `T3` |
+| Migrate một repo | chưa đo | **8s** · 5/5 repo tại `1.9.20` | đo rồi — **đạt** |
 
 **Đã xong 10/09:** `R1` bảng thôi bị cổng đòi khớp HEAD — bỏ **37% commit**, qua **6 vòng audit
 độc lập, 20 lỗi** · `R2` một bản cho một ĐỢT VIỆC đã đóng · `R3` **ĐÓNG BĂNG**: cấm THÊM tính
 năng · phép kiểm · luật · tài liệu; được **BỎ** và **GỘP**. Lý do ở [decisions](../decisions.md).
 
-## HÔM NAY — ba việc, đúng thứ tự này, không xen việc khác
+## HÔM NAY — ba việc đã XONG cả ba. Việc kế: `R6` (Đức chốt thứ tự 10/09)
 
 | # | Việc | Vì sao đúng thứ tự đó | Xong khi |
 |---|---|---|---|
 | `T1` | **Cắt suite còn ≤ 3 phút** (`R7`) | mọi việc dưới trả thuế này TỪNG LƯỢT — riêng `R1` hôm nay tiêu 6 lượt suite ≈ **75 phút chờ** | `npm test` ≤ **180s**, 24/24 xanh, **không bỏ vế kiểm nào** |
 | `T2` | **Hook: trả khoá + ĐO hiệu quả** (`R9`) | Đức đòi hai lần *"khoá nhả ngay khi hết sửa, hook tốt vào"*; và `commit-msg` **chưa ai đo nó chặn thật ở repo đích** | `post-commit` tự trả khoá file · **một ca thật ở repo đích** chứng minh cửa index chặn · 2 test ghim |
-| `T3` | **Đóng gói** (`R11`) | vạch đích | 5 repo cùng một bản, cùng xanh, **bấm giờ** migrate một repo |
+| ~~`T3`~~ | ~~**Đóng gói** (`R11`)~~ | **XONG** | 5/5 tại `1.9.20`, **8s/repo**, 5/5 sinh được trang, 5/5 cửa index bật. Còn: `KHUNG-66` ở một repo đích |
 
 **`T1` có số đo sẵn, không phải đi tìm.** Bốn suite nặng dựng lại CÙNG MỘT fixture:
 `cong-do-that` 462s · `init-repo-smoke` 251s · `harness-smoke` 237s · `upgrade-smoke` 216s (riêng

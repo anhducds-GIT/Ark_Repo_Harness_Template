@@ -18,6 +18,23 @@
 
 ## P1
 
+### KHUNG-66 · `fileScriptCanChep` bị bỏ khỏi lõi — 3 file test ở một repo đích KHÔNG NẠP ĐƯỢC
+
+Lượt migrate `0.3.0 → 1.8.0` xoá export `fileScriptCanChep` khỏi `scripts/repo-structure.mjs`.
+`Chrome_Extension_AI_Agentic` có **3 file test của riêng nó** import cái đó — `build-dashboard-smoke.mjs`,
+`dashboard-dirty-repo-regression.mjs`, `dau-vet-vung-smoke.mjs` — nên chúng **không nạp nổi một dòng**.
+Cổng bên đó vẫn XANH vì nó chỉ chạy suite của gói, không chạy suite gốc — tức một việc **im lặng
+không chạy**, đúng loại "đồ trang trí" mà luật vàng 2 cấm.
+
+Lịch sử: lane `claude-gpt-chay-het-job` đã tìm ra và **cố tính không tự sửa** (10/09, commit
+`ab88c78e` ở repo đó), lý do ghi rõ: đoán xem hàm đó trở thành gì là đúng loại lỗi họ vừa phải
+revert một lần. Tôi giữ nguyên quyết định đó: không bị bản trích nào cần tới, nên **lõi không thiếu
+gì** — câu hỏi thật là API này có nên có lại không, và đó là việc của vai ② mang về, không phải
+của vai ① đoán hộ.
+
+**đóng khi:** hoặc lõi có lại một hàm tương đương **kèm một phép ghim**, hoặc 3 file test ở repo
+đích đổi sang đường khác và **chạy thật được** — đo bằng `node <file>` trả 0, không bằng cổng xanh.
+
 ### KHUNG-65 · Mục nhật ký viết ở mức `###` LÁCH ĐƯỢC trần byte — và trần đó đi đòi lane khác
 
 `scripts/handoff.mjs` tách mục bằng `RE_TIEU_DE_MUC = /^##[ \t]/`, tức **đúng hai dấu `#`**. Một
