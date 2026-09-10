@@ -1703,3 +1703,20 @@ chặn vì **khoá của lane khác**, không phải vì token.
 
 **Vấp:** ghi log vào `scratchpad/` TRONG repo → `_root` bị sửa → `TREE_CHANGED` + cổng đỏ, mất một
 vòng ~9 phút. Log lệnh dài phải ghi RA NGOÀI cây.
+
+## 2026-09-11 · harness-loi-02 — **1.9.41**: máy in ra một hướng dẫn KHÔNG LÀM ĐƯỢC
+
+`upgrade` in *"commit CẢ BA phần trên MỘT commit"*. **Không làm được:** artifact mang dấu **NGÀY
+CỦA HEAD**, nên sinh trước commit là cổng ĐỎ ở mục *Sự thật máy sinh còn tươi*, sinh sau commit thì
+nó là commit **thứ hai**. Đo 11/09 trên 3 repo: cả 3 đều hai commit — và lịch sử cả 5 repo trước
+giờ cũng vậy (`chore(khung)` rồi `chore(bang)`). Đây đúng chỗ đau nhất của vòng này: **câu sai nằm
+trong OUTPUT của máy**.
+
+**Số:** `1.9.41` trỏ tới **CÙNG** dấu vân tay với `1.9.40` (`f1c563d1`) — sự thật, vì chỉ đổi chữ
+in ra. Cửa index ở repo nhà coi **mọi `.mjs`** là tầng máy (cố ý, có lý do ghi sẵn) nên nó đòi cắt
+bản chứ không tra dấu vân tay; giá là một vòng lan xuống repo đích, và đó là **giá đúng**.
+
+**Trạng thái cuối:** nhà `1.9.41` sạch, đã đẩy · `n8n-orchestrator` · `n8n_Local host` ·
+`Project 3` đều `1.9.41` **đã đẩy** · `ALL_SKILL_MANAGEMENT` `1.9.41` commit rồi, **19 commit chưa
+đẩy — chờ Đức** · `Chrome_Extension_AI_Agentic` vẫn `1.9.29`, **chưa chạm** (`HANDOFF.md` bị lane
+`harness-loi-01` khoá >27 giờ).

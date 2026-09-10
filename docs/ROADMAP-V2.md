@@ -14,24 +14,24 @@ ttl_days: 120
 
 | | |
 |---|---|
-| Repo nhà | bản **1.9.40** · hiến pháp **6 mục** (từ 9) · **43** mục luật Tầng 1 (từ 111) |
+| Repo nhà | bản **1.9.41** · hiến pháp **6 mục** (từ 9) · **43** mục luật Tầng 1 (từ 111) |
 | Máy canh được ĐO | **9** đường dẫn · **6/6** mục luật còn phần KHÔNG máy nào canh, đã nói ra |
 | Suite · cổng | **24/24 xanh** ≈ **406s** · cổng đóng phiên **12 mục** |
-| 5 repo đích | **3 ĐÃ ĐẨY ở 1.9.40** · 1 commit-rồi-chưa-đẩy · 1 chưa chạm |
+| 5 repo đích | **4 ghim 1.9.41** — 3 ĐÃ ĐẨY · 1 commit-rồi-chưa-đẩy · 1 chưa chạm (`1.9.29`) |
 | Ngân sách | nạp **4196/4200** · nợ **30/30** — **sát trần** |
 
-## ĐÓNG GÓI: xong 3/5, và hai chỗ còn lại cần ĐỨC
+## ĐÓNG GÓI: 4/5 ghim `1.9.41` (3 đã đẩy), hai chỗ còn lại cần ĐỨC
 
 Đ1 · Đ2 · Đ3 của bản trước **đã làm**, 11/09. Bảng kết quả thật: `HANDOFF.md`, mục
 *"ĐÓNG GÓI: 3/5 repo đích ĐÃ ĐẨY"*. Lượt nâng còn tìm ra **một cửa CHẾT ở cả 5 repo** —
 `safe-push` đọc `audit.nguoi_duyet` từ đĩa mà bản trích chưa từng phát khối đó, nên nhãn `Audit:`
-ở repo đích **chỉ có thể làm HẠI**. Vá gốc ở `1.9.40` ([ADR-0020](adr/0020-cua-audit-o-repo-dich.md)).
+ở repo đích **chỉ có thể làm HẠI**. Vá gốc ở `1.9.40` · `1.9.41` sửa chữ máy in ra ([ADR-0020](adr/0020-cua-audit-o-repo-dich.md)).
 
 **Việc còn lại — cả hai đều là ĐÁNH ĐỔI của Đức, KHÔNG phải việc AI tự quyết:**
 
 | Repo | Đang ở đâu | Đức cần chốt gì |
 |---|---|---|
-| `ALL_SKILL_MANAGEMENT` | `1.9.40` đã commit tại chỗ, **18 commit chưa đẩy** | Đẩy sẽ cuốn theo **6 commit của `harness-phat-01`** và `b742625` (không nhãn `Lane:`). Duyệt `--carry` (luật ở [AGENTS.md](../AGENTS.md) mục 2), hoặc vá nhãn (= **sửa lịch sử**) |
+| `ALL_SKILL_MANAGEMENT` | `1.9.41` đã commit tại chỗ, **19 commit chưa đẩy** | Đẩy sẽ cuốn theo **6 commit của `harness-phat-01`** và `b742625` (không nhãn `Lane:`). Duyệt `--carry` (luật ở [AGENTS.md](../AGENTS.md) mục 2), hoặc vá nhãn (= **sửa lịch sử**) |
 | `Chrome_Extension_AI_Agentic` | vẫn `1.9.29`, **chưa chạm** | `HANDOFF.md` đang bị lane `harness-loi-01` khoá **>27 giờ**, và lane `claude-gpt-chay-het-job` đang làm việc ở đó. Chỉ ba đường gỡ khoá: lane đó trả · lane đó kết thúc · **Đức chốt** |
 
 Cách chạy lại một lượt nâng, nếu cần: `node scripts/upgrade.mjs --plan "<đường-dẫn>"` rồi `--apply`,
