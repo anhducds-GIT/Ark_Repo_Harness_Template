@@ -371,9 +371,12 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     g2("config", "core.hooksPath", ".githooks");
     const dinh = () => g2("rev-parse", "HEAD").trim();
 
-    if (!coBoPhatHanh) {
-      ok("6 · cửa tầng máy — BỎ QUA ở repo dựng từ bản trích: nó là cửa của NƠI PHÁT HÀNH, và `scripts/build-template.mjs` cố ý không đi theo bản trích");
-    } else {
+    /* MỘT `ok()` DUY NHẤT CHO VẾ NÀY, nhãn đổi theo nhánh — `core-contract` đếm số vế bằng số
+     * lời gọi `ok(` TĨNH trong file, nên hai lời gọi cho một vế làm con số đếm được (15) lệch
+     * khỏi số vế chạy được (14). Và một con số sai trong tài liệu "không làm đỏ bất cứ thứ gì
+     * nên nó sống rất lâu" — chính câu phép kiểm đó in ra. */
+    let nhan6 = "6 · cửa tầng máy — BỎ QUA ở repo dựng từ bản trích: nó là cửa của NƠI PHÁT HÀNH, và `scripts/build-template.mjs` cố ý không đi theo bản trích";
+    if (coBoPhatHanh) {
     // ⑴ CHẶN: chạm tầng máy, số bản không đổi.
     const truoc = dinh();
     ghi("scripts/may.mjs", "// v2\n");
@@ -450,8 +453,9 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     const h = cm(`feat: sua .mjs o repo dich${nhan}`);
     assert.equal(h.ma, 0, `repo KHONG phai noi phat hanh thi cua tang may khong ap: ${h.ra.slice(0, 300)}`);
 
-    ok("6 · cửa tầng máy — TÁM nhánh: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` · và KHÔNG áp ở repo không phải nơi phát hành");
+    nhan6 = "6 · cửa tầng máy — TÁM nhánh: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` · và KHÔNG áp ở repo không phải nơi phát hành";
     }
+    ok(nhan6);
   } finally {
     fs.rmSync(t2, { recursive: true, force: true });
   }
