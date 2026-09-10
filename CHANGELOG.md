@@ -3,6 +3,45 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.10 — 2026-09-10 — Sổ phát hành KHÔNG thấy cái hook, và bản trích phát phép ghim mà không phát thứ nó ghim
+
+Đức hỏi *"đổi hook thế này thì có phải nâng version không?"*. Có — và tôi ĐÃ nâng (1.8.8→1.8.9).
+Nhưng đo lại thì **máy không hề bắt tôi phải nâng**, và chỗ đó mới là lỗi:
+
+| Đo | Kết quả |
+|---|---|
+| dấu vân tay bản trích | `5af2e421f591117b` |
+| ...sau khi **vô hiệu hoá hoàn toàn** `.githooks/commit-msg` | `5af2e421f591117b` — **không đổi một ký tự** |
+| đối chứng: sửa `scripts/claim.mjs` | ĐÃ ĐỔI — bắt được |
+
+Tầng máy định nghĩa theo **ĐUÔI FILE** (`.mjs`, `.cmd`). Git hook **bắt buộc không có đuôi** — git
+gọi đúng cái tên `commit-msg`. Nên nó ra khỏi `bamBanTrich`, và **sổ phát hành nói dối về một bản
+đã phát** — đúng câu đã viết sẵn cho `features.json` ở chính chỗ đó.
+
+**Hệ quả thứ hai, nặng hơn, dựng lại được:** `upgrade --plan` kể `tests/cua-index.mjs` là THIẾU mà
+**không hề nhắc** `.githooks/commit-msg`. Repo đích nhận **phép ghim** mà không nhận **thứ nó
+ghim** → suite bên đó chết `ENOENT` ngay lượt đầu. Đây là ca `bang-song/` 1.3.26 **nguyên văn**,
+lần thứ tư cùng một lớp lỗi.
+
+**Vá bằng QUY TẮC, không bằng danh sách:** hai byte `#!` là lời tự khai *"tôi chạy được"* của
+chính file. Một danh sách gõ tay thì đợi người sau nhớ — ba lần trước cho thấy không ai nhớ.
+`TEP_CUA_REPO_DICH` vẫn thắng: `package.json` · `.repo-structure.json` · `.agents/claims.json`
+không bao giờ vào tầng máy, kể cả nếu một ngày chúng mọc ra dòng `#!`.
+
+**Phép ghim cũ cũng hỏi sai câu:** vế *"không bỏ sót thứ chạy được"* quét `/\.(mjs|cmd)$/` — tức
+nó ghim CHÍNH cái định nghĩa đang sai, nên nó XANH suốt. Nay hỏi bằng đuôi **hoặc** `#!`.
+
+**Và một vế của tôi hoá ra rỗng:** *"file repo đích không được vào tầng máy"* vẫn xanh cả khi lớp
+chặn bị gỡ hẳn — vì ba file đó không có shebang, nên câu hỏi không chạm gì. Nay vế đó **nhét
+shebang vào chính ba file đó** rồi mới hỏi. Đột biến ⑿ nay ĐỎ.
+
+`tests/upgrade-smoke.mjs`: **24 vế**. Đột biến: ⑾ quay lại quy tắc chỉ-theo-đuôi → ĐỎ *"1 file
+chạy được bị BỎ QUÊN"* · ⑿ gỡ lớp chặn repo đích → ĐỎ, nêu tên cả ba file.
+
+**Chính sổ phát hành đã trả lời câu hỏi của Đức:** sau bản vá, `upgrade` từ chối bằng
+`SO_PHAT_HANH_LECH: bản 1.8.9 đã ghi 5af2e421…, nội dung tầng máy hiện tại là 2fb2ff87…` và bắt
+tăng số. Trước bản vá nó im lặng.
+
 ## 1.8.9 — 2026-09-10 — Vòng audit độc lập trả REVISE, và cả bốn chỗ đều đúng
 
 Bản 1.8.8 cắt xong thì đưa audit độc lập. Kết luận **`REVISE`**, bốn chỗ. Tự dựng lại từng ca rồi

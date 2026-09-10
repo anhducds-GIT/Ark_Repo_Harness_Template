@@ -1364,9 +1364,33 @@ export const TEP_CUA_REPO_DICH = Object.freeze([
   "package.json", ".repo-structure.json", ".agents/claims.json"
 ]);
 
+/* THỨ CHẠY ĐƯỢC MÀ KHÔNG CÓ ĐUÔI — cùng một lỗ, lần thứ TƯ, và lần này là một git hook.
+ *
+ * Quy tắc "theo đuôi file" ở trên tự đúng khi bộ khung mọc thêm THƯ MỤC mã. Nó KHÔNG tự đúng
+ * khi bộ khung mọc thêm một file chạy được **không có đuôi** — và git hook thì bắt buộc phải
+ * thế: git gọi đúng cái tên `commit-msg`, không gọi `commit-msg.mjs`.
+ *
+ * ĐO 10/09, ngay sau khi phát 1.8.9: `.githooks/commit-msg` có trong bản trích nhưng KHÔNG vào
+ * `bamBanTrich`. Vô hiệu hoá hoàn toàn cửa index → dấu vân tay **không đổi một ký tự**. Tức sổ
+ * phát hành nói dối về một bản đã phát, đúng câu đã viết cho `features.json` ở trên. Và hệ quả
+ * thứ hai, đúng nguyên văn ca `bang-song/` 1.3.26: `upgrade --plan` kể `tests/cua-index.mjs` là
+ * THIẾU mà không hề nhắc `.githooks/commit-msg` — repo đích nhận phép ghim, không nhận thứ nó
+ * ghim, và suite bên đó chết `ENOENT` ngay lượt đầu. Dựng lại được cả hai.
+ *
+ * DÙNG QUY TẮC, KHÔNG DÙNG DANH SÁCH: `#!` ở hai byte đầu là lời tự khai *"tôi chạy được"* của
+ * chính file. Một danh sách gõ tay thì đợi người sau nhớ, và ba lần trước đã cho thấy không ai
+ * nhớ. Khác `TEP_MAY_THEM` cho `.json` — ở đó không có phép suy nào tách được dữ liệu bộ khung
+ * khỏi cấu hình repo đích, nên phải khai tay. Ở đây có.
+ *
+ * `TEP_CUA_REPO_DICH` vẫn thắng: không file nào của repo đích được vào tầng máy, kể cả nếu một
+ * ngày nào đó nó mọc ra dòng `#!`. */
+export const laShebang = (noiDung) => String(noiDung ?? "").startsWith("#!");
+
 export function fileMay(chuan) {
-  return [...chuan.keys()].filter((rel) =>
-    DUOI_MAY.some((d) => rel.endsWith(d)) || TEP_MAY_THEM.includes(rel));
+  return [...chuan.keys()].filter((rel) => {
+    if (TEP_CUA_REPO_DICH.includes(rel)) return false;
+    return DUOI_MAY.some((d) => rel.endsWith(d)) || TEP_MAY_THEM.includes(rel) || laShebang(chuan.get(rel));
+  });
 }
 
 export function bamBanTrich(chuan) {

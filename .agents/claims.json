@@ -40,11 +40,59 @@
       "released_at": "2026-09-09T15:38:07.471Z"
     }
   },
-  "_fingerprint": "748eca23821861bb",
+  "_fingerprint": "5324352427e1de52",
   "tam": {
+    "scripts/build-template.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:45:42.001Z"
+    },
+    "tests/upgrade-smoke.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:45:42.001Z"
+    },
+    "package.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:47:00.578Z"
+    },
+    "CHANGELOG.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:58:00.990Z"
+    },
+    "BACKLOG.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:58:00.990Z"
+    },
     "HANDOFF.md": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-09T21:39:55.027Z"
+      "luc": "2026-09-10T01:58:00.990Z"
+    },
+    "docs/BAN-DO-CHI-TIET.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:58:00.990Z"
+    },
+    "STATUS.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:58:59.737Z"
+    },
+    "RELEASE-LEDGER.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:59:03.691Z"
+    },
+    "template/scripts/build-template.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:59:03.691Z"
+    },
+    "template/tests/upgrade-smoke.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:59:03.691Z"
+    },
+    "template/package.json": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:59:03.691Z"
+    },
+    "template/README.md": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T01:59:22.171Z"
     }
   }
 }

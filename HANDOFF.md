@@ -21,6 +21,40 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep) · harness-loi-02 · So phat hanh KHONG thay cai hook — ban 1.8.10
+
+Duc hoi *"doi hook the nay thi co phai nang version khong?"*. **Co, va toi DA nang** (1.8.8→1.8.9).
+Cau tra loi that nam o cho khac: **may khong he bat toi phai nang**.
+
+| Do | Ket qua |
+|---|---|
+| dau van tay ban trich | `5af2e421f591117b` |
+| ...sau khi VO HIEU HOA HOAN TOAN cua index | `5af2e421f591117b` — khong doi |
+| doi chung: sua `scripts/claim.mjs` | DA DOI |
+
+Tang may dinh nghia theo DUOI FILE. Git hook **bat buoc khong co duoi**. Nen `upgrade --plan` ke
+`tests/cua-index.mjs` la THIEU ma khong nhac `.githooks/commit-msg` — repo dich nhan PHEP GHIM ma
+khong nhan THU NO GHIM, suite ben do chet `ENOENT` luot dau. Dung ca `bang-song/` 1.3.26, **lan
+thu tu cung mot lop loi**. Dung lai duoc ca hai, roi va, roi dung lai: **12/12 XANH** o repo dich
+mo phong.
+
+Va bang QUY TAC (`#!`), khong bang danh sach — ba lan truoc cho thay khong ai nho sua danh sach.
+
+**MOT VE CUA TOI HOA RA RONG:** ve *"file repo dich khong duoc vao tang may"* van xanh ca khi lop
+chan bi go han, vi ba file do khong co shebang nen cau hoi khong cham gi. Nay ve do NHET shebang
+vao chinh ba file do roi moi hoi. **Bai hoc: viet xong mot ve thi go thu chinh cai no canh; ve nao
+van xanh la do trang tri.**
+
+### Tra loi cau thu hai cua Duc: KHONG can migrate lai
+
+Nam repo dich, khong repo nao co cua: `ALL_SKILL_MANAGEMENT` 1.3.76 · `Project 3 AI Agent Unify`
+1.3.75 · `Chrome_Extension_AI_Agentic` 1.8.0 · `n8n-orchestrator` 1.8.0 · `n8n_Local host` 1.8.0.
+Chua ai nhan 1.8.9 nen khong co gi de lam LAI. Va **nang truoc ban 1.8.10 thi hong** — do la
+chinh ca `ENOENT` o tren.
+
+`Chrome_Extension_AI_Agentic` da co `commit-msg` RIENG (N-40/N-05): `--plan` xep no vao `CHUA
+GHIM`, `--apply` TU CHOI, cua cua ho an toan. Can nguoi quyet → `KHUNG-60`.
+
 ## 2026-09-10 · harness-loi-02 · KHUNG-59: cua INDEX — `git commit` thoi cuon duoc viec lane khac
 
 **Da va, CHUA GACH MA** (muc 5). Ban **1.8.9**. Chi tiet co che + bang do: `CHANGELOG.md` 1.8.8

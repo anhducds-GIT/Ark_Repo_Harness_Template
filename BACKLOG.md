@@ -884,6 +884,29 @@ của A in vùng đó ở **đúng một** rổ, kèm câu nói rõ *"của tôi
 
 Vùng: `_code`.
 
+### KHUNG-60 · `Chrome_Extension_AI_Agentic` đã có `commit-msg` RIÊNG — nâng lên 1.8.10 là hai cửa tranh một tên file
+
+**Đo 10/09, không phải giả định.** Repo đó ghim bản khung `1.8.0`, và nó **đã có**
+`.githooks/commit-msg` của riêng nó (*"chốt cuối của N-40/N-05"*) với `core.hooksPath=.githooks`
+đặt sẵn. Bộ khung 1.8.10 phát một file **cùng đường dẫn, cùng tên**.
+
+Máy đã chặn đúng — `upgrade --plan` xếp nó vào `CHƯA GHIM`, và `--apply` **TỪ CHỐI** (mã 3), nêu
+tên file. Không mất gì. Nhưng nó cũng nghĩa là **repo đó không nâng được** cho tới khi có người
+quyết, và `--force` ở đây sẽ **xoá cửa N-40/N-05 của họ** — im lặng.
+
+Ba lối, chưa cái nào đo: ⑴ gộp hai cửa vào một file (cửa của họ gọi thêm `claim.mjs --cua-index`)
+· ⑵ bộ khung đổi sang một tên khác (`.githooks/commit-msg` là tên git đòi, nên phải là một hook
+gọi nhiều script) · ⑶ để repo đó tự giữ cửa của mình và khai miễn trừ.
+
+**Cùng họ với `KHUNG-59`:** cả hai đều là *"một tài nguyên dùng chung mà không ai khai chủ"* —
+lần trước là index, lần này là tên file hook.
+
+**đóng khi:** repo đó `upgrade --apply` lên bản mới nhất mà **cả hai cửa còn chạy** — dựng nổi ca
+hỏng bằng một phép ghim (repo đích có hook riêng + `--apply` → cửa của họ vẫn từ chối đúng ca của
+nó, cửa index vẫn từ chối đúng ca của nó), và `--force` không còn là đường xoá im lặng.
+
+Vùng: `_template`.
+
 ### KHUNG-59 · Hai lane chung một cây git thì chung luôn **INDEX** — `git add` của tôi, `git commit` của họ
 
 **Xảy ra HAI LẦN trong một ngày, hai chiều ngược nhau, hai lane khác nhau.** Đây là cơ chế, không

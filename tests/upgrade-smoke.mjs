@@ -103,13 +103,37 @@ const dungRepo = (ghiSoGhim) => {
    *
    * Hỏi ngược lại mới có răng: quét bản trích tìm MỌI file chạy được, rồi đòi từng cái phải nằm
    * trong tập nâng cấp. Câu hỏi này còn đúng khi bộ khung mọc thêm thư mục mã lần sau. */
-  const chayDuoc = [...chuan.keys()].filter((r) => /\.(mjs|cmd)$/.test(r));
+  /* HỎI BẰNG ĐUÔI FILE LÀ HỎI LẠI CHÍNH ĐỊNH NGHĨA ĐANG SAI — lần thứ hai của vế này.
+   *
+   * Bản trước quét `/\.(mjs|cmd)$/`, nên nó mù với thứ chạy được KHÔNG CÓ ĐUÔI. Đo 10/09:
+   * `.githooks/commit-msg` (git gọi đúng cái tên đó, không gọi `commit-msg.mjs`) lọt khỏi tầng
+   * máy, và vế này vẫn XANH. Hai hệ quả dựng lại được: dấu vân tay bản phát KHÔNG đổi khi vô
+   * hiệu hoá hoàn toàn cửa index · `upgrade --plan` kể `tests/cua-index.mjs` là THIẾU mà không
+   * nhắc cái hook, nên repo đích nhận phép ghim mà không nhận thứ nó ghim → `ENOENT` lượt đầu.
+   *
+   * Nay hỏi bằng thứ file TỰ KHAI: đuôi máy, HOẶC hai byte `#!`. */
+  const chayDuoc = [...chuan.keys()].filter((r) =>
+    /\.(mjs|cmd)$/.test(r) || String(chuan.get(r) ?? "").startsWith("#!"));
   const bo = chayDuoc.filter((r) => !tap.has(r));
   assert.deepEqual(bo, [],
     `${bo.length} file chay duoc bi BO QUEN khoi tap nang cap: ${bo.join(", ")} — repo dich se nhan phep ghim ma khong nhan thu no kiem`);
+  assert.ok(chayDuoc.some((r) => !/\.(mjs|cmd)$/.test(r)),
+    "ban trich phai co it nhat MOT file chay duoc khong co duoi (git hook), neu khong ve tren khong ghim gi moi");
+
+  /* CHIỀU 3 — quy tắc `#!` KHÔNG được nuốt file của repo đích. `TEP_CUA_REPO_DICH` thắng.
+   *
+   * PHẢI DỰNG NỔI CA HỎNG, không chỉ soi bản trích thật. Đo 10/09: vế đầu tôi viết chỉ hỏi
+   * *"ba file đó có trong tầng máy không"* — và chúng không có shebang, nên vế XANH cả khi lớp
+   * chặn bị gỡ hẳn (đột biến ⑿). Một vế không phân biệt được hai nhánh là đồ trang trí.
+   * Nên: NHÉT shebang vào chính ba file đó rồi hỏi lại. */
+  const bay = new Map(chuan);
+  for (const rel of TEP_CUA_REPO_DICH) bay.set(rel, `#!/bin/sh${String.fromCharCode(10)}${chuan.get(rel) ?? "{}"}`);
+  const nuot = fileMay(bay).filter((r) => TEP_CUA_REPO_DICH.includes(r));
+  assert.deepEqual(nuot, [],
+    `file CUA REPO DICH bi nuot vao tang may chi vi co dong #!: ${nuot.join(", ")} — ghi de chung la xoa repo cua nguoi ta`);
 
   assert.ok(ds.length >= 6, `phai co it nhat 6 file may, dang ${ds.length}`);
-  ok(`chỉ tầng máy được nâng cấp — ${ds.length} file chạy được, 0 file chữ`);
+  ok(`chỉ tầng máy được nâng cấp — ${ds.length} file chạy được (kể cả không-đuôi), 0 file chữ`);
 }
 
 /* ---- 1b. PHỤ LỤC NGHỀ: kể tên, KHÔNG tự mang ----------------------------
