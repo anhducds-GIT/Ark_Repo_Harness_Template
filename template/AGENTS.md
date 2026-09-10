@@ -3,8 +3,7 @@
 > **Tầng 1: LUẬT, không phải lý lẽ.** Ở đây chỉ giữ thứ **máy không kịp nói cho bạn** — cơ chế nào
 > máy tự chặn và tự giải thích lúc hỏng thì không nằm ở đây. Bằng chứng, số đo, và năm câu phải
 > trả lời trước khi THÊM một luật: [VI-SAO-LUAT](docs/VI-SAO-LUAT.md).
-> **Máy nào canh mục nào, mục nào KHÔNG có máy:** `features.json` → `luat_nha.canh`. Hai câu đo
-> được đi kèm nó: **CÓ MẶT ≠ ĐANG BẬT** · **CHẶN ≠ BÁO**.
+> **Máy nào canh mục nào:** `features.json` → `luat_nha.canh`. **CÓ MẶT ≠ ĐANG BẬT · CHẬN ≠ BÁO.**
 > **Trống mục 4 · 5 · 7 là CỐ Ý** — gộp vào mục 2 · 3 · 0; ~250 chỗ trỏ vào mục theo SỐ.
 > Chủ dự án là **Đức** (non-tech, tiếng Việt, câu ngắn), người chốt duy nhất.
 
@@ -56,8 +55,11 @@ Sửa dở của lane khác **trong chính file bạn nêu** vẫn bị cuốn �
 ## 1. Ai giữ package nào — chống hai AI giẫm chân
 
 Bảng chủ sở hữu là `.agents/claims.json`; nhận và trả **bằng lệnh**, không sửa tay.
-**MẶC ĐỊNH LÀ KHOÁ MỨC FILE, khoá vùng để dành:** giữ khoá đúng ở file mình đang sửa, nhận **ngay
-trước** lượt ghi, đừng giữ rộng hơn mẻ ghi. **Chỉ đọc thì không cần khoá.**
+**MẶC ĐỊNH LÀ KHOÁ MỨC FILE, khoá vùng để dành.** Khoá file chỉ sống trong **đúng lượt ghi**: nhận
+**ngay trước** khi ghi, đúng những file mình sửa, và trả **ngay sau commit** chứa lượt ghi đó.
+**Đọc · suy nghĩ · chạy test · chờ — KHÔNG được giữ khoá.** Cần ghi tiếp thì **nhận lại**, nhận
+lại không tốn gì. **Chỉ đọc thì không cần khoá.** Mốc là **COMMIT**, không phải lúc gõ
+xong — giứa hai nhịp đó, lane khác nhận được khoá và `git commit --only` cuốn luôn việc của họ.
 
 ```bash
 node scripts/claim.mjs --sua <file>… --as <phiên>   # NGAY TRƯỚC lượt ghi · nhận cả mẻ
@@ -66,13 +68,13 @@ node scripts/claim.mjs --list                       # ai đang giữ gì
 node scripts/claim.mjs --take|--release <khoá> --as <phiên> --task "một câu"   # cả VÙNG
 ```
 
-**MỖI LOẠI KHOÁ ĐÚNG MỘT MỐC TRẢ** — hai loại, hai mốc, và không loại nào có mốc thứ hai: khoá
-**file** trả NGAY SAU commit chứa lượt ghi · khoá **vùng** trả sau khi ĐÃ ĐẨY. Cổng ĐỎ khi khoá file còn treo là **lưới đỡ**, không phải hạn chót —
-còn khoá VÙNG treo thì **không mục cổng nào đỏ**, nên mốc đó chỉ có bạn giữ.
+**MỖI LOẠI KHOÁ ĐÚNG MỘT MỐC, không loại nào có mốc thứ hai:** khoá **file** như trên · khoá
+**vùng** trả sau khi ĐÃ ĐẨY. Mục cổng đỏ vì khoá file còn treo là **lưới đỡ cuối phiên, KHÔNG phải
+hạn chót**; còn khoá VÙNG treo thì không mục cổng nào đỏ, nên mốc đó chỉ có bạn giữ.
 
 **KHÔNG nhả khoá của LANE KHÁC, và không giành vùng lane khác đang giữ — đúng BA đường, không có
-đường thứ tư:** chính lane đó trả · lane đó đã kết thúc · **Đức chốt**. Tín hiệu *"repo chưa thấy dấu vết"* nói repo chưa thấy gì, **không**
-nói lane kia rảnh; quá 30 phút thì máy chỉ NÊU TÊN lane đang giữ, nó không tự nhả.
+đường thứ tư:** chính lane đó trả · lane đó đã kết thúc · **Đức chốt**. Tín hiệu *"repo chưa thấy
+dấu vết"* nói repo chưa thấy gì, **không** nói lane kia rảnh.
 
 Ba luật cơ chế còn lại — chứa nhau hai chiều · chia gốc repo thành nhiều khoá · hai file được miễn —
 máy tự chặn và tự nêu tên khoá thiếu: [MULTIFLOW](docs/protocols/MULTIFLOW.md).

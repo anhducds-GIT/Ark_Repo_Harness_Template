@@ -358,7 +358,12 @@ const mine = (file) => myPackages.some((pkg) => file.startsWith(`${pkg}/`))
 
 /* ---- 0b. Khoá mức FILE đã trả hết --------------------------------------- */
 const doKhoaFile = () => {
-  /* MỐC LÀ *HẾT PHIÊN*, KHÔNG PHẢI *ĐÃ ĐẨY* — và đây là chỗ khác khoá vùng, đừng lẫn.
+  /* MỐC LÀ *NGAY SAU COMMIT*, và MỤC CỔNG NÀY CHỈ LÀ LƯỚI ĐỠ — đừng lẫn hai thứ.
+   *
+   * Đức bắt được 10/09 khi đọc chính thông điệp dưới đây: nó nêu mốc là *cuối phiên*, trong khi
+   * `AGENTS.md` mục 1, `MULTIFLOW`, `cua-index` và sổ vân tay đều nói *"NGAY SAU commit chứa lượt ghi"*.
+   * Bốn chỗ nói đúng, một chỗ nói sai — và chỗ SAI lại là chỗ operator ĐỌC. Đúng bệnh ba-mốc mà
+   * quyết định 09/09 đã đóng một lần; nó quay lại trong OUTPUT của máy.
    *
    * Khoá vùng trả SAU khi đẩy, vì commit chưa đẩy nằm trong một vùng vô chủ để lại một mục đỏ
    * cho phiên sau (xem `tra_khi_chua_day` trong `claim.mjs`). Khoá file KHÔNG mang trách nhiệm
@@ -378,8 +383,9 @@ const doKhoaFile = () => {
   return {
     ok: false,
     msg: `KHOA_FILE_CON_TREO: bạn còn giữ ${cua.length} khoá mức FILE — ${cua.map(([d]) => d).join(" · ")}.`
-      + NL1 + "Khoá file là loại giữ VÀI PHÚT: nhận ngay TRƯỚC lượt ghi, trả ngay SAU."
-      + NL1 + "Mốc là HẾT PHIÊN, không phải ĐÃ ĐẨY — nó không mang trách nhiệm truy nguồn, nhãn `Lane:` mang."
+      + NL1 + "Khoá file chỉ sống trong ĐÚNG LƯỢT GHI: nhận ngay TRƯỚC khi ghi, trả NGAY SAU COMMIT chứa lượt ghi."
+      + NL1 + "Đọc · suy nghĩ · chạy test · chờ thì KHÔNG giữ khoá. Cần ghi tiếp thì nhận lại."
+      + NL1 + "Mục cổng này là LƯỚI ĐỠ cuối phiên, KHÔNG phải hạn chót. (Khoá VÙNG mới trả sau khi ĐÃ ĐẨY.)"
       + NL1 + `Trả hết: node scripts/claim.mjs --xong --het --as ${asLabel}`,
   };
 };

@@ -3,6 +3,43 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.38 — 2026-09-10 — Đức đọc OUTPUT của cổng và bắt được MỐC THỨ BA
+
+**Đức chốt hai việc** (`decisions.md`): khoá FILE **chỉ sống trong đúng lượt ghi**, và **giữ** quyền
+bypass branch protection.
+
+**Anh bắt được gì:** thông điệp `KHOA_FILE_CON_TREO` của cổng nêu mốc là *cuối phiên*, trong khi
+`AGENTS.md` mục 1 · `MULTIFLOW` · `cua-index` · sổ đổi vân tay đều nói **NGAY SAU commit chứa lượt
+ghi**. Lời anh: *"cuối phiên khác với cả kết thúc sửa file."*
+
+| | |
+|---|---|
+| Chỗ phát biểu mốc trả khoá FILE | **5** |
+| Nói đúng | **4** |
+| Nói sai | **1** — và đó là chỗ **operator ĐỌC** |
+
+Đây là bệnh **ba-mốc** mà quyết định 09/09 đã đóng một lần. Nó quay lại **trong output của máy**,
+tức chỗ không tài liệu nào soi.
+
+**Vá:** mục 1 nhận nguyên lời Đức, kèm bốn trạng thái bị cấm nêu thẳng — **đọc · suy nghĩ · chạy
+test · chờ**. Thông điệp cổng nay nêu mốc commit và tự gọi mình là **LƯỚI ĐỠ**, không phải hạn chót.
+Bỏ câu *"quá 30 phút máy chỉ nêu tên"* khỏi Tầng 1 — nó là hành vi MÁY, đã `CHUYỂN SANG MÁY` ở
+`ADR-0018` mà tôi để sót.
+
+**MỘT CHỖ TÔI KHÔNG LÀM THEO NGUYÊN VĂN:** giữ mốc ở **COMMIT**, không phải *"ngay khi ghi xong"*.
+Giữa gõ-xong và commit, lane khác nhận được khoá rồi sửa cùng file, và `git commit --only` cuốn
+luôn việc của họ — đúng ca `KHUNG-59`, đã xảy ra **hai lần** ngày 10/09. Ý của Đức (*không giữ khoá
+qua lúc rảnh*) lấy trọn bằng bốn trạng thái bị cấm.
+
+**GHIM — và phép ghim này bắt chính ghi chú của tôi trước:** `F20` nay đòi hai chiều — không file
+cưỡng chế nào được phát biểu mốc kiểu *hết-phiên*, và thông điệp cổng **phải** nêu mốc commit cùng
+chữ *LƯỚI ĐỠ*. Lượt đầu nó ĐỎ vì tôi trích **nguyên văn câu sai** vào comment giải thích: một câu
+sai nằm trong file cưỡng chế thì đọc y như một lời phát biểu, dù nó là lời kể chuyện.
+
+**Bốn đột biến, và cả bốn lúc đầu chết Ở CHỖ KHÁC** — dấu vân tay luật chung và sổ phát hành chặn
+trước khi tới `F20`. Một phép ghim chỉ "đỏ" nhờ một cửa khác thì nó **chưa được thử**. Harness đột
+biến nay **hoà giải hai cửa đó** (dập lại vân tay + cắt bản) rồi mới đo `F20`.
+
 ## 1.9.36 — 2026-09-10 — Codex CHẠY THẬT: bản đồ máy canh cho một TÀI LIỆU đóng vai máy
 
 Đức sửa sandbox Codex, nên vòng audit thứ ba **chạy được lệnh** — thứ hai vòng trước (chỉ soi chữ)

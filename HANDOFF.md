@@ -21,6 +21,30 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 12) · harness-loi-02 — Đức bắt MỐC THỨ BA, nằm trong output của máy
+
+**Đức đọc thông điệp cổng** `KHOA_FILE_CON_TREO` và thấy nó nêu mốc là *cuối phiên*, trong khi
+`AGENTS.md` mục 1 · `MULTIFLOW` · `cua-index` · sổ vân tay đều nói **NGAY SAU commit**. Lời anh:
+*"cuối phiên khác với cả kết thúc sửa file."* **5 chỗ phát biểu, 4 đúng, 1 sai — và chỗ sai là chỗ
+OPERATOR ĐỌC.** Bệnh ba-mốc của 09/09 quay lại, lần này ở nơi không tài liệu nào soi.
+
+**Vá:** mục 1 nhận nguyên lời Đức + bốn trạng thái bị cấm (**đọc · suy nghĩ · chạy test · chờ**);
+thông điệp cổng nêu mốc commit và tự gọi mình là **lưới đỡ**; bỏ câu *"quá 30 phút"* khỏi Tầng 1
+(hành vi MÁY, đã chuyển ở `ADR-0018` mà tôi để sót).
+
+**KHÔNG làm theo nguyên văn một chỗ:** mốc ở **COMMIT**, không phải *"ngay khi ghi xong"* — giữa
+hai nhịp đó lane khác nhận được khoá và `--only` cuốn luôn việc của họ (`KHUNG-59`, hai lần 10/09).
+
+**HAI BÀI HỌC VỀ PHÉP GHIM, cả hai đáng nhớ hơn bản vá:**
+⑴ `F20` mới **ĐỎ ngay ở chính ghi chú của tôi** — tôi trích nguyên văn câu sai vào comment giải
+thích. Một câu sai nằm trong file cưỡng chế thì đọc y như lời phát biểu, dù nó là lời kể chuyện.
+⑵ Bốn đột biến lúc đầu **chết ở CHỖ KHÁC**: dấu vân tay luật chung và sổ phát hành chặn trước khi
+tới `F20`. **Một phép ghim chỉ đỏ nhờ cửa khác thì nó CHƯA ĐƯỢC THỬ.** Harness nay hoà giải hai
+cửa đó rồi mới đo.
+
+**Đức chốt GIỮ bypass** branch protection: `cong-kiem` bắt buộc mà không chặn, cả 6 lượt đẩy 10/09
+đi xuyên qua. Hệ quả đã ghi: **8 mục luật ở lại Tầng 1** thay vì chuyển sang máy.
+
 ## 2026-09-10 (tiep 11) · harness-loi-02 — Codex chạy thật, bắt 2 chỗ "xanh mà đo số 0"
 
 **Đức sửa sandbox Codex.** Thủ phạm còn lại là cờ **`-C`** của tôi: trỏ ra ngoài cwd tạo **hai gốc

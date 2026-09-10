@@ -1021,6 +1021,24 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   assert.deepEqual([...new Set(khongTro)], [],
     `doan van phat bieu luat \`--carry\` ma khong tro ve AGENTS.md: ${[...new Set(khongTro)].join(", ")}`
     + " — luat do da doi mot lan, va hai ban chep sai mat bon ngay");
+  /* MOT MOC, MOT CAU TRA LOI — va lan nay cho SAI nam trong OUTPUT cua may.
+   *
+   * Duc bat duoc 10/09 khi doc thong diep cong: no viet "Moc la HET PHIEN", trong khi AGENTS.md
+   * muc 1, MULTIFLOW, cua-index va so van tay deu noi "NGAY SAU commit chua luot ghi". Quyet
+   * dinh 09/09 da dong benh ba-moc mot lan; no quay lai o cho operator DOC. Nen ve nay doi HAI
+   * chieu: khong file dang cuong che nao duoc phat bieu moc kieu HET PHIEN, va thong diep that
+   * cua cong PHAI neu moc commit. Do theo NOI DUNG FILE, khong theo mot bien trung gian. */
+  const MOC_SAI = /Mốc là HẾT PHIÊN/;
+  const phatBieuMoc = ["AGENTS.md", "scripts/session-check.mjs", "scripts/claim.mjs", "docs/protocols/MULTIFLOW.md"];
+  const noiSai = phatBieuMoc.filter((rel) => MOC_SAI.test(readFileSync(join(ROOT, rel), "utf8")));
+  assert.deepEqual(noiSai, [],
+    `file dang cuong che con phat bieu moc tra khoa FILE la HET PHIEN: ${noiSai.join(", ")}`
+    + " — moc DUY NHAT la NGAY SAU commit chua luot ghi; muc cong cuoi phien chi la LUOI DO.");
+  const nguonCong = readFileSync(join(ROOT, "scripts/session-check.mjs"), "utf8");
+  assert.match(nguonCong, /KHOA_FILE_CON_TREO[\s\S]{0,600}NGAY SAU COMMIT/,
+    "thong diep KHOA_FILE_CON_TREO phai NEU moc commit — khong thi operator doc mot moc khac voi luat");
+  assert.match(nguonCong, /KHOA_FILE_CON_TREO[\s\S]{0,600}LƯỚI ĐỠ/,
+    "thong diep do phai noi ro muc cong nay la LUOI DO, khong phai han chot");
   ok(`F20 - ${mocPhai.length} file nhac khoa vung deu nhac ca khoa file · ${doanNhac.length} doan nhac --carry deu tro ve AGENTS.md`);
 }
 

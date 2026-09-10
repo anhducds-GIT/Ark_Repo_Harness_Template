@@ -12,6 +12,45 @@
 
 ---
 
+## 2026-09-10 · Khoá FILE chỉ sống trong ĐÚNG LƯỢT GHI — không phải tới cuối phiên
+
+**Đức chốt**, nguyên văn: *"FILE lock chỉ được giữ trong đúng lượt ghi: nhận ngay trước khi ghi,
+trả ngay khi ghi xong; đọc, suy nghĩ, test hoặc chờ không được giữ lock. Cần ghi tiếp thì nhận
+lại."* Lý do Đức nói: *"cuối phiên khác với cả kết thúc sửa file."*
+
+**Anh đọc câu sai từ đâu:** thông điệp của **cổng** (`session-check.mjs`) viết *"Mốc là HẾT PHIÊN"*,
+trong khi `AGENTS.md` mục 1 · `MULTIFLOW` · `cua-index` · sổ đổi vân tay đều nói *"NGAY SAU commit
+chứa lượt ghi"*. **Bốn chỗ nói đúng, một chỗ nói sai — và chỗ sai đúng là chỗ operator ĐỌC.** Đây
+là bệnh ba-mốc mà quyết định 09/09 đã đóng một lần; nó quay lại trong OUTPUT của máy.
+
+**Một chỗ tôi KHÔNG làm theo nguyên văn:** giữ mốc ở **COMMIT**, không phải *"ngay khi ghi xong"*.
+Vì sao: giữa gõ-xong và commit, một lane khác nhận được khoá rồi sửa cùng file, và
+`git commit --only` cuốn luôn việc của họ — đúng ca `KHUNG-59`, đã xảy ra **hai lần** ngày 10/09.
+Ý của Đức (*không giữ khoá qua lúc rảnh*) lấy trọn, bằng cách nêu thẳng bốn trạng thái bị cấm:
+**đọc · suy nghĩ · chạy test · chờ**.
+
+**Cái MẤT:** thêm một nhịp *trả rồi nhận lại* cho phiên ghi nhiều lượt. Đổi lại: khoá file thôi
+thoái hoá thành khoá dài hạn, và mục cổng cuối phiên trở lại đúng vai **lưới đỡ**. Ghim: `F20` của
+`core-contract` nay đòi **không file cưỡng chế nào** phát biểu mốc kiểu *HẾT PHIÊN*, và thông điệp
+cổng **phải** nêu mốc commit.
+
+## 2026-09-10 · GIỮ quyền bypass branch protection
+
+**Đức chốt:** *"tôi đồng ý bypass"* — **giữ nguyên**, không tắt quyền bỏ qua. Không bấm gì trên
+GitHub.
+
+**Nghĩa là, nói thẳng:** luật `cong-kiem` bắt buộc trên `main` **có thật nhưng không chặn** — cả 6
+lượt đẩy ngày 10/09 đều đi xuyên qua nó, và CI chạy **sau** khi code đã lên `main`. Thứ thật sự
+canh là **cổng đóng phiên trên máy** (12 mục, rộng hơn CI — CI không chạy phép kiểm secret).
+
+**Vì sao chốt vậy:** tắt bypass thì lượt đẩy thẳng `main` bị từ chối (lúc đẩy CI chưa kịp chạy nên
+chưa có kết quả xanh), tức phải chuyển sang nhánh + Pull Request và viết lại `safe-push.mjs`. Đó
+là đổi nhịp làm việc, không phải siết một con ốc.
+
+**Cái MẤT:** nếu cổng ở máy bị bỏ qua và CI đỏ, code sai **đã nằm trên `main`**. Và **8 mục luật**
+(`R-009` `R-020` `R-022` `R-023` `R-067` `R-068` `R-080` `R-083`) phải **ở lại Tầng 1** thay vì
+chuyển sang máy — xem [ADR-0018](docs/adr/0018-ra-lai-111-muc-luat.md).
+
 ## 2026-09-10 · Audit độc lập phải gọi **Codex CLI**
 
 **Đức chốt**, nguyên văn: *"cần audit độc lập bạn gọi Codex CLI"*. Trước lượt này tôi dùng một
