@@ -3,6 +3,26 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.29 — 2026-09-10 — Lỗi 9: bản trích đòi một tính chất **DỮ LIỆU** của repo đích
+
+**LỖI 9.** `handoff-smoke` đòi *"mục dài nhất trong lịch sử phải vượt trần"* — lý lẽ: một trần cao
+hơn mọi thứ từng viết là trần trang trí. Đúng **ở repo nhà**, nơi trần 2600 sinh ra VÌ đã có mục
+dài hơn. Nhưng bản trích mang vế này sang mọi repo đích, và một repo có nhật ký **vốn gọn** thì
+Đỏ — trong khi nó không sai gì: trần ở đó chỉ là **chưa ràng buộc**.
+
+| Repo | `laNoiPhatHanh` | số mục | mục dài nhất | trần |
+|---|---|---|---|---|
+| `Ark_Repo_Harness` | **true** | 18 | **71.810 byte** | 2600 |
+| `n8n_Local host` | false | 1 | 1.611 byte | 2600 |
+
+Sửa: câu đó chỉ hỏi ở **nơi phát hành** (`laNoiPhatHanh`) — cơ chế repo này đã dựng cho đúng lớp
+câu hỏi *"chỉ có nghĩa ở nhà"*. **Không mất lưới nào**: khả năng phân biệt của `handoffCapFrom`
+đã được bốn dòng ngay trên ghim bằng **fixture**, không bằng dự liệu repo.
+
+**Lỗi 8 và 9 cùng một họ, và đây là bài của cả lượt đóng gói:** một vế trong bản trích được phép
+đòi **hành vi của mã**; đòi **chính sách** hay **dự liệu** của repo thì phải có điều kiện, và phải
+**nêu tên phần bỏ**. Không thế thì lượt migrate giao cho repo đích một cổng **không thể xanh**.
+
 ## 1.9.27 — 2026-09-10 — Bản trích thôi cưỡng chế chính sách mà repo đích chưa nhận
 
 **LỖI 8.** Vế 8b của `bang-song` đóng cứng `DASHBOARD-Ark-Repo-Harness.html` — **tên trang của

@@ -21,6 +21,27 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 5) · harness-loi-02 — lỗi 9, và luật cho cả lớp lỗi này
+
+**Lỗi 9.** `handoff-smoke` đòi *"mục dài nhất lịch sử phải vượt trần"* — một tính chất **DỮ LIỆU**.
+Đúng ở nhà (18 mục, dài nhất **71.810** byte / trần 2600); Đỏ ở `n8n_Local host` (1 mục, 1.611
+byte) — repo đó không sai gì, trần chỉ **chưa ràng buộc**. Sửa: câu đó chỉ hỏi ở `laNoiPhatHanh`.
+
+**LUẬT RÚT RA — áp cho mọi vế trong bản trích:**
+
+| Vế đòi gì | Được chạy ở đâu |
+|---|---|
+| **hành vi của mã** (hàm nhận gì, ném gì) | mọi repo, không điều kiện |
+| **chính sách của repo** (`R1`, trần, miễn trừ) | chỉ nơi ĐÃ KHAI chính sách đó |
+| **dự liệu của repo** (lịch sử, số mục) | chỉ `laNoiPhatHanh` — và phải **nêu tên phần bỏ** |
+
+Không theo luật này thì lượt migrate **giao cho repo đích một cổng không thể xanh** — đã xảy ra
+hai lần hôm nay (lỗi 8, lỗi 9).
+
+**MỘT LỖI THAO TÁC CỦA TÔI, đáng ghi:** mỗi repo khai bản đồ file ở MỘT CHỖ KHÁC NHAU
+(`docs.file_map`). Tôi khai `.githooks/` vào `AGENTS.md` cho cả 5, nên ở `n8n_Local host` nó vào
+**đúng file sai** và cổng vẫn Đỏ. **Phải ĐỌC `docs.file_map` của từng repo, đừng đoán.**
+
 ## 2026-09-10 (tiep 4) · harness-loi-02 — lỗi 8: bản trích cưỡng chế chính sách repo nhà
 
 **Lỗi 8.** Vế 8b của `bang-song` đóng cứng `DASHBOARD-Ark-Repo-Harness.html` — tên trang của

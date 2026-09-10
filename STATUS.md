@@ -9,7 +9,7 @@ last_verified_how: "23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHAN
 evidence_ref: HANDOFF.md
 owner: harness-loi-02
 priority_rank: 1
-next_step: "`T1`·`T2`·`T3` XONG — 5 repo tại **1.9.26**. `T3` lôi ra **7 lỗi ẩn ở lõi**; nặng nhất: `md()` treo đốt **18 tiếng CPU**. Việc kế: `R6`. Nạp/doc/nợ SÁT TRẦN."
+next_step: "`T1`·`T2`·`T3` XONG — 5 repo tại **1.9.29**. `T3` lôi ra **9 lỗi ẩn ở lõi**, 0 do phép kiểm ở nhà tìm ra. Việc kế: `R6`. Nạp/doc/nợ SÁT TRẦN."
 version_source: package.json
 current_focus: "ĐÓNG GÓI, không hoàn thiện. Đo 7 ngày: 522 commit · 191 (37%) chỉ sinh bảng · 78 lần cắt bản · lõi chỉ 22% mã. ĐÓNG BĂNG tính năng và phép kiểm tới khi 5 repo đích cùng bản, cùng xanh."
 human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật."
