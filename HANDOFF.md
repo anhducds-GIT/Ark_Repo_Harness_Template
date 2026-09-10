@@ -21,6 +21,29 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 3) · harness-loi-02 — lỗi 6 và 7: `Audit:` và phép kiểm tự mù
+
+**Lỗi 6** — `auditFromMessage` quét cả **dòng tiêu đề**, mà `Audit:` là TRAILER. Ca nặng nhất: một
+commit có nhãn `Audit: codex` HỢP LỆ mà tiêu đề tình cờ là `audit:` thì thành HAI nhãn →
+`AUDIT_XUNG_DOT`, **cản đúng cái commit đã làm đúng**. Tìm ra ở `Chrome_Extension_AI_Agentic` — họ
+tự vá từ 10/09, lõi thì chưa. Ghim: `khoa-dau-vet` vế 13, ba ca.
+
+**Lỗi 7 — phép kiểm TỰ MẤT ĐỐI TƯỢNG ĐO, và đây là cái đáng nhớ nhất hôm nay.** Vế *"số vế khai =
+số vế chạy"* ghép liên kết VÀ cửa sổ 400 ký tự vào MỘT biểu thức, nên `lastIndex` nhảy qua cả
+cửa sổ — liên kết nằm trong đó **không bao giờ được quét**. Loại lỗi **càng viết thêm càng nặng**.
+
+Đó chính là vì sao `bang-song` khai **12** mà chạy **14** suốt vẫn xanh: nó không bị đo. Hôm nay
+tôi viết thêm vài câu vào bản đồ, số file đo được tụt về **0**, và lưới `soDo >= 3` bắt. Nay đo
+**6 file** thay vì 4.
+
+**HAI BÀI, giữ lại:**
+
+1. **Một phép kiểm phải canh cả việc NÓ CÒN ĐO ĐƯỢC GÌ.** Lưới `soDo >= 3` là thứ duy nhất đứng
+   giữa "xanh thật" và "xanh vì không đo gì". Đừng bỏ loại lưới này ở bất kỳ vế nào.
+2. **BẪY THOÁT KÝ TỰ BA TẦNG, tôi mắc LẠI hôm nay 3 lần.** `bash → python → chuỗi JS` làm `\n`
+   thành xuống dòng thật và phá cả file. **Cách đúng: neo vào đoạn KHÔNG CÓ gạch chéo, và dựng
+   gạch chéo bằng `chr(92)`.** Và luôn `node --check` sau mọi lượt vá.
+
 ## 2026-09-10 (tiep 2) · harness-loi-02 · `md()` treo vô hạn — 18 tiếng một lõi CPU
 
 **Số đo.** Một tiến trình `build-overview.mjs` ở repo đích đốt **65.765 giây CPU**, từ **23:33

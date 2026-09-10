@@ -3,6 +3,32 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.26 — 2026-09-10 — `Audit:` là trailer · phép kiểm đếm vế tự mất đối tượng đo
+
+**LỖI 6 (tìm ra ở một repo đích — họ tự vá, lõi thì chưa).** `auditFromMessage` quét **cả dòng
+tiêu đề**, mà `Audit:` là một TRAILER — trailer không bao giờ nằm ở dòng đầu. Ba ca đã dựng lại:
+
+| Thông điệp | Trước | Nay |
+|---|---|---|
+| tiêu đề `audit: MOC 2 FAIL …` | khai = *"moc 2 fail …"* → `AUDIT_NGOAI_DANH_SACH`, **chặn push** | không phải nhãn, không chặn |
+| trailer thật `Audit: codex` | đúng | đúng (không tắt cả cửa) |
+| **cả hai** | 2 nhãn → `AUDIT_XUNG_DOT` | 1 nhãn, không lỗi |
+
+Ca thứ ba nặng nhất: nó **cản đúng cái commit đã làm đúng**. Ghim: `khoa-dau-vet` vế 13, ba ca.
+
+**LỖI 7 (phép kiểm tự lộ).** Vế *"số vế khai = số vế chạy"* ghép **liên kết** và **cửa sổ 400 ký
+tự** vào MỘT biểu thức, nên `lastIndex` nhảy qua cả cửa sổ: **mọi liên kết nằm trong đó không bao
+giờ được quét**. Đây là loại lỗi **càng viết thêm càng nặng**: văn xuôi quanh một liên kết dài ra
+là số file đo được giảm đi, êm ru.
+
+Đo được: `bang-song` khai **12** trong khi chạy **14** và cổng **VẪN XANH** suốt — nó bị một cửa sổ
+trước đó ăn mất. Sau một lượt viết thêm hôm nay, số file đo được tụt về **0** — và lưới
+`soDo >= 3` bắt đúng lúc đó. **Lưới đó là lý do phép kiểm này không xanh rỗng mãi mãi — giữ nó.**
+
+Sửa: tìm liên kết riêng, rồi **cắt** cửa sổ từ chuỗi. Nay đo **6 file** thay vì 4, và `bang-song`
+lần đầu được đo. Ghim: chuỗi dựng sẵn có hai liên kết gần nhau — biểu thức cũ thấy **1/2**, bản
+mới thấy **2/2**.
+
 ## 1.9.24 — 2026-09-10 — `md()` treo vô hạn: một lõi CPU chạy hết công suất **18 tiếng**
 
 **Số đo.** Một tiến trình `build-overview.mjs` ở repo đích đã đốt **65.765 giây CPU** — bắt đầu

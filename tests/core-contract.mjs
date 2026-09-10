@@ -1061,14 +1061,25 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   const khaiBanDo = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"))?.docs?.file_map;
   const luat = (khaiBanDo ? readFileSync(join(ROOT, khaiBanDo), "utf8") : "")
     + readFileSync(join(ROOT, "AGENTS.md"), "utf8");
-  // Biên là HẾT ĐOẠN, không phải hết hàng bảng: ở bản đầy đủ nội dung là văn xuôi, không phải ô.
-  const re = /\[[^\]]*\]\(([^)]*tests\/([a-z0-9-]+\.mjs))\)([\s\S]{0,400}?)(?=\n\n|\n\||$)/g;
+  /* CỬA SỔ KHÔNG ĐƯỢC ĂN CÁC LIÊN KẾT PHÍA SAU — đây là chỗ phép kiểm này từng tự mất
+     đối tượng đo. Bản cũ ghép liên kết VÀ cửa sổ 400 ký tự vào MỘT biểu thức, nên `lastIndex`
+     nhảy qua cả cửa sổ: mọi liên kết nằm trong đó **không bao giờ được quét**. Hệ quả: văn
+     xuôi quanh một liên kết dài ra là số file đo được **giảm đi**, êm ru. Đo 10/09: `bang-song`
+     khai 12 vế trong khi chạy 14 và cổng VẪN XANH — vì nó bị một cửa sổ trước đó ăn mất; rồi sau
+     một lượt viết thêm, số file đo được tụt về **0**. Lưới `soDo >= 3` dưới bắt đúng ca đó —
+     nó là lý do phép kiểm này không chỉ xanh rỗng mãi mãi.
+     Nay: tìm liên kết riêng, rồi CẮT cửa sổ từ chuỗi — không để cửa sổ đẩy `lastIndex`.
+     Biên vẫn là HẾT ĐOẠN: ở bản đầy đủ nội dung là văn xuôi, không phải ô bảng. */
+  const re = /\[[^\]]*\]\(([^)]*tests\/([a-z0-9-]+\.mjs))\)/g;
   const lech = [];
   let soDo = 0;
   let khop;
   while ((khop = re.exec(luat)) !== null) {
+    const sau = luat.slice(re.lastIndex);
+    const bien = sau.search(/\n\n|\n\|/);
+    const cuaSo = sau.slice(0, bien < 0 ? 400 : Math.min(bien, 400));
     const ten = khop[2];
-    const khai = [...khop[3].matchAll(MAU_SO)].map((x) => doSo(x[1])).filter((x) => x !== undefined)[0];
+    const khai = [...cuaSo.matchAll(MAU_SO)].map((x) => doSo(x[1])).filter((x) => x !== undefined)[0];
     if (khai === undefined) continue;
     if (!existsSync(join(ROOT, "tests", ten))) {
       lech.push(`tests/${ten}: luat tro toi mot suite KHONG TON TAI`);
@@ -1078,6 +1089,17 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
     soDo += 1;
     if (khai !== that) lech.push(`tests/${ten}: luat noi ${khai} ve, thuc te ${that}`);
   }
+  /* GHIM CHÍNH CƠ CHẾ: hai liên kết nằm gần nhau phải đều được quét. Bản cũ ghép cửa sổ
+     vào biểu thức nên liên kết thứ hai bị ăn mất — và đó là một lỗi CÀNG VIẾT THÊM CÀNG NẶNG,
+     loại khó thấy nhất. Kiểm bằng chuỗi DỰNG SẵN, không phụ thuộc tài liệu thật đang viết thế nào. */
+  {
+    const gia = "[a](tests/mot.mjs) 3 vế, rồi [b](tests/hai.mjs) 4 vế ngay sau";
+    const r2 = /\[[^\]]*\]\(([^)]*tests\/([a-z0-9-]+\.mjs))\)/g;
+    const thay = [...gia.matchAll(r2)].map((x) => x[2]);
+    assert.deepEqual(thay, ["mot.mjs", "hai.mjs"],
+      `hai lien ket gan nhau phai deu duoc quet, dang: ${thay.join("|")}`);
+  }
+
   // Phai con doi tuong do. Doi cach viet bang tra ma ve nay ve 0 thi no thanh do trang tri.
   assert.ok(soDo >= 3,
     `ve nay MAT DOI TUONG DO: chi doc duoc ${soDo} khang dinh "<N> ve" trong AGENTS.md. Doi cach viet bang tra thi sua ve nay cho dung, dung de no xanh rong`);

@@ -240,7 +240,7 @@ khai `generated_names` trong `.repo-structure.json` — từ bản 1.3.11 ba tê
 
 ### Sắp sửa cơ chế KHOÁ VÙNG — nhận, giữ, hay trả
 
-[tests/khoa-dau-vet.mjs](tests/khoa-dau-vet.mjs) — 12 vế ghim tín hiệu *"repo chưa thấy dấu vết"*. Vế 7 ghim **mức nghiêm trọng**: tín hiệu này là VÀNG, nó **không** được đổi mã thoát của cổng — chặn một lane đang đọc kỹ là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ. Bốn đột biến đã chạy thật, ghi trong đầu file
+[tests/khoa-dau-vet.mjs](tests/khoa-dau-vet.mjs) — 13 vế; vế **13** ghim *`Audit:` là TRAILER, không phải kiểu commit* — bản cũ quét cả dòng đầu nên một commit kiểu `audit:` bị đọc thành lời khai người duyệt và bị chặn push; ca nặng nhất là tiêu đề `audit:` **cộng** nhãn thật → `AUDIT_XUNG_DOT`, cản đúng commit đã làm đúng. Ghim tín hiệu *"repo chưa thấy dấu vết"*. Vế 7 ghim **mức nghiêm trọng**: tín hiệu này là VÀNG, nó **không** được đổi mã thoát của cổng — chặn một lane đang đọc kỹ là dạy mọi lane ghi bừa một byte để giữ khoá cho hợp lệ. Bốn đột biến đã chạy thật, ghi trong đầu file
 
 ### Sắp sửa KHOÁ MỨC FILE, hay thắc mắc vì sao có HAI loại khoá
 

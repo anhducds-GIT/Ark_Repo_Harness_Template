@@ -425,7 +425,14 @@ export function nguoiDuyetSaiKhuon(structure) {
  *  Repo KHÔNG khai danh sách → KHÔNG ai là người duyệt → lời khai `chua-co` chỉ gỡ được bằng
  *  `--duc-duyet-chua-audit`. Fail-closed, và nói rõ bằng mã lỗi. */
 export function auditFromMessage(text, dsNguoiDuyet = []) {
-  const values = String(text ?? "").split("\n")
+  /* Bỏ DÒNG TIÊU ĐỀ — đo được 10/09 ở một repo đích (họ tự vá, lõi thì chưa).
+     `Audit:` là một TRAILER, và trailer không bao giờ nằm ở dòng đầu. Bản cũ quét cả dòng đầu,
+     nên một commit theo lối conventional-commit với KIỂU là `audit:` bị đọc thành lời khai
+     người duyệt tên *"moc 2 fail — thieu …"*, rơi ra ngoài `audit.nguoi_duyet` và **bị chặn
+     push**. Nặng hơn: một commit có nhãn `Audit: codex` HỢP LỆ mà tiêu đề tình cờ là `audit:`
+     thì thành HAI nhãn → `AUDIT_XUNG_DOT`, tức cản đúng cái commit đã làm đúng.
+     `laneFromMessage` ngay trên đúng từ đầu (`startsWith`, không nới) — chỉ chỗ này lệch. */
+  const values = String(text ?? "").split("\n").slice(1)
     .filter((line) => /^\s*audit\s*:/i.test(line))
     .map((line) => line.slice(line.indexOf(":") + 1).trim().toLowerCase());
   if (!values.length) return { chuaAudit: false, khai: null, problem: null };
