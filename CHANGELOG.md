@@ -3,6 +3,42 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.31 — 2026-09-10 — Hiến pháp 9 mục → 6, và 111 mục luật rà lại còn 43
+
+**Đức uỷ quyền AI chốt** bản rà 111 mục do Đức và GPT lập: *"đó chỉ là proposal thôi, bạn review
+và là người quyết định cuối cùng"*. Quyết định: [ADR-0018](docs/adr/0018-ra-lai-111-muc-luat.md).
+Sáu chỗ lượt THI HÀNH dạy lại: [ADR-0019](docs/adr/0019-sua-bay-cho-cua-adr-0018.md).
+
+| | Trước | Sau |
+|---|---:|---:|
+| Mục trong `AGENTS.md` | 9 | **6** (vạch `R0` ≤ 6 — **ĐẠT**) |
+| Mục luật ở Tầng 1 | 111 | **43** |
+| Câu trong hiến pháp | 77 | **69** |
+| Token nạp mỗi phiên | 4.196 | **4.099** (vạch 3.000 — **KHÔNG ĐẠT**) |
+| Con trỏ "AGENTS.md mục N" bị chết | — | **0** (sửa 17 chỗ) |
+
+**KHÔNG ĐÁNH SỐ LẠI, và đó là quyết định có số đo.** Mục còn 0 · 1 · 2 · 3 · 6 · 8 — có chỗ trống
+ở 4 · 5 · 7. Vì **~250 chỗ** trong mã và tài liệu trỏ vào các mục **theo SỐ**; đánh số lại là tạo
+hàng trăm con trỏ chết, chính thứ mục 8 gọi là *hai câu trả lời cho một câu hỏi*. Giữ số thì chỉ
+**17** chỗ phải sửa.
+
+**MỘT PHÉP DÒ MẤT MỤC TIÊU MÀ KHÔNG AI ĐỎ.** `F4.7` đo tầng luật ở repo đích bằng chuỗi
+`tự ký nghiệm thu`; lượt gộp bỏ bảng vai — nơi duy nhất chứa chuỗi đó — nên phép dò khớp **0 mục**
+và `5e` **vẫn xanh**. Đúng bệnh cả ngày: **máy còn nguyên, mục tiêu của nó biến mất, biểu hiện
+giống hệt lúc đang chạy.** Trả lại chuỗi thành một mệnh lệnh thật, rồi ghim: bỏ nó ra → ĐỎ.
+
+**BẢY MỤC `HẠ THÀNH HƯỚNG DẪN` KHÔNG CÓ NHÀ TẦNG 2 NÀO** — hạ chúng là XOÁ. Sáu mục thành `GỘP`
+(chúng là mệnh đề của một luật đang giữ), một mục (`R-096`) thành `BỎ`: nó khuyên thêm phép kiểm
+trong khi `R3` đang đóng băng việc thêm phép kiểm.
+
+**GỌN CHỈ 2%, nói thẳng lý do:** ADR-0016 đã nén một lượt rồi, nên 68 mục bị cắt phần lớn là mệnh
+đề trong câu. Và lượt này **THÊM ~200 token** nói thẳng chỗ máy KHÔNG canh. Đánh đổi cố ý:
+**trung thực về chỗ hở đắt hơn gọn.**
+
+**AUDIT ĐỘC LẬP CHƯA CHẠY ĐƯỢC.** `codex exec` hỏng sandbox trên máy này (`apply deny-read ACLs`,
+ba cấu hình, cả bản copy lẫn repo thật) và **tự báo đúng** là không có kết luận. Nên commit này
+mang nhãn `Audit: chua-co` và **`safe-push` TỪ CHỐI đẩy** — máy đang làm đúng việc của nó.
+
 ## 1.9.30 — 2026-09-10 — Lần đầu có máy trả lời "mục luật này ai canh" — và nó lôi ra 2 lỗ THẬT
 
 **VẤN ĐỀ.** Vạch đích `R0` đặt đích *"luật không có máy canh → 0"* rồi đọc con số hiện tại từ

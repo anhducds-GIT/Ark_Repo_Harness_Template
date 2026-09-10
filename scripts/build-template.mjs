@@ -507,9 +507,12 @@ const NGHE = [
 /* Phần luật mà `stripNghe` chịu trách nhiệm = toàn bộ TRỪ mục 6. Mục 6 là bản đồ file của
    riêng repo, bị cắt ở bước sau, nên từ vựng nghề trong đó không tính. */
 function phanLuatChung(text) {
+  /* MỐC CUỐI LÀ `## 8.`, KHÔNG PHẢI `## 7.` — lượt gộp 10/09 nhập mục 7 vào mục 0, nên mục sau
+     bản đồ file nay là mục 8. Số mục cố ý KHÔNG liền nhau: ~250 chỗ trong mã và tài liệu trỏ vào
+     các mục theo SỐ, đánh số lại là tạo hàng trăm con trỏ chết. */
   const moc = (so) => String.fromCharCode(10) + "## " + so + ".";
   const dau = text.indexOf(moc(6));
-  const cuoi = text.indexOf(moc(7));
+  const cuoi = text.indexOf(moc(8));
   if (dau < 0 || cuoi < 0 || cuoi <= dau) return text;
   return text.slice(0, dau) + text.slice(cuoi);
 }
@@ -684,8 +687,29 @@ function phanLuatChung(text) {
  *   BẢNG là những việc VẪN phải hỏi, còn thứ mất đi nằm ở hai GẠCH ĐẦU DÒNG cuối. Đổi cho đúng
  *   chỗ. Ba lượt sửa mục 2 trong một ngày, và cả ba đều do kiểm toán độc lập chỉ ra một câu nói
  *   không đúng — không phải một cơ chế hỏng. Luật là chữ, nên lỗi của nó là lỗi CHỮ.
- *   Vân tay trước: f1655d2f439fab02760c7a43d485f5ac3dcda7134112693b793401eb00b13ddf */
-const COMMON_LAW_SHA256 = "9e08b9265e7353a39794261d210588385f932807aef20261adecce39a46b83ff";
+ *   Vân tay trước: f1655d2f439fab02760c7a43d485f5ac3dcda7134112693b793401eb00b13ddf
+ *
+ *   2026-09-10 · Đức UỶ QUYỀN AI chốt · **lượt gộp: 9 mục → 6**, và 111 mục luật rà lại còn 43.
+ *   Đức nói nguyên văn: *"đó chỉ là proposal thôi, bạn review và là người quyết định cuối cùng"*
+ *   — bản rà 111 mục do Đức và GPT lập. Quyết định từng mục, 14 chỗ khác đề xuất, và cái MẤT:
+ *   `docs/adr/0018-ra-lai-111-muc-luat.md`.
+ *
+ *   SỐ MỤC CỐ Ý KHÔNG LIỀN NHAU — 0 · 1 · 2 · 3 · 6 · 8. Mục 4 gộp vào 2, mục 5 vào 3, mục 7
+ *   vào 0. Đo trước khi quyết: **~250 chỗ** trong mã và tài liệu trỏ vào các mục theo SỐ, nên
+ *   đánh số lại là tạo hàng trăm con trỏ chết — chính thứ mục 8 gọi là *hai câu trả lời cho một
+ *   câu hỏi*. Giữ số, gộp nội dung: chỉ **~16** chỗ phải sửa thay vì ~250.
+ *
+ *   BA THỨ RỜI KHỎI TẦNG 1 VÌ MÁY CANH THẬT: một-vùng-một-phiên và vùng-chủ-khác-chỉ-đọc
+ *   (`claim.mjs` từ chối) · nhãn `Lane:` mang truy nguồn (mục cổng) · `--sua` tự bật cửa index
+ *   (mục cổng). HAI THỨ BỎ HẲN, cái MẤT ghi ở ADR: *"tham chiếu phải là liên kết bấm được"*
+ *   (không có `lint` nào canh) và *"cân nhắc thêm một phép kiểm vào cổng"* (`R3` đang đóng băng
+ *   việc thêm phép kiểm — luật cũ tự mâu thuẫn với chính sách hiện hành).
+ *
+ *   VÀ MỘT THỨ TRẢ LẠI SAU KHI TỰ SOI DIFF: câu *"luật nào không kiểm được bằng máy thì sớm
+ *   muộn cũng bị bỏ qua"* — ba mục `BACKLOG.md` đang trích nó như một câu CỦA hiến pháp, nên bỏ
+ *   nó là làm chết ba con trỏ. Đúng bài học 09/09: nén văn xuôi làm rụng mệnh lệnh phụ.
+ *   Vân tay trước: 9e08b9265e7353a39794261d210588385f932807aef20261adecce39a46b83ff */
+const COMMON_LAW_SHA256 = "5e54beb1ae1514a78c00128c59c5110c516b0f2e83b875a3cd76e3c759b092fe";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
@@ -779,10 +803,10 @@ function lawForTemplate() {
   // và mọi phép thay phải tính lại — thừa một cơ hội sai mà không đổi lại được gì.
   const text = stripNghe(read("AGENTS.md"));
   const start = soleHeadingIndex(text, "## 6.").index;
-  const end = soleHeadingIndex(text, "## 7.").index;
+  const end = soleHeadingIndex(text, "## 8.").index;   // mục 7 đã gộp vào mục 0 — lượt 10/09
   if (start < 0 || end < 0 || end <= start) {
     throw new Error(
-      "TRICH_HONG: không tìm thấy mốc `## 6.` và `## 7.` trong AGENTS.md. Bộ trích cắt theo tiêu đề mục; " +
+      "TRICH_HONG: không tìm thấy mốc `## 6.` và `## 8.` trong AGENTS.md. Bộ trích cắt theo tiêu đề mục; " +
       "nếu đã đánh số lại các mục thì phải sửa `lawForTemplate()` cho khớp, đừng để nó cắt bừa."
     );
   }
@@ -822,9 +846,11 @@ dựng bộ khung: để bảng rỗng thì **4 file** rơi ra ngoài bản đ�
   // được âm thầm phát đi bản cũ.
   // Ghép từ mảng chứ không viết một chuỗi nhiều dòng: khối cũ CHỨA dấu huyền ba lần (rào
   // ```bash), nên template literal là đường thẳng tới lỗi cú pháp.
+  // 10/09 — lượt gộp 9 mục → 6 bỏ mệnh đề *"cảm tính luôn nói…"* (văn xuôi, không phải luật),
+  // nên phép thay trượt và cửa này ném ĐÚNG như thiết kế. Đổi CẢ HAI chuỗi cho khớp lời mới.
   const XUONG_DONG = String.fromCharCode(10);
   const CAN_NANG_CU = [
-    'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu":',
+    'Cân nặng được ĐO, không để cảm tính:',
     "",
     "```bash",
     "npm run can-nang",
@@ -835,7 +861,7 @@ dựng bộ khung: để bảng rỗng thì **4 file** rơi ra ngoài bản đ�
      bản trích mang cả nó lẫn `npm run can-nang`. Một dòng luật nói ngược thứ repo thật sự có
      thì phiên đọc luật sẽ không bao giờ đi đo. Sửa 09/09 khi soát bốn tính năng qua migrate. */
   const CAN_NANG_MOI = [
-    'Cân nặng được ĐO, không để cảm tính — cảm tính luôn nói "thêm một cái nữa thì có sao đâu":',
+    'Cân nặng được ĐO, không để cảm tính:',
     "",
     "```bash",
     "npm run can-nang        # kho chữ · sổ nợ · TOKEN mọi phiên phải nạp",
@@ -958,7 +984,7 @@ const CLAIMS_SEED = `{
 /* HAI SỔ MÀ LUẬT BẮT DÙNG — hạt giống, không phải file rỗng cho đủ mặt.
  *
  * VÌ SAO PHẢI ĐI THEO, đo được 05/09: luật trong khuôn bắt ghi việc ngoài phạm vi vào
- * `BACKLOG.md` (mục 0 bước 2) và quyết định của người chốt vào `decisions.md` (mục 7 bước 2) —
+ * `BACKLOG.md` (mục 0 bước 2) và quyết định của người chốt vào `decisions.md` (mục 0) —
  * mà bản trích KHÔNG mang file nào trong hai. Nên repo dựng từ khuôn SINH RA ĐÃ MANG SẴN đúng
  * bệnh repo nhà mất bốn lượt mới vá xong: luật trỏ tới thứ không tồn tại.
  *
@@ -994,7 +1020,7 @@ _(chưa có mục nào — phiên đầu tiên gặp việc ngoài phạm vi th�
 
 const DECISIONS_SEED = `# QUYẾT ĐỊNH — người chốt đã chốt gì, ngày nào, vì sao
 
-> **Luật mục 7 bước 2 bắt ghi vào đây.** Thiếu file này thì quyết định hoặc chìm trong
+> **Luật mục 0 bắt ghi vào đây.** Thiếu file này thì quyết định hoặc chìm trong
 > \`HANDOFF.md\` (nơi không ai đi tra quyết định), hoặc bốc hơi.
 >
 > **Chỉ THÊM, không sửa mục cũ.** Đổi ý thì ghi mục mới trỏ ngược lại mục cũ — một quyết định bị
@@ -1249,7 +1275,7 @@ bản mẫu [docs/_TEMPLATE-adr.md](docs/_TEMPLATE-adr.md) · luật [docs/adr/0
 
 ### Tra nhanh người chốt đã chốt gì, ngày nào
 
-[decisions.md](decisions.md) — sổ quyết định, **chỉ thêm**, luật mục 7 bắt ghi vào đây. Lập luận dài thì viết ADR, file này giữ một dòng trỏ sang
+[decisions.md](decisions.md) — sổ quyết định, **chỉ thêm**, luật mục 0 bắt ghi vào đây. Lập luận dài thì viết ADR, file này giữ một dòng trỏ sang
 
 ### Viết một tài liệu nghiên cứu
 

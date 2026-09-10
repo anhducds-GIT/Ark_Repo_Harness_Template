@@ -164,7 +164,7 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
       `${forbidden} thuoc tang GENERATED — bo SINH thi di theo, san pham cua no thi KHONG`);
   }
   // Và cũng không mang bằng chứng của repo gốc. SOI CẢ BA HÌNH DẠNG, không chỉ `evidence/`:
-  // luật vùng bằng chứng của repo (AGENTS.md mục 4) gồm `pilot-*` · `Pilot-*` · `Batch-*` nữa,
+  // luật vùng bằng chứng của repo (AGENTS.md mục 2) gồm `pilot-*` · `Pilot-*` · `Batch-*` nữa,
   // nên chỉ soi một tiền tố là bỏ sót hai hình dạng còn lại. Phiên K1 chỉ ra 02/09, mục (b).
   const VUNG_BANG_CHUNG = /^(evidence|pilots?|pilot-|Pilot-|Batch-|batch-)/;
   for (const rel of files.keys()) {

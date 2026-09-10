@@ -763,10 +763,11 @@
       "0. Ba việc phải làm, theo đúng thứ tự": {
         "may": [
           ".githooks/commit-msg",
-          "scripts/session-check.mjs"
+          "scripts/session-check.mjs",
+          "scripts/handoff.mjs"
         ],
-        "canh_gi": "Mục 0b, phần duy nhất có máy CHẶN: cửa index từ chối lượt commit cuốn theo file lane khác ĐANG KHOÁ. Cổng đóng phiên tự canh chính nó — chạy nó thì nó nói ra 12 mục.",
-        "khong": "Việc 1 (đọc luật lúc mở phiên) và việc 2 (một việc một lúc): không máy nào thấy. GOM commit và đúng thứ tự đóng phiên: cái giá là thời gian, không phải một mục đỏ. `git push` gõ tay KHÔNG hook nào chặn. VÀ — audit 10/09 đo được — `safe-push` CHỈ đọc dấu cổng khi lượt đẩy cuốn theo commit lane khác; đẩy phần của mình thì KHÔNG ai hỏi cổng đã chạy chưa."
+        "canh_gi": "Mục 0b, phần duy nhất có máy CHẶN: cửa index từ chối lượt commit cuốn theo file lane khác ĐANG KHOÁ. Việc 3 (ghi Log vào HANDOFF): cổng đỏ khi đã sửa mà chưa ghi, khi một mục vượt trần byte, khi ghi sai tháng.",
+        "khong": "Việc 1 (đọc luật lúc mở phiên) và việc 2 (một việc một lúc): không máy nào thấy. GOM commit và đúng thứ tự đóng phiên: cái giá là thời gian, không phải một mục đỏ. `git push` gõ tay KHÔNG hook nào chặn. `safe-push` CHỈ đọc dấu cổng khi lượt đẩy cuốn theo commit lane khác — đẩy phần của mình thì KHÔNG ai hỏi cổng đã chạy chưa. Và hai việc còn lại của lượt đóng phiên — ghi quyết định của Đức vào `decisions.md`, xếp nhà cho lỗi mới ở hệ ngoài — KHÔNG ai đếm; cũng không máy nào biết \"trạng thái đã đổi\" để đòi sửa `STATUS.md`."
       },
       "1. Ai giữ package nào — chống hai AI giẫm chân": {
         "may": [
@@ -778,33 +779,22 @@
         "canh_gi": "Sửa tay bảng quyền → `DAU_VO`. Nhả khoá lane khác → từ chối. Nhận vùng lane khác đang giữ → từ chối, nêu tên người giữ. Cửa index chặn commit cuốn file đang khoá. `post-commit` tự trả khoá file. Cổng đỏ khi khoá FILE còn treo, khi niêm phong vỡ, khi cửa index tắt.",
         "khong": "BA vế, audit độc lập 10/09 dựng lại được cả ba: ⑴ \"nhận khoá NGAY TRƯỚC lượt ghi\" — ghi trước rồi khoá sau, `--sua` vẫn nhận, không một lời; ⑵ khoá VÙNG treo cuối phiên KHÔNG mục nào đỏ — cổng chỉ đọc khoá FILE, nên mốc \"khoá vùng trả sau khi ĐÃ ĐẨY\" không có máy cưỡng chế; ⑶ \"MẶC ĐỊNH LÀ KHOÁ MỨC FILE\" — không ai đo bạn dùng mức nào."
       },
-      "2. BA việc phải hỏi Đức — mọi việc khác AI tự quyết": {
+      "2. Điều CẤM · và BA việc phải hỏi Đức": {
         "may": [
           "scripts/claim.mjs",
-          "scripts/safe-push.mjs"
-        ],
-        "canh_gi": "Giành vùng phiên khác đang giữ: `claim.mjs` từ chối thật. Cửa `Audit:` giữ lại commit TỰ KHAI là chưa qua audit. Nhánh carry TỰ ĐỘNG (không có cờ) đọc dấu cổng và từ chối khi cổng chưa xanh.",
-        "khong": "BA việc của Đức — xoá file hoặc sửa dữ liệu gốc · gửi bất cứ gì ra ngoài · tạo automation tự chạy: không máy nào canh được, và đó chính là LÝ DO chúng ở đây (máy không phân biệt \"xoá file rác\" với \"xoá tài sản của chủ repo\"). Ở ba việc đó, \"không có máy\" là ĐỊNH NGHĨA, không phải chỗ hở. NHƯNG có một chỗ hở THẬT: `--carry` GÕ TAY chỉ in một dòng rồi đẩy — dấu cổng KHÔNG được đọc ở nhánh đó, nên điều CẤM \"`--carry` khi cổng chưa XANH\" hiện chỉ là chữ (audit 10/09 đã đẩy thật trong kho thử, không có dấu cổng nào)."
-      },
-      "3. Năm luật vàng": {
-        "may": [],
-        "canh_gi": "",
-        "khong": "CẢ NĂM. Bỏ qua luật nào cũng KHÔNG có gì đỏ. B15 có đo luật vàng 5 (chữ operator viết không dấu) nhưng B15 KHÔNG thuộc nhóm CHẶN của dãy B — nó chỉ VÀNG. Đây là năm câu đắt nhất repo tính theo số lần bị vấp, và là mục trống máy nhất."
-      },
-      "4. Vùng cấm sửa": {
-        "may": [
+          "scripts/safe-push.mjs",
           "scripts/session-check.mjs",
           "scripts/check-bootstrap.mjs"
         ],
-        "canh_gi": "Hai mục cổng cho đúng hai gạch đầu dòng: \"Vùng CHỈ-THÊM không bị viết lại\" và \"Không có secret lọt vào repo\" (đọc thật từng file được track). B12 giữ ADR đã Accepted, và B12 THUỘC nhóm CHẶN.",
-        "khong": "Phép kiểm secret chỉ ở cổng ĐÓNG PHIÊN — nó KHÔNG chạy trong CI, và `git push` trần đi qua được nó. Điều cấm riêng của nghề ở `docs/ANNEX-*.md`: repo này chưa có phụ lục nào, nên gạch thứ ba hiện không trỏ tới gì, và không máy nào kiểm phụ lục chỉ THÊM chứ không BỚT việc phải hỏi."
+        "canh_gi": "Giành vùng phiên khác đang giữ: `claim.mjs` từ chối thật. Cửa `Audit:` giữ lại commit TỰ KHAI là chưa qua audit. Nhánh carry TỰ ĐỘNG (không có cờ) đọc dấu cổng và từ chối khi cổng chưa xanh. Hai mục cổng cho hai điều cấm: \"Vùng CHỈ-THÊM không bị viết lại\" và \"Không có secret lọt vào repo\" (đọc thật từng file được track). B12 giữ ADR đã Accepted, và B12 THUỘC nhóm CHẶN.",
+        "khong": "BA việc của Đức — xoá file hoặc sửa dữ liệu gốc · gửi bất cứ gì ra ngoài · tạo automation tự chạy: không máy nào canh được, và đó chính là LÝ DO chúng ở đây (máy không phân biệt \"xoá file rác\" với \"xoá tài sản của chủ repo\"). Ở ba việc đó, \"không có máy\" là ĐỊNH NGHĨA, không phải chỗ hở. BA CHỖ HỞ THẬT: ⑴ `--carry` GÕ TAY chỉ in một dòng rồi đẩy — dấu cổng KHÔNG được đọc ở nhánh đó, nên điều CẤM mạnh nhất của mục này hiện chỉ là chữ; ⑵ phép kiểm secret KHÔNG chạy trong CI, và `git push` trần đi qua được nó; ⑶ \"phụ lục nghề chỉ được THÊM việc phải hỏi, không được bớt\" — không phép kiểm nào đọc `docs/ANNEX-*.md` theo chiều đó."
       },
-      "5. Vai từng AI — chia theo VIỆC, không chia theo hãng": {
+      "3. Năm luật vàng — và ai nghiệm thu": {
         "may": [
           "scripts/safe-push.mjs"
         ],
         "canh_gi": "Cửa `Audit:` — cơ chế này là \"đưa một lời tự khai tới máy\", KHÔNG phải máy canh \"đã qua audit độc lập\", và câu đó phải nằm nguyên như vậy, không được nói gọn thành \"đã có máy canh\".",
-        "khong": "Bất biến \"người SỬA không tự NGHIỆM THU bản sửa của mình\": máy chỉ đọc được lời tự khai, không đọc được ai thật sự đã soi. \"Một phiên đóng đúng một vai\" cũng không ai đếm. Vai ② là cửa duy nhất ra ngoài — không ai canh."
+        "khong": "CẢ NĂM luật vàng: bỏ qua luật nào cũng KHÔNG có gì đỏ. B15 có đo luật vàng 5 (chữ operator viết không dấu) nhưng B15 KHÔNG thuộc nhóm CHẶN của dãy B — nó chỉ VÀNG. Bất biến \"người SỬA không tự NGHIỆM THU bản sửa của mình\": máy chỉ đọc được lời tự khai, không đọc được ai thật sự đã soi. \"Một phiên đóng đúng một vai\" cũng không ai đếm, và \"vai ② là cửa duy nhất ra ngoài\" thì không máy nào canh."
       },
       "6. Sổ tay mở khi cần — Tầng 2": {
         "may": [
@@ -813,14 +803,6 @@
         ],
         "canh_gi": "Cổng: \"File mới đã khai vào Bản đồ file\" (đối chiếu `docs.file_map`). B4: liên kết trỏ tới file không tồn tại — B4 THUỘC nhóm CHẶN.",
         "khong": "\"File không ai trỏ tới thì coi như không có\" — B6 đo độ sâu điều hướng nhưng chỉ VÀNG, không ĐỎ, và hiện có 23 chỗ vàng. \"Phải là liên kết bấm được, không phải chữ thường\" cũng không máy nào đo."
-      },
-      "7. Đóng phiên — ghi lại 3 thứ": {
-        "may": [
-          "scripts/session-check.mjs",
-          "scripts/handoff.mjs"
-        ],
-        "canh_gi": "Việc 1: cổng đỏ khi đã sửa mà chưa ghi Log, khi một mục vượt trần byte, khi ghi sai tháng.",
-        "khong": "Việc 2 (quyết định mới của Đức vào `decisions.md`) và việc 3 (lỗi mới ở hệ ngoài xếp nhà theo mục 8): không ai đếm. Cũng không máy nào biết \"trạng thái đã đổi\" để đòi sửa `STATUS.md`."
       },
       "8. Thêm một luật thì phải bớt một luật": {
         "may": [
@@ -836,10 +818,7 @@
     "mien": {
       "0. Ba việc phải làm, theo đúng thứ tự": "NỢ — mang được, chưa chọn chuỗi. Chuỗi phải đo NĂNG LỰC (có cổng đóng phiên và có thứ tự đọc) chứ không đo cách hành văn của repo nhà, nếu không mọi repo đỏ vì diễn đạt khác. Xem KHUNG-61.",
       "1. Ai giữ package nào — chống hai AI giẫm chân": "NỢ — cùng lý do mục 0. Xem KHUNG-61.",
-      "3. Năm luật vàng": "NỢ — cùng lý do mục 0. Xem KHUNG-61.",
-      "4. Vùng cấm sửa": "NỢ — cùng lý do mục 0. Xem KHUNG-61.",
       "6. Sổ tay mở khi cần — Tầng 2": "KHÔNG mang: bảng cửa vào của repo nhà trỏ tới file của repo nhà. Repo đích có bảng riêng, và `docs.file_map` của nó mới là nguồn.",
-      "7. Đóng phiên — ghi lại 3 thứ": "NỢ — cùng lý do mục 0. Xem KHUNG-61.",
       "8. Thêm một luật thì phải bớt một luật": "NỢ — cùng lý do mục 0. Xem KHUNG-61."
     }
   }

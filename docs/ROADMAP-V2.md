@@ -23,9 +23,9 @@ cuốn việc lane khác · cổng xanh · đẩy an toàn. Khác đi là tuỳ 
 |---|---|---|---|
 | `scripts/` · phần lõi | 16.533 dòng · lõi **22%** | — | **≤ 6.000** · lõi **≥ 60%** |
 | Suite · thời gian · cổng | 24 · **14,2 phút** · 12 mục | **7,5 phút** (cổng 3,0s) | ≤ 12 · **≤ 3 phút** · ≤ 8 mục |
-| `AGENTS.md` · `docs/` | 9 mục · 23 file | — | **≤ 6 mục** · ≤ 30 file |
-| Trần token nạp | 4.195 / 4.200 | — | hạ trần **3.000** |
-| Luật không có máy canh | **7/9** — đếm từ `mien`, *sai câu hỏi* | **9/9** còn phần hở · **1** mục cố ý không máy (mục 2) | phần hở **đo được** = 0 |
+| `AGENTS.md` · `docs/` | 9 mục · 23 file | **6 mục** ✔ · 23 file | **≤ 6 mục** · ≤ 30 file |
+| Trần token nạp | 4.195 / 4.200 | **4.099** — gọn 2%, vì thêm ~200 token nói chỗ máy KHÔNG canh | hạ trần **3.000** · chưa đạt |
+| Luật không có máy canh | **7/9** — đếm từ `mien`, *sai câu hỏi* | **6/6** còn phần hở · **1** mục cố ý không máy (mục 2) | phần hở **đo được** = 0 |
 | Hook | **1** (`commit-msg`) | **2** · bật thật ở **5/5** repo đích | **2** (+ `post-commit`), mỗi cái 1 test ghim |
 | Bộ sinh BẢNG | 3 bộ · **37% commit** | **0 commit** | **1** bộ · 0 commit |
 | Một vòng sửa → đẩy | **14,2 phút** | **7,4 phút** | **≤ 5 phút** |
@@ -48,13 +48,16 @@ năng · phép kiểm · luật · tài liệu; được **BỎ** và **GỘP**.
 nó **26 tiến trình con**). Dựng một lần rồi dùng chung — **cắt thời gian, giữ răng**. Nhát đầu đã
 làm: `template-null-repo` 505s → 179s bằng cách bỏ một lượt **suite lồng** không vế nào đọc.
 
-## `R6` — nhát một ĐO xong (1.9.30). Nhát hai CẮT: Đức uỷ quyền AI chốt (10/09)
+## `R6` ĐÓNG cả hai nhát — Đức uỷ quyền AI chốt (10/09)
 
-Đo đúng câu hỏi (`luat_nha.canh`, vế `5e`): **9 máy khai · 9/9 mục luật còn phần KHÔNG máy nào
-canh**. Số `7/9` cũ lấy từ `mien` — thứ đo *luật có tới repo đích hay không*. Nhát một lôi ra
-**2 lỗ máy thật** (`KHUNG-56`). Nhát hai đi theo bản rà **111 mục** của Đức+GPT; quyết định từng
-mục và cái MẤT ở [ADR-0018](adr/0018-ra-lai-111-muc-luat.md) — **giữ 43**, và **7 mục KHÔNG** được
-chuyển sang máy vì cái máy đó chưa tồn tại hoặc chỉ BÁO chứ không CHẶN.
+**Nhát ĐO:** `luat_nha.canh` + vế `5e` — **9 máy khai · 6/6 mục còn phần KHÔNG máy nào canh**. Số
+`7/9` cũ lấy từ `mien`, thứ đo *luật có tới repo đích hay không*. Lôi ra **2 lỗ máy thật**
+(`KHUNG-56`: `--carry` gõ tay và lượt đẩy phần của mình đều KHÔNG đọc dấu cổng).
+
+**Nhát CẮT:** bản rà **111 mục** của Đức+GPT → giữ **43** ở Tầng 1, `AGENTS.md` **9 mục → 6**.
+Quyết định từng mục và cái MẤT: [ADR-0018](adr/0018-ra-lai-111-muc-luat.md); sáu chỗ lượt thi
+hành dạy lại: [ADR-0019](adr/0019-sua-bay-cho-cua-adr-0018.md). **CHƯA ĐẨY** — `codex exec` hỏng
+sandbox trên máy này, nên commit mang `Audit: chua-co` và `safe-push` từ chối, đúng thiết kế.
 
 ## HOÃN CÓ TÊN — không làm hôm nay, và đây là lý do
 

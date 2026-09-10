@@ -173,7 +173,7 @@ export function stewardOf(relPath, parsed, prefixes = DEFAULT_CLAIM_PREFIXES) {
 }
 
 /* "CHỈ THÊM DÒNG?" — quyết định thuần, tách khỏi việc gọi git để kiểm được mọi nhánh.
-   Dùng cho miễn trừ `HANDOFF.md` ở gốc (A2): luật mục 7 bắt MỌI phiên ghi Log vào đó, nên bắt
+   Dùng cho miễn trừ `HANDOFF.md` ở gốc (A2): luật mục 0 bắt MỌI phiên ghi Log vào đó, nên bắt
    phải nhận thêm một khoá chỉ để tuân luật là tự chặn luật của mình. Nhưng miễn trừ chỉ đúng
    khi **chỉ thêm dòng** — sửa hay xoá dòng cũ là viết lại lịch sử của phiên khác.
 

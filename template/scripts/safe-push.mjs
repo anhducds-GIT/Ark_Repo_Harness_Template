@@ -163,8 +163,8 @@ const ROOT_HANDOFF = "HANDOFF.md";
 // MIỄN TRỪ CŨNG PHẢI GIỐNG CỔNG — đây là lệch thứ hai trong cùng bản vá, và nó nặng hơn.
 // `.agents/claims.json`: nhận/trả quyền là thao tác hành chính, ai cũng được đẩy kèm; không miễn
 // thì một phiên vừa trả quyền sẽ chặn mọi phiên khác.
-// `HANDOFF.md` gốc: luật mục 7 BẮT mọi phiên ghi Log vào đó, và cổng đã miễn từ A2. Chỗ này thì
-// chưa — nên tuân luật mục 7 là tự quy commit của mình về `_root` rồi bị mục 1 từ chối. Hai luật
+// `HANDOFF.md` gốc: luật mục 0 BẮT mọi phiên ghi Log vào đó, và cổng đã miễn từ A2. Chỗ này thì
+// chưa — nên tuân luật mục 0 là tự quy commit của mình về `_root` rồi bị mục 1 từ chối. Hai luật
 // của repo đá nhau, và không ai thấy vì nó chỉ hiện ra lúc push.
 // Miễn CHỈ khi chỉ-thêm-dòng: sửa hay xoá dòng cũ là viết lại Log của phiên khác, không được miễn.
 //

@@ -1,6 +1,6 @@
 # QUYẾT ĐỊNH — người chốt đã chốt gì, ngày nào, vì sao
 
-> **Luật mục 7 bước 2 bắt ghi vào đây.** Thiếu file này thì quyết định hoặc chìm trong
+> **Luật mục 0 bắt ghi vào đây.** Thiếu file này thì quyết định hoặc chìm trong
 > `HANDOFF.md` (nơi không ai đi tra quyết định), hoặc bốc hơi.
 >
 > **Chỉ THÊM, không sửa mục cũ.** Đổi ý thì ghi mục mới trỏ ngược lại mục cũ — một quyết định bị

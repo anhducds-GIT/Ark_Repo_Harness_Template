@@ -24,7 +24,7 @@ bản mẫu [docs/_TEMPLATE-adr.md](docs/_TEMPLATE-adr.md) · luật [docs/adr/0
 
 ### Tra nhanh người chốt đã chốt gì, ngày nào
 
-[decisions.md](decisions.md) — sổ quyết định, **chỉ thêm**, luật mục 7 bắt ghi vào đây. Lập luận dài thì viết ADR, file này giữ một dòng trỏ sang
+[decisions.md](decisions.md) — sổ quyết định, **chỉ thêm**, luật mục 0 bắt ghi vào đây. Lập luận dài thì viết ADR, file này giữ một dòng trỏ sang
 
 ### Viết một tài liệu nghiên cứu
 

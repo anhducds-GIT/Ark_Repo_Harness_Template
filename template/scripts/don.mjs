@@ -71,7 +71,7 @@ function tachKhoi(lines, tuDong = 0) {
    công, và không có gì đỏ. Một lệnh dọn sai chiều thì nó cất đi đúng thứ người ta cần đọc. */
 /* DỌN TỚI 80% TRẦN, KHÔNG TỚI ĐÚNG TRẦN — đo 09/09, và nó làm chính nhịp này vô dụng.
  *
- * Bản trước dọn cho tới sát ngân sách: `HANDOFF.md` 1264 → **đúng 600/600**. Nhưng luật mục 7
+ * Bản trước dọn cho tới sát ngân sách: `HANDOFF.md` 1264 → **đúng 600/600**. Nhưng luật mục 0
  * bắt MỌI phiên ghi một dòng Log vào file đó, nên **ngay dòng Log kế tiếp** là 601/600 — đỏ lại.
  * Tức muốn giữ xanh thì phải chạy nhịp dọn ở MỖI phiên, và một "nhịp" phải chạy mỗi lượt thì nó
  * không còn là nhịp, nó là thuế.

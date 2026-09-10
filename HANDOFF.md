@@ -21,6 +21,36 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 8) · harness-loi-02 — hiến pháp 9 mục → 6; audit độc lập CHƯA chạy được
+
+**Đức uỷ quyền AI chốt** bản rà 111 mục của Đức+GPT. Quyết định `ADR-0018`, sáu chỗ thi hành dạy
+lại `ADR-0019`.
+
+| | Trước | Sau |
+|---|---:|---:|
+| Mục `AGENTS.md` | 9 | **6** — vạch `R0` ĐẠT |
+| Mục luật Tầng 1 | 111 | **43** |
+| Token nạp | 4.196 | **4.099** — vạch 3.000 **KHÔNG ĐẠT** |
+| Con trỏ mục chết | — | **0** (sửa 17 chỗ) |
+
+**KHÔNG đánh số lại:** mục còn `0 1 2 3 6 8`, trống 4 · 5 · 7. Đo trước khi quyết: **~250 chỗ**
+trỏ vào mục theo SỐ. Giữ số → 17 chỗ phải sửa thay vì ~250.
+
+**BA THỨ LƯỢT THI HÀNH LÔI RA, phiên sau đọc kỹ ba cái này:**
+⑴ **Bảy mục `HẠ` không có nhà Tầng 2** — hạ là XOÁ. Sáu thành `GỘP`, một (`R-096`) thành `BỎ`.
+⑵ **`F4.7` mất mục tiêu mà `5e` vẫn xanh** — phép dò đo bằng chuỗi `tự ký nghiệm thu`, lượt gộp
+bỏ đúng bảng chứa chuỗi đó. Nay có đột biến ghim cho cả `F4.7` và `F5.1`.
+⑶ **Phép so CÂU (77→69):** đúng **một** câu rời Tầng 1, và cổng **in nguyên văn** nó
+(`session-check.mjs:382`). Lượt nén 09/09 rụng **bốn**; lần này 1 và nó không rụng.
+
+**GỌN CHỈ 2%** — vì lượt này thêm ~200 token nói thẳng chỗ máy KHÔNG canh. Cố ý.
+
+**CHƯA ĐẨY, và đừng đẩy hộ.** `codex exec` hỏng sandbox trên máy này — `apply deny-read ACLs`,
+thử ba cấu hình, cả bản copy lẫn repo thật; nó tự báo *"không có kết luận"*. Commit mang
+`Audit: chua-co` nên `safe-push` **TỪ CHỐI** — đúng thiết kế. Không dùng
+`--dangerously-bypass-approvals-and-sandbox`: đó là chạy agent bên thứ ba **không sandbox** trên
+máy chủ repo, phơi nhiễm phải do Đức chọn.
+
 ## 2026-09-10 (tiep 7) · harness-loi-02 — bản đồ MÁY CANH, và 2 lỗ thật nó lôi ra
 
 **Số cũ đo SAI CÂU HỎI.** Bảng `R0` ghi *"luật không có máy canh: 7/9"* và lấy số đó từ

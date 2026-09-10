@@ -12,6 +12,16 @@
 
 ---
 
+## 2026-09-10 · Audit độc lập phải gọi **Codex CLI**
+
+**Đức chốt**, nguyên văn: *"cần audit độc lập bạn gọi Codex CLI"*. Trước lượt này tôi dùng một
+agent phụ trong phiên, và tên nó **không** nằm trong `audit.nguoi_duyet` (`codex` · `duc`) — nên
+không gắn được nhãn `Audit:` cho đúng. Nay có tên hợp lệ.
+
+**Chưa dùng được ngay:** `codex exec` bản `0.153.4` hỏng sandbox trên máy này
+(`helper_unknown_error: apply deny-read ACLs`, ba cấu hình). Chi tiết và cách sửa ở
+[ADR-0019](docs/adr/0019-sua-bay-cho-cua-adr-0018.md) mục ⑸.
+
 ## 2026-09-10 · Bản rà 111 mục luật là ĐỀ XUẤT — AI chốt từng mục, không phải Đức
 
 **Đức chốt.** Đức và GPT rà cả `AGENTS.md` + `CLAUDE.md` thành **111 mục** (`R-001`→`R-111`), mỗi

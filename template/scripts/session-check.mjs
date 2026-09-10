@@ -297,7 +297,7 @@ const orphanPackages = packagesToiPhaiTraLoi.filter((pkg) => !CLAIMS?.[pkg] || !
    HAI FILE ĐƯỢC MIỄN, và lý do khác nhau:
    · `.agents/claims.json` — nhận và TRẢ quyền là thao tác hành chính. Không miễn thì không ai
      trả lại được quyền, vì chính thao tác trả cũng bị coi là sửa file gốc.
-   · `HANDOFF.md` ở gốc — luật mục 7 bắt MỌI phiên ghi Log vào đây. Bắt phải nhận thêm một khoá
+   · `HANDOFF.md` ở gốc — luật mục 0 bắt MỌI phiên ghi Log vào đây. Bắt phải nhận thêm một khoá
      chỉ để tuân luật là tự chặn luật của mình. NHƯNG chỉ miễn khi **chỉ thêm dòng**: sửa hay
      xoá dòng cũ là viết lại lịch sử của phiên khác, và cái đó thì không được miễn. */
 const ROOT_HANDOFF = "HANDOFF.md";

@@ -220,7 +220,7 @@ Vùng: `_code`.
 nhãn `Lane:` và không khoá nào thì mục đó vẫn phải ĐỎ.
 
 **BẢN VÁ ĐÃ CÓ TRONG HEAD LOCAL 09/09 — MỤC NÀY VẪN MỞ, vì chưa qua audit độc lập.** Người sửa
-không tự nghiệm thu bản sửa của mình (`AGENTS.md` mục 5). Codex hết lượt dùng tới 10/09 01:25.
+không tự nghiệm thu bản sửa của mình (`AGENTS.md` mục 3). Codex hết lượt dùng tới 10/09 01:25.
 
 Đã làm: `session-check.mjs` suy trách nhiệm từ nhãn `Lane:` của **chính phiên đang hỏi**, không
 chỉ nhãn người khác (`daQuyThuoc`), và `myPackages`/`myRootAreas` nhận cả hai đường đứng tên.
@@ -281,7 +281,7 @@ sơ `docs/migrations/`. Làm phép đo này TRƯỚC phép thử onboard: nếu 
 
 `ORCHESTRATOR.md` tự khai: hàng rào chống trượt vai · query-driven · luật nạp báo cáo năm mục —
 cả ba **chưa có phép kiểm nào canh**. Ở repo sinh ra sổ này, một phép kiểm cho hàng rào **đã
-được viết nhưng chưa đi theo bộ khung**. `AGENTS.md` mục 7: *luật nào máy không kiểm được thì
+được viết nhưng chưa đi theo bộ khung**. `AGENTS.md` mục 0: *luật nào máy không kiểm được thì
 sớm muộn cũng bị bỏ qua* — nên ba mục đó hiện là quy ước, không phải chốt. Vùng: `_code`.
 
 ### ~~KHUNG-6~~ · ĐÓNG 09/09 · Danh tính phiên là thứ TỰ KHAI — ba lớp quy trách nhiệm đều tin lời khai
@@ -437,7 +437,7 @@ Ghim ở `dau-suite-smoke.mjs` (**14 → 16 vế**). Ba lượt đột biến tr
 | hạ xuống BỎ **không** đòi dòng tổng xanh (fail-OPEN) | *"suite đỏ THẬT thì phải bị gọi là ĐỎ"* |
 
 **đóng khi:** một lượt audit ĐỘC LẬP xác nhận hai bản vá trên không mở đường lách — cùng lượt với
-`KHUNG-53`. Người sửa không tự ký nghiệm thu (`AGENTS.md` mục 5).
+`KHUNG-53`. Người sửa không tự ký nghiệm thu (`AGENTS.md` mục 3).
 
 
 ### KHUNG-22 · Chưa ghim được "collectModel có truyền opts xuống không"
@@ -599,7 +599,7 @@ hình dạng bệnh, nhẹ hơn — nhưng 69% commit chỉ chạm giấy tờ t
 
 **Vì sao ⑦ phải đổi hình dạng.** *"Một luật"* không đếm được — một gạch đầu dòng là một luật? một
 câu? một đoạn? Không trả lời được thì không máy nào kiểm được, nên nó là **lời hứa**. Và
-`AGENTS.md` mục 7 có đúng câu *"luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua"* —
+`AGENTS.md` mục 0 có đúng câu *"luật nào không kiểm được bằng máy thì sớm muộn cũng bị bỏ qua"* —
 tức mục 8 hiện tại **tự vi phạm nguyên tắc gốc của chính nó**.
 
 Đổi thành **TRẦN SỐ DÒNG cho file luật, cổng đóng phiên ĐỎ khi vượt**. Lúc file đã sát trần, muốn
@@ -875,7 +875,7 @@ commit đều mang nhãn `Lane:` quy thuộc được, tức đủ đúng ba đi
 
 **Gốc bệnh, và nó là gốc bệnh của cả bộ khung:** lời cảnh báo nằm trong `HANDOFF.md` — Tầng 2,
 **không nạp mặc định**. Không lane nào phải đọc nhật ký của lane khác trước khi đẩy, và cũng không
-nên phải. Đúng câu `AGENTS.md` mục 7 tự nói: *"Luật nào không kiểm được bằng máy thì sớm muộn cũng
+nên phải. Đúng câu `AGENTS.md` mục 0 tự nói: *"Luật nào không kiểm được bằng máy thì sớm muộn cũng
 bị bỏ qua"* — ở đây *"sớm muộn"* là **hai mươi phút**.
 
 **Đừng vá bằng cách bắt người ta đọc thêm.** Chỗ mang tín hiệu phải là chỗ máy đã đọc: commit hoặc
@@ -960,7 +960,7 @@ chỉ được đọc trong nhánh `if (blocked.length && !carry)` (`safe-push.m
 
 Dựng lại được trong kho thử: `origin` là một bare repo cục bộ, **không có `.git/ark-gate-stamp.json`**,
 cổng chưa từng chạy — cả hai đường đều **đẩy thành công**. Nên điều CẤM mạnh nhất ở mục 2 hiện chỉ
-là chữ, và `AGENTS.md` mục 7 lại tự nói trước: *"luật nào không kiểm được bằng máy thì sớm muộn
+là chữ, và `AGENTS.md` mục 0 lại tự nói trước: *"luật nào không kiểm được bằng máy thì sớm muộn
 cũng bị bỏ qua"*.
 
 **đóng khi (thêm vào điều kiện trên, không thay):** dựng một kho không có dấu cổng, rồi đòi

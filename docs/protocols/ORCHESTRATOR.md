@@ -20,7 +20,7 @@ bạn ai là người chốt thì `AGENTS.md` ở gốc nói.
 
 ## ⚠ Đọc trước — phần lớn sổ này CHƯA CÓ PHÉP KIỂM MÁY
 
-`AGENTS.md` mục 7: *luật nào máy không kiểm được thì sớm muộn cũng bị bỏ qua.* Nên phải nói
+`AGENTS.md` mục 0: *luật nào máy không kiểm được thì sớm muộn cũng bị bỏ qua.* Nên phải nói
 thẳng cái gì đang có răng và cái gì chưa:
 
 | Mục | Có phép kiểm máy trong bộ khung? |
