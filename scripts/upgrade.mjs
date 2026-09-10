@@ -27,6 +27,9 @@ import { fileURLToPath } from "node:url";
 
 import { bam, bamBanTrich, buildTemplateFiles, fileMay, kiemSoPhatHanh,
   loiSoPhatHanh, TEMPLATE_VERSION } from "./build-template.mjs";
+/* DUNG CHINH PHEP LOC MA `safe-push` DUNG, khong viet lai regex o day: mot su that viet hai cho
+   se troi, va cho troi se la "upgrade tuong danh sach co hieu luc trong khi cua doc ra rong". */
+import { nguoiDuyetFrom } from "./repo-structure.mjs";
 
 /* Ba hàm này mô tả BẢN TRÍCH, không mô tả việc nâng cấp, nên nhà của chúng là
    `build-template.mjs`. Giữ lại lối vào cũ ở đây để không bẻ nơi đang gọi. */
@@ -220,6 +223,60 @@ export function ghepLenh(rawDich, thieu) {
   return JSON.stringify(j, null, 2) + NL;
 }
 
+/* KHOI `audit` CUA `.repo-structure.json` — CUNG KHUON VOI TEN LENH, va vi sao no can ton tai.
+ *
+ * `safe-push` co mot cua audit doc `audit.nguoi_duyet` TU DIA. Ban trich phat `safe-push` sang
+ * repo dich nhung `.repo-structure.json` nam trong tap "cau hinh cua repo dich" nen KHONG BAO GIO
+ * bi ghi de — va seed cu KHONG he co khoi `audit`. Do that 11/09 tren 5 repo da nhan bo khung:
+ * ca 5 deu khai RONG, nen o do cua audit chi noi duoc "khong":
+ *   · commit KHONG co nhan `Audit:`      -> DI QUA. Va chi commit cham `scripts/` hoac `tests/`
+ *     moi duoc mot dong canh bao (`chamCode` o safe-push.mjs:337) — commit chi cham CHU thi cua
+ *     im lang hoan toan. (Ban dau toi viet "di qua voi mot dong canh bao" cho MOI commit; audit
+ *     doc lap 11/09 bat duoc cho noi qua.)
+ *   · commit CO nhan, ten ngoai danh sach -> CHAN VINH VIEN
+ * Tuc mot nhan `Audit:` o repo dich chi co the lam HAI, khong bao gio giup. Cua co mat ma khong
+ * bat duoc — dung benh CO MAT KHAC DANG BAT ma ca vong nay di sua.
+ *
+ * LUAT GHEP GIONG HET TEN LENH: **THIEU thi mang sang · DA CO thi CHI KE TEN, khong ghi de.**
+ * Ai duoc duyet audit la quyet dinh cua chu repo dich; ghi de danh sach cua ho la doi nguoi duyet
+ * sau lung ho, va hong IM LANG vi `safe-push` van xanh. */
+export function soSanhAudit(rawDich, rawChuan) {
+  const doc = (raw) => {
+    if (raw === null || raw === undefined) return null;
+    const laKhoi = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
+    try {
+      const j = JSON.parse(String(raw));
+      if (!laKhoi(j)) return null;
+      /* KHONG CO KHOA `audit` va KHOA `audit` HONG la HAI ca khac nhau, dung gop. Thieu thi
+         mang sang duoc; hong thi KHONG BIET, va khong biet thi khong dung vao. */
+      if (j.audit === undefined) return { trangThai: "THIEU", khoi: null };
+      if (!laKhoi(j.audit)) return null;
+      /* KHAI RA MA KHONG CO TEN NAO CO HIEU LUC = CUA CHET, y NHU chua khai — va day la ca audit
+       * doc lap 11/09 bat duoc trong chinh ban va nay: `audit: {}`, `nguoi_duyet: 5`,
+       * `nguoi_duyet: []` deu duoc doc thanh "DA CO" nen `upgrade` bo qua, trong khi `safe-push`
+       * doc ra danh sach RONG. Dung benh minh dang di sua, chi la o mot nhanh khac.
+       * KHONG TU GHI DE: mot danh sach rong CO THE la chu repo co y — "khong ai duoc duyet o day".
+       * Nen day la trang thai RIENG, duoc NEU TEN chu khong bi vá. */
+      if (nguoiDuyetFrom(j).length === 0) return { trangThai: "RONG_VO_HIEU", khoi: j.audit };
+      return { trangThai: "DA CO", khoi: j.audit };
+    } catch { return null; }
+  };
+  const chuan = doc(rawChuan);
+  const dich = doc(rawDich);
+  if (chuan === null || dich === null) return null;
+  // Ban trich khong khai thi khong co gi de mang sang — noi thang, khong im lang.
+  if (chuan.trangThai === "THIEU") return { trangThai: "BAN_TRICH_KHONG_KHAI", khoi: null };
+  return { trangThai: dich.trangThai, khoi: chuan.khoi, cuaDich: dich.khoi };
+}
+
+/** Ghep khoi `audit` THIEU vao `.repo-structure.json` cua repo dich, GIU NGUYEN moi thu khac. */
+export function ghepAudit(rawDich, khoi) {
+  const j = JSON.parse(String(rawDich));
+  if (j.audit !== undefined) return String(rawDich);   // DA CO thi khong dung vao, du bi goi nham
+  j.audit = khoi;
+  return JSON.stringify(j, null, 2) + NL;
+}
+
 /* ---- chạy ------------------------------------------------------------------ */
 
 const THIS = fileURLToPath(import.meta.url);
@@ -328,6 +385,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   /* TEN LENH — tang thu ba, doc cung mot luc voi hai tang kia. */
   const docTep = (rel) => { try { return fs.readFileSync(path.join(repo, ...rel.split("/")), "utf8"); } catch { return null; } };
   const lenhSo = soSanhLenh(docTep("package.json"), chuan.get("package.json"));
+  const auditSo = soSanhAudit(docTep(".repo-structure.json"), chuan.get(".repo-structure.json"));
 
   const tl = soSanhTaiLieu(repo, chuan);
   const tlThieu = tl.filter((d) => d.trangThai === "THIẾU");
@@ -374,6 +432,34 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     }
   }
 
+  if (auditSo === null || auditSo.trangThai !== "DA CO") {
+    console.log("");
+    console.log("  NGƯỜI DUYỆT AUDIT (`.repo-structure.json` → `audit`):");
+    if (auditSo === null) {
+      console.log("    KHÔNG ĐỌC ĐƯỢC `.repo-structure.json`, hoặc khối `audit` ở đó không phải một khối.");
+      console.log("           → `--apply` sẽ KHÔNG chạm tới nó.");
+    } else if (auditSo.trangThai === "BAN_TRICH_KHONG_KHAI") {
+      console.log("    BẢN TRÍCH KHÔNG KHAI khối này, nên không có gì để mang sang.");
+    } else if (auditSo.trangThai === "RONG_VO_HIEU") {
+      console.log(`    KHAI RỒI MÀ KHÔNG CÓ TÊN NÀO CÓ HIỆU LỰC: ${JSON.stringify(auditSo.cuaDich?.nguoi_duyet)}`);
+      console.log("           → `--apply` KHÔNG đụng tới: một danh sách rỗng CÓ THỂ là chủ repo cố ý");
+      console.log("             (\"không ai được duyệt ở đây\"). Nhưng hệ quả thì giống hệt chưa khai —");
+      console.log("             xem đoạn dưới. Muốn cửa nói được `đạt` thì tự khai tên vào đó.");
+      console.log("           → Tên người duyệt là một thẻ chữ thường: khớp `^[a-z0-9][a-z0-9._-]*$`.");
+    } else {
+      console.log(`    THIẾU  → SẼ THÊM: ${JSON.stringify(auditSo.khoi.nguoi_duyet)}`);
+      console.log("           → ĐỔI CHO KHỚP REPO ĐÍCH sau khi nâng: đó là người duyệt của chủ bộ khung.");
+    }
+    if (auditSo !== null && (auditSo.trangThai === "THIEU" || auditSo.trangThai === "RONG_VO_HIEU")) {
+      console.log("           → Không có tên nào có hiệu lực thì cửa audit của `safe-push` ở repo đích");
+      console.log("             KHÔNG BAO GIỜ nói được `đạt`: mọi nhãn `Audit:` đều bị đọc là NGOÀI DANH");
+      console.log("             SÁCH và bị CHẶN. Còn commit KHÔNG nhãn thì ĐI QUA — và chỉ commit chạm");
+      console.log("             `scripts/` hoặc `tests/` mới được một dòng cảnh báo; commit chỉ chạm CHỮ");
+      console.log("             thì cửa im lặng hoàn toàn. Tức ở đó nhãn `Audit:` chỉ có thể làm HẠI.");
+      console.log("             Đo thật 11/09 trên cả 5 repo đã nhận bộ khung: cả 5 đều rơi vào đây.");
+    }
+  }
+
   if (tlThieu.length || tlKhac.length || tuyChon.length) {
     console.log("");
     console.log("  TÀI LIỆU:");
@@ -408,9 +494,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     if (lechNoiDung) cau = "`--apply` sẽ TỪ CHỐI: số phiên bản ở repo nhà không trỏ đúng nội dung. Tăng phiên bản ở nhà trước.";
     else if (dem("SỬA TAY").length) cau = "`--apply` sẽ TỪ CHỐI vì có file bị sửa tay. Đọc `git diff` ở repo đích, rồi quyết — cố ý bỏ thì thêm `--force`.";
     else if (dem("CHƯA GHIM").length) cau = "`--apply` sẽ TỪ CHỐI: file đã khác mà repo chưa có sổ ghim, không đủ căn cứ. Đọc `git diff` ở đích, chắc chắn thì thêm `--force`.";
-    else if (canLam || tlThieu.length || lenhSo?.thieu.length) cau = `Chạy lại với --apply để ghi ${canLam} file máy`
+    else if (canLam || tlThieu.length || lenhSo?.thieu.length || auditSo?.trangThai === "THIEU") cau = `Chạy lại với --apply để ghi ${canLam} file máy`
       + (tlThieu.length ? `, mang thêm ${tlThieu.length} file tài liệu repo đích chưa có` : "")
       + (lenhSo?.thieu.length ? `, và thêm ${lenhSo.thieu.length} tên lệnh vào package.json` : "")
+      + (auditSo?.trangThai === "THIEU" ? ", và khai người duyệt audit vào .repo-structure.json" : "")
       + ".";
     else if (canChot) cau = `Nội dung đã khớp, không phải ghi file nào — nhưng sổ ghim ở đích còn ghi ${soGhim.version}. Chạy --apply để đóng lại dấu ${TEMPLATE_VERSION}.`;
     else cau = "Không có gì để nâng cấp.";
@@ -490,6 +577,22 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     }
   }
 
+  /* KHAI NGUOI DUYET AUDIT NEU CON THIEU. Doc lai file NGAY LUC GHI cung ly do voi `package.json`
+     o tren: giua luc lap ke hoach va luc ghi co the co phien khac sua no, va ghi lai ban cu la xoa
+     viec cua ho. DA CO thi khong dung vao, du mot chu. */
+  let daKhaiAudit = false;
+  if (auditSo && auditSo.trangThai === "THIEU") {
+    const duong = path.join(repo, ".repo-structure.json");
+    const rawNay = docTep(".repo-structure.json");
+    const soNay = soSanhAudit(rawNay, chuan.get(".repo-structure.json"));
+    if (soNay && soNay.trangThai === "THIEU") {
+      const tam = `${duong}.tam-${process.pid}`;
+      fs.writeFileSync(tam, ghepAudit(rawNay, soNay.khoi), "utf8");
+      fs.renameSync(tam, duong);
+      daKhaiAudit = true;
+    }
+  }
+
   let daGhiTaiLieu = 0;
   for (const d of tlThieu) {
     duongMoi.push(d.rel);
@@ -513,6 +616,11 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   console.log(`${NL}Đã ghi ${daGhi} file máy và cập nhật ${SO_GHIM} → ${TEMPLATE_VERSION}.`);
   if (daGhiTaiLieu) console.log(`Đã mang thêm ${daGhiTaiLieu} file tài liệu repo đích chưa có — nhớ khai vào Bản đồ file, cổng đóng phiên bắt.`);
   if (daThemLenh) console.log(`Đã thêm ${daThemLenh} tên lệnh vào package.json — giờ \`npm run\` gọi được chúng bằng tên chuẩn.`);
+  if (daKhaiAudit) {
+    console.log("Đã khai `audit.nguoi_duyet` vào .repo-structure.json — trước lượt này, cửa audit của");
+    console.log("`safe-push` ở repo này KHÔNG BAO GIỜ nói được `đạt`. ĐỔI danh sách cho khớp repo đích.");
+  }
+  if (auditSo === null) console.log("KHÔNG chạm tới khối `audit`: .repo-structure.json đọc không ra, hoặc khối đó không phải một khối.");
   if (lenhSo === null) console.log("KHÔNG chạm tới package.json: đọc không ra. Sửa ở repo đích rồi chạy lại.");
   else if (lenhSo.khac.length) console.log(`${lenhSo.khac.length} tên lệnh có giá trị khác bản trích — KHÔNG đụng tới, xem ở trên.`);
   if (tlKhac.length) console.log(`${tlKhac.length} file tài liệu khác bản trích — KHÔNG đụng tới, xem danh sách ở trên.`);

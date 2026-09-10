@@ -993,3 +993,16 @@ thì AI vẫn làm sai, vì hệ thống rule của ta hơi dày."* Hai cửa m�
 `commit-msg` chặn mẻ chạm tầng máy mà chưa cắt bản (11 phút → 0,2 giây), và `post-commit` tự trả
 khoá file. Cách chữa "rule dày" **không phải viết luật ngắn hơn** mà là: **luật nào không có máy
 canh thì XOÁ** — nó vẫn chiếm chỗ đọc của mọi phiên và cho cảm giác an toàn sai.
+
+## 2026-09-11 · Bản trích phát ổ khoá cùng với cửa audit — AI tự quyết, Đức uỷ quyền
+
+Đo 11/09: **5/5 repo** đã nhận bộ khung khai `audit.nguoi_duyet` = `null`, nên cửa audit của
+`safe-push` ở đó **không bao giờ nói được `đạt`** — nhãn `Audit:` chỉ có thể làm HẠI. Bản trích nay
+khai sẵn `["codex","duc"]`, `upgrade` ghép khối còn THIẾU (**ĐÃ CÓ thì không đụng**).
+
+**CÁI MẤT, lời người duyệt độc lập:** *"mở quyền đi qua cho trailer tự khai `Audit: codex` ngay sau
+nâng cấp, trước khi chủ repo đổi danh sách; thứ mất là trạng thái fail-closed trước đó."* Nhận
+đúng vậy — nhưng fail-closed đó là cửa **không nói `đạt` được bao giờ**, tức nó chỉ đóng con đường
+trung thực. Repo đích nay vào **cùng thế với repo nhà**: nhãn là lời TỰ KHAI, không máy nào kiểm
+được Codex đã chạy thật (`KHUNG-56`). Lý lẽ, số đo, năm đột biến ghim:
+[ADR-0020](docs/adr/0020-cua-audit-o-repo-dich.md).

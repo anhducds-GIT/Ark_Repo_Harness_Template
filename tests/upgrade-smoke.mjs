@@ -24,7 +24,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { bamBanTrich, buildTemplateFiles, kiemSoPhatHanh, loiSoPhatHanh, soVoiLichSu, TEP_CUA_REPO_DICH, TEP_MAY_THEM } from "../scripts/build-template.mjs";
-import { docSoGhim, fileMay, fileTaiLieu, fileTuyChon, ghepLenh, soGhimMoi, soSanh, soSanhLenh } from "../scripts/upgrade.mjs";
+import { nguoiDuyetFrom } from "../scripts/repo-structure.mjs";
+import { docSoGhim, fileMay, fileTaiLieu, fileTuyChon, ghepAudit, ghepLenh, soGhimMoi, soSanh, soSanhAudit, soSanhLenh } from "../scripts/upgrade.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -859,6 +860,68 @@ const dungRepo = (ghiSoGhim) => {
     }
   }
   ok(`tên lệnh: thiếu thì mang · khác thì chỉ kể tên · đọc không ra là KHÔNG BIẾT · ${Object.keys(lenhThat).length} lệnh bản trích đều trỏ tới file có thật`);
+}
+
+/* ---- 20b. NGUOI DUYET AUDIT: cua khong noi duoc "dat" thi la cua CHET -------
+ *
+ * Do that 11/09 tren 5 repo da nhan bo khung: ca 5 deu KHONG khai `audit.nguoi_duyet`, vi
+ * `.repo-structure.json` nam trong tap "cau hinh cua repo dich" nen KHONG bao gio bi ghi de, va
+ * seed cu khong he co khoi do. Hau qua do duoc, khong doan: o repo dich, commit CO nhan `Audit:`
+ * bi chan vinh vien (ten nao cung NGOAI DANH SACH), commit KHONG nhan thi di qua voi mot canh
+ * bao, va chi khi commit do cham `scripts/` hoac `tests/` (audit doc lap 11/09 sua lai cho toi noi
+ * qua o day) — tuc nhan `Audit:` o repo dich chi co the lam HAI. Ve nay ghim BA CHIEU cua phep ghep. */
+{
+  const chuanGia = JSON.stringify({ audit: { nguoi_duyet: ["codex", "duc"] }, khac: 1 });
+
+  // THIEU thi mang sang, va KHONG duoc lam mat gi cua repo dich.
+  const dichThieu = JSON.stringify({ name: "d", areas: { "scripts/": { steward: "_root" } } });
+  const soThieu = soSanhAudit(dichThieu, chuanGia);
+  assert.equal(soThieu.trangThai, "THIEU", "repo khong khai `audit` phai la THIEU");
+  const daGhep = JSON.parse(ghepAudit(dichThieu, soThieu.khoi));
+  assert.deepEqual(daGhep.audit.nguoi_duyet, ["codex", "duc"], "THIEU thi phai mang danh sach sang");
+  assert.equal(daGhep.name, "d", "ghep khoi `audit` khong duoc lam mat khoa khac");
+  assert.deepEqual(daGhep.areas, { "scripts/": { steward: "_root" } }, "ghep khong duoc lam mat khoi `areas`");
+
+  // DA CO thi TUYET DOI khong dung vao — ai duoc duyet la quyet dinh cua chu repo dich.
+  const dichDaCo = JSON.stringify({ audit: { nguoi_duyet: ["nguoi-cua-toi"] } });
+  const soDaCo = soSanhAudit(dichDaCo, chuanGia);
+  assert.equal(soDaCo.trangThai, "DA CO", "repo da khai roi phai la DA CO");
+  assert.deepEqual(soDaCo.cuaDich.nguoi_duyet, ["nguoi-cua-toi"], "phai ke duoc danh sach repo dich dang khai");
+  assert.equal(ghepAudit(dichDaCo, soDaCo.khoi), dichDaCo,
+    "DA CO ma bi ghi de la doi nguoi duyet sau lung chu repo, va hong IM LANG vi safe-push van xanh");
+
+  /* KHAI RA MA KHONG CO TEN NAO CO HIEU LUC = CUA CHET, y NHU chua khai. Audit doc lap 11/09 bat
+     duoc dung nhanh nay trong ban va dau: `{}` / `nguoi_duyet: 5` / `[]` / ten SAI KHUON deu bi doc
+     thanh DA CO nen `upgrade` bo qua, trong khi `safe-push` doc ra danh sach RONG. Trang thai rieng,
+     duoc NEU TEN — va TUYET DOI khong tu vá, vi mot danh sach rong CO THE la chu repo co y. */
+  for (const rong of [{}, { nguoi_duyet: 5 }, { nguoi_duyet: [] }, { nguoi_duyet: ["Codex"] }]) {
+    const raw = JSON.stringify({ audit: rong });
+    const so = soSanhAudit(raw, chuanGia);
+    assert.equal(so.trangThai, "RONG_VO_HIEU",
+      `audit=${JSON.stringify(rong)} khong co ten nao co hieu luc — doc thanh "DA CO" la de nguyen mot CUA CHET`);
+    assert.equal(ghepAudit(raw, so.khoi), raw, "RONG_VO_HIEU cung KHONG duoc tu vá — co the la co y");
+  }
+  /* Va phep loc phai la CHINH phep loc cua `safe-push`, khong phai mot regex thu hai. */
+  assert.equal(nguoiDuyetFrom({ audit: { nguoi_duyet: ["Codex"] } }).length, 0,
+    "neu `safe-push` doi y ve khuon ten thi ve tren phai doi theo — dung viet lai phep loc o day");
+
+  // DOC KHONG RA la KHONG BIET, khong phai "khong thieu gi" — cung luat voi ten lenh.
+  assert.equal(soSanhAudit("{ hong", chuanGia), null, ".repo-structure.json hong cu phap phai la KHONG BIET");
+  assert.equal(soSanhAudit("[]", chuanGia), null, "mot MANG khong phai `.repo-structure.json`, phai la KHONG BIET");
+  assert.equal(soSanhAudit(JSON.stringify({ audit: 5 }), chuanGia), null, "`audit` khong phai mot khoi phai la KHONG BIET");
+  assert.equal(soSanhAudit(dichThieu, JSON.stringify({ x: 1 })).trangThai, "BAN_TRICH_KHONG_KHAI",
+    "ban trich khong khai thi phai NOI THANG, khong duoc im lang");
+
+  /* VA CHINH BAN TRICH PHAI KHAI — day la ve giu cho lo cu khong quay lai. Bo khoi `audit` ra
+     khoi STRUCTURE_SEED thi ve nay DO, thay vi 5 repo tiep theo lai nhan mot cua chet. */
+  const seedThat = JSON.parse(chuan.get(".repo-structure.json"));
+  assert.ok(Array.isArray(seedThat.audit?.nguoi_duyet) && seedThat.audit.nguoi_duyet.length > 0,
+    "ban trich PHAI khai `audit.nguoi_duyet` — phat `safe-push` co cua audit ma khong phat o khoa la CO MAT KHAC DANG BAT");
+  for (const ten of seedThat.audit.nguoi_duyet) {
+    assert.match(ten, /^[a-z0-9][a-z0-9._-]*$/,
+      `ten nguoi duyet "${ten}" SAI KHUON nen safe-push doc thanh KHONG CO HIEU LUC — phat mot danh sach chet`);
+  }
+  ok(`người duyệt audit: thiếu thì khai · đã có thì không đụng · đọc không ra là KHÔNG BIẾT · bản trích khai ${seedThat.audit.nguoi_duyet.length} tên, đúng khuôn`);
 }
 
 /* ---- 21. DU LIEU MAY: bo do phai di CUNG thu no do -----------------------

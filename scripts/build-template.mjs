@@ -948,6 +948,12 @@ const STRUCTURE_SEED = `{
     "_doc_thuoc": "THUOC COC cho kho chu, KHONG phai tran ly tuong. Khong ke docs/adr/, docs/archive/, docs/migrations/ — ca ba la ban ghi viec DA XAY RA, chi to len duoc, nen tinh vao thi moi quyet dinh moi lam cong do va nguoi ta se noi con so cho xong. Ban trich mang san 1.456 dong; 2.200 la cho repo ban tu viet them. MOI LUOT XOA THI HA CON SO NAY XUONG — cho da ha khong quay lai duoc.",
     "tran_dong_khong_ke_adr": 2200
   },
+  "audit": {
+    "_doc": "Ai duoc coi la NGUOI DUYET doc lap. Nhan \`Audit: <ten>\` trong commit chi go duoc cua audit cua safe-push khi <ten> nam trong danh sach nay. Ten la mot the chu thuong, khop \`^[a-z0-9][a-z0-9._-]*$\` (hau to vong \`-rNN\` duoc phep). Ngoai danh sach = CHUA duyet.",
+    "_vi_sao_PHAT_KEM_TEN": "Vi sao ban trich phat san hai ten thay vi mot mang RONG. Do that 11/09 tren 5 repo da nhan bo khung: ca 5 deu KHONG khai khoi nay, nen cua audit cua safe-push o do KHONG BAO GIO noi duoc \`dat\` — moi nhan \`Audit:\` deu bi doc la NGOAI DANH SACH va bi chan, con commit KHONG co nhan thi di qua voi mot dong canh bao. Tuc phat cua ma khong phat o khoa: dung benh CO MAT KHAC DANG BAT. Mot mang RONG khong sua duoc benh do, no chi doi ten benh.",
+    "_doi_di": "DOI CHO KHOP REPO BAN. Hai ten nay la nguoi duyet cua chu bo khung, khong phai cua repo ban. Ten khai SAI KHUON thi safe-push NEU TEN va ten do khong co hieu luc — no khong im lang.",
+    "nguoi_duyet": ["codex", "duc"]
+  },
   "backlog": {
     "_doc": "Tran so no. Cong dong phien DO khi so muc MO vuot tran. Khong khai khoi nay = khong co tran va cong van XANH — tuc so no phinh vo hinh. Doi con so phai hoi nguoi chot (ADR-0010).",
     "tran": 25
