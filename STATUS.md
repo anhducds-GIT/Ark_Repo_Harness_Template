@@ -9,9 +9,9 @@ last_verified_how: "23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHAN
 evidence_ref: HANDOFF.md
 owner: harness-loi-02
 priority_rank: 1
-next_step: "`T1`·`T2`·`T3` ĐÓNG. 5 repo tại **1.9.29**, hook sống 5/5, cổng **2/5 XANH** — ba repo còn lại chặn bởi **nợ sấn của chính chúng** (xem HANDOFF). `T3` lôi ra **9 lỗi lõi**. Việc kế: `R6`."
+next_step: "`T1`·`T2`·`T3` ĐÓNG (5 repo tại **1.9.30**, cổng 2/5 xanh — xem HANDOFF). `R6` nhát MỘT xong: **8/9 mục luật còn phần KHÔNG máy nào canh**. Nhát HAI là CẮT — **CHỜ ĐỨC**: ba định nghĩa `R6` ngược nhau, và `ADR-0016` đã Accepted chốt tiêu chí ngược lại (`docs/ROADMAP-V2.md`)."
 version_source: package.json
-current_focus: "ĐÓNG GÓI, không hoàn thiện. Đo 7 ngày: 522 commit · 191 (37%) chỉ sinh bảng · 78 lần cắt bản · lõi chỉ 22% mã. ĐÓNG BĂNG tính năng và phép kiểm tới khi 5 repo đích cùng bản, cùng xanh."
+current_focus: "ĐÓNG GÓI, không hoàn thiện. `R3` ĐÓNG BĂNG: cấm THÊM tính năng · phép kiểm · luật · tài liệu; chỉ được BỎ và GỘP. Số đo 7 ngày ở `docs/ROADMAP-V2.md`."
 human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
@@ -25,8 +25,7 @@ ref_handoff: HANDOFF.md
 
 **Đây là nhà riêng của bộ khung** — nó tự dựng bằng chính mình, và tự sinh lại `template/`.
 
-**Đang ở đâu:** đã chạy thật trên hai repo khác nghề — `nav_platform_main` (Node, chứng khoán) và
-`Project 3 AI Agent Unify` (Python). Cả hai ghim cùng một bản khung và nhận bản vá bằng lệnh,
-không chép tay.
+**Đang ở đâu:** đã chạy thật trên **5 repo khác nghề**, cùng một bản khung, nhận bản vá bằng
+lệnh — bảng kết quả từng repo ở [HANDOFF.md](HANDOFF.md).
 
 **Còn mở:** `next_step` ở đầu file này, và [BACKLOG.md](BACKLOG.md).

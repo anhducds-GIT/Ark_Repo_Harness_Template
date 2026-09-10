@@ -32,8 +32,8 @@
  *   5. `demTheoTrangThai` đếm "một phần" vào "xong"        → vế 2 ĐỎ
  */
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
@@ -391,8 +391,63 @@ if (!laNoiPhatHanh(ROOT)) {
   const mienThua = Object.keys(mien).filter((t) => !tenKhuc.has(t));
   assert.deepEqual(mienThua, [], `\`luat_nha.mien\` còn miễn cho mục đã biến mất khỏi AGENTS.md: ${mienThua.join(" · ")}`);
 
+  /* ---- CANH: MÁY NÀO ĐANG CANH MỤC NÀY — và phần nào KHÔNG CÓ MÁY ------
+   *
+   * Khối trên hỏi *"luật có ĐƯỜNG TỚI repo đích không"*. Khối này hỏi câu KHÁC: *"ở NHÀ, máy nào
+   * cưỡng chế mục này"*. Vạch đích `R0` trộn hai câu đó vào một con số — nó lấy "7/9 mục không có
+   * máy canh" từ `mien` — nên mục 1, thứ được `claim.mjs` cộng hai hook cộng ba mục cổng canh,
+   * vẫn bị đếm là không có máy. Hai câu hỏi, hai con số, và từ 1.9.30 chúng nằm hai chỗ.
+   *
+   * RĂNG nằm ở phép kiểm SỰ CÓ MẶT: mọi đường dẫn trong `may` phải có thật. Máy bị xoá hay đổi
+   * tên thì mục luật nó canh quay về KHÔNG CÓ MÁY — và đó đúng là kiểu hỏng đã ăn bốn trong chín
+   * lỗi ngày 10/09: luật CÓ máy canh, nhưng máy đã tắt, và biểu hiện giống hệt lúc đang chạy. */
+  const canh = danhMuc.luat_nha?.canh ?? {};
+  const thieuCanh = khuc.map((k) => k.ten).filter((t) => !canh[t]);
+  assert.deepEqual(thieuCanh, [],
+    `mục luật ở AGENTS.md của repo nhà chưa khai MÁY CANH: ${thieuCanh.join(" · ")}`
+    + ' → khai vào `features.json` → `luat_nha.canh`: `may` là đường dẫn những máy cưỡng chế nó,'
+    + ' `canh_gi` nói nó chặn gì, `khong` nói phần nào KHÔNG máy nào canh.'
+    + ' Không có máy nào thì `may: []`, và `khong` phải nói ra điều đó.');
+
+  const canhThua = Object.keys(canh).filter((t) => t !== "_doc" && !tenKhuc.has(t));
+  assert.deepEqual(canhThua, [],
+    '`luat_nha.canh` còn khai máy cho mục đã biến mất khỏi AGENTS.md: ' + canhThua.join(" · "));
+
+  const mayMat = [];
+  const mayThay = new Set();
+  let soCoLoHong = 0;
+  for (const k of khuc) {
+    const c = canh[k.ten];
+    const may = c.may ?? [];
+    for (const m of may) {
+      /* CHUẨN HOÁ TRƯỚC KHI ĐẾM, và đòi đúng FILE — hai lỗ mà audit độc lập 10/09 mở được:
+         ⑴ bảy BÍ DANH của cùng một file (`./x`, `x/../x`, `x//y`, `X`, `x\y`) bơm `mayThay.size`
+         qua vạch 6 trong khi bản đồ chỉ có MỘT máy; ⑵ `existsSync` nhận cả THƯ MỤC, nên khai
+         `scripts` hay `docs` là "máy" thì mọi assert vẫn xanh. */
+      mayThay.add(relative(ROOT, resolve(ROOT, m)).split(sep).join("/").toLowerCase());
+      let laFile = false;
+      try { laFile = statSync(join(ROOT, m)).isFile(); } catch { laFile = false; }
+      if (!laFile) mayMat.push(`${k.ten} → ${m}`);
+    }
+    /* Danh sách đường dẫn mà không nói nó CHẶN gì thì đọc y hệt một danh sách đúng — và phiên sau
+       không có cách nào biết mục luật này thật sự được canh hay chỉ được trỏ tới. */
+    assert.ok(may.length === 0 || String(c.canh_gi ?? "").trim().length >= 20,
+      `${k.ten}: khai may ma khong noi no CHAN gi`);
+    assert.ok(may.length > 0 || String(c.khong ?? "").trim().length >= 20,
+      `${k.ten}: khong khai may nao VA khong noi thieu gi — mot trong hai phai co that`);
+    if (String(c.khong ?? "").trim()) soCoLoHong += 1;
+  }
+  assert.deepEqual(mayMat, [],
+    `MÁY CANH ĐÃ BIẾN MẤT — mục luật khai một máy không còn tồn tại: ${mayMat.join(" · ")}`
+    + ' → hoặc máy đó đã bị xoá / đổi tên, và khi đó mục luật ấy NAY KHÔNG có máy canh nữa: khai'
+    + ' lại `khong` cho đúng. Đừng chỉ sửa đường dẫn cho hết đỏ.');
+  /* "Tôi còn đo được gì không" — bản đồ máy rỗng vẫn làm mọi assert trên xanh, nên phải đòi nó
+     đọc được một số lượng máy thật. Đây là chốt chặn rẻ nhất cho một phép kiểm xanh-vì-trống. */
+  assert.ok(mayThay.size >= 6,
+    `chi doc duoc ${mayThay.size} may canh khac nhau — ban do may HONG, chu khong phai repo chi co the`);
+
   const soDo = khuc.length - Object.keys(mien).length;
-  ok(`5e · tầng luật: ${khuc.length} mục ở AGENTS.md nhà — ${soDo} có phép dò · ${Object.keys(mien).length} miễn có lý do`);
+  ok(`5e · tầng luật: ${khuc.length} mục ở AGENTS.md nhà — ${soDo} có phép dò · ${Object.keys(mien).length} miễn có lý do · ${mayThay.size} máy khai, file có thật (CÓ MẶT ≠ ĐANG BẬT) · ${soCoLoHong}/${khuc.length} mục còn phần KHÔNG máy nào canh`);
 }
 
 /* ---- 6. Khối markdown dán vào hồ sơ migrate ----------------------------- */

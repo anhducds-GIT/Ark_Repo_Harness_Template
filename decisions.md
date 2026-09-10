@@ -12,6 +12,22 @@
 
 ---
 
+## 2026-09-10 · Bản rà 111 mục luật là ĐỀ XUẤT — AI chốt từng mục, không phải Đức
+
+**Đức chốt.** Đức và GPT rà cả `AGENTS.md` + `CLAUDE.md` thành **111 mục** (`R-001`→`R-111`), mỗi
+mục một trong năm số phận: `GIỮ` · `GỘP` · `HẠ THÀNH HƯỚNG DẪN` · `CHUYỂN SANG MÁY` · `BỎ`.
+Đức nói: *"đó chỉ là proposal thôi, bạn review và là người quyết định cuối cùng nhé"* — mục đích
+*"core rule lean hơn và consistent hơn"*.
+
+**Vì sao đây là việc của AI, không phải của Đức:** mục 2 của luật chung đã cho AI tự quyết việc
+đổi luật an toàn khi đủ ba điều kiện (audit độc lập sạch · sổ quyết định nói cái MẤT · không làm
+yếu lớp bảo vệ mà không gọi tên thứ mất đi). Chốt từng mục **cần đọc mã để biết máy nào có thật**,
+và đó là dữ kiện Đức không có trong tay.
+
+**Quyết định của tôi và cái MẤT: [ADR-0018](docs/adr/0018-ra-lai-111-muc-luat.md).** Khác đề xuất
+ở **14 chỗ**, và giữ **43** mục thay vì 36 — bảy mục thêm vào đều là mục đề xuất muốn chuyển sang
+máy, mà cái máy đó **chưa tồn tại hoặc chỉ BÁO chứ không CHẶN** (đo được, xem ADR).
+
 ## 2026-09-10 · `upgrade` KHÔNG tự sửa tài liệu repo đích — ba bước cuối làm TAY
 
 **Đức chốt.** Sau `upgrade --apply`, ba bước để cổng repo đích xanh lại — khai thư mục mới vào

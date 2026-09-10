@@ -147,6 +147,10 @@ trong một lượt ngồi là sáu ca báo động giả rải lên năm repo.
 `4. Vùng cấm sửa` · `7. Đóng phiên` · `8. Thêm một luật thì bớt một luật`.
 *(`6. Sổ tay mở khi cần` KHÔNG nợ — nó cố ý không mang sang, đã ghi lý do.)*
 
+**KHÔNG PHẢI câu hỏi "máy nào canh"** — đừng lẫn hai con số. `mien` đo *luật có ĐƯỜNG TỚI repo
+đích hay không*; `luat_nha.canh` (từ 1.9.30) đo *máy nào cưỡng chế nó ở NHÀ*. Mục 1 nằm trong
+`mien` với lời `NỢ` mà lại là mục DUY NHẤT được canh kín — hai câu hỏi, hai bảng, hai con số.
+
 **đóng khi:** mỗi mục trong sáu mục trên hoặc có một mục `trong_file` trong `features.json` mà
 chuỗi của nó **đo được ở ít nhất hai repo đích có cách hành văn khác nhau**, hoặc được đổi lời
 miễn từ `NỢ` sang một lý do thật *"không mang sang, vì…"*. Và `luat_nha.mien` không còn chữ `NỢ`.
@@ -944,6 +948,24 @@ với khoảng commit thật sự đã kiểm — nó gỡ theo *thứ tự*, kh
 một lệnh nghiệm thu ghi phạm vi vào dấu, tức `Y-02`. Cho tới lúc đó, cơ chế này là *"đưa một lời tự
 khai tới máy"*, **không phải** máy canh *"đã qua audit độc lập"* — và câu đó phải nằm nguyên ở đây,
 không được nói gọn thành "đã có máy canh".
+
+**ĐO ĐƯỢC 10/09, audit độc lập — VẾ "CỔNG XANH" CŨNG KHÔNG CÓ MÁY.** Mục này viết ở trên rằng
+*"vế cổng xanh có máy canh — `safe-push` đòi dấu cổng"*. Câu đó **SAI**, và đây là số đo: dấu cổng
+chỉ được đọc trong nhánh `if (blocked.length && !carry)` (`safe-push.mjs:265`). Hai đường đi qua:
+
+| Đường | Máy làm gì | Luật viết gì |
+|---|---|---|
+| đẩy phần **của mình** (`blocked` rỗng) | **không đọc dấu cổng** | mục 0: đóng phiên phải chạy cổng |
+| `--carry` **gõ tay** (`safe-push.mjs:316`) | **in một dòng** rồi đẩy | mục 2: **CẤM** `--carry` khi cổng chưa XANH |
+
+Dựng lại được trong kho thử: `origin` là một bare repo cục bộ, **không có `.git/ark-gate-stamp.json`**,
+cổng chưa từng chạy — cả hai đường đều **đẩy thành công**. Nên điều CẤM mạnh nhất ở mục 2 hiện chỉ
+là chữ, và `AGENTS.md` mục 7 lại tự nói trước: *"luật nào không kiểm được bằng máy thì sớm muộn
+cũng bị bỏ qua"*.
+
+**đóng khi (thêm vào điều kiện trên, không thay):** dựng một kho không có dấu cổng, rồi đòi
+`safe-push` **TỪ CHỐI** ở CẢ HAI đường — đẩy phần của mình, và `--carry` gõ tay — kèm đối chứng
+NGƯỢC: cùng kho đó, khi dấu cổng XANH hợp lệ thì cả hai đường phải **cho qua**. Vùng: `_code`.
 
 ### KHUNG-57 · `can-nang.mjs` chạy **603 giây** — đắt hơn cả bộ test, mà số nó in ra lấy được trong 0 giây
 

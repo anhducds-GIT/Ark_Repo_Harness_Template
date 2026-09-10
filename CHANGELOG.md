@@ -3,6 +3,51 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.30 — 2026-09-10 — Lần đầu có máy trả lời "mục luật này ai canh" — và nó lôi ra 2 lỗ THẬT
+
+**VẤN ĐỀ.** Vạch đích `R0` đặt đích *"luật không có máy canh → 0"* rồi đọc con số hiện tại từ
+`features.json` → `luat_nha.mien`. Hai câu hỏi khác nhau dùng chung một con số: `mien` đo **luật
+có đường tới repo đích hay không**, KHÔNG đo **máy nào cưỡng chế nó**.
+
+**VÁ.** `luat_nha.canh`: mỗi mục `##` của `AGENTS.md` khai `may` (đường dẫn máy cưỡng chế nó) ·
+`canh_gi` (nó chặn gì) · `khong` (phần KHÔNG máy nào canh). Vế `5e` đòi đủ ba, và đòi mỗi đường
+dẫn trong `may` **là một FILE có thật** sau khi chuẩn hoá đường dẫn.
+
+**HAI LỖ MÁY THẬT, do audit độc lập đo được — không phải lỗi lời khai, là lỗ của `safe-push`:**
+
+| Điều luật viết | Máy thật làm gì |
+|---|---|
+| mục 2: *"**CẤM** `--carry` khi cổng chưa XANH TOÀN BỘ"* | `--carry` **gõ tay** chỉ in một dòng rồi đẩy. Dấu cổng chỉ được đọc ở nhánh carry **TỰ ĐỘNG** |
+| mục 0: cổng đóng phiên là việc 3 | Đẩy phần **của mình** thì `safe-push` **không đọc dấu cổng** — `if (blocked.length && !carry)` |
+
+Cả hai đã dựng lại được trong kho thử: đẩy thành công khi **chưa từng có dấu cổng nào**. Ghi vào
+`BACKLOG.md` → `KHUNG-56` kèm `đóng khi:` — **không** vá trong lượt này, vì vá là đổi hành vi
+`safe-push` và nó cần vòng audit riêng.
+
+| | Trước | Sau |
+|---|---:|---:|
+| Máy canh được ĐO | **0** — không phép kiểm nào hỏi | **9** đường dẫn, là file có thật |
+| Mục còn phần không ai canh | *không ai biết* | **9/9** |
+| Lỗ máy thật lôi ra được | — | **2** |
+| Đột biến dựng nổi ca hỏng | — | **5**, cả năm ĐỎ |
+
+**"CÓ MẶT" MUA ĐƯỢC ÍT HƠN TÔI VIẾT LÚC ĐẦU — audit bác đúng.** Bản đầu tôi viện *"4/9 lỗi hôm
+nay là máy đã tắt"*, nhưng ở cả bốn ca đó **file vẫn có mặt**, nên `existsSync` xanh. Phép kiểm
+sự-có-mặt chỉ mua được **máy bị XOÁ hoặc ĐỔI TÊN**. `core.hooksPath` bị bỏ thì hai hook chết mà
+`5e` vẫn xanh — cổng có mục `cửa index` cho `commit-msg`, còn `post-commit` **không máy nào canh**.
+Câu đó nay nằm trong `canh._doc` để không ai đọc lời khai mạnh hơn thực tế.
+
+**CHẶN KHÁC BÁO, và nó đổi ba con số.** Chỉ `B1 B2 B3 B4 B10 B12 B16` thuộc nhóm CHẶN; `B15` và
+`B9` chỉ VÀNG. Nên: mục 3 — **cả NĂM luật vàng** không có gì đỏ, không phải bốn. Mục 1 — **không**
+được canh kín: khoá nhận SAU lượt ghi vẫn qua · khoá VÙNG treo cuối phiên không mục nào đỏ · không
+ai đo bạn dùng khoá mức nào. Vì vậy con số thật là **9/9**, không phải 8/9.
+
+**KHÔNG PHẢI THÊM PHÉP KIỂM** — `R3` đóng băng việc thêm. Vẫn đúng một vế `5e`, đúng một `ok()`,
+cổng vẫn 12 mục: lượt này **đổi một phép đo sai câu hỏi thành đúng câu hỏi**.
+
+**CÁI MẤT, gọi tên:** `canh` nặng **6.440 byte** và đi theo bản trích tới mọi repo đích, nơi nhánh
+`5e` **luôn BỎ QUA** — trả chỗ trong bản phát hành cho một câu hỏi chỉ repo nhà hỏi.
+
 ## 1.9.29 — 2026-09-10 — Lỗi 9: bản trích đòi một tính chất **DỮ LIỆU** của repo đích
 
 **LỖI 9.** `handoff-smoke` đòi *"mục dài nhất trong lịch sử phải vượt trần"* — lý lẽ: một trần cao

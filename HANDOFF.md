@@ -21,6 +21,35 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 7) · harness-loi-02 — bản đồ MÁY CANH, và 2 lỗ thật nó lôi ra
+
+**Số cũ đo SAI CÂU HỎI.** Bảng `R0` ghi *"luật không có máy canh: 7/9"* và lấy số đó từ
+`luat_nha.mien` — nhưng `mien` trả lời *"luật có ĐƯỜNG TỚI repo đích không"*. Đo đúng câu hỏi
+(`luat_nha.canh`, vế `5e`): **9 máy khai · 9/9 mục còn phần KHÔNG máy nào canh.**
+
+**HAI LỖ MÁY THẬT — không phải lỗi chữ:**
+
+| Luật viết | Máy làm |
+|---|---|
+| mục 2: **CẤM** `--carry` khi cổng chưa xanh | `--carry` gõ tay chỉ **in một dòng** rồi đẩy |
+| mục 0: đóng phiên phải chạy cổng | đẩy phần của mình thì `safe-push` **không đọc dấu cổng** |
+
+Dựng lại được: đẩy thành công khi chưa từng có dấu cổng. → `KHUNG-56` kèm `đóng khi:`. **Không vá
+lượt này** — vá là đổi hành vi `safe-push`, cần vòng audit riêng.
+
+**BA CHỖ TÔI VIẾT MẠNH HƠN SỰ THẬT, audit bác đúng cả ba.**
+⑴ *"chỉ mục 1 được canh kín"* — SAI: khoá nhận SAU lượt ghi vẫn qua · khoá VÙNG treo không ai đỏ ·
+không ai đo bạn dùng mức khoá nào. ⑵ *"bốn luật vàng không máy"* — **cả NĂM**: `B15` không thuộc
+nhóm CHẶN, chỉ `B1 B2 B3 B4 B10 B12 B16` chặn. ⑶ *"4/9 lỗi hôm nay là máy đã tắt nên sự-có-mặt là
+đúng răng"* — ở cả bốn ca **file vẫn có mặt**. Sự-có-mặt chỉ mua được **XOÁ hoặc ĐỔI TÊN**.
+
+**Nếp rút ra: `CÓ MẶT ≠ ĐANG BẬT`, và `CHẶN ≠ BÁO`.** Hai câu này nay in ngay trong nhãn của vế và
+trong `canh._doc`, vì cả hai lần tôi đều tự đọc lời khai mạnh hơn thực tế.
+
+**Đột biến:** 5 ca, cả 5 ĐỎ — trong đó **2 ca do audit mở ra** mà bản đầu của tôi để xanh: khai
+THƯ MỤC làm máy, và 7 **bí danh** của cùng một file bơm số máy qua vạch. Vá hai dòng: `statSync
+().isFile()` và chuẩn hoá đường dẫn trước khi đếm.
+
 ## 2026-09-10 (tiep 6) · harness-loi-02 — `T3` ĐÓNG: 5 repo tại 1.9.29, **2/5 xanh**
 
 **KẾT QUẢ THẬT, không làm tròn.**
