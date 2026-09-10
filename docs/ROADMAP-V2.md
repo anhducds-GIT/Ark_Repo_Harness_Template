@@ -52,7 +52,8 @@ làm: `template-null-repo` 505s → 179s bằng cách bỏ một lượt **suite
 
 **Nhát ĐO:** `luat_nha.canh` + vế `5e` — **9 máy khai · 6/6 mục còn phần KHÔNG máy nào canh**. Số
 `7/9` cũ lấy từ `mien`, thứ đo *luật có tới repo đích hay không*. Lôi ra **2 lỗ máy thật**
-(`KHUNG-56`: `--carry` gõ tay và lượt đẩy phần của mình đều KHÔNG đọc dấu cổng).
+(`KHUNG-56`: `--carry` gõ tay và lượt đẩy phần của mình đều KHÔNG đọc dấu cổng — nên điều CẤM ở
+`AGENTS.md` mục 2 hiện chỉ có phiên tự cưỡng chế).
 
 **Nhát CẮT:** bản rà **111 mục** của Đức+GPT → giữ **43** ở Tầng 1, `AGENTS.md` **9 mục → 6**.
 Quyết định từng mục và cái MẤT: [ADR-0018](adr/0018-ra-lai-111-muc-luat.md); sáu chỗ lượt thi
