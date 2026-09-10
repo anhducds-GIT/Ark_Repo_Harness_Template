@@ -31,7 +31,7 @@ ttl_days: 120
 
 | Repo | Đang ở đâu | Đức cần chốt gì |
 |---|---|---|
-| `ALL_SKILL_MANAGEMENT` | `1.9.40` đã commit tại chỗ, **18 commit chưa đẩy** | Đẩy sẽ cuốn theo **6 commit của `harness-phat-01`** và `b742625` (không nhãn `Lane:`). Duyệt `--carry`, hoặc vá nhãn (= **sửa lịch sử**) |
+| `ALL_SKILL_MANAGEMENT` | `1.9.40` đã commit tại chỗ, **18 commit chưa đẩy** | Đẩy sẽ cuốn theo **6 commit của `harness-phat-01`** và `b742625` (không nhãn `Lane:`). Duyệt `--carry` (luật ở [AGENTS.md](../AGENTS.md) mục 2), hoặc vá nhãn (= **sửa lịch sử**) |
 | `Chrome_Extension_AI_Agentic` | vẫn `1.9.29`, **chưa chạm** | `HANDOFF.md` đang bị lane `harness-loi-01` khoá **>27 giờ**, và lane `claude-gpt-chay-het-job` đang làm việc ở đó. Chỉ ba đường gỡ khoá: lane đó trả · lane đó kết thúc · **Đức chốt** |
 
 Cách chạy lại một lượt nâng, nếu cần: `node scripts/upgrade.mjs --plan "<đường-dẫn>"` rồi `--apply`,
@@ -51,7 +51,8 @@ không phải một như `upgrade` đang in.
 
 ## Chờ Đức chốt — không tự làm
 
-- **Đẩy `ALL_SKILL_MANAGEMENT`:** duyệt `--carry` (cuốn theo 6 commit `harness-phat-01`), hoặc vá
+- **Đẩy `ALL_SKILL_MANAGEMENT`:** duyệt `--carry` — luật của nó ở [AGENTS.md](../AGENTS.md) mục 2,
+  đây chỉ trỏ sang (cuốn theo 6 commit `harness-phat-01`) — hoặc vá
   nhãn `Lane:` cho `b742625` — vá nhãn là **sửa lịch sử**, mục 2 bắt hỏi.
 - **Gỡ khoá `HANDOFF.md` ở `Chrome_Extension_AI_Agentic`** (lane `harness-loi-01` giữ >27 giờ) để
   lượt nâng ở đó làm được bước ③.
