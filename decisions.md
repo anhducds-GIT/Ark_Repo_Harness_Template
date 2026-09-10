@@ -793,3 +793,17 @@ thứ làm một mục nợ đóng được.
 
 **Trần TẠM, không phải trần mới.** Lượt DỌN tiếp theo phải hạ lại; số 30 không được tự sống.
 
+
+## 2026-09-10 — VẠCH ĐÍCH của bộ khung: hai vế, và vế nào cũng là SỐ
+
+Đức chốt `R0` trong [ROADMAP-V2](docs/ROADMAP-V2.md). **Vế A — LÀM ĐƯỢC:** một repo mới sau
+migrate làm được bốn việc (nhận khoá · commit không cuốn việc lane khác · cổng xanh · đẩy an
+toàn). **Vế B — CÂN NẶNG:** bảng chín ô, mỗi ô một con số.
+
+**Vì sao phải có SỐ.** Bản Đức mô tả đầu tiên toàn tính từ — *lean · không phình · không
+over-engineer · không quá nhiều luật*. Không có số thì tuần sau vẫn cãi được, và mọi phiên vẫn
+tìm ra chỗ đáng gọn hơn. Đó đúng là cỗ máy đã ăn mất một tuần: **repo không có vạch đích thì mọi
+thứ đều là "còn thiếu"**. Đức thêm hai ô AI bỏ sót — **bộ sinh BẢNG** và **một vòng sửa → đẩy** —
+vì đó là hai chỗ ngốn thời gian thật, không phải hai chỗ trông xấu.
+
+**Đủ bảng thì DỪNG.** Vạch đích không chỉ nói khi nào được nghỉ, nó còn cấm gọn thêm sau đó.

@@ -12,32 +12,33 @@ ttl_days: 120
 > Đây là lớp ĐIỀU PHỐI: thứ tự · chỗ cần người chốt. Nội dung từng mục ở [BACKLOG](../BACKLOG.md)
 > · [IDEAS](../IDEAS.md); bản đồ sống `npm run what-next`. Bản trước: [V1](archive/ROADMAP-V1.md).
 
-## Vì sao đổi hướng — số đo 7 ngày, không phải cảm tính
+## R0 · VẠCH ĐÍCH — Đức chốt 10/09, và nó CHẶN mọi đợt dưới
 
-| Đo | Số |
-|---|---|
-| Commit | **522** · trong đó **191 (37%)** chỉ sinh lại bảng, không việc nào |
-| Lần cắt bản | **78** — trong khi mục 0b có sẵn luật *"GOM BẢN PHÁT"* |
-| `scripts/` | **16.533 dòng** — **lõi** (khoá · cổng · đẩy · chạy test) chỉ **3.557 = 22%** |
-| Ba bộ sinh bảng | **5.733 dòng = 35%** — **nhiều hơn cả lõi**, và đẻ ra `KHUNG-63` |
-| Tổng kho | ~39.500 dòng · 23 suite (~8 phút) · 12 mục cổng · 142 bản trong sổ |
+**Vế A — LÀM ĐƯỢC.** Một repo mới, sau migrate, làm được **bốn việc**: nhận khoá · commit không
+cuốn việc lane khác · cổng xanh · đẩy an toàn. Cả bốn **đã chạy thật**. Khác đi là tuỳ chọn.
 
-**Gốc không phải "AI thêm nhiều tính năng". Gốc là repo KHÔNG CÓ VẠCH ĐÍCH** — nên mọi thứ đều
-là "còn thiếu", và mỗi phiên đều tìm được chỗ đáng vá. Từng bản vá đều đúng; cộng lại thì không.
+**Vế B — CÂN NẶNG.** Chưa đủ bảng này thì chưa xong; **đủ rồi thì DỪNG**, không gọn thêm.
 
-## R0 · VẠCH ĐÍCH — Đức chốt, và nó CHẶN mọi đợt dưới
+| Đo | Hôm nay 10/09 | Vạch |
+|---|---|---|
+| `scripts/` · phần lõi | 16.533 dòng · lõi 3.557 = **22%** | **≤ 6.000** dòng · lõi **≥ 60%** |
+| Suite · cổng | **24** suite · **14,2 phút** · **12** mục cổng | **≤ 12** suite · **≤ 3 phút** · **≤ 8** mục |
+| `AGENTS.md` · `docs/` | 9 mục · 23 file (3.115 dòng) | **≤ 6 mục** · **≤ 30 file** |
+| Trần token nạp | 4.195 / **4.200** | hạ trần xuống **3.000** |
+| Luật không có máy canh | **7/9 mục** được MIỄN khỏi phép dò | **0** — không ca thật + không máy canh thì BỎ |
+| Hook | **1** (`commit-msg`) | **2** (thêm `post-commit` trả khoá), mỗi cái một test ghim |
+| Bộ sinh BẢNG | **3** bộ · 5.733 dòng = **35%** `scripts/` · **37% commit** chỉ để sinh lại bảng | **1** bộ · **0 commit** — host tự chạy, F5 là tươi |
+| Một vòng sửa → đẩy | suite **14,2 phút**, và MỖI commit làm hỏng dấu nên phải chạy lại | **≤ 5 phút** |
+| Migrate một repo | **chưa đo** | bấm giờ ở `R11`, số đo đó thành vạch |
 
-> Bộ khung **XONG** khi một repo mới làm được **bốn việc**: nhận khoá · commit không cuốn việc
-> lane khác · cổng xanh · đẩy an toàn. **Mọi thứ khác là tuỳ chọn.**
-
-Theo vạch này cả bốn **đã chạy thật, đo được**. Đức xác nhận hoặc sửa lại. Chưa chốt thì đừng
-bắt đầu Đợt 1 — không có vạch đích thì cắt gì cũng thành cãi nhau.
+**Gốc không phải "AI thêm nhiều tính năng" — gốc là repo KHÔNG CÓ VẠCH ĐÍCH**, nên mọi thứ đều là
+"còn thiếu". Bảng trên là cái phanh: mỗi ô một CON SỐ, không phải một tính từ.
 
 ## Đợt 1 · BỎ BỚT — không viết thêm dòng mã nào
 
 | Mã | Việc | Cái được, đo được |
 |---|---|---|
-| `R1` | **Thôi commit bảng** — Đức đã chốt 06/09 *"bảng tự tươi, F5 là thấy"*, chưa ai làm | bỏ **37% commit**; mỗi commit đó còn kéo theo một lượt suite ~8 phút |
+| `R1` | **Thôi commit bảng** — Đức đã chốt 06/09 *"bảng tự tươi, F5 là thấy"*, chưa ai làm | bỏ **37% commit**; mỗi commit đó còn kéo theo một lượt suite ~14 phút |
 | `R2` | **Cắt bản theo NGÀY**, mục tiêu ≤ 7/tuần, chỉ cắt khi thật có repo nhận | 78 → 7 |
 | `R3` | **ĐÓNG BĂNG** tính năng và phép kiểm tới khi xong Đợt 5 | việc ngoài phạm vi → ghi sổ, không tự làm |
 
@@ -58,7 +59,7 @@ máy canh** — trong khi nó là mục được trích dẫn nhiều nhất.
 Một phép đo cho cả ba: **thứ chưa từng đổi hành vi của ai thì không đáng giữ.**
 
 `R6` bỏ luật không có ca thật (bằng chứng ở [VI-SAO-LUAT](VI-SAO-LUAT.md)) · `R7` bỏ phép kiểm
-chưa từng bắt lỗi thật (23 suite · 12 mục cổng) · `R8` gộp ba bộ sinh bảng còn một.
+chưa từng bắt lỗi thật (24 suite; `can-nang` TREO >15 phút — BỎ, đừng sửa) · `R8` gộp 3 bộ sinh còn 1.
 
 **`R6` chạm luật chung** → phải đi qua `COMMON_LAW_SHA256` **và** một vòng audit độc lập. Nén tay
 đã làm rụng mệnh lệnh phụ **sáu lần**, lần gần nhất là 10/09.
