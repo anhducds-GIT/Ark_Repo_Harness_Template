@@ -1519,17 +1519,105 @@ export function createHeadDeps(root = ROOT) {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"]
   });
-  const treeEntries = (relPath) => git("ls-tree", "-z", "--name-only", `HEAD:${relPath}`)
-    .split("\0").filter(Boolean).sort(compareText);
-  const objectType = (relPath) => {
-    try { return git("cat-file", "-t", `HEAD:${relPath}`).trim(); }
-    catch { return null; }
+  /* NHỚ LẠI TRONG MỘT LƯỢT CHẠY — T1 (10/09), và đây là chỗ 90% thời gian cổng nằm.
+   *
+   * Mỗi `readFile` là MỘT tiến trình `git show HEAD:<file>`, mỗi `fileExists`/`isFile` là một
+   * `git cat-file -t` nữa. Đo 10/09: một tiến trình git ~37,5 ms; `collectModel` đọc hết file
+   * rồi `B6` ĐỌC LẠI hết để dò link, rồi `B12` đọc nữa. Kết quả: `check-bootstrap` 11,0 giây
+   * trên 12,2 giây của cả lượt cổng — và `tests/cong-do-that.mjs` gọi cổng 50 lượt, tức 462
+   * giây, đúng bằng thời gian tường của CẢ suite (suite chạy song song, nên tường ≈ suite chậm
+   * nhất).
+   *
+   * VÌ SAO NHỚ LẠI LÀ ĐÚNG, KHÔNG PHẢI NỚI: mọi thứ ở đây đọc từ `HEAD`, và `HEAD` không đổi
+   * trong một lượt chạy. Bộ nhớ nằm TRONG closure của từng `createHeadDeps()`, không phải toàn
+   * cục — nên hai lượt gọi khác nhau (ví dụ máy chủ bảng sống sinh lại) vẫn đọc lại từ đầu.
+   * Nếu sau này có ai dùng bộ deps này trong một tiến trình sống lâu mà HEAD đổi giữa chừng thì
+   * phải dựng deps mới, đừng dùng lại cái cũ. */
+  const nho = new Map();
+  const nhoLai = (khoa, tinh) => {
+    if (!nho.has(khoa)) nho.set(khoa, tinh());
+    return nho.get(khoa);
   };
+  /* MỘT LỆNH CHO CẢ CÂY, THAY VÌ MỘT TIẾN TRÌNH CHO MỖI ĐƯỜNG DẪN — T1 (10/09).
+   *
+   * `objectType` cũ chạy `git cat-file -t HEAD:<path>` mỗi lượt hỏi. Nó bị hỏi cho MỌI tên mà
+   * `listDirs`/`listFiles` trả về, ở mọi tầng, nhiều lần — tức hàng trăm tiến trình. `ls-tree
+   * -r -t` khai đủ kiểu của cả cây trong MỘT lượt, nên bảng này thay hết chỗ đó.
+   *
+   * `-t` là phần dễ quên: không có nó thì `ls-tree -r` chỉ liệt kê blob, và mọi THƯ MỤC thành
+   * "không tồn tại" — `listDirs` rỗng sạch, và số "chưa khai chủ" âm thầm về 0. Đúng hình dạng
+   * lỗi mà repo này đã ăn một lần với `--name-only`. */
+  let bangKieu = null;
+  let bangSha = null;
+  const napBangKieu = () => {
+    if (bangKieu) return bangKieu;
+    bangKieu = new Map();
+    bangSha = new Map();
+    for (const rec of git("ls-tree", "-r", "-t", "-z", "HEAD").split("\0")) {
+      const tab = rec.indexOf("\t");
+      if (tab < 0) continue;
+      const [, kieu, sha] = rec.slice(0, tab).split(/\s+/);
+      const duong = rec.slice(tab + 1);
+      bangKieu.set(duong, kieu);
+      if (kieu === "blob") bangSha.set(duong, sha);
+    }
+    return bangKieu;
+  };
+  // Đường dẫn RỖNG là gốc repo — `cat-file -t HEAD:` trả "tree", còn `ls-tree` không kể nó.
+  const objectType = (relPath) => (relPath === "" ? "tree" : (napBangKieu().get(relPath) ?? null));
+
+  /* ĐỌC CẢ CÂY BẰNG MỘT LỆNH — T1 (10/09), và đây là nửa còn lại của 11 giây.
+   *
+   * `git show HEAD:<file>` là một tiến trình cho MỘT file. `collectModel` đọc ~210 file, tức
+   * ~210 tiến trình × 37,5 ms. `cat-file --batch` nhận danh sách trên stdin và trả tất cả trong
+   * MỘT lượt.
+   *
+   * ĐỌC THEO SHA, KHÔNG THEO ĐƯỜNG DẪN: tên file trong repo này có dấu tiếng Việt và dấu cách,
+   * và `--batch` tách yêu cầu theo DÒNG — một đường dẫn có ký tự lạ là một yêu cầu hỏng mà
+   * không ai thấy. SHA thì luôn 40 ký tự hex.
+   *
+   * KHÔNG dùng `encoding` ở đây: `--batch` trả nhị phân xen tiêu đề, nên phải đếm BYTE. Giải mã
+   * utf8 lúc trả về, đúng như `git show` cũ vẫn làm. */
+  let bangNoiDung = null;
+  const napNoiDung = () => {
+    if (bangNoiDung) return bangNoiDung;
+    bangNoiDung = new Map();
+    napBangKieu();
+    const duongTheoSha = new Map();
+    for (const [duong, sha] of bangSha) {
+      if (!duongTheoSha.has(sha)) duongTheoSha.set(sha, []);
+      duongTheoSha.get(sha).push(duong);
+    }
+    if (!duongTheoSha.size) return bangNoiDung;
+    const ra = execFileSync("git", ["cat-file", "--batch"], {
+      cwd: root, input: [...duongTheoSha.keys()].join("\n") + "\n",
+      maxBuffer: 512 * 1024 * 1024
+    });
+    let i = 0;
+    while (i < ra.length) {
+      const nl = ra.indexOf(10, i);
+      if (nl < 0) break;
+      const [sha, , co] = ra.slice(i, nl).toString("utf8").split(" ");
+      const dai = Number(co);
+      if (!Number.isFinite(dai)) break;                 // "<sha> missing" — bỏ qua, không đoán
+      const than = ra.slice(nl + 1, nl + 1 + dai).toString("utf8");
+      for (const duong of duongTheoSha.get(sha) ?? []) bangNoiDung.set(duong, than);
+      i = nl + 1 + dai + 1;                             // +1 cho dấu xuống dòng sau nội dung
+    }
+    return bangNoiDung;
+  };
+  const treeEntries = (relPath) => nhoLai(`tree\0${relPath}`, () =>
+    git("ls-tree", "-z", "--name-only", `HEAD:${relPath}`).split("\0").filter(Boolean).sort(compareText));
   return {
     root,
     fileExists: (relPath) => objectType(relPath) !== null,
     isFile: (relPath) => objectType(relPath) === "blob",
-    readFile: (relPath) => git("show", `HEAD:${relPath}`),
+    readFile: (relPath) => {
+      const co = napNoiDung();
+      if (co.has(relPath)) return co.get(relPath);
+      // Không có trong bảng = không phải blob ở HEAD. Giữ đúng hành vi cũ: để git tự nói lỗi.
+      return git("show", `HEAD:${relPath}`);
+    },
     writeFile: () => { throw new Error("HEAD_READ_ONLY: --check-head không được ghi file."); },
     // `childPath` chứ không phải `${relPath}/${name}`: khi relPath là "" (thư mục gốc
     // repo, cần cho phép đếm top-level của S2) thì cách cũ sinh ra "/docs" và
@@ -1543,7 +1631,33 @@ export function createHeadDeps(root = ROOT) {
       // Ngày commit cuối chạm vào file. Dùng làm "lần rà gần nhất" để tính nợ tài
       // liệu quá hạn — vì frontmatter CỐ TÌNH không có trường `created`/`last_reviewed`:
       // ngày gõ tay sẽ mục, còn lịch sử git thì không nói dối được.
-      lastCommitDate: (relPath) => git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", "--", relPath).trim(),
+      //
+      /* MỘT LƯỢT LOG CHO CẢ CÂY — T1 (10/09), cùng bệnh với `readFile` ở trên. Bản cũ chạy
+       * `git log -1 -- <file>` cho MỖI file, tức một tiến trình mỗi lượt hỏi; `collectModel`
+       * hỏi nó cho mọi tài liệu. Đo: một tiến trình git ~37,5 ms.
+       *
+       * `git log --name-only` liệt kê mọi commit kèm file nó chạm, mới nhất trước — nên lượt
+       * ĐẦU TIÊN thấy một đường dẫn chính là commit cuối chạm nó. Đúng thứ `-1 --` trả về.
+       *
+       * File KHÔNG có trong bảng (bị đổi tên, hoặc chưa từng commit) thì hỏi lại theo cách cũ:
+       * bảng thiếu một dòng KHÁC HẲN việc đoán một ngày. */
+      lastCommitDate: (relPath) => {
+        const bang = nhoLai("ngay-cuoi", () => {
+          const bd = new Map();
+          let ngay = null;
+          for (const raw of git("log", "--name-only", "--no-renames", "--format=%x01%cd", "--date=format:%Y-%m-%d")
+            .replace(/\r\n?/g, "\n").split("\n")) {
+            if (raw.startsWith("\x01")) { ngay = raw.slice(1).trim() || null; continue; }
+            const f = raw.trim();
+            if (!f || ngay === null) continue;
+            if (!bd.has(f)) bd.set(f, ngay);
+          }
+          return bd;
+        });
+        const co = bang.get(relPath);
+        if (co) return co;
+        return git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", "--", relPath).trim();
+      },
       // Danh sách file ĐÃ TRACK tại HEAD. Cả chế độ đĩa lẫn chế độ HEAD đều gọi
       // đúng lệnh này, nên hai chế độ không bao giờ nhìn thấy hai tập file khác
       // nhau. `-z` để tên có dấu cách / tiếng Việt không bị git bọc dấu nháy.
