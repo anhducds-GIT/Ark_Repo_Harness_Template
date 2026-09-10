@@ -180,8 +180,11 @@ export const MIEN_KHOA = Object.freeze(["HANDOFF.md"]);
  * vùng nếu sau này có hàng chục phiên cùng lúc.`
  *
  * Trả về hàm NHẢ. Gọi nhiều lần vô hại. */
-export function giuBangQuyen() {
-  const KHOA = `${CLAIMS_FILE}.lock`;
+/* NHẬN ĐƯỜNG DẪN BẢNG — T2 (10/09): cửa `post-commit` chạy với `--goc` có thể khác gốc
+   module (fixture, và `git worktree` của KHUNG-50). Khoá phải nằm cạnh ĐÚNG bảng đang ghi.
+   Mặc định giữ nguyên nên mọi bên gọi cũ không đổi một chữ. */
+export function giuBangQuyen(tepBang = CLAIMS_FILE) {
+  const KHOA = `${tepBang}.lock`;
   let daKhoa = false;
   for (let i = 0; i < 50 && !daKhoa; i += 1) {
     try { fs.mkdirSync(KHOA); daKhoa = true; }
@@ -797,6 +800,67 @@ async function main() {
     process.exit(EXIT.OK);
   }
 
+  /* ---- --sau-commit : CỬA gọi bởi hook `post-commit` --------------------
+   *
+   * T2 (10/09). Luật mục 1 nói: khoá FILE trả NGAY SAU commit chứa lượt ghi. Nó bị cưỡng chế
+   * bởi CỔNG — tức cuối phiên, và cổng ĐỎ chỉ là lưới đỡ. Đức: *"khoá phải nhả ngay khi hết
+   * sửa, cố gắng hook tốt vào"*, nói hai lần. Đây là cái hook đó.
+   *
+   * `post-commit` là mốc ĐÚNG: commit đã hình thành, nên "lượt ghi đã xong" là sự thật, không
+   * phải dự đoán. Và mã thoát của nó KHÔNG ảnh hưởng `git commit` (đo 10/09: hook thoát 7 →
+   * git thoát 0), nên cửa này KHÔNG THỂ chặn oan ai. Đó là lý do nó được phép tự động.
+   *
+   * CHỈ TRẢ KHOÁ CỦA FILE TRONG COMMIT NÀY, và chỉ của lane đứng tên commit. File đang sửa dở
+   * mà chưa commit thì giữ nguyên khoá — trả hộ chúng là lấy mất lưới đỡ của chính lane đó.
+   *
+   * DÙNG LẠI `quyetDinhXong`, không viết đường trả thứ hai. Vòng audit 10/09 bắt tôi hai lần vì
+   * tự viết bản thứ hai của một thứ đã có nhà. */
+  if (flag("sau-commit")) {
+    const goc = typeof flag("goc") === "string" ? path.resolve(flag("goc")) : ROOT;
+    const gitO = (...a) => execFileSync("git", ["-c", "core.quotepath=false", ...a], { cwd: goc, encoding: "utf8" });
+    let khai = { lane: null, problem: null };
+    try { khai = laneFromMessage(gitO("log", "-1", "--format=%B")); } catch { /* không đọc được lời nhắn: im, để cổng nói */ }
+    if (!khai.lane || khai.problem) process.exit(EXIT.OK);
+    const toi = khai.lane;
+    const tepBang = path.join(goc, ".agents", "claims.json");
+    let bang;
+    try { bang = readClaims(tepBang); } catch { process.exit(EXIT.OK); }
+    if (!bang.tam || !Object.keys(bang.tam).length) process.exit(EXIT.OK);
+    let trongCommit = [];
+    try {
+      trongCommit = gitO("show", "--pretty=", "--name-only", "-z", "HEAD")
+        .split(String.fromCharCode(0)).filter(Boolean);
+    } catch { process.exit(EXIT.OK); }
+    let tam = bang.tam;
+    const daTra = [];
+    for (const d of trongCommit) {
+      const chu = tam[chuanDuongDan(d)]?.owner ?? tam[chuanDuongDan(d)]?.chu ?? null;
+      if (chu !== toi) continue;                  // không phải khoá của tôi → không chạm
+      const kq = quyetDinhXong({ claims: bang.claims, tam }, { duongDan: d, as: toi });
+      if (kq.code !== EXIT.OK) continue;          // im lặng: đây là tiện ích, không phải cổng
+      tam = kq.next;
+      daTra.push(chuanDuongDan(d));
+    }
+    if (!daTra.length) process.exit(EXIT.OK);
+    const nhaKhoaBang = giuBangQuyen(tepBang);
+    try {
+      const lai = readClaims(tepBang);           // đọc lại DƯỚI khoá: lane khác có thể vừa ghi
+      let tam2 = lai.tam || {};
+      const thatSu = [];
+      for (const d of daTra) {
+        const kq = quyetDinhXong({ claims: lai.claims, tam: tam2 }, { duongDan: d, as: toi });
+        if (kq.code !== EXIT.OK) continue;
+        tam2 = kq.next;
+        thatSu.push(d);
+      }
+      if (!thatSu.length) return;
+      if (Object.keys(tam2).length) lai.tam = tam2; else delete lai.tam;
+      ghiBang(lai, tepBang);
+      console.log(`đã tự trả khoá file sau commit (${toi}): ${thatSu.join(" · ")}`);
+    } finally { nhaKhoaBang(); }
+    process.exit(EXIT.OK);
+  }
+
   /* ---- --cua-index : CỬA gọi bởi hook `commit-msg` ----------------------
    *
    * Chỗ DUY NHẤT thấy đúng mẻ sắp vào commit. `--soat` là một LỆNH người nhớ gọi, và cửa sổ
@@ -850,6 +914,7 @@ async function main() {
     const docIndex = (...them) => execFileSync("git", ["-c", "core.quotepath=false", "diff", "--cached", "--name-only", "-z", ...them],
       { cwd: goc, encoding: "utf8" }).split(String.fromCharCode(0)).filter(Boolean);
     let daDan = [];
+    let mocSo = "HEAD";      // mẻ được đọc ra so với mốc nào — cửa tầng máy phải so số bản với ĐÚNG mốc đó
     try {
       daDan = docIndex();
       /* MẺ RỖNG mà commit vẫn đang hình thành = `--amend` (hoặc `--allow-empty`): index bằng
@@ -862,7 +927,7 @@ async function main() {
           try { execFileSync("git", ["rev-parse", "--verify", "HEAD^"], { cwd: goc, stdio: "ignore" }); return true; }
           catch { return false; }
         })();
-        if (coCha) daDan = docIndex("HEAD^");
+        if (coCha) { daDan = docIndex("HEAD^"); mocSo = "HEAD^"; }
       }
     } catch (e) {
       /* FAIL-CLOSED. Không đọc được index thì không biết mình đang commit gì của ai — và đúng
@@ -871,6 +936,52 @@ async function main() {
       process.exit(EXIT.REFUSED);
     }
     if (!daDan.length) process.exit(EXIT.OK);
+
+    /* ---- CỬA TẦNG MÁY — T2 (10/09) ------------------------------------------
+     *
+     * Chặn: mẻ commit chạm TẦNG MÁY mà số phiên bản KHÔNG đổi. Đức nói đúng chỗ: *"luật cũng
+     * cần kèm cơ chế hook, chứ không thì AI vẫn làm sai"* — hôm nay tôi vi phạm đúng điều này,
+     * và suite bắt được SAU 11 PHÚT. Cửa này biết đúng mẻ sắp vào commit và trả lời trong ~0,2s.
+     *
+     * DÙNG CHÍNH BA HẰNG SỐ CỦA `fileMay`, không chép lại danh sách — vòng audit 10/09 bắt tôi
+     * hai lần vì tự viết bản thứ hai của một thứ đã có nhà. Nạp động để `--sua`/`--xong` (chạy
+     * liên tục) không phải trả 99 ms nạp module này.
+     *
+     * `template/` KHÔNG tính: nó là bản SINH RA từ tầng máy, không phải tầng máy.
+     *
+     * SO VỚI ĐÚNG MỐC MÀ MẺ ĐƯỢC ĐỌC RA. Nhánh `--amend` ở trên đọc mẻ so với `HEAD^`; so số bản
+     * với `HEAD` trong ca đó là CHẶN OAN một bản đã cắt — và một cửa chặn oan là ai đó gõ
+     * `--no-verify`, từ lúc đó nó không canh gì nữa.
+     *
+     * FAIL-OPEN khi không đọc được số bản, cố ý: repo không có `package.json` (hoặc đọc không ra
+     * số) thì để cổng đóng phiên nói. Cửa này chỉ chặn ca nó CHẮC CHẮN. */
+    {
+      const { DUOI_MAY, TEP_MAY_THEM, TEP_CUA_REPO_DICH } = await import("./build-template.mjs");
+      const laTangMay = (rel) => {
+        const p = String(rel ?? "").replaceAll("\\", "/");
+        if (!p || p.startsWith("template/")) return false;
+        if (TEP_CUA_REPO_DICH.includes(p)) return false;
+        return DUOI_MAY.some((d) => p.endsWith(d)) || TEP_MAY_THEM.includes(p);
+      };
+      const may = daDan.filter(laTangMay);
+      if (may.length) {
+        const soBan = (ref) => {
+          try { return JSON.parse(execFileSync("git", ["show", `${ref}:package.json`], { cwd: goc, encoding: "utf8" })).version ?? null; }
+          catch { return null; }
+        };
+        const banMoc = soBan(mocSo);
+        const banIndex = soBan("");            // `git show :package.json` — bản trong INDEX
+        if (typeof banMoc === "string" && typeof banIndex === "string" && banMoc === banIndex) {
+          console.error(`CUA_TANG_MAY_CHUA_CAT_BAN: mẻ này chạm ${may.length} file TẦNG MÁY mà "version" vẫn là ${banMoc}.`);
+          console.error(`  ${may.slice(0, 6).join(" · ")}${may.length > 6 ? ` · …+${may.length - 6}` : ""}`);
+          console.error("Một số phiên bản trỏ tới HAI nội dung tầng máy thì nó không còn là mốc, và `upgrade.mjs`");
+          console.error("sẽ phát hai thứ khác nhau dưới cùng một nhãn. Sửa: tăng \"version\" trong package.json,");
+          console.error("chạy `npm run template`, rồi commit lại — hoặc `--no-verify` nếu bạn biết mình đang làm gì.");
+          process.exit(EXIT.REFUSED);
+        }
+      }
+    }
+
     try { parsed = readClaims(path.join(goc, ".agents", "claims.json")); }
     catch (e) { console.error(`CUA_INDEX_KHONG_DOC_DUOC_BANG: ${String(e.message).split(String.fromCharCode(10))[0]}`); process.exit(EXIT.REFUSED); }
     const cauTruc = readStructureFromDisk(goc);

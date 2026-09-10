@@ -166,6 +166,11 @@ const VERBATIM = [
    * nhiều lane: một cây làm việc có đúng một index. Phép ghim tự dựng kho git riêng và tự khai
    * `areas`, nên nó chạy ở repo đích y như ở đây. */
   [".githooks/commit-msg", ".githooks/commit-msg"],
+  /* CỬA TỰ TRẢ KHOÁ — T2 (10/09). Đi theo bản trích cùng lý do: luật mục 1 GỌI TÊN mốc "trả
+   * NGAY SAU commit", và một luật chỉ được cổng cưỡng chế ở CUỐI phiên là một luật AI vẫn làm
+   * sai — đo được ở chính phiên này. Mã thoát của `post-commit` không ảnh hưởng `git commit`,
+   * nên nó không thể chặn oan repo đích. */
+  [".githooks/post-commit", ".githooks/post-commit"],
   ["tests/cua-index.mjs", "tests/cua-index.mjs"],
   /* BẢNG SỐNG — ba cửa, một lõi. Đi theo bản trích vì chỗ hỏng nó vá là chỗ MỌI repo dựng từ bộ
    * khung đều có: bảng suy từ HEAD trả lời câu về QUÁ KHỨ, mà câu người chốt hỏi là câu về BÂY
@@ -1356,7 +1361,7 @@ export const DUOI_MAY = Object.freeze([".mjs", ".cmd"]);
  * "cấu hình của repo đích" — `package.json` · `.repo-structure.json` · `.agents/claims.json`
  * cũng là `.json` trong bản trích, và ghi đè bất kỳ cái nào là xoá repo của người ta. Nên thà
  * một danh sách ngắn có phép ghim canh, hơn một quy tắc rộng đoán sai một lần là mất dữ liệu. */
-export const TEP_MAY_THEM = Object.freeze(["features.json", ".githooks/commit-msg"]);
+export const TEP_MAY_THEM = Object.freeze(["features.json", ".githooks/commit-msg", ".githooks/post-commit"]);
 
 /* Ba file này là CỦA REPO ĐÍCH, không bao giờ được vào tầng máy. Phép ghim đọc danh sách này
    chứ không gõ lại tên — hai bản chép sẽ lệch. */

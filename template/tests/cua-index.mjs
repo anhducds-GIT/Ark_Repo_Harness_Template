@@ -308,3 +308,113 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
  * vế 3f VẪN xanh, và ngược lại cũng xanh. Hai cái mỗi cái tự đủ; ca hỏng chỉ dựng lại được khi
  * thiếu CẢ HAI. Nên vế 3f ghim "có ít nhất một trong hai", không ghim `-z` là thứ chịu lực.
  */
+
+/* ---- 6. CỬA TẦNG MÁY — T2 (10/09) --------------------------------------
+ *
+ * Đức: *"các luật cũng cần kèm cơ chế hook, chứ không thì AI vẫn làm sai."* Luật này đã có:
+ * sửa tầng máy thì phải cắt bản. Nó bị cưỡng chế bởi SUITE, và hôm nay tôi vi phạm rồi phát
+ * hiện SAU 11 PHÚT. Cửa `commit-msg` biết đúng mẻ sắp vào commit, trả lời trong ~0,2 giây.
+ *
+ * SÁU VẾ, và bốn trong sáu là ĐỐI CHỨNG NGƯỢC — vì một cửa chặn oan là ai đó gõ `--no-verify`,
+ * và từ lúc đó nó không canh gì nữa. Ca `--amend` là ca tôi thiết kế để chống chặn oan: nhánh
+ * amend đọc mẻ so với `HEAD^`, nên số bản cũng phải so với `HEAD^`. */
+{
+  const t2 = fs.mkdtempSync(path.join(os.tmpdir(), "ark-cua-may-"));
+  const g2 = (...a) => execFileSync("git", a, { cwd: t2, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  const cm = (msg, ...them) => {
+    try { return { ma: 0, ra: execFileSync("git", ["commit", ...them, "-m", msg], { cwd: t2, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }) }; }
+    catch (e) { return { ma: e.status ?? 1, ra: `${e.stdout || ""}${e.stderr || ""}` }; }
+  };
+  const ghi = (rel, noi) => {
+    const abs = path.join(t2, rel);
+    fs.mkdirSync(path.dirname(abs), { recursive: true });
+    fs.writeFileSync(abs, noi);
+  };
+  const datBan = (v) => ghi("package.json", `${JSON.stringify({ name: "thu", version: v, scripts: { test: "node tests/x.mjs" } }, null, 2)}\n`);
+  const nhan = "\n\nLane: lane-a";
+  try {
+    g2("init", "-q", ".");
+    g2("config", "user.email", "t@t");
+    g2("config", "user.name", "t");
+    ghi(".repo-structure.json", `${JSON.stringify({ schema_version: 1, repo: "thu", areas: { "scripts/": { steward: "_code", mutability: "rw", ownership_mode: "root" }, ".agents/": { steward: "_root", mutability: "rw", ownership_mode: "root" } } }, null, 2)}\n`);
+    ghi(".agents/claims.json", `${JSON.stringify({ claims: { _code: { owner: null }, _root: { owner: null } }, tam: {} }, null, 2)}\n`);
+    datBan("1.0.0");
+    ghi("scripts/may.mjs", "// v1\n");
+    ghi("docs/tay.md", "# tay\n");
+    g2("add", "-A");
+    g2("commit", "-q", "-m", `goc${nhan}`);
+    const hook = path.join(t2, ".githooks", "commit-msg");
+    fs.mkdirSync(path.dirname(hook), { recursive: true });
+    fs.writeFileSync(hook, fs.readFileSync(path.join(ROOT, ".githooks", "commit-msg"), "utf8")
+      .replace('exec node "$goc/scripts/claim.mjs"', `exec node "${path.join(ROOT, "scripts", "claim.mjs").replaceAll("\\", "/")}"`));
+    fs.chmodSync(hook, 0o755);
+    g2("config", "core.hooksPath", ".githooks");
+    const dinh = () => g2("rev-parse", "HEAD").trim();
+
+    // ⑴ CHẶN: chạm tầng máy, số bản không đổi.
+    const truoc = dinh();
+    ghi("scripts/may.mjs", "// v2\n");
+    g2("add", "scripts/may.mjs");
+    const a = cm(`feat: sua tang may${nhan}`);
+    assert.notEqual(a.ma, 0, "cham tang may ma khong cat ban thi PHAI bi chan");
+    assert.match(a.ra, /CUA_TANG_MAY_CHUA_CAT_BAN/, `phai neu ten loi: ${a.ra.slice(0, 300)}`);
+    assert.match(a.ra, /scripts\/may\.mjs/, "phai NEU TEN file tang may trong me");
+    assert.equal(dinh(), truoc, "commit phai bi HUY — HEAD khong duoc doi");
+
+    // ⑵ QUA: cắt bản trong cùng mẻ.
+    datBan("1.0.1");
+    g2("add", "package.json");
+    const b = cm(`feat: sua tang may + cat ban${nhan}`);
+    assert.equal(b.ma, 0, `cat ban trong cung me thi phai QUA: ${b.ra.slice(0, 300)}`);
+
+    /* ⑶ CHẶN: `--amend` thêm nội dung tầng máy MỚI dưới CÙNG một số bản.
+     *
+     * Kỳ vọng đầu của tôi là "phải qua" — và nó SAI, cửa mới đúng. Sổ phát hành là vùng
+     * chỉ-thêm: một số bản đã ghi dấu vân tay thì không ghi được dấu thứ hai cho số đó. Nên
+     * đổi nội dung tầng máy dưới một số đã cắt là trạng thái KHÔNG hợp lệ, dù chỉ tạm.
+     * Hệ quả về nếp làm: CẮT BẢN TRƯỚC, rồi mới commit — đúng hướng `R2`. */
+    ghi("scripts/may.mjs", "// v2b\n");
+    g2("add", "scripts/may.mjs");
+    const c = cm(`feat: sua tang may + cat ban (amend)${nhan}`, "--amend");
+    assert.notEqual(c.ma, 0, "amend them noi dung tang may duoi CUNG so ban thi PHAI bi chan");
+    assert.match(c.ra, /CUA_TANG_MAY_CHUA_CAT_BAN/, `phai neu ten loi: ${c.ra.slice(0, 200)}`);
+
+    /* ⑶b QUA: `--amend` MẺ RỖNG — chỉ sửa lời nhắn, sau khi đã cắt bản.
+     *
+     * Đây là ca `mocSo` sinh ra để chống chặn oan: mẻ rỗng nên cửa index đọc lại nội dung so
+     * với `HEAD^`, và số bản cũng phải so với `HEAD^` (1.0.0 → 1.0.1, khác nhau → qua). So với
+     * `HEAD` trong ca này là chặn oan một bản đã cắt đúng. */
+    /* BỎ DÀN TRƯỚC RỒI MỚI PHỤC HỒI. `checkout --` lấy nội dung từ INDEX, mà index vẫn còn
+     * `v2b` đã dàn ở lượt bị chặn ⑶ (cửa huỷ commit nhưng KHÔNG chạm index — đó là hợp đồng
+     * của nó). Không `reset` thì mẻ vẫn không rỗng và ca này đo một thứ khác. */
+    g2("reset", "-q", "HEAD", "--", "scripts/may.mjs");
+    g2("checkout", "--", "scripts/may.mjs");
+    assert.equal(g2("diff", "--cached", "--name-only").trim(), "", "tien de ca nay: me phai RONG");
+    const cb = cm(`feat: sua tang may + cat ban (sua loi nhan)${nhan}`, "--amend");
+    assert.equal(cb.ma, 0, `amend me RONG sau khi da cat ban PHAI qua: ${cb.ra.slice(0, 300)}`);
+
+    // ⑷ QUA: mẻ chỉ có tài liệu — không chạm tầng máy.
+    ghi("docs/tay.md", "# tay 2\n");
+    g2("add", "docs/tay.md");
+    const d = cm(`docs: chi tai lieu${nhan}`);
+    assert.equal(d.ma, 0, `me chi co tai lieu thi khong lien quan cua nay: ${d.ra.slice(0, 300)}`);
+
+    // ⑸ QUA: `template/` là bản SINH RA từ tầng máy, không phải tầng máy.
+    ghi("template/scripts/may.mjs", "// ban sinh\n");
+    g2("add", "template/scripts/may.mjs");
+    const e2 = cm(`chore: ban trich${nhan}`);
+    assert.equal(e2.ma, 0, `template/ la ban sinh, khong duoc tinh la tang may: ${e2.ra.slice(0, 300)}`);
+
+    // ⑹ QUA: không có `package.json` thì FAIL-OPEN — để cổng đóng phiên nói, đừng chặn ở cửa.
+    g2("rm", "-q", "--cached", "package.json");
+    fs.rmSync(path.join(t2, "package.json"));
+    ghi("scripts/may.mjs", "// v3\n");
+    g2("add", "scripts/may.mjs");
+    const f2 = cm(`feat: repo khong co package.json${nhan}`);
+    assert.equal(f2.ma, 0, `khong doc duoc so ban thi phai FAIL-OPEN: ${f2.ra.slice(0, 300)}`);
+
+    ok("6 · cửa tầng máy: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` — bảy nhánh");
+  } finally {
+    fs.rmSync(t2, { recursive: true, force: true });
+  }
+}
