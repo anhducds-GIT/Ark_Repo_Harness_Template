@@ -21,6 +21,46 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep) · harness-loi-02 · Doi huong: DONG GOI, khong hoan thien — ban 1.8.12
+
+Duc chot huong moi: *"mot tuan roi khong dong goi xong… he thong lean, du dung, khong over
+engineer, khong kiem qua nhieu."* Da do, va so nay la ly do doi huong:
+
+| Do 7 ngay | So |
+|---|---|
+| commit | **522** · trong do **191 (37%)** chi sinh lai bang |
+| lan cat ban | **78** — trong khi muc 0b da co luat GOM BAN PHAT |
+| `scripts/` | 16.533 dong · **loi chi 3.557 = 22%** |
+| ba bo sinh bang | **5.733 dong = 35%** — nhieu hon ca loi |
+
+**Goc KHONG phai "AI them nhieu tinh nang". Goc la repo KHONG CO VACH DICH** — nen moi thu deu la
+"con thieu", va moi phien deu tim duoc cho dang va. Tung ban va deu dung; cong lai thi khong.
+Toi co phan trong do: hom nay toi them ba phep kiem moi.
+
+`docs/ROADMAP-V2.md` **viet lai han** — 97 -> 95 dong, kho chu 3117 -> **3115**. Roadmap ngan di,
+dung huong. `R0` (Duc chot vach dich) CHAN moi dot duoi.
+
+### KHUNG-63 da va trong luot nay — ban 1.8.12
+
+Bo sinh doc DONG HO o o thoi-gian-giu-khoa. Khong phai o hien thi xau, la mot VONG KHONG LOI RA:
+cong doi trang tuoi -> sinh lai roi commit -> mat dau xac nhan -> suite ~19 phut -> phut da doi ->
+trang lai cu. **Lane giu khoa VUNG khong bao gio dong duoc phien.**
+Luat rut ra: **bang doc du lieu o dau thi phai doc DONG HO o do.** Ban commit doc HEAD -> moc la
+luc cua HEAD; ban song `--khoa-song` doc dia -> moc la BAY GIO. Ghim o `khoa-dau-vet` ve 12, ghim
+CAI VONG (sinh hai lan, hai moc cach 19 phut, doi ra Y HET). Dot bien 17 -> DO.
+
+### Hai cho HO da tim ra, CHUA va — nam o `R9` va `R10`
+
+⑴ Khoa file khong co gi cuong che moc tra; cong chi bat luc DONG PHIEN. Toi tu giu **47 phut**.
+⑵ **`--as` la loi tu khai**: dung lai duoc — ai cung tra duoc khoa cua nguoi khac chi bang cach
+GO TEN ho, va dau niem phong VAN NGUYEN. Ba cau luat muc 1 hien la chu, khong phai luat.
+
+### Mot loi cua toi, ghi de phien sau khong lap
+
+Noi lenh sau mot pipe: `claim.mjs --sua … | head -2 && <ghi file>`. `&&` doc ma thoat cua `head`,
+khong doc cua lenh khoa — nen lenh khoa DA TU CHOI ma toi van ghi vao vung lane khac. Da go ngay.
+**Dung noi `&&` sau mot pipe khi ve trai la mot cua kiem.**
+
 ## 2026-09-10 (tiep) · harness-loi-02 · So phat hanh KHONG thay cai hook — ban 1.8.10
 
 Duc hoi *"doi hook the nay thi co phai nang version khong?"*. **Co, va toi DA nang** (1.8.8→1.8.9).

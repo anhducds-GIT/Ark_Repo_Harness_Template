@@ -41,39 +41,19 @@
       "released_at": "2026-09-10T04:14:40.426Z"
     }
   },
-  "_fingerprint": "dc00270f2f02be58",
+  "_fingerprint": "39be3a6cd9ffa66f",
   "tam": {
-    "scripts/build-overview.mjs": {
+    "docs/ROADMAP-V2.md": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:24:08.497Z"
+      "luc": "2026-09-10T04:33:35.569Z"
     },
-    "tests/khoa-dau-vet.mjs": {
+    "STATUS.md": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:24:47.372Z"
+      "luc": "2026-09-10T04:34:48.765Z"
     },
-    "package.json": {
+    "HANDOFF.md": {
       "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:26:55.306Z"
-    },
-    "RELEASE-LEDGER.json": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:27:18.681Z"
-    },
-    "template/README.md": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:27:18.681Z"
-    },
-    "template/package.json": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:27:18.681Z"
-    },
-    "template/scripts/build-overview.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:27:18.681Z"
-    },
-    "template/tests/khoa-dau-vet.mjs": {
-      "owner": "harness-loi-02",
-      "luc": "2026-09-10T04:27:18.681Z"
+      "luc": "2026-09-10T04:34:48.765Z"
     }
   }
 }

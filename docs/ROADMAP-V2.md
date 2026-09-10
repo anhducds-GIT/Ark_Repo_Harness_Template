@@ -4,94 +4,92 @@ status: active
 ttl_days: 120
 ---
 
-# ROADMAP V2 — thứ tự việc đang mở
+# ROADMAP V2 — đường ĐÓNG GÓI, bản 10/09
 
-> **Đây là lớp ĐIỀU PHỐI: thứ tự · phân luồng · phụ thuộc · chỗ cần người chốt.** Nội dung từng
-> mục ở [BACKLOG.md](../BACKLOG.md) và [IDEAS.md](../IDEAS.md) — file này **không chép lại**. Bản
-> đồ việc **sống**: `npm run what-next`. Lịch sử: [ROADMAP-V1](archive/ROADMAP-V1.md).
+> **Mục tiêu đổi ngày 10/09: ĐÓNG GÓI, không phải hoàn thiện.** Đức: *"một tuần rồi không đóng
+> gói xong… ta cần hệ thống lean, đủ dùng, không over engineer, không kiểm quá nhiều."*
 >
-> Luật song song ([ORCHESTRATOR](protocols/ORCHESTRATOR.md) mục 2): **hai việc chạy song song được
-> khi và chỉ khi thuộc hai khoá khác nhau và cả hai khoá đang trống.**
+> Đây là lớp ĐIỀU PHỐI: thứ tự · chỗ cần người chốt. Nội dung từng mục ở [BACKLOG](../BACKLOG.md)
+> · [IDEAS](../IDEAS.md); bản đồ sống `npm run what-next`. Bản trước: [V1](archive/ROADMAP-V1.md).
 
-## Bốn luật chi phối THỨ TỰ — vì sao đợt nào đứng trước
+## Vì sao đổi hướng — số đo 7 ngày, không phải cảm tính
 
-> Lịch sử từng bản ở [CHANGELOG.md](../CHANGELOG.md), từng lượt việc ở
-> [docs/archive/HANDOFF-2026-09-2.md](archive/HANDOFF-2026-09-2.md). Cả bốn sinh từ ca hỏng thật.
-
-1. **Một mục nợ chỉ đóng được khi đã chạy trên DỮ LIỆU THẬT và qua ĐỘT BIẾN KIỂM** — 06/09, năm
-   thứ *"viết xong, test xanh"* đều hỏng. *"Test xanh"* không phải điều kiện đủ.
-2. **`npm test` xanh không chứng minh gì về lớp bảo vệ vừa bị NỚI** (1.3.5 là cửa hậu do 1.3.3 mở).
-   Mọi lượt nới một cấu hình phải kèm một khối trong `tests/cong-do-that.mjs`.
-3. **Migrate đứng SỚM** — bốn lỗi nặng nhất 05/09 đều do migrate thật lôi ra, không do đọc code.
-4. **Phép đo NÓI DỐI đứng trước phép đo còn THIẾU** — một phép kiểm luôn xanh làm mọi số đo khác
-   mất giá đúng lúc ta cần tin chúng. Đây là lý do đợt 3 đứng sau đợt 1.
-
-Bộ phép kiểm chạy vượt trần từ 06/09, **chưa ai xử** — nhà của nó là `Y-06` ([IDEAS](../IDEAS.md)).
-
-## Thứ tự việc — bản 10/09, xếp theo THỨ ĐANG THU THUẾ MỖI PHIÊN
-
-> Xếp theo **thuế mỗi phiên phải trả**, không theo số mã việc. Nội dung từng mục ở
-> [BACKLOG.md](../BACKLOG.md) và [IDEAS.md](../IDEAS.md) — ở đây **chỉ có thứ tự và vì sao**.
-
-### Bốn mục đắt nhất là MỘT bệnh — phát hiện 10/09
-
-`KHUNG-59` · `KHUNG-50` · `KHUNG-55` · `KHUNG-51` trông như bốn việc rời. Chúng là **một**: nhiều
-lane dùng **chung một cây làm việc git**, nên chung luôn đĩa, chung index, chung HEAD.
-
-| Mã | Cái giá ĐO ĐƯỢC |
+| Đo | Số |
 |---|---|
-| ~~`KHUNG-59`~~ | chung **index** — **ĐÃ VÁ 1.8.9** bằng cửa `.githooks/commit-msg`; chờ một vòng audit sạch rồi gạch mã |
-| `KHUNG-50` | chung **đĩa + HEAD**: dấu xác nhận không ghi được → 3 lượt đủ bộ **29 phút**, 0 dấu |
-| `KHUNG-55` | chung **đĩa**: lane khác sửa dở một file `docs/` là cổng bạn ĐỎ, và lời nhắn **nói sai tên người** |
-| `KHUNG-51` | chung **đĩa**: suite đột biến ghi đè file thật đúng lúc lane khác `git add` |
+| Commit | **522** · trong đó **191 (37%)** chỉ sinh lại bảng, không việc nào |
+| Lần cắt bản | **78** — trong khi mục 0b có sẵn luật *"GOM BẢN PHÁT"* |
+| `scripts/` | **16.533 dòng** — **lõi** (khoá · cổng · đẩy · chạy test) chỉ **3.557 = 22%** |
+| Ba bộ sinh bảng | **5.733 dòng = 35%** — **nhiều hơn cả lõi**, và đẻ ra `KHUNG-63` |
+| Tổng kho | ~39.500 dòng · 23 suite (~8 phút) · 12 mục cổng · 142 bản trong sổ |
 
-**Đừng vá bốn lần.** Hỏi trước: *một `git worktree` riêng cho suite + bộ sinh đóng được mấy mục
-trong bốn?* Đo rồi mới quyết — vá từng mục là cách một bệnh sinh ra bốn bản vá không chữa gốc.
+**Gốc không phải "AI thêm nhiều tính năng". Gốc là repo KHÔNG CÓ VẠCH ĐÍCH** — nên mọi thứ đều
+là "còn thiếu", và mỗi phiên đều tìm được chỗ đáng vá. Từng bản vá đều đúng; cộng lại thì không.
 
-### Đợt 1 · TRẢ THUẾ — làm trước, hiệu quả đo được ngay
+## R0 · VẠCH ĐÍCH — Đức chốt, và nó CHẶN mọi đợt dưới
 
-| Mã | Vì sao đứng đây |
-|---|---|
-| `KHUNG-50` | **Việc kế.** Nửa còn lại của bài toán tốc độ, và 10/09 nó nổ hai lần trong một phiên: lane khác commit GIỮA LÚC suite chạy → `TREE_CHANGED`, mất dấu sau 461 giây xanh. Chữa bằng worktree riêng, không phải nới băm |
-| ~~`KHUNG-59`~~ | Đã vá 1.8.9 — cửa index. Đọc `CHANGELOG` 1.8.8→1.8.9 trước khi đụng lại: bốn fail-open của vòng audit đều là *tự viết bản thứ hai của một thứ đã có* |
-| `KHUNG-57` | `can-nang` **603 giây**, đắt hơn cả `npm test` |
-| `KHUNG-55` | Thước kho chữ đọc **ĐĨA** thay vì HEAD |
+> Bộ khung **XONG** khi một repo mới làm được **bốn việc**: nhận khoá · commit không cuốn việc
+> lane khác · cổng xanh · đẩy an toàn. **Mọi thứ khác là tuỳ chọn.**
 
-### Đợt 2 · CHỜ MỘT VÒNG AUDIT SẠCH — việc RẺ nhất, dọn được nhiều nhất
+Theo vạch này cả bốn **đã chạy thật, đo được**. Đức xác nhận hoặc sửa lại. Chưa chốt thì đừng
+bắt đầu Đợt 1 — không có vạch đích thì cắt gì cũng thành cãi nhau.
 
-`KHUNG-53` · `KHUNG-15` · `KHUNG-56` · `KHUNG-58` **đã có bản vá trong HEAD** và đã qua audit, nhưng
-chưa mục nào đóng — người sửa không tự ký nghiệm thu (mục 5). Còn lại: **một vòng audit không tìm
-thêm lỗi**, rồi gạch mã. Đọc `CHANGELOG.md` bản 1.8.1→1.8.7 trước — bốn vòng audit 10/09 để lại lý
-lẽ mà đọc code không thấy.
+## Đợt 1 · BỎ BỚT — không viết thêm dòng mã nào
 
-### Đợt 3 · CHỐNG TỰ DỐI — phép kiểm không phân biệt được hai nhánh là đồ trang trí
+| Mã | Việc | Cái được, đo được |
+|---|---|---|
+| `R1` | **Thôi commit bảng** — Đức đã chốt 06/09 *"bảng tự tươi, F5 là thấy"*, chưa ai làm | bỏ **37% commit**; mỗi commit đó còn kéo theo một lượt suite ~8 phút |
+| `R2` | **Cắt bản theo NGÀY**, mục tiêu ≤ 7/tuần, chỉ cắt khi thật có repo nhận | 78 → 7 |
+| `R3` | **ĐÓNG BĂNG** tính năng và phép kiểm tới khi xong Đợt 5 | việc ngoài phạm vi → ghi sổ, không tự làm |
 
-`KHUNG-9` → `KHUNG-47` → `KHUNG-44` → `KHUNG-4`. Độc lập nhau, song song được nếu khác khoá.
+`R1` gỡ luôn cái vòng `KHUNG-63` sinh ra. `R3` áp cho **cả AI lẫn người**.
 
-### Đợt 4 · ĐƯỜNG PHÁT HÀNH — `KHUNG-7` → `KHUNG-39`
+## Đợt 2 · DỤNG CỤ ĐỂ ĐỨC TỰ RÀ — chuyển việc phân loại về đúng người
 
-(`KHUNG-51` đã dời lên đợt 1 vì nó thuộc họ cây-làm-việc-chung.)
+| Mã | Việc | Vì sao |
+|---|---|---|
+| `R4` | **Bảng LUẬT**: số `L<mục>.<n>` **suy từ `AGENTS.md`**, kèm hai cột *máy nào canh* · *ca thật nào sinh ra* | Đức rà và gọi tên luật; số **không được gõ tay** — repo đã bị "bốn bản chép trôi lệch trong một ngày" |
+| `R5` | **Bảng SỔ NỢ**: mỗi mục một ô **giữ · gộp · bỏ** | AI mở `BACKLOG.md` tốn **20.300 token**; `what-next` chỉ **1.000**. Đức rà offline thì AI tốn **0** |
 
-### Đợt 5 · `Y-12` ONE LOADING LAW
+Đo sẵn cho `R4`: **7/9 mục luật** đang MIỄN khỏi phép dò; **§3 "Năm luật vàng" không luật nào có
+máy canh** — trong khi nó là mục được trích dẫn nhiều nhất.
 
-Bản đề xuất **619 dòng đã qua hai lượt review** ở repo `Chrome_Extension_AI_Agentic`.
-**ĐỌC TRƯỚC KHI THIẾT KẾ LẠI.**
+## Đợt 3 · CẮT MỠ theo đúng thứ Đức vừa rà
 
-### KHÔNG ĐỘNG VÀO — đang chờ Đức chốt: `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08`
+Một phép đo cho cả ba: **thứ chưa từng đổi hành vi của ai thì không đáng giữ.**
 
-### BỐN LUẬT LÀM VIỆC rút ra 10/09 — áp cho MỌI mục ở trên
+`R6` bỏ luật không có ca thật (bằng chứng ở [VI-SAO-LUAT](VI-SAO-LUAT.md)) · `R7` bỏ phép kiểm
+chưa từng bắt lỗi thật (23 suite · 12 mục cổng) · `R8` gộp ba bộ sinh bảng còn một.
 
-1. **Vá ba lần cùng một chỗ = đang vá SAI TẦNG.** Gốc là *ai được quyền định nghĩa*, không phải
-   regex nào còn thiếu.
-2. **Đề bài cho audit phải có THÂN HÀM, không chỉ `git diff`** — sandbox Codex không đọc được repo.
-3. **Đặt một câu bắt người audit soi chính QUYẾT ĐỊNH của mình**, không chỉ soi code.
-4. **Phép ghim chỉ gồm phủ định thì chưa ghim gì.** Vế thành công đòi **mã thoát 0 + một chuỗi
-   dương**; vế từ chối đòi **đúng thông báo của cửa đó**.
+**`R6` chạm luật chung** → phải đi qua `COMMON_LAW_SHA256` **và** một vòng audit độc lập. Nén tay
+đã làm rụng mệnh lệnh phụ **sáu lần**, lần gần nhất là 10/09.
 
-**GOM BẢN PHÁT** còn nguyên hiệu lực: mỗi lượt cắt bản là một lần mọi repo đích phải nâng.
+## Đợt 4 · SIẾT HAI CHỖ CÒN HỞ THẬT
 
-## Ba thứ roadmap này CỐ Ý không chứa
+`R9` **`post-commit` tự trả khoá file** — đã đo: hook thấy đúng nhãn và đúng mẻ, mã thoát của nó
+không ảnh hưởng `git commit`. Trả khoá thôi là kỷ luật, thành hệ quả của việc commit.
+`R10` **`--as` là lời tự khai** — dựng lại được 10/09: ai cũng trả được khoá của người khác chỉ
+bằng cách gõ tên họ, dấu niêm phong vẫn nguyên. Ba câu luật mục 1 hiện là chữ. **Thiết kế thật,
+đừng vá vội.**
 
-**Không gán HẠN** (repo chạy theo phiên, không theo lịch — ngày ở đây là *đã đo lúc nào*) ·
-**không có bản vá kỹ thuật cho từng mục** (việc của brief giao executor, `ORCHESTRATOR` mục 4b) ·
-**không nhắc lại nội dung từng mục nợ** (ở [BACKLOG.md](../BACKLOG.md); ở đây chỉ thứ tự).
+## Đợt 5 · ĐÓNG GÓI
+
+`R11` — **5 repo đích cùng một bản, cùng xanh**: `ALL_SKILL_MANAGEMENT` · `Project 3 AI Agent
+Unify` (đang 1.3.7x) · `Chrome_Extension_AI_Agentic` · `n8n-orchestrator` · `n8n_Local host`
+(1.8.0). Xong `R11` là xong.
+
+## Còn treo, đừng quên
+
+`KHUNG-63` **đã vá (1.8.12), CHƯA chạy suite, CHƯA đẩy** — việc đầu tiên sau compact.
+`KHUNG-59` chờ một vòng audit sạch rồi gạch mã · `KHUNG-60` (repo kia có `commit-msg` riêng, cùng
+đường dẫn — cần Đức quyết) · `KHUNG-50/55/51` là MỘT bệnh (nhiều lane chung một cây git), `R1`
+bớt được phần lớn cái giá của chúng.
+
+**KHÔNG ĐỘNG VÀO — chờ Đức chốt:** `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08`.
+
+## Ba luật làm việc, rút từ 10/09 — áp cho MỌI mục trên
+
+1. **Vá ba lần cùng một chỗ = đang vá SAI TẦNG.** Gốc là *ai được quyền định nghĩa*.
+2. **Đừng dựng nguồn sự thật thứ hai.** Ba trong bốn fail-open ngày 10/09 là *tự viết bản thứ hai
+   của một thứ đã có*: bộ đọc nhãn · cách đọc tên file · cách hỏi "cửa có đó không".
+3. **Phép ghim chỉ gồm phủ định thì chưa ghim gì.** Vế thành công đòi mã thoát 0 **cộng** một
+   chuỗi dương; vế từ chối đòi đúng thông báo của cửa đó.

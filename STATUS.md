@@ -5,13 +5,13 @@ name: Ark Repo Harness
 lifecycle: active
 last_verified: 2026-09-10
 last_verified_commit: d6da6a0290bbb58c1837be86f2dfaf6e0982a852
-last_verified_how: "23 suite · cổng đóng phiên XANH TOÀN BỘ · bản 1.8.10 (xem CHANGELOG)"
+last_verified_how: "23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHANGELOG)"
 evidence_ref: HANDOFF.md
 owner: harness-loi-02
 priority_rank: 1
-next_step: "`KHUNG-50` — dấu xác nhận suite không ghi được vì HEAD đổi giữa lượt. Hỏi trước khi vá: một `git worktree` riêng cho suite + bộ sinh đóng được mấy trong ba mục còn lại?"
+next_step: "Đọc `docs/ROADMAP-V2.md` TRƯỚC. `R0` — Đức chốt VẠCH ĐÍCH, nó chặn mọi đợt. Rồi `R1` thôi commit bảng (bỏ 37% commit). `KHUNG-63` đã vá 1.8.12 nhưng CHƯA chạy suite, CHƯA đẩy — làm nốt trước."
 version_source: package.json
-current_focus: "`KHUNG-50/55/51` là MỘT bệnh — nhiều lane chung một cây làm việc git (chung đĩa, chung HEAD). Đừng vá ba lần. `KHUNG-59` (chung INDEX) đã đóng 10/09 bằng cửa `.githooks/commit-msg`. Thứ tự ở docs/ROADMAP-V2.md; bản đồ sống `npm run what-next`."
+current_focus: "ĐÓNG GÓI, không hoàn thiện. Đo 7 ngày: 522 commit · 191 (37%) chỉ sinh bảng · 78 lần cắt bản · lõi chỉ 22% mã. ĐÓNG BĂNG tính năng và phép kiểm tới khi 5 repo đích cùng bản, cùng xanh."
 human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
