@@ -257,18 +257,21 @@ const bang = (khoa) => JSON.stringify({ claims: khoa });
      không phải lưới, nó là **thuế bắt buộc đóng mà không ai báo trước**.
      Tên trang suy từ khai báo của chính repo, không đóng cứng. */
   const khai = JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"));
+  /* MỘT vế = MỘT lời gọi `ok()`. Hai nhánh mỗi nhánh một `ok()` thì SỐ VẾ ĐẾM ĐƯỢC lệch số
+     vế CHẠY ĐƯỢC, và `core-contract` Đỏ — tôi mắc đúng lỗi này hai lần trong ngày. */
+  let nhan8b = "8b · `[]` hợp lệ mà vắng khoá vẫn mặc định";
   if (!Array.isArray(khai.generators) || khai.generators.length > 0) {
-    ok("8b · `[]` hợp lệ mà vắng khoá vẫn mặc định (repo này chưa khai `generators: []` — bỏ phần chính sách R1)");
+    nhan8b += " (repo này chưa khai `generators: []` — bỏ phần chính sách R1)";
   } else {
-    // (3) CÂY HEAD, không phải index.
     const trang = tenTrang(readFileSync(join(ROOT, ".repo-structure.json"), "utf8"));
     assert.equal(biBoQua(trang), true, `trang HTML ${trang} PHAI bi .gitignore bo qua`);
     assert.ok(!trongHEAD.has(trang), `trang HTML ${trang} KHONG duoc nam trong cay HEAD`);
     for (const f of ["llms.txt", "DASHBOARD.md", "repo-map.json"]) {
       assert.ok(trongHEAD.has(f), f + " PHAI o lai trong cay HEAD — llms.txt la goc dieu huong cua B6");
     }
-    ok(`8b · \`[]\` hợp lệ mà vắng khoá vẫn mặc định · ${trang} ngoài cây HEAD · ba file text ở lại`);
+    nhan8b += ` · ${trang} ngoài cây HEAD · ba file text ở lại`;
   }
+  ok(nhan8b);
 }
 
 /* ---- 9. BĂNG: gỡ được, không chồng, và NÓI RA thứ nó không thấy ---------- */

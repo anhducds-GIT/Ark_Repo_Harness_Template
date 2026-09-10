@@ -21,6 +21,31 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 4) · harness-loi-02 — lỗi 8: bản trích cưỡng chế chính sách repo nhà
+
+**Lỗi 8.** Vế 8b của `bang-song` đóng cứng `DASHBOARD-Ark-Repo-Harness.html` — tên trang của
+**riêng repo nhà** — rồi bản trích mang vế đó sang **mọi repo đích**. Ở đó nó Đỏ vì **một tên file
+không tồn tại**, không phải vì repo đó sai. Đo ở `n8n_Local host`.
+
+Tách hai loại: **hành vi của mã** chạy mọi nơi; **chính sách `R1`** chỉ chạy ở repo đã khai
+`generators: []`, và tên trang **suy từ khai báo của chính repo** (`tenTrang`). Repo chưa khai thì
+vế NÊU TÊN phần bỏ.
+
+> Một phép kiểm cưỡng chế chính sách mà repo chưa nhận thì **không phải lưới — nó là thuế bắt
+> buộc đóng mà không ai báo trước.**
+
+**TÔI MẮC LẠI MỘT LỖI CỦA CHÍNH MÌNH, lần thứ HAI trong ngày:** nhánh điều kiện của tôi thêm
+`ok()` thứ hai cho **cùng một vế** → số vế ĐẾM ĐƯỢC (16) lệch số vế CHẠY ĐƯỢC (15) → `core-contract`
+Đỏ. **Luật: MỘT vế = MỘT lời gọi `ok()`; nhánh thì đổi NHÃN, không thêm lời gọi.** Lần đầu là
+vế 6 của `cua-index` sáng nay — cùng hình dạng, cùng cách sửa.
+
+**ĐỘT BIẾN GIẢ, lần thứ HAI:** `String.replace` sửa **nhánh XANH** vì câu XANH và câu Đỏ dùng chuỗi
+giống nhau, rồi báo thành công. **Neo vào mã lỗi, và ĐỌC LẠI file sau khi ghi.**
+
+**TỔNG NGÀY: 8 lỗi lõi, 0 do phép kiểm ở nhà tìm ra.** Cả tám nằm trên con đường repo nhà không
+tự đi — đúng câu một phiên cũ đã ghi trong `build-dashboard.mjs`: *"thứ gì repo nhà không dùng thì
+repo nhà không kiểm được"*. Đây là bằng chứng số cho câu đó.
+
 ## 2026-09-10 (tiep 3) · harness-loi-02 — lỗi 6 và 7: `Audit:` và phép kiểm tự mù
 
 **Lỗi 6** — `auditFromMessage` quét cả **dòng tiêu đề**, mà `Audit:` là TRAILER. Ca nặng nhất: một
