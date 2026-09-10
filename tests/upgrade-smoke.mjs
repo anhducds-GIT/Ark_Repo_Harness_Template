@@ -106,31 +106,52 @@ const dungRepo = (ghiSoGhim) => {
   /* HỎI BẰNG ĐUÔI FILE LÀ HỎI LẠI CHÍNH ĐỊNH NGHĨA ĐANG SAI — lần thứ hai của vế này.
    *
    * Bản trước quét `/\.(mjs|cmd)$/`, nên nó mù với thứ chạy được KHÔNG CÓ ĐUÔI. Đo 10/09:
-   * `.githooks/commit-msg` (git gọi đúng cái tên đó, không gọi `commit-msg.mjs`) lọt khỏi tầng
-   * máy, và vế này vẫn XANH. Hai hệ quả dựng lại được: dấu vân tay bản phát KHÔNG đổi khi vô
-   * hiệu hoá hoàn toàn cửa index · `upgrade --plan` kể `tests/cua-index.mjs` là THIẾU mà không
-   * nhắc cái hook, nên repo đích nhận phép ghim mà không nhận thứ nó ghim → `ENOENT` lượt đầu.
+   * `.githooks/commit-msg` (git gọi đúng cái tên đó) lọt khỏi tầng máy và vế này vẫn XANH.
    *
-   * Nay hỏi bằng thứ file TỰ KHAI: đuôi máy, HOẶC hai byte `#!`. */
+   * MÁY DÒ, KHÔNG PHẢI QUY TẮC SỞ HỮU. Vòng audit độc lập bắt bản vá đầu của tôi: cho `#!`
+   * quyết định tư cách tầng máy là để tư cách phụ thuộc vào chính nội dung đang cần băm — gỡ
+   * dòng `#!` là file rơi khỏi tập băm, nên `exit 0` và `exit 1` cho CÙNG một dấu vân tay.
+   * Nên tư cách đi theo ĐƯỜNG DẪN (`TEP_MAY_THEM`), còn `#!` ở lại ĐÂY: nó chặn phát hành khi
+   * bộ khung mọc thêm một file chạy được mà chưa ai khai. */
   const chayDuoc = [...chuan.keys()].filter((r) =>
     /\.(mjs|cmd)$/.test(r) || String(chuan.get(r) ?? "").startsWith("#!"));
   const bo = chayDuoc.filter((r) => !tap.has(r));
   assert.deepEqual(bo, [],
-    `${bo.length} file chay duoc bi BO QUEN khoi tap nang cap: ${bo.join(", ")} — repo dich se nhan phep ghim ma khong nhan thu no kiem`);
+    `${bo.length} file chay duoc bi BO QUEN khoi tap nang cap: ${bo.join(", ")}`
+    + " — repo dich se nhan phep ghim ma khong nhan thu no kiem. Khai duong dan do vao TEP_MAY_THEM.");
   assert.ok(chayDuoc.some((r) => !/\.(mjs|cmd)$/.test(r)),
-    "ban trich phai co it nhat MOT file chay duoc khong co duoi (git hook), neu khong ve tren khong ghim gi moi");
+    "ban trich phai co it nhat MOT file chay duoc khong co duoi (git hook), neu khong ve tren khong ghim gi");
 
-  /* CHIỀU 3 — quy tắc `#!` KHÔNG được nuốt file của repo đích. `TEP_CUA_REPO_DICH` thắng.
+  /* MÁY DÒ PHẢI CÒN RĂNG khi bộ khung mọc thêm hook thứ hai — dựng nổi ca đó, đừng chỉ soi bản
+     trích hôm nay. Một file chạy được mới mà chưa ai khai thì vế trên PHẢI đỏ. */
+  {
+    const themHook = new Map(chuan);
+    themHook.set(".githooks/pre-push", "#!/bin/sh\nexit 0\n");
+    const soHoLot = [...themHook.keys()].filter((r) =>
+      String(themHook.get(r) ?? "").startsWith("#!") && !new Set(fileMay(themHook)).has(r));
+    assert.deepEqual(soHoLot, [".githooks/pre-push"],
+      "them mot hook moi ma khong khai thi phep ghim PHAI bat duoc — neu khong, may do nay la do trang tri");
+  }
+
+  /* CHIỀU 3 — file của repo đích KHÔNG BAO GIỜ vào tầng máy.
    *
-   * PHẢI DỰNG NỔI CA HỎNG, không chỉ soi bản trích thật. Đo 10/09: vế đầu tôi viết chỉ hỏi
-   * *"ba file đó có trong tầng máy không"* — và chúng không có shebang, nên vế XANH cả khi lớp
-   * chặn bị gỡ hẳn (đột biến ⑿). Một vế không phân biệt được hai nhánh là đồ trang trí.
-   * Nên: NHÉT shebang vào chính ba file đó rồi hỏi lại. */
-  const bay = new Map(chuan);
-  for (const rel of TEP_CUA_REPO_DICH) bay.set(rel, `#!/bin/sh${String.fromCharCode(10)}${chuan.get(rel) ?? "{}"}`);
-  const nuot = fileMay(bay).filter((r) => TEP_CUA_REPO_DICH.includes(r));
-  assert.deepEqual(nuot, [],
-    `file CUA REPO DICH bi nuot vao tang may chi vi co dong #!: ${nuot.join(", ")} — ghi de chung la xoa repo cua nguoi ta`);
+   * GÕ THẲNG BA TÊN, không đọc `TEP_CUA_REPO_DICH`. Vòng audit 10/09 nêu đúng chỗ này: vế đọc
+   * chính danh sách nó canh thì XOÁ một tên khỏi danh sách là vế tự thu hẹp theo, và nó xanh.
+   * Một phép kiểm đọc cùng nguồn với thứ nó kiểm thì không kiểm gì. */
+  for (const rel of ["package.json", ".repo-structure.json", ".agents/claims.json"]) {
+    assert.ok(!tap.has(rel), `${rel} la file CUA REPO DICH, khong duoc vao tang may`);
+  }
+
+  /* VÀ ĐÂY LÀ ĐƯỜNG DUY NHẤT CÒN LẠI để một file repo đích lọt vào: có người khai tên nó vào
+   * `TEP_MAY_THEM`. Lớp chặn `TEP_CUA_REPO_DICH` trong `fileMay` là dây an toàn; vế này là cái
+   * nói ra trước khi ai đó phải dựa vào dây.
+   *
+   * Vế cũ của tôi ở chỗ này NHÉT `#!` vào ba file rồi hỏi lại — nó có răng khi tư cách tầng máy
+   * đọc từ NỘI DUNG. Tư cách nay đọc từ ĐƯỜNG DẪN, nên phép nhét ấy không còn chạm gì: đột biến
+   * ⒂ (gỡ hẳn lớp chặn) vẫn XANH. Giữ một vế đã hết răng là tự nói dối về mức che phủ. */
+  const trung = TEP_MAY_THEM.filter((r) => TEP_CUA_REPO_DICH.includes(r));
+  assert.deepEqual(trung, [],
+    `khai file CUA REPO DICH vao tang may la ghi de repo cua nguoi ta: ${trung.join(", ")}`);
 
   assert.ok(ds.length >= 6, `phai co it nhat 6 file may, dang ${ds.length}`);
   ok(`chỉ tầng máy được nâng cấp — ${ds.length} file chạy được (kể cả không-đuôi), 0 file chữ`);
@@ -910,6 +931,18 @@ const dungRepo = (ghiSoGhim) => {
   doi.set("features.json", String(chuan.get("features.json")).replace('"version"', '"ban_doi_roi"'));
   assert.notEqual(bamBanTrich(doi), bamBanTrich(chuan),
     "đổi features.json mà dấu vân tay bản phát không đổi — sổ phát hành sẽ nói dối");
+
+  /* VÀ PHỦ CẢ CÁI HOOK — ca thật của 1.8.9, cộng ca mà vòng audit 10/09 lôi ra.
+     Hai hook TRÁI NGƯỢC nhau và ĐỀU mất dòng `#!` vẫn phải cho hai dấu vân tay khác nhau. Bản vá
+     đầu của tôi cho chúng cùng một dấu, vì tư cách tầng máy khi đó đọc từ nội dung. */
+  const hookTat = new Map(chuan);
+  hookTat.set(".githooks/commit-msg", "#!/bin/sh\nexit 0\n");
+  assert.notEqual(bamBanTrich(hookTat), bamBanTrich(chuan),
+    "vo hieu hoa cua index ma dau van tay khong doi — dung ca ban 1.8.9");
+  const khongShebang0 = new Map(chuan); khongShebang0.set(".githooks/commit-msg", "exit 0\n");
+  const khongShebang1 = new Map(chuan); khongShebang1.set(".githooks/commit-msg", "exit 1\n");
+  assert.notEqual(bamBanTrich(khongShebang0), bamBanTrich(khongShebang1),
+    "hai hook trai nguoc nhau, deu mat dong #!, van phai khac dau van tay — tu cach tang may KHONG duoc doc tu noi dung");
   ok(`dữ liệu máy: ${TEP_MAY_THEM.length} file khai đều có thật · ${TEP_CUA_REPO_DICH.length} file của repo đích đều bị loại · bộ đo đi cùng thứ nó đo · dấu vân tay phủ được`);
 }
 

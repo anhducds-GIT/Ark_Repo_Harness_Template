@@ -1356,7 +1356,7 @@ export const DUOI_MAY = Object.freeze([".mjs", ".cmd"]);
  * "cấu hình của repo đích" — `package.json` · `.repo-structure.json` · `.agents/claims.json`
  * cũng là `.json` trong bản trích, và ghi đè bất kỳ cái nào là xoá repo của người ta. Nên thà
  * một danh sách ngắn có phép ghim canh, hơn một quy tắc rộng đoán sai một lần là mất dữ liệu. */
-export const TEP_MAY_THEM = Object.freeze(["features.json"]);
+export const TEP_MAY_THEM = Object.freeze(["features.json", ".githooks/commit-msg"]);
 
 /* Ba file này là CỦA REPO ĐÍCH, không bao giờ được vào tầng máy. Phép ghim đọc danh sách này
    chứ không gõ lại tên — hai bản chép sẽ lệch. */
@@ -1366,30 +1366,31 @@ export const TEP_CUA_REPO_DICH = Object.freeze([
 
 /* THỨ CHẠY ĐƯỢC MÀ KHÔNG CÓ ĐUÔI — cùng một lỗ, lần thứ TƯ, và lần này là một git hook.
  *
- * Quy tắc "theo đuôi file" ở trên tự đúng khi bộ khung mọc thêm THƯ MỤC mã. Nó KHÔNG tự đúng
- * khi bộ khung mọc thêm một file chạy được **không có đuôi** — và git hook thì bắt buộc phải
- * thế: git gọi đúng cái tên `commit-msg`, không gọi `commit-msg.mjs`.
+ * Quy tắc "theo đuôi file" tự đúng khi bộ khung mọc thêm THƯ MỤC mã. Nó KHÔNG tự đúng khi bộ
+ * khung mọc thêm một file chạy được **không có đuôi** — và git hook bắt buộc phải thế: git gọi
+ * đúng cái tên `commit-msg`, không gọi `commit-msg.mjs`.
  *
  * ĐO 10/09, ngay sau khi phát 1.8.9: `.githooks/commit-msg` có trong bản trích nhưng KHÔNG vào
- * `bamBanTrich`. Vô hiệu hoá hoàn toàn cửa index → dấu vân tay **không đổi một ký tự**. Tức sổ
- * phát hành nói dối về một bản đã phát, đúng câu đã viết cho `features.json` ở trên. Và hệ quả
- * thứ hai, đúng nguyên văn ca `bang-song/` 1.3.26: `upgrade --plan` kể `tests/cua-index.mjs` là
- * THIẾU mà không hề nhắc `.githooks/commit-msg` — repo đích nhận phép ghim, không nhận thứ nó
- * ghim, và suite bên đó chết `ENOENT` ngay lượt đầu. Dựng lại được cả hai.
+ * `bamBanTrich`. Vô hiệu hoá hoàn toàn cửa index → dấu vân tay không đổi một ký tự. Và
+ * `upgrade --plan` kể `tests/cua-index.mjs` là THIẾU mà không nhắc cái hook — repo đích nhận
+ * phép ghim, không nhận thứ nó ghim, suite bên đó chết `ENOENT`. Ca `bang-song/` 1.3.26 nguyên văn.
  *
- * DÙNG QUY TẮC, KHÔNG DÙNG DANH SÁCH: `#!` ở hai byte đầu là lời tự khai *"tôi chạy được"* của
- * chính file. Một danh sách gõ tay thì đợi người sau nhớ, và ba lần trước đã cho thấy không ai
- * nhớ. Khác `TEP_MAY_THEM` cho `.json` — ở đó không có phép suy nào tách được dữ liệu bộ khung
- * khỏi cấu hình repo đích, nên phải khai tay. Ở đây có.
+ * BẢN VÁ ĐẦU CỦA TÔI SAI TẦNG, và vòng audit độc lập bắt được: tôi cho `#!` QUYẾT ĐỊNH tư cách
+ * tầng máy. Tức tư cách phụ thuộc vào **chính nội dung đang cần băm** — gỡ dòng `#!` là file rơi
+ * khỏi tập băm, nên `exit 0` và `exit 1` (hai hook trái ngược nhau) cho **cùng một dấu vân tay**.
+ * Dựng lại được: cả hai ra `5af2e421f591117b`, đúng dấu vân tay hỏng của 1.8.9. Vá một cái lỗ
+ * bằng một cửa hậu cùng hình dạng.
  *
- * `TEP_CUA_REPO_DICH` vẫn thắng: không file nào của repo đích được vào tầng máy, kể cả nếu một
- * ngày nào đó nó mọc ra dòng `#!`. */
+ * NÊN: **tư cách theo ĐƯỜNG DẪN** (`TEP_MAY_THEM`), y như `features.json` — đường dẫn không đổi
+ * khi nội dung đổi, nên nó là mốc dùng được. Còn `#!` làm việc nó làm được: **MÁY DÒ** trong phép
+ * ghim, chặn phát hành khi bộ khung mọc thêm một file chạy được mà chưa ai khai. Danh sách vẫn
+ * đợi người sau nhớ — nhưng nay có một phép kiểm nhắc thay, và nhắc trước khi phát. */
 export const laShebang = (noiDung) => String(noiDung ?? "").startsWith("#!");
 
 export function fileMay(chuan) {
   return [...chuan.keys()].filter((rel) => {
     if (TEP_CUA_REPO_DICH.includes(rel)) return false;
-    return DUOI_MAY.some((d) => rel.endsWith(d)) || TEP_MAY_THEM.includes(rel) || laShebang(chuan.get(rel));
+    return DUOI_MAY.some((d) => rel.endsWith(d)) || TEP_MAY_THEM.includes(rel);
   });
 }
 
