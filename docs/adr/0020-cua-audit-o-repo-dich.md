@@ -1,7 +1,8 @@
 ---
 status: Accepted
 adr: 0020
-chu_de: cong-kiem
+chu_de: ranh-gioi
+thuoc: 0001
 date: 2026-09-11
 deciders: AI (Đức uỷ quyền — `AGENTS.md` mục 2 "Đổi luật an toàn")
 ---
