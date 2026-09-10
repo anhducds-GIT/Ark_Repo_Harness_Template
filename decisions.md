@@ -850,3 +850,45 @@ thêm luật mới · thêm tài liệu mới. Việc ngoài phạm vi → ghi `
 
 Áp cho **cả AI lẫn người**. Vì sao cần một dòng chốt: repo chết vì phình, và mỗi bản vá riêng lẻ
 đều đúng — cộng lại thì không. Đo: `scripts/` 16.533 dòng mà lõi thật chỉ **22%**.
+
+## 2026-09-10 — Rút SÁU việc phải hỏi Đức xuống BA. Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI
+
+Đức: *"bản chất tôi muốn AI hoàn toàn tự chủ động và quyết định, vì tôi không code nên không tham
+gia control. Làm thế nào hệ thống ổn định an toàn + tiết kiệm usage để không phải nhắc đi nhắc lại,
+hỏi đi hỏi lại tôi là được."*
+
+**An toàn hôm nay KHÔNG đến từ việc Đức duyệt.** Đo ngày 10/09, trên một bản vá ~20 dòng mã:
+
+| Ai bắt lỗi | Số lỗi |
+|---|---|
+| Cổng kiểm (máy) | 4 |
+| Audit độc lập (Codex, 6 vòng) | 11 |
+| Chính bản vá làm lộ ra | 3 |
+| AI tự thấy | 2 |
+| **Đức** | **0 lỗi mã** |
+
+Nhưng Đức bắt **hai thứ máy không thấy**: bảng vạch đích thiếu ô *bộ sinh BẢNG* và *một vòng
+sửa → đẩy*, và quyết định **đánh đổi** lớp "artifact còn tươi" để lấy tốc độ. Đó là đường phân
+chia đúng: **Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI.** Hỏi Đức một câu đúng/sai là hỏi người
+không có dữ liệu — vừa tốn lượt, vừa cho câu trả lời kém hơn máy.
+
+**GIỮ ba việc:** xoá/sửa dữ liệu gốc · gửi ra ngoài · tạo automation tự chạy. Cả ba là quyết định
+của **người sở hữu**, không phải câu hỏi kỹ thuật.
+
+**BA VIỆC CŨ KHÔNG ĐƯỢC NỚI — chúng thành ĐIỀU CẤM.** Đây là chỗ dễ đọc sai nhất: rút khỏi danh
+sách "phải hỏi" KHÔNG có nghĩa là được phép. Một luật máy luôn có hiệu lực; một câu hỏi thì bỏ qua
+được, trả lời sai được, và quên được.
+- `--carry` khi cổng chưa xanh toàn bộ → **CẤM**, không còn đường "hỏi rồi làm".
+- Giành vùng phiên khác đang giữ → **CẤM**, ba đường hợp lệ vẫn như mục 1.
+- Đổi luật an toàn → **AI tự quyết**, đủ ba điều kiện MÁY: audit độc lập sạch · một dòng sổ này
+  nói rõ **cái MẤT** · không làm yếu một lớp bảo vệ mà không **gọi tên** thứ mất đi.
+
+**CÁI MẤT, nói thẳng.** Từ nay không còn một con người nào đứng giữa AI và lịch sử repo cho những
+việc lùi lại được. Nếu cổng và audit cùng sai thì không ai chặn. Đổi lấy: Đức thôi bị hỏi những
+câu Đức không có dữ liệu để trả lời, và chuỗi việc chạy liền không đứt.
+
+**Kèm theo, cùng ngày — LUẬT PHẢI CÓ HOOK.** Đức: *"các luật cũng cần kèm cơ chế hook, chứ không
+thì AI vẫn làm sai, vì hệ thống rule của ta hơi dày."* Hai cửa máy dựng ngay lượt này (`T2`):
+`commit-msg` chặn mẻ chạm tầng máy mà chưa cắt bản (11 phút → 0,2 giây), và `post-commit` tự trả
+khoá file. Cách chữa "rule dày" **không phải viết luật ngắn hơn** mà là: **luật nào không có máy
+canh thì XOÁ** — nó vẫn chiếm chỗ đọc của mọi phiên và cho cảm giác an toàn sai.

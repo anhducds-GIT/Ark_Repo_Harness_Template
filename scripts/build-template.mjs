@@ -646,8 +646,33 @@ function phanLuatChung(text) {
  *   LUẬT CHUNG GỌI TÊN MỘT FILE, nên file đó PHẢI đi theo bản trích: `.githooks/commit-msg` và
  *   `tests/cua-index.mjs` vào danh sách ngay lượt này. Bẫy *"luật trỏ tới thứ chỉ nơi phát hành
  *   mới có"* đã bắt được năm lần ở sổ này; lần này chặn trước khi phát.
- *   Vân tay trước: 956bd6f139a744ff96062b34f615e9c6a9bc744d4f5211bc07b51ebeb3e438cd */
-const COMMON_LAW_SHA256 = "6cce53b34852abf0920f1dd3acc7834d0252f7aa52633eb8c73313b97db1339c";
+ *   Vân tay trước: 956bd6f139a744ff96062b34f615e9c6a9bc744d4f5211bc07b51ebeb3e438cd *
+ * ĐỔI 10/09 — MỤC 2, SÁU VIỆC PHẢI HỎI ĐỨC XUỐNG BA. Đức chốt bằng chữ của mình: *"bản chất tôi
+ *   muốn AI hoàn toàn tự chủ động và quyết định, vì tôi không code nên không tham gia control…
+ *   tiết kiệm usage để cứ phải nhắc đi nhắc lại, hỏi đi hỏi lại tôi là được."*
+ *
+ *   GIỮ ba việc — xoá/sửa dữ liệu gốc · gửi ra ngoài · tạo automation tự chạy. Cả ba là quyết
+ *   định của NGƯỜI SỞ HỮU, không phải câu hỏi kỹ thuật.
+ *
+ *   BA VIỆC CŨ KHÔNG ĐƯỢC NỚI — chúng thành ĐIỀU CẤM, và đây là chỗ dễ đọc sai nhất của lượt
+ *   đổi này: rút khỏi danh sách "phải hỏi" KHÔNG nghĩa là được phép. `--carry` khi cổng chưa
+ *   xanh → CẤM. Giành vùng phiên khác đang giữ → CẤM. Đổi luật an toàn → AI tự quyết, đủ BA
+ *   điều kiện máy (audit độc lập sạch · `decisions.md` nói cái MẤT · không làm yếu lớp bảo vệ
+ *   mà không gọi tên thứ mất đi). Một luật máy luôn có hiệu lực; một câu hỏi thì bỏ qua được,
+ *   trả lời sai được, và quên được.
+ *
+ *   BẰNG CHỨNG, không phải cảm tính: đo cùng ngày trên một bản vá ~20 dòng mã — cổng bắt 4 lỗi,
+ *   audit độc lập bắt 11, bản vá tự làm lộ 3, AI tự thấy 2, **Đức bắt 0 lỗi mã**. Nhưng Đức bắt
+ *   hai thứ máy không thấy: một ô thiếu trong vạch đích, và một đánh đổi đáng làm. Nên đường
+ *   phân chia là: **Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI.**
+ *
+ *   CÁI MẤT: từ nay không còn con người nào đứng giữa AI và lịch sử repo cho những việc lùi lại
+ *   được; cổng và audit cùng sai thì không ai chặn. Ghi ở `decisions.md` cùng ngày.
+ *
+ *   Mục 2 giữ ĐÚNG 21 dòng như bản cũ — phần lý lẽ xuống `decisions.md`, vì luật là thứ MỌI
+ *   phiên phải nạp. Đo: phần nạp **4.196/4.200 token**.
+ *   Vân tay trước: 6cce53b34852abf0920f1dd3acc7834d0252f7aa52633eb8c73313b97db1339c */
+const COMMON_LAW_SHA256 = "6cabbb5689a02fe049a8c48ad782ca1360ee4f27f0c92bca45591b4d0b6146a5";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

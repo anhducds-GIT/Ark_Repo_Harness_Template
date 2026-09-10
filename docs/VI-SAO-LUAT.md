@@ -62,7 +62,7 @@ nói repo chưa thấy gì, không nói lane kia rảnh.
 được quyền, và luật mục 7 bắt MỌI phiên ghi Log. Miễn chỉ khi **THÊM dòng** — sửa hay xoá dòng cũ
 là viết lại lịch sử phiên khác.
 
-## Mục 2 — sáu việc phải hỏi
+## Mục 2 — ba việc phải hỏi (rút từ sáu, 10/09)
 
 Danh sách này từng có **ba bản chép tay nói ba kiểu khác nhau**. Nay `AGENTS.md` giữ bản duy nhất
 và file khác chỉ được trỏ sang.

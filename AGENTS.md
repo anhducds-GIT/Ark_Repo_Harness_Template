@@ -69,26 +69,26 @@ chỉ NÊU TÊN lane đang giữ. Ba đường hợp lệ: chính lane đó tr�
 Ba luật cơ chế còn lại — chứa nhau hai chiều · chia gốc repo thành nhiều khoá · hai file được miễn —
 máy tự chặn và tự nêu tên khoá thiếu: [MULTIFLOW](docs/protocols/MULTIFLOW.md).
 
-## 2. Sáu việc PHẢI hỏi Đức trước
+## 2. BA việc phải hỏi Đức — mọi việc khác AI tự quyết
 
 > **BẢN DUY NHẤT của danh sách này trong cả repo.** File khác chỉ được trỏ sang đây, không chép lại.
 
-| # | Việc | Vì sao không lùi lại được |
+| # | Việc | Vì sao Đức, không phải máy |
 |---|---|---|
-| 1 | Xoá file, hoặc sửa dữ liệu gốc | Mất là mất |
-| 2 | `--carry` khi cổng CHƯA xanh toàn bộ, hoặc có commit không quy thuộc được | Công bố việc chưa ai duyệt |
-| 3 | Giành vùng một phiên khác đang giữ | Người kia mất việc mà không biết |
-| 4 | Gửi bất cứ gì ra ngoài (mail, tin nhắn, đăng công khai) | Ra rồi thì không rút về |
-| 5 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
-| 6 | Đổi luật an toàn của repo | Đổi thứ đang canh mọi thứ khác |
+| 1 | Xoá file, hoặc sửa dữ liệu gốc | Mất là mất, và đó là tài sản của chủ repo |
+| 2 | Gửi bất cứ gì ra ngoài (mail, tin nhắn, đăng công khai) | Ra rồi thì không rút về |
+| 3 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
 
-Ngoài sáu việc này, AI tự làm. **Tự do trong phạm vi làm repo tốt lên và LÙI LẠI ĐƯỢC; cái gì
-không lùi lại được, hoặc chạm tới việc người khác, thì hỏi.** *"Luật an toàn"* ở hàng 6 là năm
-thứ nào — [LEGEND](docs/LEGEND.md). Phụ lục nghề (`docs/ANNEX-*.md`) chỉ được **thêm** việc phải hỏi.
+Đức chốt 10/09, rút từ sáu xuống ba — **Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI**; số đo ở
+[decisions](decisions.md). Ba việc cũ thành **ĐIỀU CẤM**, không phải được nới:
+
+- **CẤM** `--carry` khi cổng chưa XANH TOÀN BỘ, hoặc có commit không quy thuộc được.
+- **CẤM** giành vùng phiên khác đang giữ — ba đường hợp lệ vẫn như mục 1.
+- **Đổi luật an toàn: AI tự quyết** — audit độc lập sạch · `decisions.md` nói cái **MẤT** · không làm yếu lớp bảo vệ mà không **gọi tên** thứ mất đi.
 
 **Commit và push tự làm** khi đủ ba: (1) việc hoàn tất trọn vẹn; (2) cổng XANH TOÀN BỘ, code thì
-đã qua audit độc lập; (3) đẩy bằng `safe-push.mjs`. **Đủ ba điều đó thì `--carry` cũng tự làm**,
-miễn mọi commit mang nhãn `Lane:` quy thuộc được. Vẫn phải hỏi: force-push, sửa lịch sử, merge `main`.
+đã qua audit độc lập; (3) đẩy bằng `safe-push.mjs`. Đủ ba đó thì `--carry` cũng tự làm, miễn mọi
+commit quy thuộc được. **Vẫn hỏi: force-push, sửa lịch sử, merge `main`.** *"Luật an toàn"* — [LEGEND](docs/LEGEND.md); phụ lục nghề chỉ được **thêm** việc phải hỏi.
 
 ## 3. Năm luật vàng
 

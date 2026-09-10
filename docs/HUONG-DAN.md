@@ -86,7 +86,7 @@ Ba con số quan trọng hơn một phần trăm:
 
 ### "Tôi cần duyệt những gì?"
 
-Danh sách đầy đủ ở **[AGENTS.md mục 2 — Sáu việc PHẢI hỏi Đức trước](../AGENTS.md#2-sáu-việc-phải-hỏi-đức-trước)**.
+Danh sách đầy đủ ở **[AGENTS.md mục 2 — BA việc phải hỏi Đức](../AGENTS.md#2-ba-việc-phải-hỏi-đức--mọi-việc-khác-ai-tự-quyết)**.
 Đó là **một bản duy nhất**, cố ý không chép lại ở đây — ba bản chép tay đã từng nói ba kiểu
 khác nhau, và đó đúng là thứ nguy hiểm nhất trong cả tập tài liệu này.
 
