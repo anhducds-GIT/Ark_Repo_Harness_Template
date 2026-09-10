@@ -319,6 +319,19 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
  * và từ lúc đó nó không canh gì nữa. Ca `--amend` là ca tôi thiết kế để chống chặn oan: nhánh
  * amend đọc mẻ so với `HEAD^`, nên số bản cũng phải so với `HEAD^`. */
 {
+  /* VẾ NÀY CHỈ ĐO ĐƯỢC Ở NƠI PHÁT HÀNH, và nó phải NÓI RA chứ không giả vờ đo.
+   *
+   * Cửa tầng máy đọc ba hằng số từ `scripts/build-template.mjs` — file CỐ Ý không đi theo bản
+   * trích (nó là một trong hai dấu hiệu "nơi phát hành"). Nên ở một repo dựng từ bản trích,
+   * cửa đó không thể chạy, và cũng KHÔNG CẦN: `.mjs` ở đó là mã của họ.
+   *
+   * `template-null-repo` bắt được đúng chỗ này: nó chạy suite CỦA repo giả, và vế này đòi một
+   * thông báo mà repo giả không có cách nào sinh ra. Bỏ qua có điều kiện là câu trả lời ĐÚNG —
+   * còn dựng một `build-template.mjs` giả để vế xanh thì là đo chính cái giả đó.
+   *
+   * Ca ⑺ (repo KHÔNG phải nơi phát hành thì cửa không áp) VẪN chạy ở mọi repo — nó là ranh
+   * giới, và ranh giới thì phải đúng ở cả hai bên. */
+  const coBoPhatHanh = fs.existsSync(path.join(ROOT, "scripts", "build-template.mjs"));
   const t2 = fs.mkdtempSync(path.join(os.tmpdir(), "ark-cua-may-"));
   const g2 = (...a) => execFileSync("git", a, { cwd: t2, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   const cm = (msg, ...them) => {
@@ -358,6 +371,9 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     g2("config", "core.hooksPath", ".githooks");
     const dinh = () => g2("rev-parse", "HEAD").trim();
 
+    if (!coBoPhatHanh) {
+      ok("6 · cửa tầng máy — BỎ QUA ở repo dựng từ bản trích: nó là cửa của NƠI PHÁT HÀNH, và `scripts/build-template.mjs` cố ý không đi theo bản trích");
+    } else {
     // ⑴ CHẶN: chạm tầng máy, số bản không đổi.
     const truoc = dinh();
     ghi("scripts/may.mjs", "// v2\n");
@@ -435,6 +451,7 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     assert.equal(h.ma, 0, `repo KHONG phai noi phat hanh thi cua tang may khong ap: ${h.ra.slice(0, 300)}`);
 
     ok("6 · cửa tầng máy — TÁM nhánh: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` · và KHÔNG áp ở repo không phải nơi phát hành");
+    }
   } finally {
     fs.rmSync(t2, { recursive: true, force: true });
   }
