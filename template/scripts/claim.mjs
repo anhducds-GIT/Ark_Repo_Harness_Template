@@ -818,8 +818,13 @@ async function main() {
   if (flag("sau-commit")) {
     const goc = typeof flag("goc") === "string" ? path.resolve(flag("goc")) : ROOT;
     const gitO = (...a) => execFileSync("git", ["-c", "core.quotepath=false", ...a], { cwd: goc, encoding: "utf8" });
+    /* CHOT COMMIT DANG XU LY — kiem toan 10/09 [B]#5. Doc loi nhan roi doc danh sach file bang
+     * HAI lan hoi "HEAD" thi giua hai lan do mot lane khac co the commit, va cua nay se tra khoa
+     * theo danh sach file cua MOT commit khac voi commit no doc nhan. Giai mot lan, dung mot SHA. */
+    let dinh = "HEAD";
+    try { dinh = gitO("rev-parse", "HEAD").trim(); } catch { process.exit(EXIT.OK); }
     let khai = { lane: null, problem: null };
-    try { khai = laneFromMessage(gitO("log", "-1", "--format=%B")); } catch { /* không đọc được lời nhắn: im, để cổng nói */ }
+    try { khai = laneFromMessage(gitO("log", "-1", "--format=%B", dinh)); } catch { /* không đọc được lời nhắn: im, để cổng nói */ }
     if (!khai.lane || khai.problem) process.exit(EXIT.OK);
     const toi = khai.lane;
     const tepBang = path.join(goc, ".agents", "claims.json");
@@ -828,19 +833,31 @@ async function main() {
     if (!bang.tam || !Object.keys(bang.tam).length) process.exit(EXIT.OK);
     let trongCommit = [];
     try {
-      trongCommit = gitO("show", "--pretty=", "--name-only", "-z", "HEAD")
+      trongCommit = gitO("show", "--pretty=", "--name-only", "-z", dinh)
         .split(String.fromCharCode(0)).filter(Boolean);
     } catch { process.exit(EXIT.OK); }
+    /* CHI TRA KHOA CUA FILE DA SACH — kiem toan 10/09 [B]#5, va day la mot lo THAT.
+     * Mot file vua vao commit MA VAN con sua do (dan mot phan bang `git add -p`, hay sua tiep sau
+     * khi `git add`) thi luot ghi CHUA xong — tra khoa luc do la lay mat luoi do cua chinh lane
+     * dang sua. Hoi git: file nao con hien trong `status --porcelain` thi GIU khoa. */
+    let banTrenCay = new Set();
+    try {
+      banTrenCay = new Set(gitO("status", "--porcelain", "-z", "-uall")
+        .split(String.fromCharCode(0)).filter(Boolean).map((rec) => chuanDuongDan(rec.slice(3))));
+    } catch { process.exit(EXIT.OK); }   // khong doc duoc trang thai cay thi khong tra gi ca
     let tam = bang.tam;
     const daTra = [];
+    const giuLai = [];
     for (const d of trongCommit) {
       const chu = tam[chuanDuongDan(d)]?.owner ?? tam[chuanDuongDan(d)]?.chu ?? null;
-      if (chu !== toi) continue;                  // không phải khoá của tôi → không chạm
+      if (chu !== toi) continue;                  // khong phai khoa cua toi -> khong cham
+      if (banTrenCay.has(chuanDuongDan(d))) { giuLai.push(chuanDuongDan(d)); continue; }   // còn sửa dở → GIỮ
       const kq = quyetDinhXong({ claims: bang.claims, tam }, { duongDan: d, as: toi });
       if (kq.code !== EXIT.OK) continue;          // im lặng: đây là tiện ích, không phải cổng
       tam = kq.next;
       daTra.push(chuanDuongDan(d));
     }
+    if (giuLai.length) console.log(`giu khoa (con sua do, chua sach tren cay): ${giuLai.join(" · ")}`);
     if (!daTra.length) process.exit(EXIT.OK);
     const nhaKhoaBang = giuBangQuyen(tepBang);
     try {

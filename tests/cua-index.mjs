@@ -418,3 +418,75 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     fs.rmSync(t2, { recursive: true, force: true });
   }
 }
+
+/* ---- 7. CỬA TỰ TRẢ KHOÁ SAU COMMIT — T2 (10/09) ------------------------
+ *
+ * Luật mục 1: khoá FILE trả NGAY SAU commit chứa lượt ghi. Trước hook này luật đó chỉ được CỔNG
+ * cưỡng chế — tức cuối phiên. Đức đòi hai lần: *"khoá phải nhả ngay khi hết sửa, hook tốt vào"*.
+ *
+ * BA VẾ, và vế giữa là chỗ kiểm toán độc lập [B]#5 tìm ra: một file VỪA vào commit mà VẪN còn
+ * sửa dở (dàn một phần, hay sửa tiếp sau `git add`) thì lượt ghi CHƯA xong — trả khoá lúc đó là
+ * lấy mất lưới đỡ của chính lane đang sửa. Nên cửa hỏi git: còn hiện trong `status --porcelain`
+ * thì GIỮ khoá. */
+{
+  const t3 = fs.mkdtempSync(path.join(os.tmpdir(), "ark-tra-khoa-"));
+  const g3 = (...a) => execFileSync("git", a, { cwd: t3, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  const ghi3 = (rel, noi) => {
+    const abs = path.join(t3, rel);
+    fs.mkdirSync(path.dirname(abs), { recursive: true });
+    fs.writeFileSync(abs, noi);
+  };
+  const khoaFile = (ds) => ghi3(".agents/claims.json", `${JSON.stringify({
+    claims: { _code: { owner: null }, _root: { owner: null } },
+    tam: Object.fromEntries(ds.map((d) => [d, { owner: "lane-a", claimed_at: new Date().toISOString() }])),
+  }, null, 2)}\n`);
+  const dangGiu = () => Object.keys(JSON.parse(fs.readFileSync(path.join(t3, ".agents", "claims.json"), "utf8")).tam ?? {}).sort();
+  try {
+    g3("init", "-q", ".");
+    g3("config", "user.email", "t@t");
+    g3("config", "user.name", "t");
+    ghi3(".repo-structure.json", `${JSON.stringify({ schema_version: 1, repo: "thu", areas: { "scripts/": { steward: "_code", mutability: "rw", ownership_mode: "root" }, ".agents/": { steward: "_root", mutability: "rw", ownership_mode: "root" } } }, null, 2)}\n`);
+    khoaFile([]);
+    ghi3("scripts/a.mjs", "// a1\n");
+    ghi3("scripts/b.mjs", "// b1\n");
+    g3("add", "-A");
+    g3("commit", "-q", "-m", "goc\n\nLane: lane-a");
+    for (const ten of ["commit-msg", "post-commit"]) {
+      const dich = path.join(t3, ".githooks", ten);
+      fs.mkdirSync(path.dirname(dich), { recursive: true });
+      fs.writeFileSync(dich, fs.readFileSync(path.join(ROOT, ".githooks", ten), "utf8")
+        .replace(/node "\$goc\/scripts\/claim\.mjs"/g, `node "${path.join(ROOT, "scripts", "claim.mjs").replaceAll("\\", "/")}"`));
+      fs.chmodSync(dich, 0o755);
+    }
+    g3("config", "core.hooksPath", ".githooks");
+
+    // ⑴ File SẠCH sau commit → khoá được TRẢ.
+    khoaFile(["scripts/a.mjs", "scripts/b.mjs"]);
+    ghi3("scripts/a.mjs", "// a2\n");
+    g3("add", "scripts/a.mjs");
+    g3("commit", "-q", "-m", "sua a\n\nLane: lane-a");
+    assert.deepEqual(dangGiu(), ["scripts/b.mjs"],
+      "khoa cua file DA VAO COMMIT va sach thi phai duoc tra; khoa cua file khac phai CON");
+
+    // ⑵ File vào commit MÀ VẪN còn sửa dở → khoá phải GIỮ. (kiểm toán [B]#5)
+    khoaFile(["scripts/a.mjs", "scripts/b.mjs"]);
+    ghi3("scripts/b.mjs", "// b2 da dan\n");
+    g3("add", "scripts/b.mjs");
+    ghi3("scripts/b.mjs", "// b2 da dan + sua tiep KHI CHUA commit\n");
+    g3("commit", "-q", "-m", "sua b nhung con sua do\n\nLane: lane-a");
+    assert.ok(dangGiu().includes("scripts/b.mjs"),
+      `file vao commit ma VAN con sua do thi PHAI giu khoa — dang giu: ${JSON.stringify(dangGiu())}`);
+
+    // ⑶ Commit KHÔNG nhãn `Lane:` → cửa im lặng, không trả hộ ai.
+    khoaFile(["scripts/a.mjs"]);
+    ghi3("scripts/a.mjs", "// a3\n");
+    g3("add", "scripts/a.mjs");
+    g3("commit", "-q", "-m", "khong nhan");
+    assert.deepEqual(dangGiu(), ["scripts/a.mjs"],
+      "commit khong nhan thi cua khong biet ai dang commit — khong duoc tra ho khoa cua ai");
+
+    ok("7 · tự trả khoá sau commit: file sạch được trả · file còn sửa dở GIỮ khoá · commit không nhãn thì không trả hộ ai");
+  } finally {
+    fs.rmSync(t3, { recursive: true, force: true });
+  }
+}

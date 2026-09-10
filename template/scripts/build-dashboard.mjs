@@ -1553,7 +1553,7 @@ export function createHeadDeps(root = ROOT) {
     if (bangKieu) return bangKieu;
     bangKieu = new Map();
     bangSha = new Map();
-    for (const rec of git("ls-tree", "-r", "-t", "-z", "HEAD").split("\0")) {
+    for (const rec of git("ls-tree", "-r", "-t", "-z", MOC).split("\0")) {
       const tab = rec.indexOf("\t");
       if (tab < 0) continue;
       const [, kieu, sha] = rec.slice(0, tab).split(/\s+/);
@@ -1589,6 +1589,11 @@ export function createHeadDeps(root = ROOT) {
       duongTheoSha.get(sha).push(duong);
     }
     if (!duongTheoSha.size) return bangNoiDung;
+    /* CHI CONG BO BANG KHI DOC DU — kiem toan 10/09 [A]#2. "missing" hay dau ra cut lam vong lap
+     * duoi dung som; bang cut thi readFile van dung (thieu duong dan nao thi no hoi lai `git
+     * show`), nhung "dung nho may" khong phai mot bao dam. Dung vao bang TAM, dem lai, va chi
+     * nhan neu du so doi tuong da yeu cau. Thieu thi bo ca bang va ve duong cu — cham hon, khong sai. */
+    const tam = new Map();
     const ra = execFileSync("git", ["cat-file", "--batch"], {
       cwd: root, input: [...duongTheoSha.keys()].join("\n") + "\n",
       maxBuffer: 512 * 1024 * 1024
@@ -1601,13 +1606,22 @@ export function createHeadDeps(root = ROOT) {
       const dai = Number(co);
       if (!Number.isFinite(dai)) break;                 // "<sha> missing" — bỏ qua, không đoán
       const than = ra.slice(nl + 1, nl + 1 + dai).toString("utf8");
-      for (const duong of duongTheoSha.get(sha) ?? []) bangNoiDung.set(duong, than);
+      for (const duong of duongTheoSha.get(sha) ?? []) tam.set(duong, than);
       i = nl + 1 + dai + 1;                             // +1 cho dấu xuống dòng sau nội dung
     }
+    if (tam.size === bangSha.size) bangNoiDung = tam;   // du: nhan. Thieu: bang rong, ve `git show`
     return bangNoiDung;
   };
+  /* CHOT HEAD THANH MOT SHA — kiem toan 10/09 [A]#1, va day la loi CO TU TRUOC ma bo nho trong
+   * mot luot chay lam rong cua so ra: bang KIEU nap o H1, roi treeEntries/trackedPaths/ngay doc
+   * lai "HEAD" o H2 sau khi mot lane khac commit — MOT luot chay thay HAI trang thai. Repo nay
+   * nhieu lane dung CHUNG mot cay git, nen do khong phai ca gia dinh.
+   *
+   * Giai HEAD dung MOT lan roi dung SHA do cho moi lenh, ke ca duong fallback. Bo deps vi the la
+   * anh cua MOT commit — doc lai no sau khi HEAD doi thi phai dung deps moi. */
+  const MOC = git("rev-parse", "HEAD").trim();
   const treeEntries = (relPath) => nhoLai(`tree\0${relPath}`, () =>
-    git("ls-tree", "-z", "--name-only", `HEAD:${relPath}`).split("\0").filter(Boolean).sort(compareText));
+    git("ls-tree", "-z", "--name-only", `${MOC}:${relPath}`).split("\0").filter(Boolean).sort(compareText));
   return {
     root,
     fileExists: (relPath) => objectType(relPath) !== null,
@@ -1616,7 +1630,7 @@ export function createHeadDeps(root = ROOT) {
       const co = napNoiDung();
       if (co.has(relPath)) return co.get(relPath);
       // Không có trong bảng = không phải blob ở HEAD. Giữ đúng hành vi cũ: để git tự nói lỗi.
-      return git("show", `HEAD:${relPath}`);
+      return git("show", `${MOC}:${relPath}`);
     },
     writeFile: () => { throw new Error("HEAD_READ_ONLY: --check-head không được ghi file."); },
     // `childPath` chứ không phải `${relPath}/${name}`: khi relPath là "" (thư mục gốc
@@ -1626,8 +1640,8 @@ export function createHeadDeps(root = ROOT) {
     listDirs: (relPath) => treeEntries(relPath).filter((name) => objectType(childPath(relPath, name)) === "tree"),
     listFiles: (relPath) => treeEntries(relPath).filter((name) => objectType(childPath(relPath, name)) === "blob"),
     git: {
-      shortHead: () => git("rev-parse", "--short", "HEAD").trim(),
-      headDate: () => git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d").trim(),
+      shortHead: () => git("rev-parse", "--short", MOC).trim(),
+      headDate: () => git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", MOC).trim(),
       // Ngày commit cuối chạm vào file. Dùng làm "lần rà gần nhất" để tính nợ tài
       // liệu quá hạn — vì frontmatter CỐ TÌNH không có trường `created`/`last_reviewed`:
       // ngày gõ tay sẽ mục, còn lịch sử git thì không nói dối được.
@@ -1645,7 +1659,11 @@ export function createHeadDeps(root = ROOT) {
         const bang = nhoLai("ngay-cuoi", () => {
           const bd = new Map();
           let ngay = null;
-          for (const raw of git("log", "--name-only", "--no-renames", "--format=%x01%cd", "--date=format:%Y-%m-%d")
+                    /* --diff-merges=first-parent: kiem toan 10/09 [A]#3. `git log --name-only` KHONG ke file
+           * cua commit MERGE, nen mot file chi bi cham trong merge se nhan ngay cua commit CU HON —
+           * va vi bang DA CO dong, duong fallback khong chay de cuu. Repo nay hien 0 commit merge
+           * nen chua voi toi, nhung bo khung phat sang 5 repo dich thi co. */
+          for (const raw of git("log", "--name-only", "--no-renames", "--diff-merges=first-parent", "--format=%x01%cd", "--date=format:%Y-%m-%d", MOC)
             .replace(/\r\n?/g, "\n").split("\n")) {
             if (raw.startsWith("\x01")) { ngay = raw.slice(1).trim() || null; continue; }
             const f = raw.trim();
@@ -1656,12 +1674,12 @@ export function createHeadDeps(root = ROOT) {
         });
         const co = bang.get(relPath);
         if (co) return co;
-        return git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", "--", relPath).trim();
+        return git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", MOC, "--", relPath).trim();
       },
       // Danh sách file ĐÃ TRACK tại HEAD. Cả chế độ đĩa lẫn chế độ HEAD đều gọi
       // đúng lệnh này, nên hai chế độ không bao giờ nhìn thấy hai tập file khác
       // nhau. `-z` để tên có dấu cách / tiếng Việt không bị git bọc dấu nháy.
-      trackedPaths: () => git("ls-tree", "-r", "-z", "--name-only", "HEAD").split("\0").filter(Boolean),
+      trackedPaths: () => git("ls-tree", "-r", "-z", "--name-only", MOC).split("\0").filter(Boolean),
       // Submodule ở tầng gốc: `ls-tree` KHÔNG có `-r` mới khai kiểu đối tượng, và
       // gitlink có kiểu "commit". Với `-r --name-only` nó chỉ là một tên trơ, không
       // có dấu "/", nên bị xếp nhầm là file.

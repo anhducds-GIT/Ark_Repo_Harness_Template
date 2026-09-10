@@ -79,8 +79,8 @@ máy tự chặn và tự nêu tên khoá thiếu: [MULTIFLOW](docs/protocols/MU
 | 2 | Gửi bất cứ gì ra ngoài (mail, tin nhắn, đăng công khai) | Ra rồi thì không rút về |
 | 3 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
 
-Đức chốt 10/09, rút từ sáu xuống ba — **Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI**; số đo ở
-[decisions](decisions.md). Ba việc cũ thành **ĐIỀU CẤM**, không phải được nới:
+Đức chốt 10/09, sáu xuống ba — **Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI**; số đo ở
+[decisions](decisions.md). Cái MẤT: **quyền phủ quyết TRƯỚC** của Đức, ở hai hàng cuối.
 
 - **CẤM** `--carry` khi cổng chưa XANH TOÀN BỘ, hoặc có commit không quy thuộc được.
 - **CẤM** giành vùng phiên khác đang giữ — ba đường hợp lệ vẫn như mục 1.

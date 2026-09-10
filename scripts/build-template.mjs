@@ -671,8 +671,15 @@ function phanLuatChung(text) {
  *
  *   Mục 2 giữ ĐÚNG 21 dòng như bản cũ — phần lý lẽ xuống `decisions.md`, vì luật là thứ MỌI
  *   phiên phải nạp. Đo: phần nạp **4.196/4.200 token**.
- *   Vân tay trước: 6cce53b34852abf0920f1dd3acc7834d0252f7aa52633eb8c73313b97db1339c */
-const COMMON_LAW_SHA256 = "6cabbb5689a02fe049a8c48ad782ca1360ee4f27f0c92bca45591b4d0b6146a5";
+ *   Vân tay trước: 6cce53b34852abf0920f1dd3acc7834d0252f7aa52633eb8c73313b97db1339c
+ *
+ *   SỬA CÙNG NGÀY, sau kiểm toán độc lập [C]#6: câu "ba việc cũ thành ĐIỀU CẤM, không phải được
+ *   nới" NÓI KHÔNG ĐÚNG. Chỉ MỘT trong ba thành điều cấm (giành vùng); hai cái kia — `--carry`
+ *   khi cổng xanh, và đổi luật an toàn — là BỎ QUYỀN PHỦ QUYẾT TRƯỚC của Đức. Kiểm toán bắt tôi
+ *   vi phạm chính điều kiện tôi vừa đặt ra trong cùng commit đó: *"không làm yếu lớp bảo vệ mà
+ *   không GỌI TÊN thứ mất đi"*. Nay mục 2 gọi tên: **quyền phủ quyết TRƯỚC hành động**.
+ *   Vân tay trước: 6cabbb5689a02fe049a8c48ad782ca1360ee4f27f0c92bca45591b4d0b6146a5 */
+const COMMON_LAW_SHA256 = "f1655d2f439fab02760c7a43d485f5ac3dcda7134112693b793401eb00b13ddf";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {
