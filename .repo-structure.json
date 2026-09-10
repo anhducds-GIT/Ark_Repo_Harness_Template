@@ -27,12 +27,12 @@
       "note": "tài liệu bốn tầng: studies, briefs, archive, adr"
     },
     ".githooks/": {
-    "steward": "_code",
-    "mutability": "rw",
-    "ownership_mode": "root",
-    "note": "CUA INDEX (KHUNG-59): commit-msg tu choi khi commit cuon theo file lane khac. Bat bang `git config core.hooksPath .githooks` — `claim.mjs --sua` tu bat, cong dong phien DO neu tat."
-  },
-  "scripts/": {
+      "steward": "_code",
+      "mutability": "rw",
+      "ownership_mode": "root",
+      "note": "CUA INDEX (KHUNG-59): commit-msg tu choi khi commit cuon theo file lane khac. Bat bang `git config core.hooksPath .githooks` — `claim.mjs --sua` tu bat, cong dong phien DO neu tat."
+    },
+    "scripts/": {
       "steward": "_code",
       "mutability": "rw",
       "ownership_mode": "root",
@@ -92,7 +92,8 @@
   },
   "backlog": {
     "_doc": "Tran so no ha tang cua repo nay. Cong dong phien DO khi so muc MO vuot tran. Khong khai khoi nay = khong co tran, cong xanh. Doi con so nay phai hoi Duc (ADR-0010).",
-    "tran": 25
+    "_do_that": "2026-09-10: Duc chot NOI 25 -> 30, nguyen van \"tam thoi noi margin len 30, ta se clean sau\". DAY LA TRAN TAM: no duoc noi de mot luot lam viec di tiep, khong phai vi 30 la con so dung. Luot DON tiep theo phai ha lai — mo mot muc no cho viec ha, dung de con so nay tu song.",
+    "tran": 30
   },
   "handoff": {
     "_doc": "Tran do dai MOT muc nhat ky trong HANDOFF.md, tinh bang byte UTF-8. Cong dong phien chi chan MUC VUA THEM trong phien nay — muc cu KHONG bi chan, vi chan ca file la moi lane do ngay vi chu cua nguoi khac.",

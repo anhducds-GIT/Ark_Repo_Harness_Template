@@ -18,6 +18,23 @@
 
 ## P1
 
+### KHUNG-62 · Không có cửa máy cho "Đức chốt cho nhả khoá FILE của lane khác" — nên phải MẠO NHÃN
+
+Khoá VÙNG có cửa: `--take <khoá> --as <phiên> --duc-duyet "<câu chốt>"`, ghi lại `taken_from` ·
+`taken_by` · `duc_decision`. **Khoá mức FILE không có cửa tương đương.** Đức chốt cho tôi lấy
+`_code` trong khi `harness-loi-02` còn hai khoá file bên trong; `--take _code --duc-duyet` **vẫn
+từ chối** — cờ đó chỉ áp cho tranh chấp vùng-với-vùng. Đường duy nhất còn lại là
+`--xong <file> --as harness-loi-02`, tức **mạo nhãn lane kia**.
+
+**Cái mất không phải cái khoá — là BẢN GHI.** Sau lượt đó bảng quyền nói *"harness-loi-02 tự trả
+khoá"*, trong khi người nhả là tôi. Cả bộ khung dựng trên nguyên tắc *mọi thay đổi đều quy thuộc
+được*, và đây là lối đi tạo ra bản ghi SAI mà không cảnh báo gì. Sự thật hiện chỉ nằm ở
+`HANDOFF.md` — tức nằm ở chỗ máy không đọc.
+
+**đóng khi:** `--xong <file>… --as <phiên> --duc-duyet "<câu chốt>"` nhả được khoá file
+của lane khác **dưới nhãn của chính người nhả**, ghi `taken_from`/`taken_by`/`duc_decision` y như
+khoá vùng; thiếu `--duc-duyet` thì vẫn từ chối như hiện nay; kèm một phép ghim dựng nổi ca đó.
+
 ### KHUNG-61 · Bảy mục luật ở `AGENTS.md` nhà chưa có phép dò — đang MIỄN, không phải đang ĐỦ
 
 Bản 1.8.11 dựng vế `5e`: mỗi mục `##` trong `AGENTS.md` của repo nhà phải có một phép dò
@@ -1019,22 +1036,3 @@ ca hỏng bằng một phép ghim (lane A `add`, lane B `commit`, và B **không
 ghim đó ĐỎ trên bản hôm nay, và `AGENTS.md` mục 0b nêu cách gọi git đã chốt. Không đóng bằng một
 dòng dặn *"nhớ commit ngay sau add"* — dặn dò thì lần thứ ba sẽ có người bỏ qua, và lần này người
 bỏ qua đã là hai lane khác nhau trong cùng một ngày.
-
----
-
-**Ca thứ hai, cùng gốc, đo 10/09: khoá FILE của lane khác không có cửa nào để Đức mở.**
-
-Khoá VÙNG có cửa: `--take <khoá> --as <phiên> --duc-duyet "<câu chốt>"`, ghi lại `taken_from` ·
-`taken_by` · `duc_decision`. **Khoá mức FILE không có cửa tương đương.** Đức chốt cho tôi lấy
-`_code` trong khi `harness-loi-02` còn hai khoá file bên trong; `--take _code --duc-duyet` **vẫn
-từ chối** — cờ đó chỉ áp cho tranh chấp vùng-với-vùng. Đường duy nhất còn lại là
-`--xong <file> --as harness-loi-02`, tức **mạo nhãn lane kia**.
-
-**Cái mất không phải cái khoá — là BẢN GHI.** Sau lượt đó bảng quyền nói *"harness-loi-02 tự trả
-khoá"*, trong khi người nhả là tôi. Cả bộ khung dựng trên nguyên tắc *mọi thay đổi đều quy thuộc
-được*, và đây là lối đi tạo ra bản ghi SAI mà không cảnh báo gì. Sự thật hiện chỉ nằm ở
-`HANDOFF.md` — tức nằm ở chỗ máy không đọc.
-
-**đóng khi (vế hai):** `--xong <file>… --as <phiên> --duc-duyet "<câu chốt>"` nhả được khoá file
-của lane khác **dưới nhãn của chính người nhả**, ghi `taken_from`/`taken_by`/`duc_decision` y như
-khoá vùng; thiếu `--duc-duyet` thì vẫn từ chối như hiện nay; kèm một phép ghim dựng nổi ca đó.

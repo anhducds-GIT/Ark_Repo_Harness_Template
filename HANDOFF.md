@@ -1184,3 +1184,19 @@ rồi làm tiếp. Bản khung đã lên **1.8.11** trong lúc đó, nên lượ
 **Đã ghi vào  (vế hai), không mở mục mới — sổ nợ đang kịch trần 25:** không có cửa máy nào cho ca *"Đức chốt cho nhả khoá FILE của lane khác"*,
 nên nó buộc phải làm bằng cách mạo nhãn — và mạo nhãn thì bảng quyền ghi sai người. Cùng họ với
 `--duc-duyet` đã có sẵn cho khoá vùng.
+
+## 2026-09-10 · `harness-migrate-3repo` — đính chính hai chỗ ở mục ngay trên
+
+**⑴ Một câu bị hỏng chữ.** Mục trên có dòng *"Đã ghi vào  (vế hai)…"* — chỗ trống đó lẽ ra là
+`KHUNG-59`. Nguyên nhân: tôi viết thông điệp qua heredoc của shell, và cụm trong dấu backtick bị
+shell **thực thi như một lệnh** rồi thay bằng chuỗi rỗng (`KHUNG-59: command not found`). Cùng
+lỗi đó ăn mất một chữ trong thông điệp commit `6bc278a`. Sổ chỉ-thêm nên tôi không sửa dòng cũ.
+**Bài học nhỏ mà lặp được:** chữ có backtick thì đừng đi qua heredoc không trích dẫn — dùng
+`<<'EOF'` (có nháy) hoặc ghi bằng file.
+
+**⑵ Câu đó nay đã lạc hậu, theo hướng tốt.** Đức chốt nới trần sổ nợ **25 → 30** (nguyên văn:
+*"tạm thời nới margin lên 30, ta sẽ clean sau"*), nên phần đã gộp vào `KHUNG-59` được **tách ra
+thành `KHUNG-62`** — có `đóng khi:` riêng, tức đóng được riêng. Quyết định ghi ở `decisions.md`.
+
+**Trần 30 là trần TẠM.** Đã khai `_do_that` ngay cạnh con số để lượt DỌN sau không đọc nhầm 30 là
+số đúng. Sổ hiện **26/30**.

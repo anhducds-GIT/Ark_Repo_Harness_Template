@@ -776,3 +776,20 @@ niêm phong cộng ghi nguyên tử. Đếm tên không phải đếm năng lự
 trần dòng — thêm cái thứ ba vào cùng một file là phình), và **ONE LOADING LAW** trong
 `CONTEXT-COMPILER-V1-PROPOSAL.md` của họ: bảng máy đọc `việc → file#mục`, mạnh hơn bảng văn xuôi
 mục 6 của ta. Đáng làm, chưa làm.
+
+## 2026-09-10 — Nới trần sổ nợ 25 → 30, và nó là trần TẠM
+
+**Đức chốt**, nguyên văn: *"tạm thời nới margin lên 30, ta sẽ clean sau"*.
+
+**Vì sao cần chốt:** `backlog.tran` là con số duy nhất trong `.repo-structure.json` mà
+`ADR-0010` bắt phải hỏi người chốt — nới trần là cách rẻ nhất để một cái cổng thôi kêu, nên
+nó cố ý không nằm trong tay AI. Cổng cũng nói thẳng: *"đừng nâng trần để đi tiếp"*.
+
+**Bối cảnh đo được:** bản 1.8.11 lôi ra hai nợ thật cùng lúc — `KHUNG-61` (6 mục luật ở
+`AGENTS.md` nhà chưa có phép dò) và `KHUNG-62` (không có cửa máy cho *"Đức chốt cho nhả khoá
+FILE của lane khác"*, nên phải mạo nhãn và bảng quyền ghi sai người). Sổ đang 25/25, nên một
+trong hai phải bị gộp vào mục khác — tức **mất một dòng `đóng khi:` riêng**, mà đó chính là
+thứ làm một mục nợ đóng được.
+
+**Trần TẠM, không phải trần mới.** Lượt DỌN tiếp theo phải hạ lại; số 30 không được tự sống.
+
