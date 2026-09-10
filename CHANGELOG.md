@@ -3,6 +3,38 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.36 — 2026-09-10 — Codex CHẠY THẬT: bản đồ máy canh cho một TÀI LIỆU đóng vai máy
+
+Đức sửa sandbox Codex, nên vòng audit thứ ba **chạy được lệnh** — thứ hai vòng trước (chỉ soi chữ)
+không làm được. Nó bắt **2 chỗ NGHIÊM TRỌNG** trong chính vế `5e` tôi vừa dựng, và cả hai là
+**xanh mà đo số 0**:
+
+| Codex làm gì | Vế `5e` trả lời | Sai ở đâu |
+|---|---|---|
+| đổi `scripts/handoff.mjs` → `AGENTS.md` | **XANH**, "9 máy khai" | `isFile()` đúng với MỌI file — một trang **tài liệu** đóng vai máy được |
+| khai 3 **bí danh** của `.githooks/commit-msg` trong MỘT mục | **XANH**, "8 máy khai" | chuẩn hoá chỉ dùng cho tổng toàn bản đồ, không cấm trùng trong từng mục |
+
+**Vá:** máy phải khớp `scripts|bang-song/*.mjs|cmd` hoặc `.githooks/*` — tức **một thứ chạy được
+của repo này** — và mỗi mục phải có `Set(may).size === may.length`. Thêm một loại máy mới (ví dụ
+workflow CI) thì phải **nới danh sách**, cố ý để nó ĐỎ và bắt người thêm nhìn vào.
+
+Nhãn của vế đổi theo cho khỏi nói quá: *"9 máy khai, file có thật"* → **"9 máy CHẠY ĐƯỢC, không bí
+danh"**. Đột biến: **6 ca, cả 6 ĐỎ** (4 ca cũ + 2 ca Codex mở).
+
+**BA VÒNG AUDIT, BA LOẠI LỖI KHÁC NHAU — và đây là số đo đáng giữ:**
+
+| Vòng | Codex làm được gì | Bắt được loại lỗi nào |
+|---|---|---|
+| 1–2 | chỉ đọc CHỮ (`stdin`) | **11 câu mệnh lệnh** bị rụng hoặc nói quá |
+| 3 | chạy lệnh + đột biến | **2 phép kiểm xanh mà đo số 0** |
+
+Chữ và chạy bắt hai loại khác nhau; **không cái nào thay được cái nào**. Bốn con trỏ chết vào mốc
+`## 7.` (bản 1.9.35) thì **cả ba vòng đều không thấy** — tôi tự tìm bằng `grep`.
+
+**Giới hạn của vòng 3, Codex tự nói:** trong sandbox của nó, Node không tạo được tiến trình con
+`git` (`spawnSync git EPERM`), nên `npm test` · `template-null-repo` · `check-bootstrap` · cổng
+đóng phiên **không chạy được** — *"lỗi môi trường audit, không phải xanh"*. Phần đó vẫn là tôi.
+
 ## 1.9.35 — 2026-09-10 — BỐN con trỏ chết vào `## 7.` trong MÃ, hai cái làm phép kiểm mất răng
 
 Lượt gộp 9 mục → 6 bỏ mục 7 (nhập vào mục 0). Tôi đã sửa **17** chỗ nói *"AGENTS.md mục N"* bằng

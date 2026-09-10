@@ -21,6 +21,29 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 11) · harness-loi-02 — Codex chạy thật, bắt 2 chỗ "xanh mà đo số 0"
+
+**Đức sửa sandbox Codex.** Thủ phạm còn lại là cờ **`-C`** của tôi: trỏ ra ngoài cwd tạo **hai gốc
+ghi**, và sandbox không cưỡng chế được (`cannot enforce split writable root sets`). Bỏ `-C`, `cd`
+vào bản copy rồi chạy — **gốc ghi duy nhất là bản copy**, không chạm cây làm việc thật.
+
+**Nếp gọi Codex, ghi lại để phiên sau không mò:**
+`cd <ban-copy> && cat <de-bai> | codex exec -s workspace-write -` — **KHÔNG dùng `-C`**.
+
+**Hai chỗ nó bắt, cả hai trong vế `5e` tôi vừa dựng:** ⑴ đổi một máy thành `AGENTS.md` → vẫn XANH,
+vì `isFile()` đúng với mọi file, nên **tài liệu đóng vai máy được**; ⑵ ba **bí danh** của cùng một
+hook trong MỘT mục → vẫn XANH, vì chuẩn hoá chỉ dùng cho tổng. Vá: máy phải khớp
+`scripts|bang-song/*.mjs|cmd` hoặc `.githooks/*`, và mỗi mục không được trùng đường dẫn. Đột biến
+**6 ca, cả 6 ĐỎ**.
+
+**SỐ ĐO ĐÁNG GIỮ — ba vòng, ba loại lỗi:** vòng 1–2 (chỉ CHỮ) bắt **11** câu bị rụng/nói quá ·
+vòng 3 (CHẠY) bắt **2** phép kiểm xanh-mà-đo-số-0 · và **4** con trỏ chết vào mốc `## 7.` thì
+**cả ba vòng đều không thấy**, tôi tự tìm bằng `grep`. **Ba nguồn, ba vùng mù khác nhau.**
+
+**Giới hạn vòng 3, Codex tự nói ra:** Node trong sandbox không spawn được `git`
+(`spawnSync git EPERM`), nên `npm test`, `template-null-repo`, `check-bootstrap` và cổng đóng phiên
+**không chạy được** — nó ghi rõ *"lỗi môi trường audit, không phải xanh"*.
+
 ## 2026-09-10 (tiep 10) · harness-loi-02 — SỐ TỔNG NÓI NGƯỢC: hiến pháp KHÔNG gọn hơn
 
 **Đính chính chính tôi.** Giữa lượt tôi báo *"gọn 2%"* (4.196 → 4.099 token) và ghi vào

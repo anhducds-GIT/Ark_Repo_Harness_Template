@@ -419,12 +419,28 @@ if (!laNoiPhatHanh(ROOT)) {
   for (const k of khuc) {
     const c = canh[k.ten];
     const may = c.may ?? [];
+    /* MÁY PHẢI LÀ MỘT THỨ CHẠY ĐƯỢC CỦA REPO NÀY, không phải "một file có thật".
+       Audit Codex (vòng chạy-thật, 10/09) đổi `scripts/handoff.mjs` thành `AGENTS.md` và vế này
+       VẪN XANH: `isFile()` đúng với mọi file, kể cả một trang tài liệu. Một bản đồ máy mà tài
+       liệu đóng vai máy được thì nó là bản đồ trang trí.
+       KHI THÊM MỘT LOẠI MÁY MỚI (ví dụ một workflow CI) thì phải nới danh sách này — cố ý để nó
+       ĐỎ và bắt người thêm nhìn vào, chứ không đoán rộng ra trước. */
+    const LA_MAY = /^(?:scripts|bang-song)\/[^/]+\.(?:mjs|cmd)$|^\.githooks\/[^/]+$/;
+    const chuanHoa = (m) => relative(ROOT, resolve(ROOT, m)).split(sep).join("/").toLowerCase();
+    /* BÍ DANH TRONG CÙNG MỘT MỤC cũng bị Codex mở: ba bí danh của `.githooks/commit-msg` khai ở
+       một mục luật thì mục đó tự thổi số máy của nó, mà tổng toàn bản đồ vẫn qua vạch 6. */
+    const trong1Muc = may.map(chuanHoa);
+    assert.equal(new Set(trong1Muc).size, trong1Muc.length,
+      `${k.ten}: khai TRUNG duong dan may (bi danh cua cung mot file) — ${may.join(" · ")}`);
     for (const m of may) {
+      assert.match(chuanHoa(m), LA_MAY,
+        `${k.ten}: \`${m}\` khong phai MOT MAY CHAY DUOC cua repo nay. May phai la`
+        + " scripts/*.mjs · bang-song/*.mjs|cmd · .githooks/* — mot file tai lieu KHONG duoc dong vai may.");
       /* CHUẨN HOÁ TRƯỚC KHI ĐẾM, và đòi đúng FILE — hai lỗ mà audit độc lập 10/09 mở được:
          ⑴ bảy BÍ DANH của cùng một file (`./x`, `x/../x`, `x//y`, `X`, `x\y`) bơm `mayThay.size`
          qua vạch 6 trong khi bản đồ chỉ có MỘT máy; ⑵ `existsSync` nhận cả THƯ MỤC, nên khai
          `scripts` hay `docs` là "máy" thì mọi assert vẫn xanh. */
-      mayThay.add(relative(ROOT, resolve(ROOT, m)).split(sep).join("/").toLowerCase());
+      mayThay.add(chuanHoa(m));
       let laFile = false;
       try { laFile = statSync(join(ROOT, m)).isFile(); } catch { laFile = false; }
       if (!laFile) mayMat.push(`${k.ten} → ${m}`);
@@ -447,7 +463,7 @@ if (!laNoiPhatHanh(ROOT)) {
     `chi doc duoc ${mayThay.size} may canh khac nhau — ban do may HONG, chu khong phai repo chi co the`);
 
   const soDo = khuc.length - Object.keys(mien).length;
-  ok(`5e · tầng luật: ${khuc.length} mục ở AGENTS.md nhà — ${soDo} có phép dò · ${Object.keys(mien).length} miễn có lý do · ${mayThay.size} máy khai, file có thật (CÓ MẶT ≠ ĐANG BẬT) · ${soCoLoHong}/${khuc.length} mục còn phần KHÔNG máy nào canh`);
+  ok(`5e · tầng luật: ${khuc.length} mục ở AGENTS.md nhà — ${soDo} có phép dò · ${Object.keys(mien).length} miễn có lý do · ${mayThay.size} máy CHẠY ĐƯỢC, không bí danh (CÓ MẶT ≠ ĐANG BẬT) · ${soCoLoHong}/${khuc.length} mục còn phần KHÔNG máy nào canh`);
 }
 
 /* ---- 6. Khối markdown dán vào hồ sơ migrate ----------------------------- */
