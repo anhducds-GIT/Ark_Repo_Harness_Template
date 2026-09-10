@@ -12,6 +12,22 @@
 
 ---
 
+## 2026-09-10 · `upgrade` KHÔNG tự sửa tài liệu repo đích — ba bước cuối làm TAY
+
+**Đức chốt.** Sau `upgrade --apply`, ba bước để cổng repo đích xanh lại — khai thư mục mới vào
+Bản đồ file · sinh lại artifact · ghi Log — **làm TAY**, không tự động hoá.
+
+**Lý do Đức nói:** *"mục đích là đảm bảo repo đích chạy được chính xác"*. Một lượt nâng tự viết
+vào tài liệu repo đích thì không ai đọc lại xem nó viết đúng chưa — và cái cổng Đỏ ở đó chính
+là thứ bắt người ta đọc.
+
+**Số đo đã có khi chốt:** `--apply` **7 giây**; ba bước tay **~3 phút/repo**, tức **96%** thời gian
+migrate nằm ở phần làm tay. Đức biết con số đó và vẫn chốt như trên.
+
+**Cái MẤT:** migrate không phải một lệnh, mà là một lệnh cộng ba việc người — và ba việc đó
+**có thể bị quên**. Bù lại bằng cách DUY NHẤT không vi phạm nguyên tắc: `upgrade` **nói tên đúng
+ba bước đó** ở cuối mọi lượt `--apply`, thay vì chỉ nói *"chạy npm test rồi cổng"*.
+
 ## 2026-09-10 · Thứ tự sau đóng gói: `T3` → `R6`, không phải `R4`/`R5`
 
 **Đức chốt.** Đóng gói cái đang có trước (`T3`), rồi **bỏ luật không có máy canh** (`R6`).

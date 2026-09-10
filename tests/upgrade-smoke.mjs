@@ -975,6 +975,17 @@ const dungRepo = (ghiSoGhim) => {
       `core.hooksPath phai bang ".githooks" o repo dich, dang "${troToi}" — cua index chua bat`);
     assert.ok(!/không bật được/.test(ra.stdout),
       `--apply in ra canh bao khong bat duoc cua: ${ra.stdout}`);
+
+    /* BA BUOC CUOI phai duoc NEU TEN. Duc chot 10/09: `upgrade` KHONG tu sua tai lieu repo dich,
+       nen ba buoc do lam TAY — va thu duy nhat may duoc lam la noi ro chung. Cau cu chi noi
+       "chay npm test roi cong", nen sau MOI luot nang, cong o repo dich DO o ba muc ma nguoi van
+       hanh khong biet truoc. Mat cau nay la mat toan bo phan bu cho quyet dinh do. */
+    for (const can of ["Bản đồ file", "build-dashboard.mjs", "HANDOFF.md"]) {
+      assert.ok(ra.stdout.includes(can),
+        `--apply phai NEU TEN buoc "${can}" o cuoi: ${ra.stdout.slice(-600)}`);
+    }
+    assert.match(ra.stdout, /\.githooks\//,
+      "buoc 1 phai neu dung thu muc VUA MANG SANG, khong noi chung chung");
   } finally { rmSync(rieng, { recursive: true, force: true }); }
 
   /* CA THU HAI: repo dich DA co hooksPath RIENG cua no -> KHONG duoc ghi de. Nhanh nay co trong

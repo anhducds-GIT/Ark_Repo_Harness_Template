@@ -21,6 +21,30 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 2) · harness-loi-02 · `md()` treo vô hạn — 18 tiếng một lõi CPU
+
+**Số đo.** Một tiến trình `build-overview.mjs` ở repo đích đốt **65.765 giây CPU**, từ **23:33
+09/09** tới **18:30 10/09**. Đã dừng 3 tiến trình. Sau khi vá: cả **5/5** repo thoát trong 2–33s.
+
+**Gốc.** Nhánh đoạn văn của `md()` **dừng** ở mọi dòng mở bằng `|`, nhưng nhánh bảng chỉ **vào**
+khi dòng sau là hàng ngăn cách. Một dòng `|` đơn lẻ rơi vào lỗ giữa hai tập đó → `i` không
+tăng → vòng vô hạn. Sửa bằng **một chốt**: `doan` rỗng thì ăn một dòng rồi đi tiếp.
+
+**BA ĐIỀU ĐÁNG GIỮ LẠI:**
+
+1. **`--prof` đọc được tiến trình ĐANG TREO, `--cpu-prof` thì không** — cái sau chỉ ghi lúc
+   thoát. Một lệnh `node --prof-process` chỉ thẳng `md ... md-mini.mjs:49`. Trước đó tôi đã thử
+   inspector + CDP và tốn công vô ích.
+2. **Vế ghim một vòng đồng bộ PHẢI chạy ở tiến trình con.** `setTimeout` cùng tiến trình không bao
+   giờ nổ → vế **treo cả suite thay vì báo Đỏ**. Một suite treo tệ hơn một suite đỏ: nó không
+   nói gì cả.
+3. **Tìm ra nó vì `T3` đi ra repo thật.** Đây là lỗi thứ **NĂM** trong ngày mà không phép kiểm nào ở
+   nhà tìm ra — cả năm đều thuộc một họ: **cơ chế im lặng không hoạt động, kèm một biểu hiện
+   giống hệt trạng thái khoẻ.**
+
+**Đức chốt 10/09:** ba bước cuối của migrate làm **TAY** — `upgrade` không tự sửa tài liệu repo
+đích. Bù lại: `--apply` giờ **nêu tên đúng ba bước**, ghim ở `upgrade-smoke` vế 25.
+
 ## 2026-09-10 (tiep) · harness-loi-02 · T3 ĐÓNG GÓI: 5 repo lên 1.9.20, 8 giây/repo
 
 **Số đo.** 5 repo từ 3 bản (`1.3.75`·`1.3.76`·`1.8.0`×3) lên cùng `1.9.20`. **8s mỗi repo**,

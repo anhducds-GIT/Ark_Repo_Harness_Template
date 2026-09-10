@@ -3,6 +3,31 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.24 — 2026-09-10 — `md()` treo vô hạn: một lõi CPU chạy hết công suất **18 tiếng**
+
+**Số đo.** Một tiến trình `build-overview.mjs` ở repo đích đã đốt **65.765 giây CPU** — bắt đầu
+**23:33 ngày 09/09**, phát hiện **18:30 ngày 10/09**. Không ai thấy, vì biểu hiện của nó là
+*"lệnh chưa xong"*, không phải một thông báo lỗi.
+
+**Gốc.** Nhánh đoạn văn của `md()` dừng ở mọi dòng khớp
+`/^(#{1,4}\s|\||>|```|\s*[-*]\s|\d+\.\s)/`, nhưng nhánh bảng **chỉ vào khi DÒNG SAU là hàng ngăn
+cách**. Gặp một dòng mở bằng `|` không thành bảng thì **không nhánh nào ăn nó**, `i` không
+tăng, vòng ngoài quay vô hạn. Tức **mẫu DẮNG rộng hơn tập ăn ĐƯỢC** — và chính lỗ hỏng giữa hai
+tập đó là nơi tiến trình rơi vào.
+
+**Sửa bằng MỘT chốt, không đi nới từng mẫu:** `doan` rỗng thì ăn một dòng rồi đi tiếp. Nới cho hai
+mẫu khớp nhau là việc phải làm lại **mỗi lần thêm một nhánh**; bất biến *"mỗi vòng ăn ít nhất một
+dòng"* thì đúng mãi.
+
+**Ghim: `luu-do-smoke` vế 11, chạy ở TIẾN TRÌNH CON.** Vòng lặp là đồng bộ, nên `setTimeout`
+trong cùng tiến trình **không bao giờ nổ**: một vế viết kiểu đó sẽ **treo cả suite thay vì báo
+Đỏ**, và một suite treo không bằng một suite đỏ — nó không nói gì cả. Ba ca: `|` đơn lẻ · `|` ở
+cuối file · đúng một dấu `|`. Đột biến: gỡ chốt → Đỏ *"md() KHONG KET THUC"*, **không treo**.
+
+**Cách tìm ra, ghi để dùng lại:** `--prof` của V8 ghi log **liên tục**, nên một tiến trình treo vẫn
+đọc được chỗ nóng. `--cpu-prof` thì **không**: nó chỉ ghi lúc thoát. Một lệnh
+`node --prof-process` chỉ thẳng `md file:.../md-mini.mjs:49`.
+
 ## 1.9.22 — 2026-09-10 — Vòng audit sau đóng gói: `--local` thay `--get`; câu Đỏ đúng đơn vị
 
 **Ba chỗ lọt, cả ba dựng lại được:**

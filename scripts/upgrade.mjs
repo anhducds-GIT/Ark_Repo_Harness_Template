@@ -453,11 +453,16 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
     process.exit(3);
   }
 
+  /* Nho ĐƯỜNG DẪN MỚI, không chỉ đếm. Đức chốt 10/09: `upgrade` KHÔNG tự sửa tài liệu repo
+     đích, nên ba bước cuối làm TAY — và thứ duy nhất máy được làm là NÊU TÊN đúng ba bước đó.
+     Đếm số file thì người đọc vẫn phải tự đi tìm xem file nào mới. */
+  const duongMoi = [];
   let daGhi = 0;
   for (const d of dong) {
     // ĐÃ BỎ = file bản khung không còn phát nữa. Chỉ kể tên, KHÔNG tự xoá: xoá file trong repo
     // người khác là việc không lùi lại được, và nó phải do người quyết.
     if (d.trangThai === "ĐÃ MỚI" || d.trangThai === "ĐÃ BỎ") continue;
+    if (d.trangThai === "THIẾU") duongMoi.push(d.rel);
     const dest = path.join(repo, ...d.rel.split("/"));
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     // Ghi ra file tạm rồi đổi tên: đổi tên là thao tác nguyên tử, nên một lần ngắt giữa chừng
@@ -487,6 +492,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
 
   let daGhiTaiLieu = 0;
   for (const d of tlThieu) {
+    duongMoi.push(d.rel);
     const dest = path.join(repo, ...d.rel.split("/"));
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     const tam = `${dest}.tam-${process.pid}`;
@@ -533,5 +539,19 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
       } catch (e) { console.log(`⚠ Cửa index không bật được: ${String(e.message).split(NL)[0]}`); }
     }
   }
-  console.log(`Bước kế ở repo đích: chạy \`npm test\`, rồi cổng đóng phiên.${NL}`);
+  /* BA BƯỚC, NÊU TÊN. Câu cũ chỉ nói "chạy npm test rồi cổng" — nên sau MỌI lượt nâng, cổng ở
+     repo đích ĐỎ ở ba mục (Bản đồ file · artifact · Log) mà người vận hành không biết trước.
+     Đo 10/09 trên 5 repo: `--apply` 7 giây, ba bước tay ~3 phút/repo, tức 96% thời gian migrate
+     nằm ở phần này. Đức chốt GIỮ làm tay (lý do: bắt người đọc lại), nên bù bằng việc nói rõ. */
+  console.log(`${NL}BA BƯỚC CUỐI — làm TAY ở repo đích, cổng ĐỎ tới khi xong cả ba:`);
+  if (duongMoi.length) {
+    const goi = new Set(duongMoi.map((r) => (r.includes("/") ? `${r.split("/")[0]}/` : r)));
+    console.log(`  1. Khai vào Bản đồ file: ${[...goi].join(" · ")}`);
+    console.log("     (khai MỘT thư mục là đã khai những gì trong nó — một dòng là đủ)");
+  } else {
+    console.log("  1. Bản đồ file: không có đường dẫn mới, bỏ qua bước này.");
+  }
+  console.log("  2. Sinh lại artifact: `node scripts/build-dashboard.mjs` rồi `build-overview.mjs`");
+  console.log("  3. Ghi một dòng Log vào HANDOFF.md, rồi commit CẢ BA phần trên MỘT commit.");
+  console.log(`${NL}Rồi mới: \`npm test\`, rồi cổng đóng phiên.${NL}`);
 }
