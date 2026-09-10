@@ -457,12 +457,21 @@ const bang = (khoa) => JSON.stringify({ claims: khoa });
 
     // Thay ĐÚNG MỘT công tắc: vùng con báo có một file .js sửa dở.
     const loi = [];
+    const noi = [];
     const ma = runDashboard({
       deps: { ...deps, writeFile: () => {}, git: { ...deps.git, dirtyFiles: () => ["goi/mot/a.js"] } },
-      output: { log() {}, error(...a) { loi.push(a.join(" ")); } }
+      output: { log(...a) { noi.push(a.join(" ")); }, error(...a) { loi.push(a.join(" ")); } }
     });
     assert.equal(ma, 0,
       `vung con ban -> ca luot sinh trang phai VAN xong: ${loi.join(" / ").slice(0, 300)}`);
+    /* KHONG chi doi "khong chet". Bo het log thi XOA CA NHANH canh bao van xanh — Codex neu
+       10/09, va do dung: nhanh do la thu duy nhat doc `behaviourOpts`, nen mot ve khong doi
+       cau canh bao la mot ve khong con doi tuong do. Doi ca NOI DUNG: dung vung, dung so. */
+    const canh = noi.filter((d) => d.includes("CẢNH BÁO") && d.includes("goi/mot"));
+    assert.equal(canh.length, 1,
+      `phai co DUNG MOT canh bao cho vung "goi/mot", dang ${canh.length}: ${noi.join(" / ").slice(0, 300)}`);
+    assert.match(canh[0], /1 file \.js/,
+      `canh bao phai dem dung 1 file .js: ${canh[0]}`);
   } finally { rmSync(kh, { recursive: true, force: true }); }
   ok("14 · vùng con đang bẩn: câu cảnh báo `.js` sửa dở KHÔNG giết lượt sinh (`behaviourOpts` sai phạm vi)");
 }

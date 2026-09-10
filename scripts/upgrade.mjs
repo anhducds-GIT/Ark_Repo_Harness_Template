@@ -519,7 +519,11 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
      ghi đè: đó có thể là hook của chính họ, và cổng đóng phiên bên đó sẽ nói tiếp. */
   if (fs.existsSync(path.join(repo, ".githooks", "commit-msg"))) {
     let troToi = "";
-    try { troToi = execFileSync("git", ["config", "--get", "core.hooksPath"], { cwd: repo, encoding: "utf8" }).trim(); } catch { /* chưa đặt */ }
+    /* `--local`, KHONG phai `--get`: `--get` doc ca global va system, nen mot may co
+         `core.hooksPath` global se lam cua nay bao "da bat tu truoc" va KHONG BAO GIO dat
+         config local — dung loai ghi nhan SAI nhu chinh loi thieu import o tren. Codex neu
+         10/09; da dung lai: dat global roi `--get` tra ".githooks" trong khi `--local` trong. */
+      try { troToi = execFileSync("git", ["config", "--local", "--get", "core.hooksPath"], { cwd: repo, encoding: "utf8" }).trim(); } catch { /* chưa đặt */ }
     if (troToi === ".githooks") console.log("Cửa index: đã bật từ trước.");
     else if (troToi) console.log(`⚠ Cửa index KHÔNG bật được: core.hooksPath ở repo đích đang trỏ "${troToi}". Hỏi chủ repo trước, đừng ghi đè.`);
     else {

@@ -962,11 +962,13 @@ const dungRepo = (ghiSoGhim) => {
     assert.equal(ra.status, 0, `--apply phai xong: ${ra.stdout}${ra.stderr}`);
     assert.ok(existsSync(join(rieng, ".githooks", "commit-msg")),
       "phai mang duoc .githooks/commit-msg sang, khong co no thi ve nay do rong");
-    // `git config --get` THOAT 1 khi khoa chua dat. Khong bat thi ve nay do bang stack trace,
-    // va Duc doc mot dong "Command failed" thay vi biet cua nao chua bat.
+    /* `--local`, KHONG `--get`: `--get` doc ca global/system, nen tren mot may co
+       `core.hooksPath` global ve nay se XANH ma khong chung minh gi ve repo dich. Codex neu 10/09.
+       `--local` THOAT 1 khi khoa chua dat -> khong bat thi ve do bang stack trace, va Duc doc mot
+       dong "Command failed" thay vi biet cua nao chua bat. */
     let troToi = "(chưa đặt)";
     try {
-      troToi = execFileSync("git", ["config", "--get", "core.hooksPath"],
+      troToi = execFileSync("git", ["config", "--local", "--get", "core.hooksPath"],
         { cwd: rieng, encoding: "utf8" }).trim();
     } catch { /* chua dat — de nguyen nhan de cau ĐỎ noi duoc */ }
     assert.equal(troToi, ".githooks",
@@ -974,6 +976,26 @@ const dungRepo = (ghiSoGhim) => {
     assert.ok(!/không bật được/.test(ra.stdout),
       `--apply in ra canh bao khong bat duoc cua: ${ra.stdout}`);
   } finally { rmSync(rieng, { recursive: true, force: true }); }
+
+  /* CA THU HAI: repo dich DA co hooksPath RIENG cua no -> KHONG duoc ghi de. Nhanh nay co trong
+     ma nhung chua ai ghim; Codex neu 10/09. Ghi de la xoa hook cua nguoi ta, va hong IM LANG vi
+     `--apply` van thoat 0. */
+  {
+    const rieng2 = mkdtempSync(join(tmpdir(), "ark-hook-rieng-"));
+    try {
+      execFileSync("git", ["init", "--quiet"], { cwd: rieng2, stdio: "pipe" });
+      execFileSync("git", ["config", "--local", "core.hooksPath", ".hook-cua-toi"], { cwd: rieng2, stdio: "pipe" });
+      const ra2 = spawnSync(process.execPath, [join(ROOT, "scripts", "upgrade.mjs"), rieng2, "--apply"],
+        { encoding: "utf8" });
+      assert.equal(ra2.status, 0, `--apply phai xong: ${ra2.stdout}${ra2.stderr}`);
+      const con = execFileSync("git", ["config", "--local", "--get", "core.hooksPath"],
+        { cwd: rieng2, encoding: "utf8" }).trim();
+      assert.equal(con, ".hook-cua-toi",
+        `hooksPath RIENG cua repo dich bi ghi de thanh "${con}" — do la xoa hook cua nguoi ta`);
+      assert.match(ra2.stdout, /hook-cua-toi/,
+        `khong ghi de thi phai NEU TEN cho no dang tro toi, im lang la de nguoi ta tuong cua da bat: ${ra2.stdout}`);
+    } finally { rmSync(rieng2, { recursive: true, force: true }); }
+  }
   ok("cửa index BẬT THẬT ở repo đích — đo `core.hooksPath`, không đọc chữ in");
 }
 
