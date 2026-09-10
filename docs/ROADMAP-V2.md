@@ -14,53 +14,47 @@ ttl_days: 120
 
 | | |
 |---|---|
-| Repo nhà | bản **1.9.39** · hiến pháp **6 mục** (từ 9) · **43** mục luật Tầng 1 (từ 111) |
+| Repo nhà | bản **1.9.40** · hiến pháp **6 mục** (từ 9) · **43** mục luật Tầng 1 (từ 111) |
 | Máy canh được ĐO | **9** đường dẫn · **6/6** mục luật còn phần KHÔNG máy nào canh, đã nói ra |
-| Suite · cổng | **24/24 xanh** ≈ **445s** · cổng đóng phiên **12 mục**, 3,0s |
-| 5 repo đích | ghim bản **1.9.29** — chậm **10 bản** so với nhà, mỗi repo **7 file** tầng máy đã cũ |
-| Ngân sách | nạp **4195/4200** · kho chữ **3103/3117** · nợ **30/30** — **sát trần cả ba** |
+| Suite · cổng | **24/24 xanh** ≈ **406s** · cổng đóng phiên **12 mục** |
+| 5 repo đích | **3 ĐÃ ĐẨY ở 1.9.40** · 1 commit-rồi-chưa-đẩy · 1 chưa chạm |
+| Ngân sách | nạp **4196/4200** · nợ **30/30** — **sát trần** |
 
-## Việc còn lại để ĐÓNG GÓI XONG — ba bước, đúng thứ tự
+## ĐÓNG GÓI: xong 3/5, và hai chỗ còn lại cần ĐỨC
 
-**Đ1 · Nâng 5 repo đích lên `1.9.39`.** Mỗi repo, chạy TỪ repo nhà:
+Đ1 · Đ2 · Đ3 của bản trước **đã làm**, 11/09. Bảng kết quả thật: `HANDOFF.md`, mục
+*"ĐÓNG GÓI: 3/5 repo đích ĐÃ ĐẨY"*. Lượt nâng còn tìm ra **một cửa CHẾT ở cả 5 repo** —
+`safe-push` đọc `audit.nguoi_duyet` từ đĩa mà bản trích chưa từng phát khối đó, nên nhãn `Audit:`
+ở repo đích **chỉ có thể làm HẠI**. Vá gốc ở `1.9.40` ([ADR-0020](adr/0020-cua-audit-o-repo-dich.md)).
 
-```bash
-node scripts/upgrade.mjs --plan  "<đường-dẫn-repo-đích>"   # xem trước, không ghi gì
-node scripts/upgrade.mjs --apply "<đường-dẫn-repo-đích>"
-```
+**Việc còn lại — cả hai đều là ĐÁNH ĐỔI của Đức, KHÔNG phải việc AI tự quyết:**
 
-Năm đường dẫn: `C:\WORKING ZONE\n8n-orchestrator` · `C:\WORKING ZONE\n8n_Local host` ·
-`C:\WORKING ZONE\ALL_SKILL_MANAGEMENT` · `C:\WORKING ZONE\Project 3 AI Agent Unify` ·
-`C:\WORKING ZONE\Chrome_Extension_AI_Agentic`.
-
-Rồi **BA BƯỚC TAY ở repo đích** — chính `--apply` in ra tên ba bước, làm đúng chúng, và **gộp cả
-ba vào MỘT commit**: ① khai đường dẫn mới vào Bản đồ file của repo đó (đọc `docs.file_map` của
-CHÍNH nó, mỗi repo một chỗ khác nhau) · ② sinh lại artifact · ③ ghi một dòng Log vào `HANDOFF.md`.
-Sau đó tại repo đích: `npm test` → cổng đóng phiên → `safe-push`.
-
-Đo được 10/09: **7 giây** lệnh + **~3 phút** tay mỗi repo. Đức chốt ba bước này **làm TAY**, không
-tự động hoá ([decisions](../decisions.md)).
-
-**Đ2 · Ghi kết quả THẬT.** Một mục `HANDOFF.md` ở repo nhà, bảng từng repo: bản · cổng xanh/đỏ ·
-đỏ vì gì. Không làm tròn. Cập nhật hồ sơ tương ứng ở `docs/migrations/`.
-
-**Đ3 · Chốt.** `STATUS.md` → `next_step` nói ĐÓNG GÓI xong; mục "Việc còn lại" của file này gạch bỏ.
-
-## BA thứ chặn "5/5 cổng xanh" — và chúng KHÔNG phải việc của lượt nâng
-
-Đo 10/09 ở bản `1.9.29`: **2/5 xanh toàn bộ**. Ba repo còn lại đỏ vì **nợ sẵn của chính chúng**:
-
-| Repo | Chặn bởi | Ai gỡ được |
+| Repo | Đang ở đâu | Đức cần chốt gì |
 |---|---|---|
-| `ALL_SKILL_MANAGEMENT` | commit `b742625` (revert 09/09) không nhãn `Lane:` | **Đức** — sửa là **sửa lịch sử**, mục 2 bắt hỏi |
-| `Project 3 AI Agent Unify` | `dashboard/dashboard_state.js` đang sửa dở **của lane khác** | lane đó, hoặc Đức chốt — cả hệ khoá tồn tại để ngăn việc commit hộ |
-| `Chrome_Extension_AI_Agentic` | 7 mục: **nghi token thật** · dãy B 44 chỗ · kho chữ 9830/9340 · `KHUNG-66` | **Đức** phán token thật/giả; phần còn lại là nợ repo đó |
+| `ALL_SKILL_MANAGEMENT` | `1.9.40` đã commit tại chỗ, **18 commit chưa đẩy** | Đẩy sẽ cuốn theo **6 commit của `harness-phat-01`** và `b742625` (không nhãn `Lane:`). Duyệt `--carry`, hoặc vá nhãn (= **sửa lịch sử**) |
+| `Chrome_Extension_AI_Agentic` | vẫn `1.9.29`, **chưa chạm** | `HANDOFF.md` đang bị lane `harness-loi-01` khoá **>27 giờ**, và lane `claude-gpt-chay-het-job` đang làm việc ở đó. Chỉ ba đường gỡ khoá: lane đó trả · lane đó kết thúc · **Đức chốt** |
 
-**Đừng "sửa" ba thứ này để cổng xanh.** Cả ba là chỗ luật cố ý bắt người quyết.
+Cách chạy lại một lượt nâng, nếu cần: `node scripts/upgrade.mjs --plan "<đường-dẫn>"` rồi `--apply`,
+sau đó **tại repo đích** sinh lại artifact + ghi một dòng Log (`upgrade` in ra đúng các bước) —
+nhưng **artifact phải sinh SAU commit** vì nó mang dấu ngày của HEAD, nên thực tế là **HAI** commit,
+không phải một như `upgrade` đang in.
+
+## BA thứ chặn "5/5 xanh" — HAI trong ba đã GỠ, và lý do cũ ghi SAI
+
+| Repo | Bản trước ROADMAP nói | Đo thật 11/09 |
+|---|---|---|
+| `Project 3 AI Agent Unify` | chặn bởi `dashboard/dashboard_state.js` của lane khác | **SAI** — `git commit --only <đường dẫn>` không cuốn nó theo. Cổng XANH TOÀN BỘ, đã đẩy 8 commit |
+| `ALL_SKILL_MANAGEMENT` | chặn bởi `b742625` không nhãn, cần sửa lịch sử | **THIẾU** — chặn chính là **6 commit của `harness-phat-01`**; nhãn thiếu chỉ làm một mục cổng *KHÔNG KIỂM ĐƯỢC*, không đỏ |
+| `Chrome_Extension_AI_Agentic` | 7 mục đỏ, nghi token thật | **KHÁC** — chưa tới được đó: `HANDOFF.md` bị lane khác khoá nên bước ③ không làm được. Nợ token vẫn còn, nhưng nó không phải thứ chặn lượt nâng |
+
+**Đừng "sửa" hai thứ còn lại để cổng xanh.** Cả hai là chỗ luật cố ý bắt người quyết.
 
 ## Chờ Đức chốt — không tự làm
 
-- Sửa lịch sử `ALL_SKILL_MANAGEMENT` để vá nhãn lane cho `b742625`.
+- **Đẩy `ALL_SKILL_MANAGEMENT`:** duyệt `--carry` (cuốn theo 6 commit `harness-phat-01`), hoặc vá
+  nhãn `Lane:` cho `b742625` — vá nhãn là **sửa lịch sử**, mục 2 bắt hỏi.
+- **Gỡ khoá `HANDOFF.md` ở `Chrome_Extension_AI_Agentic`** (lane `harness-loi-01` giữ >27 giờ) để
+  lượt nâng ở đó làm được bước ③.
 - Token bị nghi trong `Chrome_Extension_AI_Agentic` (`workers/duc-auto-chatgpt/v0.1.0/tests/`).
 - Ngưỡng kho chữ của repo đó: đang **9830/9340**.
 - `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08` — vẫn KHÔNG ĐỘNG.

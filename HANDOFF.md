@@ -1679,3 +1679,27 @@ Việt làm `--batch` hỏng" khi chỉ ký tự XUỐNG DÒNG mới hỏng.
 phép ghim.
 
 **Nạp 4200/4200 — HẾT DƯ.** Phiên sau thêm một chữ vào `AGENTS.md`/`STATUS.md` là cổng ĐỎ.
+
+## 2026-09-11 · harness-loi-02 — ĐÓNG GÓI: 3/5 repo đích ĐÃ ĐẨY, và một cửa CHẾT ở cả 5
+
+**Bảng thật, không làm tròn.** Nhà `1.9.40`.
+
+| Repo đích | Bản | Cổng | Đẩy | Chặn bởi gì |
+|---|---|---|---|---|
+| `n8n-orchestrator` | **1.9.40** | XANH TOÀN BỘ | **13 commit** | — |
+| `n8n_Local host` | **1.9.40** | XANH TOÀN BỘ | **9 commit** | — |
+| `Project 3 AI Agent Unify` | **1.9.40** | XANH TOÀN BỘ | **8 commit** | — (nhánh `codex/antigravity-…`, upstream riêng) |
+| `ALL_SKILL_MANAGEMENT` | **1.9.40** commit rồi | KHÔNG KIỂM ĐƯỢC 1 mục | **KHÔNG** | 6 commit của `harness-phat-01` + `b742625` không nhãn → cần **ĐỨC** |
+| `Chrome_Extension_AI_Agentic` | vẫn **1.9.29** | không chạm | **KHÔNG** | `HANDOFF.md` đang bị `harness-loi-01` khoá, và lane `claude-gpt-chay-het-job` vừa commit |
+
+**Cửa CHẾT tìm ra khi thi hành, 5/5 repo:** `safe-push` đọc `audit.nguoi_duyet` từ đĩa, mà
+`STRUCTURE_SEED` chưa từng khai khối đó → nhãn `Audit:` ở repo đích **chỉ có thể làm HẠI**. Vá gốc
+ở `1.9.40`; ADR-0020. Ca thật: hai commit `1.9.39` bị chặn vì tự khai `Audit: codex` — nhãn nói
+THẬT lại là thứ khoá cửa.
+
+**Ba chỗ ROADMAP ghi SAI, đã sửa:** `Project 3` không bị `dashboard_state.js` chặn (nêu đường dẫn
+là xong) · `ALL_SKILL` chặn vì **commit lane khác**, không chỉ vì sửa lịch sử · `Chrome_Extension`
+chặn vì **khoá của lane khác**, không phải vì token.
+
+**Vấp:** ghi log vào `scratchpad/` TRONG repo → `_root` bị sửa → `TREE_CHANGED` + cổng đỏ, mất một
+vòng ~9 phút. Log lệnh dài phải ghi RA NGOÀI cây.
