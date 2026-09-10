@@ -15,17 +15,27 @@ ttl_days: 180
 > giao cho AI khác. Đọc file này mà vẫn không làm nổi thì **đó là lỗi của file này**: ghi chỗ vấp
 > vào `BACKLOG.md` của repo bộ khung.
 
+## Bốn luật của một lượt nâng — chỗ mất mát thật sự xảy ra
+
+1. **`--plan` trước, LUÔN LUÔN.** `--apply` tự từ chối khi có `SỬA TAY`. Gặp từ chối thì đọc
+   `git diff` ở repo đích rồi quyết **từng file**. `--force` nghĩa là *"tôi biết repo bị sửa
+   tay, cứ đè"* — nó là cách mất việc của người ta, không phải cách đi nhanh. Đo được rằng
+   không ai sửa tay: `git log --oneline -- scripts/` ở repo đích chỉ có đúng commit lắp đặt.
+2. **Nâng là lượt RIÊNG.** Không trộn với migrate, không trộn với việc tính năng — một lượt
+   cổng chỉ quy thuộc được một loại thay đổi.
+3. **Cổng XANH TRƯỚC rồi mới nâng.** Xanh-trước là thứ làm cho đỏ-sau quy được về bản nâng;
+   thiếu nó thì mọi cái đỏ đều mồ côi.
+4. **Một repo một lượt, repo đầu là chim báo mỏ.** Đo 10/09: năm repo đã lắp lệch **giống hệt
+   nhau**, nên chỗ vấp ở repo đầu lặp y nguyên ở bốn repo sau — trả tiền học một lần.
+
+Không biết repo nào đang cần nâng thì **đừng cố nhớ, đi đo**: `npm run doi-hinh` ở repo bộ khung
+in ra repo nào ghim bản nào, lệch mấy file, và bỏ lỡ bản nào đáng.
+
 ## Việc này chạm những vùng nào
 
-Nâng bộ khung chạm `scripts/` + `tests/` + `docs/` + gốc repo — thường là ba tới bốn khoá:
-
-```bash
-node scripts/claim.mjs --take _code --as <tên-phiên> --task "nang bo khung"
-node scripts/claim.mjs --take _docs --as <tên-phiên> --task "so tay moi"
-node scripts/claim.mjs --take _root --as <tên-phiên> --task "ban do file + nhat ky"
-```
-
-Tên khoá của repo đích có thể khác — khối **ĐO ĐƯỢC** ở đầu đề bài đã in bảng quyền thật.
+Chạm `scripts/` + `tests/` + `docs/` + gốc repo — thường ba tới bốn khoá (`_code` · `_docs` ·
+`_root`), nhận bằng `claim.mjs --take`. Tên khoá repo đích có thể khác: khối **ĐO ĐƯỢC** ở đầu
+đề bài đã in bảng quyền thật.
 
 ## 1. Xem trước, rồi mới ghi
 
@@ -64,22 +74,12 @@ Không có `SỬA TAY` và `CHƯA GHIM` thì ghi:
 node scripts/upgrade.mjs --apply "<REPO ĐÍCH>"
 ```
 
-**Đừng dùng `--force` nếu bạn không tự đo được rằng file khác chỉ vì nó là bản cũ.** Cách đo: ở
-repo đích chạy `git log --oneline -- scripts/` — chỉ có đúng commit lắp đặt thì không ai sửa
-tay, `--force` an toàn. Có commit khác thì **hỏi người chốt**.
-
 ## 2. Khai lệnh mới vào `package.json` của repo đích
 
 Bản nâng có thể mang script mới mà repo đích chưa khai lệnh:
 
-```bash
-cd "<REPO ĐÍCH>"
-ls scripts/*.mjs
-node -e "console.log(Object.keys(require('./package.json').scripts))"
-```
-
-Script có mà lệnh chưa khai thì thêm vào. Hai lệnh hay thiếu nhất:
-`"can-nang": "node scripts/can-nang.mjs"` và `"don": "node scripts/don.mjs"`.
+Đối chiếu `ls scripts/*.mjs` với `scripts` trong `package.json` của repo đích; script có mà lệnh
+chưa khai thì thêm. Hay thiếu nhất: `can-nang` và `don`.
 
 ## 3. Khai file mới vào Bản đồ file — **cổng sẽ bắt nếu quên**
 

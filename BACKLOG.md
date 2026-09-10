@@ -18,6 +18,26 @@
 
 ## P1
 
+### KHUNG-61 · Bảy mục luật ở `AGENTS.md` nhà chưa có phép dò — đang MIỄN, không phải đang ĐỦ
+
+Bản 1.8.11 dựng vế `5e`: mỗi mục `##` trong `AGENTS.md` của repo nhà phải có một phép dò
+`trong_file`, hoặc một lời miễn có lý do trong `features.json` → `luat_nha.mien`. Cơ chế đã
+chạy và bắt được omission (thêm một mục mà quên khai thì ĐỎ). **Nhưng số hiện tại là 2 dò / 7
+miễn**, và sáu trong bảy lời miễn ghi thẳng là `NỢ`.
+
+**Vì sao không khai luôn trong cùng lượt.** Phép dò đo bằng CHUỖI. Chọn vội một chuỗi lấy từ
+cách hành văn của repo nhà thì mọi repo đích đỏ vì **diễn đạt khác**, trong khi luật của họ có
+đủ — đúng ngược lại cái mà `F4.7` đã dạy: đo NĂNG LỰC, đừng đo TÊN GỌI. Sáu chuỗi chọn vội
+trong một lượt ngồi là sáu ca báo động giả rải lên năm repo.
+
+**Sáu mục còn nợ:** `0. Ba việc phải làm` · `1. Ai giữ package nào` · `3. Năm luật vàng` ·
+`4. Vùng cấm sửa` · `7. Đóng phiên` · `8. Thêm một luật thì bớt một luật`.
+*(`6. Sổ tay mở khi cần` KHÔNG nợ — nó cố ý không mang sang, đã ghi lý do.)*
+
+**đóng khi:** mỗi mục trong sáu mục trên hoặc có một mục `trong_file` trong `features.json` mà
+chuỗi của nó **đo được ở ít nhất hai repo đích có cách hành văn khác nhau**, hoặc được đổi lời
+miễn từ `NỢ` sang một lý do thật *"không mang sang, vì…"*. Và `luat_nha.mien` không còn chữ `NỢ`.
+
 ### KHUNG-51 · Suite ĐỘT BIẾN ghi thẳng vào file ĐÃ COMMIT của cây làm việc chính
 
 > **Mục này viết ra với số `KHUNG-47` — TRÙNG với một mục lane `harness-phat-01` vừa thêm cùng

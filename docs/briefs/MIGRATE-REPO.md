@@ -139,13 +139,13 @@ node scripts/features.mjs --migrate "<REPO ĐÍCH>"    # khối checklist, dán 
 cd "<REPO ĐÍCH>" && node tests/features-smoke.mjs    # ĐỎ nếu có mục MỘT PHẦN
 ```
 
-**`assess` đếm FILE, `features` đếm NĂNG LỰC — và hai con số đó lệch nhau thật.** Đo 09/09 ở
-`n8n_Local host`: `assess` báo **mức 3/3, chi phí 0/0/0**, trong khi `features-smoke` ĐỎ vì thiếu
-`F4.7` (luật hai vai chưa có trong `AGENTS.md`). `--apply` không mang nổi vì đó là **nội dung bên
-trong một file cấm đè**, không phải một file để chép.
+**`assess` đếm FILE, `features` đếm NĂNG LỰC.** Đo 09/09 ở `n8n_Local host`: `assess` báo **3/3,
+chi phí 0/0/0**, `features-smoke` ĐỎ vì thiếu `F4.7` — **nội dung bên trong một file cấm đè**,
+`--apply` không mang nổi. Vá bằng cách **THÊM một mục**, không viết lại.
 
-Mục `[~] MỘT PHẦN` **nguy hơn** mục `[ ]` thiếu: thiếu thì còn đợi được, một nửa thì hỏng im lặng.
-Vá bằng cách **THÊM một mục** vào file cấm đè — không viết lại.
+Bốn dấu: `[~]` **một phần** nguy hơn `[ ]` **thiếu** (một nửa hỏng im lặng, thiếu thì còn đợi
+được); `[!]` **có nhưng bản CŨ** là việc **NÂNG**, không thuộc lượt này — cùng lý do với dòng
+*"việc NÂNG"* mà khối checklist tự in ra khi một cơ chế ra đời sau bản repo đích đang ghim.
 
 ### 9. Bốn thước, và bàn giao phần PHÁN ĐOÁN qua SỔ
 
@@ -163,21 +163,17 @@ thuộc repo đích. Khai đủ **bốn**, rồi đo và siết về **số th�
 migrate làm hết, không để lại.
 
 **Phần PHÁN ĐOÁN thì KHÔNG làm ở đây** — nén/gộp bộ luật sẵn có của repo đích. Ba lý do: ⑴
-`rule-compiler.mjs` đóng cứng `ROOT` vào repo chứa nó, **không có `--repo`** ⑵ câu nào thừa là
-phán đoán về **NGHỀ của họ**, từ đây chỉ đoán được ⑶ bất biến mục 5: người SỬA không tự NGHIỆM
-THU — lượt migrate vừa lắp bộ nén vừa dùng nó viết lại hiến pháp của họ thì không còn ai soi.
-
-**Nhưng đừng vứt phân tích đi.** Chạy chế độ ĐỌC ngay tại repo đích rồi **dán nguyên kết quả vào
-`BACKLOG.md` của họ**, kèm `đóng khi:`:
+`rule-compiler.mjs` đóng cứng `ROOT`, **không có `--repo`** ⑵ câu nào thừa là phán đoán về
+**NGHỀ của họ** ⑶ mục 5: người SỬA không tự NGHIỆM THU. **Nhưng đừng vứt phân tích đi** — chạy
+chế độ ĐỌC tại repo đích rồi dán nguyên kết quả vào `BACKLOG.md` của họ, kèm `đóng khi:`:
 
 ```bash
 cd "<REPO ĐÍCH>" && node scripts/rule-compiler.mjs --trim      # mục nào đáng cắt
 cd "<REPO ĐÍCH>" && node scripts/rule-compiler.mjs --check     # luật nào trùng/mâu thuẫn
 ```
 
-Phiên sau ở repo đó mở sổ ra là **đã có sẵn danh sách kèm số đo** — nó chỉ phải quyết và chịu
-trách nhiệm, không phải phân tích lại. Đó là cách giữ ngữ cảnh mà không đốt lại token: **ngữ cảnh
-nằm trong SỔ, không nằm trong cửa sổ chat** — chat sẽ biến mất, sổ thì không.
+Phiên sau mở sổ ra là **đã có sẵn danh sách kèm số đo** — chỉ phải quyết, không phải phân tích
+lại: **ngữ cảnh nằm trong SỔ, không nằm trong cửa sổ chat.**
 
 ### 10. Ba phép thử của "assistant onboard" — CHƯA LÀM LÀ CHƯA XONG
 

@@ -3,6 +3,59 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.8.11 — 2026-09-10 — Bảng tính năng thôi nói dối về BẢN, và có chuông cho cả đội hình
+
+Đức hỏi: *"migrate phiên bản mới thì tính năng cũ đã có bản cập nhật, ta có mang sang không?"*
+Đo trước khi trả lời, và số đo tệ hơn dự đoán.
+
+| Đo 10/09 | Kết quả |
+|---|---|
+| ba repo vừa migrate hôm trước, bảng tính năng nói | `33 xong · 0 một phần` — **xanh tuyệt đối** |
+| `upgrade --plan` cùng ngày, cùng ba repo | **7 file CŨ · 2 file THIẾU** ở cả ba |
+| bản vá FAIL-OPEN của 1.8.3 có mặt ở ba repo đó | `session-check.mjs` chứa dấu hiệu: **0 · 0 · 0** |
+| file tầng máy không phép đo nào chạm tới | **9/38** |
+| repo đã migrate đang tụt lại | **5/5. Không cổng nào ở đó đỏ** |
+
+**Gốc bệnh: `[x]` trả lời *"có chưa"*, không trả lời *"có bản nào"*.** Với một bộ khung phát
+hành liên tục thì câu thứ hai mới tốn tiền. Và `tu_ban` — trường tưởng để trả lời câu đó — chỉ
+được IN RA: hai chỗ dùng trong cả repo, cả hai đều `console`.
+
+**Năm chỗ vá, không thêm một trường khai tay nào.**
+
+1. **Phép ghim chiều-ngược hỏi BỘ DỰNG, không bới mã nguồn.** Nó từng đọc `build-template.mjs`
+   rồi bới đúng mảng `PORTABLE_SCRIPTS` bằng regex — bắt được scripts, mù với mọi thứ khác. Nay
+   hỏi `fileMay(buildTemplateFiles())`, tức chính định nghĩa mà `bamBanTrich` dùng. Chín file
+   lộ ra, trong đó có **cả cơ chế cửa index của 1.8.8** và `bang-song/Xem-bang.cmd` — **cửa
+   chính** của đúng cái tính năng tự gọi mình là *"ba cửa"*. Thêm `F3.6` cho cửa index.
+2. **Trạng thái thứ năm `[!]` CÓ NHƯNG BẢN CŨ.** Dùng lại phép so BA chiều của `upgrade.mjs`
+   (bản chuẩn ↔ bản ở repo ↔ dấu vân tay sổ ghim), **không chép lại phép so**. `features.mjs`
+   đi theo bản trích còn `upgrade.mjs` ở lại nhà, nên nhập ĐỘNG trong try/catch: thiếu thì trả
+   `null`, và `null` **khác tập rỗng** — bản in phải nói *"CHƯA đối chiếu"*, vì một bảng không
+   có `[!]` nào trông y hệt nhau ở hai ca ngược nhau. Repo B đọc lại: `25 xong · 8 bản cũ`.
+3. **`npm run doi-hinh` — quét cả đội hình.** Câu *"repo nào đang tụt lại"* chỉ trả lời được ở
+   repo nhà. Danh sách repo suy từ `duong_dan` trong `docs/migrations/`; **đo sống, không đẻ
+   thêm sổ** — một cuốn sổ *"repo X ở bản Y"* sẽ mục ngay lượt nâng đầu tiên không ai nhớ ghi,
+   và lúc đó nó nói DỐI thay vì nói thiếu. Repo đọc không được thành một dòng có lý do.
+4. **Sổ phát hành mang thêm Ý NGHĨA.** Khối `chi_tiet` mới, song song với `ban` (140 mục,
+   **không đụng tới** — sửa một mục cũ ở đó là `SUA_LICH_SU`). Nay `doi-hinh` nói được *"bỏ lỡ
+   1.8.3 — vá một FAIL-OPEN của cổng"* thay vì chỉ liệt kê tên file. Bản chưa khai ý nghĩa được
+   **đếm riêng**, không lặng lẽ rơi khỏi danh sách.
+5. **`tu_ban` gánh việc thật.** Một cơ chế ra đời ở bản SAU bản repo đích đang ghim thì nó là
+   việc **NÂNG**, không phải lỗi của lượt migrate. Đổ nhầm cột là đổ việc cho nhầm người.
+
+**Và một vế bịt chiều OMISSION ở tầng LUẬT** (`5e`): mỗi mục `##` trong `AGENTS.md` của repo nhà
+phải có một phép dò `trong_file`, **hoặc** một lời miễn có lý do trong `features.json`. Tầng luật
+là chữ nằm trong file repo đích tự sở hữu, `upgrade` không bao giờ ghi — nên luật mới ở nhà không
+có đường nào tự tới. Đã hỏng đúng kiểu đó hai lần (`F4.7` báo `[x]` ở 4 repo trong khi grep ra
+0/4; `F5.1` thiếu ở cả 3 repo). Hiện 2 mục có dò, 7 mục miễn có lý do — nợ ở `KHUNG-61`.
+
+Ghim: `features-smoke` 11 → **13 vế** · `doi-hinh` **5 vế** mới. Đột biến đã chạy và đều ĐỎ: gỡ
+một file khỏi `can` · bộ dựng trả rỗng · `CU` che mất `MỘT PHẦN` · in giống nhau ở hai ca
+đã-đo/chưa-đo · thêm một mục `##` mà quên khai · lời miễn rỗng · gỡ một lời miễn.
+
+Trần giữ nguyên: kho chữ **3117/3117** (bốn luật lượt nâng và mục `doi-hinh` trả bằng dedup tại
+chỗ), nạp **4195/4200** — không chạm `AGENTS.md`.
+
 ## 1.8.10 — 2026-09-10 — Sổ phát hành KHÔNG thấy cái hook, và bản trích phát phép ghim mà không phát thứ nó ghim
 
 Đức hỏi *"đổi hook thế này thì có phải nâng version không?"*. Có — và tôi ĐÃ nâng (1.8.8→1.8.9).

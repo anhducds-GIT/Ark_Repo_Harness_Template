@@ -106,6 +106,10 @@ chạy `npm run bootstrap`
 
 `npm run giao-viec -- --viec <nang\|migrate\|audit> --repo "<repo-đích>" --as <tên-phiên>` → in ra stdout một đề bài **đã đo sẵn repo đích** (nhánh · lệch nhánh mặc định · file sửa dở trong/ngoài vùng · bảng quyền · bản khung đang ghim). **Đo không được thì KHÔNG in gì** — một đề bài dựng trên số liệu đoán còn nguy hiểm hơn không có đề bài. Nửa trên là [docs/briefs/GIAO-VIEC-CHUNG.md](docs/briefs/GIAO-VIEC-CHUNG.md) (luật chung: tên phiên · khoá vùng · hai lượt đẩy · năm việc cấm · mẫu báo cáo năm dòng, và **ba giới hạn đo được của `codex exec`**); nửa dưới là phần việc: [nâng](docs/briefs/NANG-BO-KHUNG.md) · [migrate](docs/briefs/MIGRATE-REPO.md) · [audit](docs/briefs/AUDIT-REPO.md). **Đức chốt 06/09**: Claude Code không làm hết một mình được. Đề bài viết TRƯỚC khi đo repo đích đã dạy sai một lượt thật — nên việc đo thành LỆNH, không thành dòng dặn dò
 
+### Biết REPO NÀO đang tụt lại bản khung nào — trước khi ai kịp quên
+
+`npm run doi-hinh` → [scripts/doi-hinh.mjs](scripts/doi-hinh.mjs), ghim ở [tests/doi-hinh.mjs](tests/doi-hinh.mjs). Câu *"repo nào đang tụt lại"* **về nguyên tắc chỉ trả lời được ở đây**: repo đích không với tới repo nhà nên nó không tự biết mình cũ. Danh sách repo suy từ `duong_dan` trong [docs/migrations/](docs/migrations/) — **đo SỐNG, không đẻ thêm sổ**: một cuốn sổ *"repo X đang ở bản Y"* sẽ mục ngay lượt nâng đầu tiên không ai nhớ ghi, và lúc đó nó nói DỐI thay vì nói thiếu. In ra: bản ghim · số file cũ/thiếu/**sửa tay** · **tính năng nào** đang chạy bản cũ (suy từ `can.file`) · **bỏ lỡ bản nào và mất gì** (khối `chi_tiet` của [RELEASE-LEDGER.json](RELEASE-LEDGER.json)). Repo đọc không được thành MỘT DÒNG có lý do, không biến mất — biến mất thì nó đọc y hệt một repo đang khớp chuẩn. Đo 10/09 lượt đầu: **5 repo đã migrate, 5 repo tụt lại, 0 khớp**, và không cổng nào ở đó đỏ
+
 ### Nhờ một AI khác brainstorm cho repo này
 
 **ĐÃ LƯU KHO 09/09** (đề bài đưa bộ khung tới v1.0; nay đã 1.6.0): [docs/archive/BRAINSTORM-GPT-V1.md](docs/archive/BRAINSTORM-GPT-V1.md) — dán trọn, đừng tóm tắt hộ

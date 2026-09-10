@@ -1131,3 +1131,31 @@ từng repo, đã khai vào bản đồ file của repo đó.
 **Còn mở:** `nav_platform_main` **16 commit chưa đẩy**, cổng còn **đúng một đỏ** —
 `LANE_KHONG_QUY_THUOC_DUOC` ở `1f49daf0` (nhãn `Lane:` có khoảng trắng, commit của chính tôi từ
 trước khi biết luật đó). Sửa = `--amend` = **sửa lịch sử**, mục 2 bắt hỏi Đức. Đã trả khoá kèm lý do.
+
+## 2026-09-10 · `harness-migrate-3repo` — bản 1.8.11: bảng tính năng thôi nói dối về BẢN
+
+Đức duyệt tám đề xuất cho bộ nâng + bộ migrate. **N2 không phải làm** — lane `harness-loi-02` đã
+vá ở 1.8.10, và vá bằng QUY TẮC chứ không bằng danh sách; tôi kiểm chứng rồi bỏ qua. Bảy mục còn
+lại xong trong bản này.
+
+**Con số mở mắt:** ba repo migrate hôm trước đọc `33 xong · 0 một phần` — xanh tuyệt đối — trong
+khi `upgrade --plan` cùng ngày kể **7 file CŨ · 2 THIẾU** ở cả ba, và bản vá FAIL-OPEN của 1.8.3
+có mặt ở **0/3** repo đó. Chạy `doi-hinh` lượt đầu: **5 repo đã migrate, 5 tụt lại, 0 khớp**, kể
+cả hai repo tôi không biết là đang tồn tại. Không cổng nào ở đó đỏ.
+
+**Chỗ tôi suýt sai — cross-lane.** `build-template.mjs` đang bị lane kia **sửa dở và giữ khoá**.
+Tôi chạy nó để sinh bản trích, tức dấu vân tay 1.8.11 có thể đã nuốt việc chưa xong của họ. Bắt
+được lúc đọc `git status`. Kiểm bằng cách clone repo tại HEAD, chép các file CỦA TÔI vào rồi dựng
+lại: `a7e332c…` — **giống hệt**, nên bản này sạch. Bài học: **sinh bản phát thì phải hỏi bộ dựng
+ở HEAD, không hỏi bộ dựng trên đĩa** — trên cây nhiều lane, hai cái đó là hai thứ khác nhau.
+Cũng vì thế mã việc của tôi phải đổi `KHUNG-60` → `KHUNG-61`: họ vừa lấy số đó.
+
+**Trần giữ nguyên, trả bằng dedup tại chỗ:** kho chữ **3117/3117** (bốn luật lượt nâng nằm gọn
+trong `NANG-BO-KHUNG.md` 96→96 dòng; mục `doi-hinh` trong bản đồ file trả bằng cắt ở
+`MIGRATE-REPO.md` 241→237), nạp **4195/4200** — không chạm `AGENTS.md` một dòng nào.
+
+**Còn mở:** `KHUNG-61` — 7 mục luật ở `AGENTS.md` nhà mới có 2 phép dò, 6 mục ghi thẳng là NỢ.
+Cố ý: chọn vội một chuỗi lấy từ cách hành văn của repo nhà là rải sáu báo động giả lên năm repo.
+
+**Việc kế (một việc):** năm repo trong `doi-hinh` đều đang tụt lại — chạy một lượt NÂNG, **một
+repo một lượt**, repo đầu là chim báo mỏ. Bốn luật của lượt nâng ở `docs/briefs/NANG-BO-KHUNG.md`.
