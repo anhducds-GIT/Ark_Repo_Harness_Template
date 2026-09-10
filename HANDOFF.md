@@ -21,6 +21,36 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 > **Lượt CŨ hơn đã dời sang** [docs/archive/HANDOFF-202609.md](docs/archive/HANDOFF-202609.md) — chữ giữ nguyên từng dòng.
 
 
+## 2026-09-10 (tiep 10) · harness-loi-02 — SỐ TỔNG NÓI NGƯỢC: hiến pháp KHÔNG gọn hơn
+
+**Đính chính chính tôi.** Giữa lượt tôi báo *"gọn 2%"* (4.196 → 4.099 token) và ghi vào
+`CHANGELOG` 1.9.31. Con số đó đúng **tại thời điểm đó**, nhưng sau khi vá 11 chỗ audit Codex bác,
+đo lại từ `a9d6e8e` tới HEAD:
+
+| | Trước | Sau |
+|---|---:|---:|
+| Mục | 9 | **6** ✔ |
+| Mục luật ở Tầng 1 | 111 | **43** |
+| Dòng | 167 | **165** |
+| Byte | 11.610 | **11.792** — **+1,6%** |
+| Token `AGENTS.md` | 3.579 | **3.598** — **+0,5%** |
+| Token NẠP | 4.197 | **4.190** |
+
+**Hiến pháp KHÔNG gọn hơn. Nó hơi TO ra.** Vạch `R0` *"hạ trần 3.000"* không đạt, và không đạt
+theo hướng ngược lại với báo cáo giữa đường của tôi.
+
+**Vì sao, đo được:** ⑴ `ADR-0016` đã nén một lượt rồi, nên 68 mục bị cắt phần lớn là **mệnh đề
+trong câu**, không phải dòng; ⑵ lượt này **THÊM** chỗ nói thẳng những gì máy KHÔNG canh, cộng ghi
+chú số-mục-có-chỗ-trống, cộng 11 câu audit đòi trả lại.
+
+**Cái ĐẠT được là NHẤT QUÁN, không phải GỌN** — và đó là nửa yêu cầu của Đức: mâu thuẫn hai-mốc-trả
+(có sẵn từ bản cũ) đã hết · `R-049` thôi có hai câu trả lời · 21 con trỏ chết đã sửa · hai phép dò
+`F4.7`/`F5.1` được ngắm lại và có đột biến ghim.
+
+**Muốn GỌN THẬT thì phải cắt LUẬT, không cắt lời thú nhận.** Chỗ còn nặng nhất, theo token: mục 0
++ 0b (số đo thứ tự đóng phiên) · mục 1 (cơ chế khoá) · mục 2 (bảng phải hỏi + điều cấm). Cả ba là
+**luật có hiệu lực**, nên cắt là đánh đổi — Đức chốt, không phải tôi.
+
 ## 2026-09-10 (tiep 9) · harness-loi-02 — audit Codex qua stdin, và phép so của tôi bỏ sót 9/9
 
 **Đức chốt hai lần:** *"cần audit độc lập bạn gọi Codex CLI"* → *"codex cli hãy dùng stdin"*.
