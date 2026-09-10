@@ -1200,3 +1200,21 @@ thành `KHUNG-62`** — có `đóng khi:` riêng, tức đóng được riêng. 
 
 **Trần 30 là trần TẠM.** Đã khai `_do_that` ngay cạnh con số để lượt DỌN sau không đọc nhầm 30 là
 số đúng. Sổ hiện **26/30**.
+
+## 2026-09-10 · `harness-migrate-3repo` — vì sao tôi trả khoá TRƯỚC khi đẩy (KHUNG-63)
+
+Luật nói khoá VÙNG trả **sau khi đã đẩy**. Lượt này tôi trả trước, kèm `--du-biet`, và đây là lý do
+đo được — không phải tiện tay.
+
+`build-overview.mjs` in *"giữ N phút"* qua `ageLabel()`, tính từ `Date.now()`. Trang tự lệch mỗi
+phút dù repo không đổi gì. Vòng khoá chặt: cổng đòi trang tươi → sinh lại rồi commit → commit làm
+mất hiệu lực dấu xác nhận → suite chạy **19 phút** → 19 phút sau con số phút đã đổi → trang lại cũ.
+**Còn giữ khoá thì không đóng được phiên.** Ba repo migrate hôm qua không dính vì `generators` của
+chúng chỉ khai `build-dashboard.mjs`.
+
+Nên: mọi lượt ghi của tôi **đã commit xong** trước khi trả; trả khoá không bỏ dở việc gì. Nợ ghi ở
+`KHUNG-63` kèm điều kiện đóng đo được (sinh hai lần cách nhau ≥2 phút phải ra hai file byte-hệt-nhau).
+
+**Cho lane sau:** đây là lý do đừng tin *"cổng đỏ ở mục artifact"* là mình làm sai. Kiểm bằng
+`git diff -- DASHBOARD-*.html` — nếu phần lệch duy nhất là chuỗi *"giữ … phút"* thì đó là KHUNG-63,
+không phải lỗi của bạn.

@@ -18,6 +18,37 @@
 
 ## P1
 
+### KHUNG-63 · Trang tổng quan nhúng "giữ N phút" — bộ sinh đọc ĐỒNG HỒ, nên lane giữ khoá KHÔNG BAO GIỜ xanh nổi cổng
+
+Đo 10/09, dựng lại được mọi lượt. `build-overview.mjs` in thời gian giữ khoá qua `ageLabel()`
+(`claim.mjs:569`), và giá trị đó tính từ `Date.now()`. Nên trang **tự lệch mỗi phút** dù không
+một dữ liệu nào trong repo đổi:
+
+```
+- ... giữ khoá `_code` · giữ 44 phút      (bản đã commit)
++ ... giữ khoá `_code` · giữ 55 phút      (sinh lại, cùng HEAD, cùng bảng quyền)
+```
+
+**Hệ quả là một vòng không lối ra, không phải một chỗ xấu xí.** Cổng đòi *"sự thật máy sinh còn
+tươi"*; muốn tươi thì sinh lại rồi commit; commit xong dấu xác nhận suite mất hiệu lực nên cổng
+chạy lại **19 phút** (`template-null-repo` 525s + `cong-do-that` 462s + `upgrade-smoke` 454s); 19
+phút sau con số phút đã đổi và trang lại cũ. **Lane nào giữ khoá vùng thì không bao giờ đóng
+được phiên** — trong khi luật lại bắt giữ khoá cho tới khi ĐÃ ĐẨY.
+
+Ba repo migrate hôm 09/09 không dính vì `generators` của chúng chỉ khai `build-dashboard.mjs`
+(không in thời gian giữ). Nó chỉ nổ ở repo có `build-overview.mjs` trong `generators` — tức repo
+nhà, và `n8n-orchestrator`.
+
+**Lỗi này đã có tên sẵn trong repo.** Đầu `build-so-migrate.mjs` viết đúng nó: *"Bộ sinh nhìn
+ĐỒNG HỒ thì sang ngày mới là bản sinh lại lệch bản đã commit dù không một dữ liệu nào đổi, và
+MỌI phiên bị chặn đẩy"* — và file đó đã chữa bằng `mocHEAD()`. `build-overview.mjs` chưa chữa
+cho ô thời-gian-giữ-khoá.
+
+**đóng khi:** sinh lại `DASHBOARD-*.html` hai lần cách nhau ≥ 2 phút trên cùng một HEAD và cùng
+một bảng quyền cho ra **hai file byte-hệt-nhau**; kèm một phép ghim dựng nổi ca đó (giả đồng hồ,
+hoặc hai lượt sinh cách nhau). Mốc thời gian nên suy từ **mốc HEAD**, không từ `Date.now()` —
+cùng phép chữa mà `build-so-migrate.mjs` đã dùng.
+
 ### KHUNG-62 · Không có cửa máy cho "Đức chốt cho nhả khoá FILE của lane khác" — nên phải MẠO NHÃN
 
 Khoá VÙNG có cửa: `--take <khoá> --as <phiên> --duc-duyet "<câu chốt>"`, ghi lại `taken_from` ·

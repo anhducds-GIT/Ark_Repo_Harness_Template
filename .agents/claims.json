@@ -3,42 +3,43 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": "harness-migrate-3repo",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-10T03:11:05.091Z",
       "task": "ban 1.8.11: do BAN chu khong chi do CO",
-      "released_at": null,
+      "released_at": "2026-09-10T04:14:40.260Z",
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
-      "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
+      "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'",
+      "tra_khi_chua_day": "1 commit · KHUNG-63: bo sinh doc dong ho, giu khoa thi cong khong xanh duoc. Viec da commit xong."
     },
     "_docs": {
-      "owner": "harness-migrate-3repo",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-10T03:11:05.238Z",
       "task": "bon luat luot nang + khai doi-hinh",
-      "released_at": null,
+      "released_at": "2026-09-10T04:14:40.045Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_code": {
-      "owner": "harness-migrate-3repo",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-10T03:17:45.737Z",
       "task": "ban 1.8.11: trang thai [!] + lenh doi-hinh",
-      "released_at": null,
+      "released_at": "2026-09-10T04:14:39.877Z",
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": "harness-migrate-3repo",
+      "owner": null,
       "ai": null,
       "claimed_at": "2026-09-10T03:11:05.509Z",
       "task": "sinh lai ban trich 1.8.11",
-      "released_at": null
+      "released_at": "2026-09-10T04:14:40.426Z"
     }
   },
-  "_fingerprint": "e20f2b795d8354ab"
+  "_fingerprint": "950991619fd8fdb8"
 }
