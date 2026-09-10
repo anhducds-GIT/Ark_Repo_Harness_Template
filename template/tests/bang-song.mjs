@@ -40,6 +40,7 @@ import { fileURLToPath } from "node:url";
 
 import { canSinh, chenBang, khoaChanSinhFrom, KHOA_CHAN_SINH, NHAN_BANG, xetChot } from "../bang-song/loi.mjs";
 import { DUONG, PHUONG_THUC, xuLy } from "../bang-song/may-chu.mjs";
+import { generatorsFrom } from "../scripts/repo-structure.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -203,6 +204,59 @@ const bang = (khoa) => JSON.stringify({ claims: khoa });
   // Và mặt còn lại: mã nguồn của ba cửa thì PHẢI được theo dõi.
   assert.equal(hoiGit("bang-song/loi.mjs"), false, "ma nguon cua ba cua thi phai duoc git theo doi");
   ok("8 · git tự xác nhận: ba file bản ra nằm ngoài, mã nguồn nằm trong");
+}
+/* VẾ 8b — R1 (10/09): CỔNG THÔI ĐÒI BẢNG KHỚP HEAD, VÀ TRANG HTML RA KHỎI GIT.
+ *
+ * Trước 10/09 cổng "Sự thật máy sinh còn tươi" đòi artifact ĐÃ COMMIT khớp HEAD. Vòng lặp:
+ * commit → HEAD đổi → bảng cũ → sinh lại → commit → HEAD đổi. Đo 7 ngày: 191/522 commit (37%)
+ * chỉ để sinh lại bảng, và mỗi cái còn làm hỏng dấu xác nhận suite (~10 phút một lượt).
+ *
+ * BẢN GHIM ĐẦU CỦA VẾ NÀY LÀ ĐỒ TRANG TRÍ, và kiểm toán độc lập bắt được: nó chỉ so
+ * `.repo-structure.json` với `[]`, tức chép lại CẤU HÌNH. Khôi phục điều kiện cũ
+ * `value.length === 0` trong `generatorsFrom` — đúng cái bug R1 chữa — thì nó VẪN XANH. Đã dựng
+ * lại ca hỏng và xác nhận: xanh. Nên nay vế này gọi THẲNG hàm và đòi HÀNH VI.
+ *
+ * Và đọc `git ls-files` là đọc INDEX — index dùng CHUNG với mọi lane, nên một lane khác `git add`
+ * là kết quả đổi dù HEAD chưa đổi. Muốn nói "một bản clone mới có gì" thì phải hỏi CÂY HEAD.
+ */
+{
+  /* `--no-index`: không có cờ này thì `check-ignore` chịu ảnh hưởng của INDEX — một lane khác
+     `git add -f` là vế này đỏ dù HEAD không đổi. Ta đang hỏi QUY TẮC .gitignore, không hỏi
+     trạng thái index. Kiểm toán vòng hai chỉ ra; cùng họ với việc đổi ls-files sang ls-tree. */
+  const biBoQua = (p) => {
+    try { execFileSync("git", ["check-ignore", "--no-index", "-q", p], { cwd: ROOT }); return true; }
+    catch (_) { return false; }
+  };
+  const trongHEAD = new Set(
+    execFileSync("git", ["ls-tree", "-r", "HEAD", "--name-only"], { cwd: ROOT, encoding: "utf8" })
+      .split(String.fromCharCode(10)).map((s) => s.trim()).filter(Boolean)
+  );
+
+  // (1) HÀNH VI của bộ đọc cấu hình — đây là thứ R1 thật sự sửa.
+  assert.deepEqual(generatorsFrom({ generators: [] }), [],
+    "`[]` PHAI hop le: cach DUY NHAT mot repo khai 'dung doi chieu artifact nao voi HEAD' — no KHONG noi repo thoi commit chung");
+  assert.ok(generatorsFrom({}).length > 0,
+    "VANG khoa thi VAN dung mac dinh — bo quen khac khai rong, tat bao ve phai la hanh dong co y");
+  assert.throws(() => generatorsFrom({ generators: "build-dashboard.mjs" }), /GENERATORS_HONG/,
+    "khong phai mang thi van phai nem loi");
+  assert.throws(() => generatorsFrom({ generators: ["scripts/build-dashboard.mjs"] }), /GENERATORS_HONG/,
+    "ten co dau / thi van phai nem loi");
+
+  // (2) LỜI MIỄN TRỪ SUITE phải chết theo khi không còn ai canh — lỗ audit tìm ra.
+  assert.equal(generatorsFrom({ generators: [] }).length, 0,
+    "co so cua le mien tru: rong nghia la khong ai canh, nen khong duoc mien suite");
+
+  // (3) CÂY HEAD, không phải index.
+  assert.equal(biBoQua("DASHBOARD-Ark-Repo-Harness.html"), true, "trang HTML PHAI bi .gitignore bo qua");
+  assert.ok(!trongHEAD.has("DASHBOARD-Ark-Repo-Harness.html"), "trang HTML KHONG duoc nam trong cay HEAD");
+  for (const f of ["llms.txt", "DASHBOARD.md", "repo-map.json"]) {
+    assert.ok(trongHEAD.has(f), f + " PHAI o lai trong cay HEAD — llms.txt la goc dieu huong cua B6");
+  }
+
+  // (4) Và repo này thật sự đã khai rỗng.
+  assert.deepEqual(JSON.parse(readFileSync(join(ROOT, ".repo-structure.json"), "utf8")).generators, [],
+    "repo nay phai khai `generators: []` — khai lai la dung lai vong lap 37%");
+  ok("8b · `[]` hợp lệ mà vắng khoá vẫn mặc định · HTML ngoài cây HEAD · ba file text ở lại");
 }
 
 /* ---- 9. BĂNG: gỡ được, không chồng, và NÓI RA thứ nó không thấy ---------- */

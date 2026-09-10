@@ -36,7 +36,7 @@
       "lifecycle": "active",
       "status_md": "STATUS.md",
       "owner": "harness-loi-02",
-      "next_step": "Đọc `docs/ROADMAP-V2.md` TRƯỚC. `R0` — Đức chốt VẠCH ĐÍCH, nó chặn mọi đợt. Rồi `R1` thôi commit bảng (bỏ 37% commit). `KHUNG-63` đã vá 1.8.12 nhưng CHƯA chạy suite, CHƯA đẩy — làm nốt trước.",
+      "next_step": "`R0` VẠCH ĐÍCH đã CHỐT 10/09 — bảng 9 ô ở `docs/ROADMAP-V2.md`, đọc TRƯỚC khi làm gì. Việc kế: `R1` thôi commit bảng — bỏ 37% commit, 3 bộ sinh còn 1.",
       "human_action": "CÓ — bảng tự đếm, xem nhóm \\\"Công việc\\\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật.",
       "priority_rank": 1,
       "superseded_by": null,
@@ -49,7 +49,7 @@
     {
       "id": "_root",
       "unit": "_root",
-      "title": "Đọc `docs/ROADMAP-V2.md` TRƯỚC. `R0` — Đức chốt VẠCH ĐÍCH, nó chặn mọi đợt. Rồi `R1` thôi commit bảng (bỏ 37% commit). `KHUNG-63` đã vá 1.8.12 nhưng CHƯA chạy suite, CHƯA đẩy — làm nốt trước.",
+      "title": "`R0` VẠCH ĐÍCH đã CHỐT 10/09 — bảng 9 ô ở `docs/ROADMAP-V2.md`, đọc TRƯỚC khi làm gì. Việc kế: `R1` thôi commit bảng — bỏ 37% commit, 3 bộ sinh còn 1.",
       "rank": 1,
       "claim": null
     }

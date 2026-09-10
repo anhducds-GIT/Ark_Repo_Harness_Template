@@ -63,19 +63,11 @@
       "note": "bản trích do build-template.mjs sinh — SINH TỰ ĐỘNG, sửa tay là mất ở lần sinh sau"
     }
   },
-  "generators": [
-    "build-dashboard.mjs",
-    "build-overview.mjs"
-  ],
-  "_generators_doc": "Script nào sinh ra artifact đã commit. Cổng đóng phiên đối chiếu từng cái với HEAD. CHỈ khai script repo này THẬT SỰ có — khai thừa là cổng đỏ vì thiếu file.",
-  "generated": [
-    "DASHBOARD.md",
-    "llms.txt",
-    "repo-map.json",
-    "DASHBOARD-Ark-Repo-Harness.html"
-  ],
+  "generators": [],
+  "_generators_doc": "Script nao sinh ra artifact DA COMMIT. Cong doi chieu tung cai voi HEAD. RONG (R1, 10/09) la CO Y va la DANH DOI: khong con ai doi chieu artifact da commit voi HEAD nua, doi lay viec bo vong lap 191/522 commit (37%) chi de sinh lai bang. Muon bat lai thi khai ten bo sinh vao day va nhan luon cai vong lap do. Chi khai script repo nay THAT SU co — khai thua la cong do vi thieu file.",
+  "generated": [],
   "_generated_doc": "FILE do các script trên sinh ra. Khai vào đây thì chúng KHÔNG đòi ai nhận quyền — nội dung tất định từ HEAD nên không ai sở hữu chúng theo nghĩa nào. Đo thật ở repo gốc: 19% lượt nhận khoá gốc tồn tại CHỈ để chạy bộ sinh; đó là tranh chấp nhân tạo.",
-  "_generated_doc2": "KHÔNG làm yếu lớp bảo vệ: nội dung vẫn bị phép kiểm 'Sự thật máy sinh còn tươi' đối chiếu với HEAD ở MỌI phiên, nên sửa tay một dòng vẫn ĐỎ. Và đừng lẫn với 'generators' (khác một chữ): cái kia là SCRIPT, cái này là FILE. Khai từng file, không khai thư mục.",
+  "_generated_doc2": "FILE do cac script tren sinh ra. Khai vao day thi chung KHONG doi ai nhan quyen — noi dung tat dinh tu HEAD nen khong ai so huu chung. RONG (R1, 10/09): repo nay khong mien tru file nao. KIEM TOAN 10/09 — `generated` khong rong ma `generators` rong la mot LO: commit bat cu gi vao artifact roi duoc mien suite, khong con ai doi chieu noi dung. Da bit o MUC CAU HINH (le mien tru chet theo khi `generators` rong, co doi chung nguoc o tests/cong-do-that.mjs ca b2). CHUA bit o muc TUNG FILE: co bo sinh khong chung minh bo sinh do canh dung file duoc mien — xem KHUNG-64.",
   "grandfathered": [],
   "_grandfathered_doc": "Đường dẫn cũ được miễn trừ vĩnh viễn. Repo mới để RỖNG. Repo cũ đang migrate thì liệt kê ở đây thay vì đổi tên hàng loạt.",
   "bootstrap": {

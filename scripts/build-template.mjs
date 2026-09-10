@@ -867,9 +867,9 @@ const STRUCTURE_SEED = `{
     "evidence/": { "steward": "_root", "mutability": "append-only", "ownership_mode": "root", "note": "bằng chứng vận hành: chỉ thêm, không sửa, không xoá" },
     "bang-song/": { "steward": "_root", "mutability": "rw", "ownership_mode": "root", "note": "ba cửa vào bảng SỐNG — bản ra (BANG.html, trang-thai.json) nằm NGOÀI git, xem .gitignore" }
   },
-  "generators": ["build-dashboard.mjs"],
-  "_generators_doc": "Script nào sinh ra artifact đã commit. Cổng đóng phiên đối chiếu từng cái với HEAD. CHỈ khai script repo này THẬT SỰ có — khai thừa là cổng đỏ vì thiếu file.",
-  "generated": ["DASHBOARD.md", "llms.txt", "repo-map.json"],
+  "generators": [],
+  "_generators_doc": "Script nao sinh ra artifact DA COMMIT. Cong doi chieu tung cai voi HEAD. RONG (R1, 10/09) la CO Y va la DANH DOI: khong con ai doi chieu artifact da commit voi HEAD nua, doi lay viec bo vong lap 191/522 commit (37%) chi de sinh lai bang. Muon bat lai thi khai ten bo sinh vao day va nhan luon cai vong lap do. Chi khai script repo nay THAT SU co — khai thua la cong do vi thieu file. MAC DINH CUA BO KHUNG LA RONG, va do la quyet dinh cua bo khung chu khong phai cua repo ban: bang van duoc COMMIT (DASHBOARD.md, llms.txt, repo-map.json), chi khong con ai canh chung con tuoi. Doi y thi khai ten bo sinh vao day.",
+  "generated": [],
   "_generated_doc": "FILE do các script trên sinh ra. Khai vào đây thì chúng KHÔNG đòi ai nhận quyền — nội dung tất định từ HEAD nên không ai sở hữu chúng theo nghĩa nào. Đo thật ở repo gốc: 19% lượt nhận khoá gốc tồn tại CHỈ để chạy bộ sinh; đó là tranh chấp nhân tạo.",
   "_generated_doc2": "KHÔNG làm yếu lớp bảo vệ: nội dung vẫn bị phép kiểm 'Sự thật máy sinh còn tươi' đối chiếu với HEAD ở MỌI phiên, nên sửa tay một dòng vẫn ĐỎ. Và đừng lẫn với 'generators' (khác một chữ): cái kia là SCRIPT, cái này là FILE. Khai từng file, không khai thư mục.",
   "docs": {

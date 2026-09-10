@@ -5,11 +5,23 @@
 # ra thấy cây làm việc bẩn, và một tiến trình nền ghi đè file đã commit là máy của người chủ
 # làm bẩn việc của lane đang chạy.
 #
-# Bản ĐÃ COMMIT là `DASHBOARD-Ark-Repo-Harness.html` ở gốc repo — nó suy hoàn toàn từ HEAD và
-# cổng đóng phiên đối chiếu nó mỗi lượt. Hai file, hai việc, đừng gộp.
 bang-song/BANG.html
 bang-song/trang-thai.json
 bang-song/DUNG.txt
+
+# R1 (10/09) — TRANG HTML Ở GỐC REPO RA KHỎI GIT, cùng lý do trên: host tự chạy bộ sinh và F5
+# là tươi, nên file này đổi byte sau lưng mọi lane. Commit nó là cây làm việc bẩn với tất cả, và
+# suite từ chối đóng dấu ("TREE_CHANGED") vì cây đổi giữa lượt chạy.
+#
+# BA FILE KIA — DASHBOARD.md, llms.txt, repo-map.json — Ở LẠI TRONG GIT, và đó là quyết định chứ
+# không phải bỏ sót. llms.txt là GỐC ĐIỀU HƯỚNG của phép kiểm B6: đưa nó ra ngoài thì bản đồ mất
+# gốc và MỌI tài liệu thành không-với-tới-được (đo 10/09: vàng 27 -> 75, repo rỗng 0 -> 18). Và
+# một bản clone mới phải có bảng đọc được ngay, không phải chạy gì trước.
+#
+# THỨ GIẾT VÒNG LẶP 37% COMMIT KHÔNG PHẢI LÀ BỎ FILE KHỎI GIT — mà là "generators": [] trong
+# .repo-structure.json: không còn ai BẮT BUỘC sinh lại sau mỗi commit. Ba file trên làm tươi lúc
+# cắt bản, không phải mỗi lượt ghi.
+DASHBOARD-*.html
 
 # Dau xac nhan suite — cua MAY NAY, khong di theo repo (scripts/chay-test.mjs)
 .ark-suite-stamp.json

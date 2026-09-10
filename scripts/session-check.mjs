@@ -16,7 +16,7 @@ import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import { appendOnlyAtEof, areaOf, claimPrefixesFrom, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_DOCS_KHONG_TINH, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
+import { appendOnlyAtEof, areaOf, claimPrefixesFrom, FILE_HANH_CHINH, generatedFrom, generatorsFrom, laneFromMessage, LANE_TRAILER, ownershipInvariant, ownershipKeys, handoffCapFrom, readStructureFromDisk, stewardOf, THU_MUC_DOCS_KHONG_TINH, unitDirOf, unitDirsUnder, unitsFrom } from "./repo-structure.mjs";
 import { napContext } from "./rule-compiler.mjs";
 import { fingerprintState, readClaims, xetCuaIndex } from "./claim.mjs";
 import { bamLenh, danhSachSuite, dauCay, docDau, xetDau, ghiDauCong, xoaDauCong, moiTruongNay } from "./chay-test.mjs";
@@ -910,7 +910,7 @@ check("Test xanh", () => {
     /* CHỈ SINH LẠI ARTIFACT THÌ KHÔNG CÓ GÌ ĐỂ CHẠY TEST — và đó là một câu trả lời, không phải
      * một dấu hỏi.
      *
-     * Bốn artifact máy sinh không đòi khoá nào (luật mục 1), nên chúng không vào `myRootAreas`,
+     * Artifact máy sinh không đòi khoá nào (luật mục 1), nên chúng không vào `myRootAreas`,
      * nên `rootSuite` false, nên phiên **chỉ sinh lại artifact** rơi thẳng vào nhánh "chưa kiểm"
      * — và không có cách nào thoát: chạy `npm test` cũng không đổi được kết luận. Tức một loại
      * commit rất thường (`chore: sinh lai artifact`) **không bao giờ đóng phiên được**.
@@ -923,10 +923,48 @@ check("Test xanh", () => {
        đúng: nhánh ngay trên (`myRootAreas.length > 0 && !hasRootTestScript()`) đã chặn mọi ca
        đổi file thật trước khi tới đây, nên biến thể sai đó bị che. Giữ điều kiện chặt vì nó
        ĐÚNG, không vì có phép kiểm ghim nó. Bỏ nhánh trên thì phải viết phép kiểm cho dòng này. */
-    const dsMaySinh = new Set(generatedFrom(structure));
+    /* AUDIT 10/09 (R1) — LỜI MIỄN TRỪ NÀY CHỈ ĐỨNG ĐƯỢC KHI CÓ AI CANH THAY.
+     * Chú thích ngay trên tự nêu tiền đề của nó: *"đã có phép kiểm riêng canh chúng"*. R1 cho
+     * repo khai `generators: []` — tức TẮT đúng phép kiểm đó. Lúc ấy `generated` một mình mở
+     * một lỗ: commit bất cứ gì vào DASHBOARD.md rồi được miễn suite, mà không còn ai đối chiếu
+     * nội dung. Tổ hợp `generated` KHÔNG RỖNG + `generators` RỖNG là hợp lệ về cú pháp, nên
+     * lỗ này mở được bằng cấu hình, không cần sửa mã. Kiểm toán độc lập bắt được, không phải tôi.
+     * Nên: không có bộ sinh nào canh thì KHÔNG miễn trừ — rơi về "chưa kiểm", đúng như trước R1.
+     *
+     * GIỚI HẠN, NÓI TRƯỚC KHI AI HỎI (kiểm toán vòng hai): điều kiện này chứng minh CÓ bộ sinh,
+     * KHÔNG chứng minh bộ sinh đó canh ĐÚNG file đang được miễn. Repo khai thêm một file vào
+     * `generated` mà không bộ sinh nào sinh ra nó thì file đó vẫn được miễn suite mà chẳng ai
+     * đối chiếu. Phủ sóng từng-file đòi một bảng "bộ sinh nào đẻ ra file nào" mà repo chưa có —
+     * dựng nó bây giờ là thêm máy giữa lúc đang đóng băng. Ghi nợ `KHUNG-64`, không giả vờ đủ. */
+    /* HAI NGUỒN MIỄN TRỪ, VÀ CHÚNG KHÁC LÝ DO — 10/09, sau khi gộp chúng làm một và gãy.
+     *
+     * ⑴ ARTIFACT MÁY SINH được miễn vì CÓ bộ sinh nào đó đang bị đối chiếu với HEAD (mục "còn
+     *   tươi"). Bỏ người canh đi — `generators: []` — là lời miễn mất chỗ dựa, nên nó chết theo.
+     *   Đó là lỗ P1-2. NÓI ĐÚNG MỨC (kiểm toán vòng ba): điều kiện này bảo đảm CÓ ÍT NHẤT MỘT bộ
+     *   sinh bị đối chiếu, KHÔNG bảo đảm file đang được miễn nằm trong số được đối chiếu. Lỗ đó
+     *   còn mở và có tên: `KHUNG-64`.
+     *
+     * ⑵ FILE HÀNH CHÍNH (`.agents/claims.json`) được miễn vì lý do KHÁC HẲN: nó không phải
+     *   file hành vi (`isBehaviourFile` false, ca thật 06/09), nó có DẤU NIÊM PHONG riêng canh,
+     *   và mọi suite tự dựng bảng quyền trong fixture của nó — nên chạy suite cho nó không
+     *   chứng minh thêm gì. Lời miễn này KHÔNG dựa vào `generators`.
+     *
+     * Bản vá lỗ P1-2 của tôi gộp hai thứ này làm một, nên nó gỡ luôn ⑵: một phiên chỉ NHẬN hay
+     * TRẢ KHOÁ bị cổng báo "chưa kiểm". Mà mỗi lượt `--sua`/`--xong` đều ghi lại file đó, tức
+     * gần như MỌI phiên. `tests/khoa-dau-vet.mjs` vế 7 bắt được — nhưng chỉ bắt được SAU khi R1
+     * làm fixture xanh lên; trước đó fixture đỏ vì lý do khác nên hai lượt đều đỏ và vế đó xanh
+     * mà chẳng đo gì. Một phép ghim chỉ đúng nhờ nền đang hỏng thì nó đang ghim số 0. */
+    const dsMaySinh = new Set([
+      ...(generatorsFrom(structure).length ? generatedFrom(structure) : []),
+      ...FILE_HANH_CHINH
+    ]);
     const chiLaArtifact = sessionChanges.length > 0 && sessionChanges.every((c) => dsMaySinh.has(c.file ?? c));
     if (chiLaArtifact) {
-      return { ok: true, msg: `Phiên này chỉ sinh lại ${sessionChanges.length} artifact máy sinh — suite không áp dụng; phép kiểm "Sự thật máy sinh còn tươi" mới là chỗ canh chúng.` };
+      return { ok: true, msg: "Phiên này chỉ đổi " + sessionChanges.length
+        + " file máy sinh hoặc hành chính — suite không áp dụng. Bảng quyền thì dấu niêm phong canh."
+        + " Artifact thì mục \"Sự thật máy sinh còn tươi\" canh BẢN RA CỦA TỪNG BỘ SINH ĐÃ KHAI: một"
+        + " file khai trong `generated` mà không bộ sinh nào nhận là bản ra của mình thì KHÔNG ai"
+        + " đối chiếu nó (nợ `KHUNG-64`)." };
     }
     const coThayDoi = sessionChanges.length > 0;
     if (!coThayDoi) return { ok: true, msg: "Phiên này không đổi file nào — không có gì phải kiểm." };
@@ -1092,6 +1130,16 @@ check("Sự thật máy sinh còn tươi", () => {
   // một repo dựng từ bộ khung chạy cổng này là hỏng ngay ở cổng của chính nó. Audit độc lập
   // bắt được; phép thử repo rỗng của tôi thì không, vì nó chỉ chạy cổng CẤU TRÚC.
   const scripts = generatorsFrom(structure);
+  /* AUDIT 10/09 (R1) — RỖNG THÌ NÓI RÕ LÀ KHÔNG ÁP DỤNG.
+   * Trước bản này, `scripts = []` đi hết vòng lặp mà không kiểm gì rồi trả câu "Artifact do
+   * sinh ra đã commit đều khớp với HEAD" — một câu XANH nói rằng đã kiểm, trong khi chưa kiểm
+   * gì cả. Đó là kiểu dối tệ nhất của một cổng: nó không sai, nó chỉ khiến người đọc tin sai.
+   * Và đây là MẤT BẢO VỆ THẬT, không phải "không áp dụng cho vui": ba artifact (DASHBOARD.md,
+   * llms.txt, repo-map.json) vẫn nằm trong git mà nay không còn ai đối chiếu với HEAD. Đánh đổi
+   * có chủ ý — đổi lấy việc bỏ vòng lặp 37% commit — nên phải NÓI RA ở đúng chỗ người ta đọc. */
+  if (!scripts.length) {
+    return { ok: true, msg: "KHÔNG ÁP DỤNG: repo khai `generators: []`, nên KHÔNG có gì được đối chiếu với HEAD. Artifact đã commit (nếu có) hiện KHÔNG ai canh — đó là đánh đổi cố ý của R1, không phải đã kiểm và thấy sạch." };
+  }
   const failures = [];
   const verdicts = scripts.map((script) => ({ script, clean: verifierMatchesHead(script) }));
   const unknown = verdicts.filter((entry) => entry.clean === null);

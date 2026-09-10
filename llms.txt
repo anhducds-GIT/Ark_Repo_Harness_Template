@@ -8,7 +8,7 @@ Trang được sinh ngày 2026-09-10.
 
 ## Việc ưu tiên #1
 
-- **_root** — Đọc `docs/ROADMAP-V2.md` TRƯỚC. `R0` — Đức chốt VẠCH ĐÍCH, nó chặn mọi đợt. Rồi `R1` thôi commit bảng (bỏ 37% commit). `KHUNG-63` đã vá 1.8.12 nhưng CHƯA chạy suite, CHƯA đẩy — làm nốt trước.
+- **_root** — `R0` VẠCH ĐÍCH đã CHỐT 10/09 — bảng 9 ô ở `docs/ROADMAP-V2.md`, đọc TRƯỚC khi làm gì. Việc kế: `R1` thôi commit bảng — bỏ 37% commit, 3 bộ sinh còn 1.
 
 ## Đọc theo thứ tự này
 

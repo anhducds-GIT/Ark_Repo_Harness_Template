@@ -533,9 +533,19 @@ function withGateRepo({ area = "evidence/", oldFile = null, declared = [] }, bod
     // với việc cổng đóng phiên đòi một script mà bộ khung cố ý không mang theo — repo dựng từ
     // bộ khung hỏng ngay ở cổng của chính nó. Phép thử nghiệm thu phải chạy ĐỦ MỌI CỔNG mà
     // người dùng thật sẽ chạy; nếu không nó chỉ chứng minh đúng phần mình đã nghĩ tới.
+    /* R7 (10/09) — `--quick`, VÀ ĐÂY LÀ THAY ĐỔI CÓ ĐO.
+     *
+     * Ba vế dưới chỉ đòi cổng CHẠY ĐƯỢC: không thiếu module, không đòi `feature-parity`, không
+     * `KHONG_CHAY_DUOC`. Không vế nào đọc kết quả suite. Nhưng lượt chạy đủ này khiến cổng chạy
+     * `npm test` CỦA REPO GIẢ — mà repo giả dựng từ bản trích có 11 suite riêng. Tức một lượt
+     * suite lồng, hoàn toàn không ai đọc.
+     *
+     * Đo 10/09: suite này 505 giây, nặng nhất trong 24 suite. Ca (2) ngay dưới VẪN chạy đủ và
+     * VẪN đòi đúng chuỗi "suite gốc repo: N passed" — nên phần "bộ khung mang theo suite của
+     * chính nó" không mất một vế nào. Cắt thời gian, không cắt phạm vi che phủ. */
     let gate = "";
     try {
-      gate = at(process.execPath, [join(tempRoot, "scripts", "session-check.mjs"), "--as", "phep-thu-repo-rong"]);
+      gate = at(process.execPath, [join(tempRoot, "scripts", "session-check.mjs"), "--as", "phep-thu-repo-rong", "--quick"]);
     } catch (error) {
       gate = String(error.stdout || "") + String(error.stderr || "");
     }

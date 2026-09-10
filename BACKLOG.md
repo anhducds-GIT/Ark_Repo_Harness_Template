@@ -18,6 +18,54 @@
 
 ## P1
 
+### KHUNG-65 · Mục nhật ký viết ở mức `###` LÁCH ĐƯỢC trần byte — và trần đó đi đòi lane khác
+
+`scripts/handoff.mjs` tách mục bằng `RE_TIEU_DE_MUC = /^##[ \t]/`, tức **đúng hai dấu `#`**. Một
+mục mở bằng `### ` không khớp, nên nó bị **gộp vào mục `## ` phía trên** và biến mất khỏi bộ đếm
+byte của riêng nó.
+
+Hai hệ quả, cả hai đo được 10/09:
+1. **Lách trần.** Viết `###` là mục dài bao nhiêu cũng không bị trần 2600 byte chạm tới.
+2. **Chặn oan lane khác.** Mục `## …harness-migrate-3repo…` dài 1329 byte, mục `### …harness-loi-02…`
+   ngay dưới dài 2590 — cổng báo **3918 byte** và **quy cho lane migrate**. Người bị chặn không
+   phải người viết phần thừa, và câu cổng in ra chỉ đúng tên của người vô can.
+
+Trong `HANDOFF.md` hiện có nhiều mục cũ ở mức `###`; chúng đã ở trên `origin` nên không tính là
+"mục MỚI", tức lỗ này im lặng cho tới lúc có ai viết mục mới ở mức đó.
+
+**đóng khi:** một mục mở bằng `###` bị bộ đếm nhìn thấy như một mục RIÊNG (hoặc bị từ chối thẳng
+với tên lỗi nói rõ phải dùng `##`), kèm một phép ghim dựng hai mục `##` + `###` cạnh nhau và đòi
+byte quy đúng cho từng mục.
+
+### KHUNG-64 · [FAIL-OPEN] Miễn suite cho file mà KHÔNG bộ sinh nào kiểm — audit xếp loại A, không phải B
+
+Cổng miễn suite cho commit chỉ-sinh-lại-artifact. Từ 10/09 lời miễn chỉ còn hiệu lực khi
+`generators` KHÔNG rỗng — nhưng điều kiện ấy đếm **số bộ sinh**, không đối chiếu **từng file**:
+chỉ cần `generators` có một phần tử là **toàn bộ** `generated` vào tập được miễn.
+
+Ca hỏng: repo khai `generated: ["BAO-CAO.md"]` mà không bộ sinh nào đẻ ra `BAO-CAO.md`. Commit
+bất cứ nội dung gì vào file đó vẫn **được miễn suite**, và mục "Sự thật máy sinh còn tươi" cũng
+không đối chiếu nó (bộ sinh chỉ kiểm bản ra của chính nó). Hai lớp cùng nghĩ lớp kia đang canh.
+
+**Kiểm toán độc lập vòng sáu (10/09) bác cách tôi xếp loại:** *"Đây là đường bảo vệ không chạy,
+không chỉ là độ mạnh của phép ghim. Ghi sổ nợ không đổi phân loại này."* Đúng — nên mục này mang
+nhãn `[FAIL-OPEN]`, không nằm chung với nhóm góp ý.
+
+**VÌ SAO CHƯA VÁ, và đã cân nhắc xoá.** Đường lười nhất là bỏ hẳn nửa artifact của lời miễn trừ,
+chỉ giữ file hành chính — sau `R1` repo nhà và bản trích đều khai `generators: []` nên nửa đó là
+mã chết **ở đây**. Nhưng nó KHÔNG chết ở đội hình: `upgrade` chỉ thay tầng máy, còn
+`.repo-structure.json` là file của repo đích, nên 5 repo đã migrate vẫn khai
+`generators: ["build-dashboard.mjs"]` và vẫn commit artifact. Xoá là commit sinh-lại-bảng của họ
+thành "chưa kiểm" — chặn cổng của người khác để dọn một chỗ hở của mình.
+
+**Phơi ra khi nào:** phải có ai khai vào `generated` một file không bộ sinh nào sinh ra. Bản trích
+khai đúng ba file `build-dashboard.mjs` sinh ra, nên hôm nay không repo nào trong đội hình ở trạng
+thái đó. Câu cổng in ra đã nêu thẳng giới hạn này thay vì nói "artifact có chỗ canh".
+
+**đóng khi:** một file khai trong `generated` mà không bộ sinh nào nhận là bản ra của mình thì
+cổng ĐỎ (hoặc không được miễn suite) — kèm phép ghim dựng đúng ca đó và ĐỎ khi gỡ bản vá. Cần một
+bảng khai "bộ sinh nào đẻ ra file nào"; đó là việc sau `R11`, không phải giữa lúc đóng băng.
+
 ### KHUNG-63 · Trang tổng quan nhúng "giữ N phút" — bộ sinh đọc ĐỒNG HỒ, nên lane giữ khoá KHÔNG BAO GIỜ xanh nổi cổng
 
 Đo 10/09, dựng lại được mọi lượt. `build-overview.mjs` in thời gian giữ khoá qua `ageLabel()`

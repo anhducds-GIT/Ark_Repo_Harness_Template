@@ -3,6 +3,150 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.6 — 2026-09-10 — R1 + R7: cổng thôi đòi bảng khớp HEAD; suite 850s → 445s
+
+Đo 7 ngày trước khi sửa: **522 commit, 191 (37%) không làm việc gì** — chỉ sinh lại bảng. Gốc là
+một mục cổng: *"Sự thật máy sinh còn tươi"* đòi artifact ĐÃ COMMIT phải khớp `HEAD`.
+
+Vòng lặp: `commit → HEAD đổi → bảng cũ → sinh lại → commit → HEAD đổi`. Mỗi commit đó còn làm
+hỏng dấu xác nhận suite, tức **~10 phút** nữa. Hôm nay tôi sửa **một câu** trong `STATUS.md` và
+ba file phải sinh lại — cổng ĐỎ đúng ở mục đó, 11 mục kia xanh.
+
+| | Trước | Sau |
+|---|---|---|
+| Commit chỉ để sinh bảng | 191 / 522 = **37%** | **0** — không ai còn BẮT BUỘC sinh lại |
+| Bộ sinh cổng đòi khớp HEAD | 2 | **0** (`generators: []`) |
+| Artifact bị host ghi đè mà vẫn trong git | 1 (trang HTML) | **0** |
+
+**Thuốc là `generators: []`, không phải bỏ file khỏi git.** `generatorsFrom` trước đó coi mảng
+rỗng là gõ sai, nên repo **không có cách nào khai** *"tôi không commit artifact nào"* — muốn thoát
+vòng lặp thì phải sửa chính hàm đó. Nay `[]` hợp lệ; **vắng khoá thì vẫn dùng mặc định**, vì bỏ
+quên khác khai rỗng và tắt một lớp bảo vệ phải là hành động cố ý.
+
+Chỉ `DASHBOARD-*.html` ra khỏi git — host tự chạy nên nó đổi byte sau lưng mọi lane, và cây bẩn
+làm suite từ chối đóng dấu. **`llms.txt` · `DASHBOARD.md` · `repo-map.json` Ở LẠI.**
+
+**Bản đầu của R1 đẩy cả bốn ra ngoài, và đó là sai.** `llms.txt` là GỐC ĐIỀU HƯỚNG của phép kiểm
+B6: mất nó thì bản đồ mất gốc và mọi tài liệu thành không-với-tới-được — vàng **27 → 75** ở repo
+nhà, **0 → 18** ở repo rỗng. `template-null-repo` bắt được. Hai bản cắt hụt `1.9.0` và `1.9.1`
+nằm trong sổ phát hành nhưng **chưa từng đẩy**; sổ là vùng chỉ-thêm nên không gỡ, và không nên gỡ.
+
+**Ghim:** `tests/bang-song.mjs` vế `8b`, ba vế — `generators` rỗng · HTML ngoài git · ba file text
+ở lại. Ba đột biến đã chạy thật, mỗi cái ĐỎ đúng vế của nó. Vế thứ ba tồn tại chính vì cái sai ở
+trên, nên đừng "dọn" nó đi.
+
+**KIỂM TOÁN ĐỘC LẬP TÌM RA 5 LỖI, HAI CÁI P1 — và bản này là bản ĐÃ VÁ chúng.**
+
+1. `generators: []` khiến cổng chạy hết vòng lặp mà **không kiểm gì**, rồi trả câu XANH *"artifact
+   đã commit đều khớp với HEAD"*. Một cổng nói dối theo kiểu tệ nhất: nó không sai, nó khiến người
+   đọc tin sai. Nay nói thẳng **KHÔNG ÁP DỤNG**, kèm câu artifact hiện không ai canh.
+2. `generated` không rỗng + `generators` rỗng là một **LỖ mở được bằng cấu hình**: commit bất cứ
+   gì vào artifact rồi được miễn suite, mà không còn ai đối chiếu nội dung. Chú thích của chính
+   nhánh miễn trừ đã tự nêu tiền đề *"đã có phép kiểm riêng canh chúng"* — R1 tắt đúng nó. Nay lời
+   miễn trừ **chết theo** khi không còn bộ sinh nào canh.
+3. Ghim `8b` bản đầu chỉ so **cấu hình** với `[]`, không gọi hàm. Khôi phục đúng bug R1 chữa thì
+   nó **vẫn xanh** — dựng lại ca hỏng và xác nhận. Nay gọi thẳng `generatorsFrom` và đòi hành vi.
+4. Ghim đọc `git ls-files` là đọc **index dùng chung**: lane khác `git add` là kết quả đổi dù HEAD
+   chưa đổi. Nay hỏi `git ls-tree -r HEAD`.
+5. Bốn chỗ chú thích vẫn mang giả định của bản vá **đã bỏ** ("bốn bảng ra khỏi git"). Đã sửa cả bốn.
+
+**THÔI TUYÊN BỐ "KHÔNG LÀM YẾU LỚP BẢO VỆ".** R1 **có** làm yếu: ba file `DASHBOARD.md`,
+`llms.txt`, `repo-map.json` vẫn nằm trong git mà nay không còn ai đối chiếu với HEAD — sửa tay một
+dòng thì không cổng nào kêu. Đó là đánh đổi có chủ ý để bỏ vòng lặp 37% commit, và chỗ đúng để nói
+ra là **ngay tại cổng**, không phải trong một dòng sổ mà chẳng ai đọc lúc cần.
+
+**HAI LỖI NẶNG NHẤT LẠI KHÔNG PHẢI DO R1 GÂY RA — R1 CHỈ LÀM CHÚNG HIỆN LÊN.** Cả hai đã nằm
+sẵn trong repo, ẩn sau một nền đang đỏ vì lý do khác:
+
+6. **Cổng SẬP khi thiếu `package.json`.** `danhSachSuite` ném `ENOENT` thô, bên gọi giữ lỗi rồi
+   ném ra **đúng trên đường thành công** — nên một cổng đã xanh hết mục lại kết luận *"CHƯA ĐỦ
+   BẰNG CHỨNG — không ghi được kết quả cổng: ENOENT..."*, một câu chẳng nói gì cho người đọc.
+   Trước R1, mục "còn tươi" luôn đỏ ở fixture nên đường đó **không bao giờ tới được**. Vá tại gốc:
+   vắng hoặc hỏng `package.json` = KHÔNG CÓ SUITE, cùng câu trả lời với "không khai
+   `scripts.test`" → `REPO CHƯA CÓ SUITE GỐC`, BỎ QUA, mã thoát 2. Cổng vẫn không được báo
+   xong; nó chỉ thôi sập. Chữa ở fixture thì dễ hơn — nhưng thế là che lỗi để nó đợi ở repo thật.
+
+7. **Bản vá lỗ số 2 gộp HAI lời miễn trừ khác lý do làm một.** Artifact được miễn suite vì CÓ ai
+   đối chiếu chúng, nên bỏ `generators` đi thì lời miễn phải chết theo — đúng. Nhưng
+   `.agents/claims.json` được miễn vì **lý do khác hẳn**: không phải file hành vi, có dấu niêm
+   phong riêng canh, và mọi suite tự dựng bảng quyền trong fixture của nó. Buộc cả hai vào
+   `generators` là **một phiên chỉ NHẬN hay TRẢ KHOÁ bị cổng báo "chưa kiểm"** — mà mỗi lượt
+   `--sua`/`--xong` đều ghi file đó, tức gần như MỌI phiên. Nay tách rõ hai nguồn.
+
+**MỘT PHÉP GHIM CHỈ ĐÚNG NHỜ NỀN ĐANG HỎNG THÌ NÓ ĐANG GHIM SỐ 0.** `khoa-dau-vet` vế 7 chỉ bắt
+được lỗi ⑦ **sau khi** R1 làm fixture xanh lên; trước đó hai lượt chạy đều đỏ vì lý do khác nên mã
+thoát khớp nhau và vế đó xanh mà chẳng đo gì. Cùng hình dạng với lỗi ③ và ⑤ trong ngày — ba lần,
+ba chỗ, một bệnh.
+
+**VÒNG BA CÒN BẮT ĐƯỢC BỐN, VÀ MỘT CÁI NẰM TRONG CHÍNH BẢN VÁ "TẠI GỐC" CỦA TÔI:**
+
+8. `catch { return []; }` **lẫn "vắng" với "hỏng"** — một repo có `package.json` sai cú pháp bị
+   gọi là "không có suite", che nguyên nhân. Và `JSON.parse` không đủ để tin: `"null"`, `"123"`,
+   `"[1,2]"` đều qua được rồi `pkg.scripts` ném `TypeError` **ngoài** `catch`. Đã dựng lại cả
+   bốn ca. Nay: chỉ `ENOENT` trả rỗng · hỏng thì thành `PACKAGE_JSON_HONG` có tên · truy cập `?.`.
+9. **`khoa-dau-vet` vế 7 so hai lượt chạy CÙNG ĐỎ.** Nền là một repo tối giản nên dãy B đỏ
+   (`nen.ma = 1`, đo được) — mọi so sánh khớp và vế xanh mà không đo gì. Nó đã che lỗi ⑦ cho tới
+   khi R1 tình cờ làm nền xanh lên. **Không chữa bằng cách đòi nền phải xanh** (một phép ghim đòi
+   điều kiện nó không dựng nổi thì sẽ bị ai đó nới ra) mà bằng cách **gỡ cơ chế che**: so TỪNG MỤC
+   theo TÊN. Đột biến xác nhận: gỡ `FILE_HANH_CHINH` là vế này ĐỎ.
+10. **Ca `b2` chỉ đi qua nhánh ĐƯỢC MIỄN**, chưa bao giờ thử nhánh KHÔNG miễn. Thêm ca `b3`:
+   chỉ đổi `.agents/claims.json` + `generators: []` → PHẢI được miễn. Đột biến ĐỎ đúng vế.
+11. Chú thích nói *"CÓ AI ĐÓ ĐỐI CHIẾU chúng"* **mạnh hơn** điều kiện mã bảo đảm. Sửa cho đúng mức.
+
+**R7 — SUITE 850,7s → 445,5s, KHÔNG BỎ MỘT VẾ KIỂM NÀO.** `template-null-repo` (505s, nặng nhất
+trong 24 suite) chạy `session-check` ĐỦ trên repo giả — mà repo giả dựng từ bản trích có 11 suite
+riêng, tức một lượt **suite lồng** mà **không vế nào đọc kết quả của nó**. Đổi sang `--quick`:
+505s → 179s. Lượt thứ hai vẫn chạy đủ và vẫn đòi đúng chuỗi `suite gốc repo: N passed, 0 failed`.
+
+**`HANDOFF.md`: mục viết ở mức `###` LÁCH ĐƯỢC trần byte** — `RE_TIEU_DE_MUC = /^##[ 	]/` chỉ
+khớp đúng hai dấu `#`, nên mục `###` bị gộp vào mục `##` phía trên. Cổng báo "3918 byte" và
+**quy cho lane migrate**, trong khi mục của họ chỉ 1329 byte và phần thừa là của tôi. Suýt đi sửa
+nhật ký của lane khác vì tin câu cổng in ra. Sửa mục của mình về `##`; lỗ ghi `KHUNG-65`.
+
+**VÒNG NĂM VÀ SÁU — BỐN PHÉP GHIM CỦA TÔI HOÁ RA KHÔNG ĐO GÌ, và đó là phần đáng giữ nhất của
+bản này.** Không phải bốn lỗi rời: cùng một bệnh — phép kiểm không phân biệt được hai nhánh, mà
+vẫn xanh nên không ai nghi.
+
+12. `bangMuc` bản đầu đòi ĐÚNG hai dấu cách trong nhãn; tôi "sửa" thành `[^]]{1,8}` để bất biến
+    với độ đệm — đó là **NỚI**, không phải siết: `[B1]` lọt vào bản đồ như một mục giả, và
+    `[^]]` nhận cả xuống dòng. Nay giới hạn vào ba nhãn có thật, chỉ cho ĐỆM tự do.
+13. **Ba cửa xanh giả:** `b2` dùng `notEqual(…,"XANH")` nên nhận cả ĐỎ vì lý do chẳng liên quan
+    (bản vá bị hoàn nguyên mà ca vẫn "đỏ như mong đợi") · `b3` chỉ đòi XANH, không đòi LÝ DO, nên
+    một bản vá làm cổng MÙ cũng qua · vế 7 so hai lượt nên **cùng sai giống nhau ở cả hai vẫn
+    qua**. Nay: đòi đúng trạng thái + đúng câu, và **NEO giá trị kỳ vọng**.
+14. Tiền đề ca `b3` **thừa hưởng** từ hai ca trên; `git diff origin/main HEAD` lại khác định nghĩa
+    với `sessionChanges`. Nay hỏi thẳng git ngay tại chỗ, và đòi **cây sạch** để hai định nghĩa
+    trùng nhau.
+15. `docMuc` tìm dòng "có `[` và có tên mục" ở bất kỳ đâu, rồi **mặc định XANH khi không nhận ra
+    nhãn** — im lặng ngả về phía tốt. Nay neo đúng khuôn dòng mục và đòi đọc được nhãn.
+16. `new RegExp("^ {2}\[…")` mất một dấu gạch chéo khi qua tay tôi: `"["` thành `[`, regex thành
+    một **lớp ký tự**. `node --check` vẫn xanh vì cú pháp không sai. Và phép thử đầu của tôi cũng
+    nói dối vì nó bóc chuỗi bằng regex, **không đi qua bước escape của JS**. Chữa bằng **regex
+    literal** — bỏ cơ chế sinh ra lỗi, không vá từng lần.
+17. Chú thích `khoa-dau-vet` nói *"CHÉP CẢ `scripts/`"* trong khi mã chỉ lấy `.mjs` tầng đầu. Chú
+    thích đó tồn tại để chống đúng một lỗi đã xảy ra thật — **một chú thích chống lỗi mà tự nói
+    sai thì nó là lỗi tiếp theo.**
+
+**VÒNG SÁU: KHÔNG CÒN FAIL-OPEN MỚI.** Còn lại đúng một, đã biết và có tên: `KHUNG-64`. Kiểm toán
+**bác cách tôi xếp loại nó** — *"đường bảo vệ không chạy, ghi sổ nợ không đổi phân loại này"* —
+nên nó mang nhãn `[FAIL-OPEN]`. Đã cân nhắc đóng bằng cách xoá nửa artifact của lời miễn trừ (sau
+R1 nó là mã chết ở đây) và **không làm**: `upgrade` không thay `.repo-structure.json` của repo
+đích, nên 5 repo đã migrate vẫn commit artifact — xoá là chặn cổng của họ.
+
+**Áp cho cả repo đích** qua bản trích và `.gitignore`. Repo đã migrate bản cũ cần chạy `upgrade`.
+
+## 1.8.12 — 2026-09-10 — KHUNG-63: bộ sinh trang thôi đọc đồng hồ treo tường
+
+`build-overview.mjs` đọc `new Date()` để tính tuổi khoá, nên **cùng một HEAD sinh ra hai trang
+khác nhau** nếu chạy cách nhau vài phút — mà cổng lại đòi trang khớp HEAD. Vòng lặp không lối ra:
+sinh lại → khác → commit → cổng vẫn đỏ.
+
+Chữa bằng `mocHEADLuc()` — lấy mốc thời gian từ `%cI` của HEAD. Thuốc này **đã có sẵn** trong
+`build-so-migrate.mjs` từ trước; một file đã học, một file chưa. Đường đọc đồng hồ thật giữ
+nguyên cho bảng SỐNG (`--khoa-song`), vì bảng sống thì phải sống.
+
+**Ghim:** `tests/khoa-dau-vet.mjs` vế 12 — hai mốc giả cách nhau 19 phút phải cho ra y hệt nhau.
+
 ## 1.8.11 — 2026-09-10 — Bảng tính năng thôi nói dối về BẢN, và có chuông cho cả đội hình
 
 Đức hỏi: *"migrate phiên bản mới thì tính năng cũ đã có bản cập nhật, ta có mang sang không?"*

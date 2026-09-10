@@ -61,17 +61,31 @@ function khoNen({ chuKhoa = "thu" } = {}) {
 
 /* Chạy cổng, rồi TÁCH RA đúng một phép kiểm theo tên. Đòi "cổng đỏ" chung chung là bẫy: cổng có
    thể đỏ vì chuyện khác, và phép kiểm ta đang chứng minh vẫn chưa hề chạy tới. */
+/* Đọc TRẠNG THÁI của một mục trong báo cáo cổng.
+ *
+ * NEO ĐÚNG DÒNG MỤC, VÀ NHẬN ĐÚNG BA NHÃN — kiểm toán vòng sáu, loại [B] nhưng vá vì rẻ.
+ * Bản trước tìm một dòng "có chứa `[` và có chứa tên mục" ở bất kỳ vị trí nào, rồi mặc định là
+ * XANH nếu không thấy `[ĐỎ` hay `[BỎ`. Hai chỗ hở: một dòng CHI TIẾT có nhắc tên mục cũng khớp
+ * (và chi tiết là chữ tự do, có thể chứa cả `[`), và "không nhận ra nhãn" bị dịch thành "đạt" —
+ * tức im lặng ngả về phía tốt, đúng bệnh mà cả repo này dựng ra để chặn.
+ * Cổng in mục theo đúng một khuôn: hai dấu cách, nhãn trong ngoặc, rồi tên
+ * (`session-check.mjs`: `r.ok ? (r.skipped ? "BỎ  " : "XANH") : "ĐỎ  "`). Neo vào khuôn đó. */
 function docMuc(kho, ten, as = "thu") {
   const r = spawnSync(process.execPath, [join(kho, "scripts", "session-check.mjs"), "--as", as],
     { cwd: kho, encoding: "utf8" });
   const out = String(r.stdout || "") + String(r.stderr || "");
   const dong = out.split(NL);
-  const i = dong.findIndex((d) => d.includes("[") && d.includes(ten));
+  /* REGEX LITERAL, KHÔNG PHẢI `new RegExp("…")` — bản đầu của tôi viết chuỗi và mất một dấu gạch
+   * chéo: `"\["` thành `"\["` thành `[`, tức regex biến thành một LỚP KÝ TỰ và không khớp mục
+   * nào. `node --check` vẫn xanh vì cú pháp không sai; chỉ ngữ nghĩa sai. Regex literal thì bước
+   * escape của chuỗi không tồn tại, nên cả lớp lỗi này biến mất. */
+  const LA_DONG_MUC = /^ {2}\[(XANH|ĐỎ|BỎ) *\] /;
+  const i = dong.findIndex((d) => LA_DONG_MUC.test(d) && d.includes(ten));
   assert.ok(i >= 0, `khong thay muc "${ten}" trong bao cao — phep kiem nay co con ton tai khong?${NL}${out.slice(0, 600)}`);
-  const trangThai = dong[i].includes("[ĐỎ") ? "ĐỎ" : dong[i].includes("[BỎ") ? "BỎ" : "XANH";
-  return { trangThai, chiTiet: dong[i + 1] || "", out };
+  const nhan = dong[i].match(LA_DONG_MUC);
+  assert.ok(nhan, `doc duoc dong muc ma khong doc duoc NHAN — cong co doi khuon in khong? ${dong[i]}`);
+  return { trangThai: nhan[1], chiTiet: dong[i + 1] || "", out };
 }
-
 /* ---- 1. Phạm vi trách nhiệm — BA VẾ, và hai vế là ĐỐI CHỨNG NGƯỢC ---------
  *
  * KHUNG-53. Câu hỏi của mục này là *"việc này có ai đứng tên không"*, và từ 08/09 có HAI đường
@@ -254,14 +268,103 @@ function docMuc(kho, ten, as = "thu") {
     assert.match(m1.chiTiet, /passed/, "phai co so that cua suite, khong phai mot cau chung chung");
 
     // (b) Chi sinh lai ARTIFACT -> khong ap dung, va phai noi ro la khong ap dung.
+    //
+    // R1 (10/09): fixture PHAI TU KHAI CA HAI KHOA. Truoc do no thua huong tu ban trich, ma
+    // ban trich khai `[]` — nen DASHBOARD.md khong con la artifact va ca nay do vi mot ly do
+    // khong lien quan toi thu no do. Co che thi VAN phai giu: repo nao CO Y commit artifact thi
+    // van di qua nhanh mien tru nay.
+    //
+    // VA PHAI KHAI CA `generators`, khong chi `generated` — kiem toan doc lap 10/09 chi ra:
+    // `generated` khong rong + `generators` rong la mot LO (commit bat cu gi vao artifact roi
+    // duoc mien suite, ma khong con ai doi chieu noi dung). Cong da bit lo do, nen mot fixture
+    // chi khai `generated` khong con di qua duoc — va NO KHONG NEN di qua duoc.
+    const hinhB = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+    hinhB.generated = ["DASHBOARD.md"];
+    hinhB.generators = ["build-dashboard.mjs"];
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(hinhB, null, 2) + NL, "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "khai DASHBOARD.md la artifact" + NL + NL + "Lane: thu");
     at("push", "-q", "origin", "main");
     writeFileSync(join(kho, "DASHBOARD.md"), "# bang" + NL + "sinh lai" + NL, "utf8");
-    at("add", "-A");
+    // `-f` la du phong: bo khung KHONG bo qua DASHBOARD.md (chi bo qua DASHBOARD-*.html), nen
+    // `add` thuong cung du. Giu `-f` de ca nay khong phu thuoc vao noi dung .gitignore.
+    at("add", "-f", "DASHBOARD.md");
     at("commit", "-q", "-m", "sinh lai artifact" + NL + NL + "Lane: thu");
     const m2 = docMuc(kho, "Test xanh");
     assert.equal(m2.trangThai, "XANH",
       `chi sinh lai artifact thi suite KHONG AP DUNG — bao "chua kiem" la khoa vinh vien mot loai commit rat thuong: ${m2.chiTiet}`);
     assert.match(m2.chiTiet, /không áp dụng/, "phai noi ro la KHONG AP DUNG, khong im lang bao xanh");
+
+    /* (b2) ĐỐI CHỨNG NGƯỢC CỦA CHÍNH (b) — KIỂM TOÁN VÒNG HAI ĐÒI CÁI NÀY.
+     *
+     * Lời miễn trừ ở (b) đứng được là NHỜ có ai đó canh artifact. Gỡ người canh đi —
+     * `generators: []` — mà vẫn giữ `generated` thì lời miễn trừ phải CHẾT THEO. Không có vế
+     * này thì bản vá "chỉ miễn khi generators khác rỗng" hoàn nguyên được mà không phép kiểm
+     * nào đỏ: (b) vẫn xanh vì nó chỉ đi qua nhánh miễn trừ, chưa bao giờ thử nhánh KHÔNG miễn.
+     *
+     * Đây đúng là lỗ P1-2 của vòng một: commit bất cứ gì vào artifact rồi được miễn suite, mà
+     * không còn ai đối chiếu nội dung. */
+    const hinhB2 = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+    hinhB2.generators = [];
+    writeFileSync(join(kho, ".repo-structure.json"), JSON.stringify(hinhB2, null, 2) + NL, "utf8");
+    at("add", "-A");
+    at("commit", "-q", "-m", "go het bo sinh" + NL + NL + "Lane: thu");
+    at("push", "-q", "origin", "main");
+    writeFileSync(join(kho, "DASHBOARD.md"), "# bang" + NL + "sinh lai lan hai" + NL, "utf8");
+    at("add", "-f", "DASHBOARD.md");
+    at("commit", "-q", "-m", "sinh lai artifact lan hai" + NL + NL + "Lane: thu");
+    const m3 = docMuc(kho, "Test xanh");
+    /* ĐÒI ĐÚNG TRẠNG THÁI VÀ ĐÚNG LÝ DO — kiểm toán vòng năm. `notEqual(…, "XANH")` nhận cả ĐỎ
+     * vì một lý do chẳng liên quan, nên nó là một cửa xanh giả: bản vá bị hoàn nguyên mà ca này
+     * vẫn "đỏ đúng như mong đợi" vì repo tình cờ đỏ chỗ khác. Đòi thẳng: BỎ, và câu phải nói
+     * "chưa kiểm". */
+    assert.equal(m3.trangThai, "BỎ",
+      "generators rong nghia la KHONG AI canh artifact — luc do phai la BO (chua kiem): " + m3.chiTiet);
+    assert.match(m3.chiTiet, /chưa kiểm/,
+      "phai noi ro la CHUA KIEM, khong duoc im lang: " + m3.chiTiet);
+
+    /* (b3) GHIM RIÊNG CHO FILE HÀNH CHÍNH — KIỂM TOÁN VÒNG BA ĐÒI, VÀ ĐÒI ĐÚNG.
+     *
+     * Ca (b) và (b2) chỉ ghim nguồn miễn trừ ⑴ (artifact + có bộ sinh canh). Nguồn ⑵ — file hành
+     * chính `.agents/claims.json` — không có vế nào ghim, nên gỡ `FILE_HANH_CHINH` khỏi tập miễn
+     * trừ thì KHÔNG phép kiểm nào ở đây đỏ. Mà đó chính là lỗi đã xảy ra thật hôm nay: một phiên
+     * CHỈ nhận hay trả khoá bị cổng báo "chưa kiểm", và mỗi lượt `--sua`/`--xong` đều ghi file đó.
+     *
+     * Ca này dựng đúng hình dạng đó: `generators` RỖNG (nên nguồn ⑴ tắt hẳn) và lượt commit chỉ
+     * đổi bảng quyền. Phải XANH. Gỡ `FILE_HANH_CHINH` đi là ca này đỏ ngay.
+     */
+    at("push", "-q", "origin", "main");   // moc phien phai sach: khong day thi commit artifact o (b2) con tinh vao
+    writeFileSync(join(kho, ".agents", "claims.json"),
+      JSON.stringify({ claims: { _root: { owner: null, ai: null, claimed_at: null, task: "doi mot lan nua", released_at: null } } }, null, 2) + NL, "utf8");
+    at("add", ".agents/claims.json");
+    at("commit", "-q", "-m", "chi doi bang quyen" + NL + NL + "Lane: thu");
+    /* GHIM TIỀN ĐỀ NGAY TRƯỚC PHÉP ĐO — kiểm toán vòng bốn, và nó đúng.
+     *
+     * Ca này chạy SAU (b) và (b2) trên cùng một kho, nên tiền đề của nó — `generators` RỖNG, và
+     * lượt commit chỉ đổi ĐÚNG một file `.agents/claims.json` — là thứ nó THỪA HƯỞNG, không phải
+     * thứ nó tự dựng. Ai đổi thứ tự ba ca, hay thêm một lượt ghi vào giữa, là ca này âm thầm đo
+     * một thứ khác mà vẫn xanh. Dựa vào một lượt `push` để "mốc phiên sạch" cũng là dựa vào thứ
+     * không ai thấy. Nên hỏi thẳng git, ngay tại đây. */
+    const hinhB3 = JSON.parse(readFileSync(join(kho, ".repo-structure.json"), "utf8"));
+    assert.deepEqual(hinhB3.generators, [], "tien de ca nay: `generators` phai RONG");
+    /* CÂY PHẢI SẠCH — nếu không thì `git diff origin/main HEAD` và `sessionChanges` của cổng là
+     * HAI ĐỊNH NGHĨA KHÁC NHAU: cái trước chỉ đọc chênh lệch giữa hai commit, cái sau còn thấy
+     * thứ chưa commit. Kiểm toán vòng năm nêu đúng khoảng trống này. Đòi cây sạch thì hai định
+     * nghĩa trùng nhau, và tiền đề ghim được. */
+    assert.equal(at("status", "--porcelain").trim(), "",
+      "tien de ca nay: cay lam viec phai SACH, khong thi hai phep do khac dinh nghia");
+    const doiTrongPhien = at("diff", "--name-only", "origin/main", "HEAD").split(NL).map((s) => s.trim()).filter(Boolean);
+    assert.deepEqual(doiTrongPhien, [".agents/claims.json"],
+      "tien de ca nay: phien phai doi DUNG MOT file la .agents/claims.json, dang la: " + JSON.stringify(doiTrongPhien));
+    const m4 = docMuc(kho, "Test xanh");
+    assert.equal(m4.trangThai, "XANH",
+      "chi doi .agents/claims.json thi PHAI duoc mien suite — no khong phai file hanh vi, va dau niem phong canh no: " + m4.chiTiet);
+    /* VÀ PHẢI XANH VÌ ĐƯỢC MIỄN, KHÔNG PHẢI VÌ CỔNG TƯỞNG KHÔNG CÓ GÌ ĐỔI — vòng năm.
+     * Hai đường đều cho XANH nhưng nói hai chuyện khác nhau: "suite không áp dụng" là lời miễn
+     * trừ đang chạy, còn "không đổi file nào" nghĩa là cổng không thấy lượt commit này. Chỉ đòi
+     * XANH thì một bản vá làm cổng MÙ cũng qua được ca này. */
+    assert.match(m4.chiTiet, /không áp dụng/,
+      "phai XANH vi LOI MIEN TRU, khong phai vi cong tuong khong co gi doi: " + m4.chiTiet);
   } finally { rmSync(cha, { recursive: true, force: true }); }
 
   // (c) DOI CHUNG NGUOC, va no phai o mot kho KHONG khai `scripts.test` — chi o do moi vao duoc

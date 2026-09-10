@@ -176,10 +176,31 @@ export function xoaDau(root = ROOT) {
 
 /* ---- danh sách suite ------------------------------------------------------- */
 
-/** Đọc chuỗi suite từ `package.json`. Mỗi phần tử là một lệnh `node …`. */
+/** Đọc chuỗi suite từ `package.json`. Mỗi phần tử là một lệnh `node …`.
+ *
+ * VẮNG `package.json` = KHÔNG CÓ SUITE, cùng một câu trả lời với "có file mà không khai
+ * `scripts.test`" — cả hai dẫn tới "REPO CHƯA CÓ SUITE GỐC", tức BỎ QUA và mã thoát 2. KHÔNG
+ * phải nới: cổng vẫn không được báo xong, nó chỉ thôi SẬP.
+ *
+ * NHƯNG HỎNG THÌ KHÁC VẮNG, và bản vá đầu của tôi lẫn hai thứ đó (kiểm toán vòng ba bắt):
+ * `catch { return []; }` biến một repo có `package.json` SAI CÚ PHÁP thành "không có suite" —
+ * che nguyên nhân, và cổng đi nói một câu không đúng sự thật. Nên nay: chỉ `ENOENT` trả rỗng,
+ * mọi lỗi khác thành `PACKAGE_JSON_HONG` có tên, đọc được.
+ *
+ * VÀ `JSON.parse` KHÔNG ĐỦ ĐỂ TIN: `"null"`, `"123"`, `"[1,2]"` đều qua được, rồi `pkg.scripts`
+ * ném `TypeError` NGOÀI `catch`. Đã dựng lại: `JSON.parse("null")` cho `null`, rồi *Cannot read
+ * properties of null*. Nên truy cập bằng `?.`, không bằng dấu chấm.
+ */
 export function danhSachSuite(root = ROOT) {
-  const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
-  const chuoi = String(pkg.scripts?.["test:tuan-tu"] ?? pkg.scripts?.test ?? "");
+  let pkg;
+  try { pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")); }
+  catch (e) {
+    if (e.code === "ENOENT") return [];
+    throw new Error("PACKAGE_JSON_HONG: không đọc được `package.json` ở " + root + " — " + e.message
+      + ". Repo CÓ file đó mà máy không hiểu được nó là một trạng thái KHÁC với 'repo chưa có suite',"
+      + " nên nó không được đi chung một cửa.");
+  }
+  const chuoi = String(pkg?.scripts?.["test:tuan-tu"] ?? pkg?.scripts?.test ?? "");
   return chuoi.split("&&").map((s) => s.trim()).filter(Boolean)
     // Bỏ chính lệnh này ra, nếu ai đó khai nó vào chuỗi — chạy đệ quy là treo máy.
     .filter((s) => !s.includes("chay-test.mjs"));

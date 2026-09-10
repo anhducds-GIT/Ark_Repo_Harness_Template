@@ -671,8 +671,16 @@ export function tenMaySinhFrom(parsed) {
 export function generatorsFrom(parsed) {
   const value = parsed?.generators;
   if (value === undefined) return DEFAULT_GENERATORS;
-  if (!Array.isArray(value) || value.length === 0) {
-    throw new Error("GENERATORS_HONG: `generators` phải là mảng không rỗng các tên script trong scripts/ (hoặc bỏ hẳn để dùng mặc định).");
+  /* MẢNG RỖNG LÀ HỢP LỆ TỪ 10/09 (R1), và đó là cả một quyết định: nó là cách DUY NHẤT để một
+     repo nói "ĐỪNG đối chiếu artifact nào của tôi với HEAD".
+     KHÔNG đồng nghĩa "repo không commit artifact nào" — repo này VẪN commit DASHBOARD.md,
+     llms.txt, repo-map.json; chúng chỉ thôi bị canh. Lẫn hai câu đó là hiểu sai cả hai chiều.
+     Trước đó `[]` bị coi là gõ sai, nên repo bắt buộc
+     phải có ít nhất một bộ sinh bị cổng đối chiếu với HEAD mỗi lượt — tức vòng lặp 37% commit
+     không có đường thoát nào ngoài việc sửa chính hàm này. Vắng khoá thì VẪN dùng mặc định:
+     bỏ quên khác với khai rỗng, và im lặng tắt một lớp bảo vệ thì phải là hành động cố ý. */
+  if (!Array.isArray(value)) {
+    throw new Error("GENERATORS_HONG: `generators` phải là MẢNG tên script trong scripts/ — `[]` nghĩa là KHÔNG đối chiếu artifact nào với HEAD (repo vẫn có thể commit chúng), bỏ hẳn khoá thì dùng mặc định.");
   }
   for (const name of value) {
     if (typeof name !== "string" || name === "" || name.includes("/") || name.includes("\\")) {

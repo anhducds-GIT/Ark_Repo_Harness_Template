@@ -807,3 +807,46 @@ thứ đều là "còn thiếu"**. Đức thêm hai ô AI bỏ sót — **bộ s
 vì đó là hai chỗ ngốn thời gian thật, không phải hai chỗ trông xấu.
 
 **Đủ bảng thì DỪNG.** Vạch đích không chỉ nói khi nào được nghỉ, nó còn cấm gọn thêm sau đó.
+
+## 2026-09-10 — Đức chốt: ĐÁNH ĐỔI lớp "artifact còn tươi" để lấy tốc độ
+
+Đức: *"đồng ý với sacrifice để optimize."*
+
+**Mất gì, nói thẳng.** Ba file `DASHBOARD.md` · `llms.txt` · `repo-map.json` vẫn nằm trong git
+nhưng **không còn ai đối chiếu chúng với `HEAD`**. Ai sửa tay một dòng thì không cổng nào kêu.
+Đó là hệ quả trực tiếp của `generators: []`, không phải chỗ mù.
+
+**Được gì.** Bỏ vòng lặp **191/522 commit (37%)** trong 7 ngày mà cổng BẮT BUỘC sinh ra — mỗi
+commit như thế còn làm hỏng dấu xác nhận suite, tức thêm ~10 phút một lượt.
+
+**Ba điều kiện đi kèm, không phải lời hứa suông:**
+1. Cổng in ra **KHÔNG ÁP DỤNG** kèm câu *"artifact đã commit hiện KHÔNG ai canh"* — chỗ mất được
+   nói ở đúng nơi người vận hành đọc, không giấu trong một dòng sổ.
+2. Lời miễn trừ suite cho commit chỉ-sinh-artifact **chết theo** khi `generators` rỗng: không ai
+   canh thì không được miễn. Có đối chứng ngược ghim (`tests/cong-do-that.mjs` ca b2).
+3. Phần CHƯA bịt được — có bộ sinh không chứng minh bộ sinh canh đúng file được miễn — ghi nợ
+   `KHUNG-64`, không tự nhận là đủ.
+
+**Vì sao ghi vào đây chứ không chỉ trong CHANGELOG:** đây là lần đầu repo **cố ý bỏ một lớp bảo
+vệ**. Mọi luật trước nay đều nói *"không làm yếu lớp bảo vệ đã có"*. Ngoại lệ có người chốt, có
+ngày, có cái giá — khác hẳn một lớp bảo vệ bị mòn đi mà không ai nhớ vì sao.
+
+## 2026-09-10 — `R2` · Bản phát hành cắt theo ĐỢT VIỆC, không theo lượt ghi file
+
+Đo 7 ngày: **78 lần cắt bản**. Không phải vì ai lười gom — vì **cơ chế bắt cắt**: sổ phát hành là
+vùng chỉ-thêm, nên mỗi lượt sửa một file tầng máy là buộc phải cắt một bản mới. Riêng việc `R1`
+hôm nay đi qua `1.9.0 → 1.9.1 → 1.9.2 → 1.9.3`, trong đó **hai bản cắt hụt chưa từng đẩy**.
+
+**Chốt:** một bản cho một **đợt việc đã đóng** (audit sạch, cổng xanh, đã đẩy), không phải một bản
+cho một lượt `git add`. Mục tiêu **≤ 7 bản/tuần**. Cách làm: gom hết thay đổi tầng máy của một đợt
+rồi mới `npm run template` **một lần** ở cuối.
+
+## 2026-09-10 — `R3` · ĐÓNG BĂNG tính năng và phép kiểm tới khi xong `R11`
+
+**Cấm cho tới khi 5 repo đích cùng một bản, cùng xanh:** thêm tính năng mới · thêm phép kiểm mới ·
+thêm luật mới · thêm tài liệu mới. Việc ngoài phạm vi → ghi `BACKLOG.md`, không tự làm.
+
+**Được phép:** BỎ, GỘP, và vá thứ đang chặn `R11`.
+
+Áp cho **cả AI lẫn người**. Vì sao cần một dòng chốt: repo chết vì phình, và mỗi bản vá riêng lẻ
+đều đúng — cộng lại thì không. Đo: `scripts/` 16.533 dòng mà lõi thật chỉ **22%**.

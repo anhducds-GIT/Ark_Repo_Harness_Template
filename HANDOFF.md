@@ -1258,3 +1258,36 @@ Nên: mọi lượt ghi của tôi **đã commit xong** trước khi trả; tr�
 **Cho lane sau:** đây là lý do đừng tin *"cổng đỏ ở mục artifact"* là mình làm sai. Kiểm bằng
 `git diff -- DASHBOARD-*.html` — nếu phần lệch duy nhất là chuỗi *"giữ … phút"* thì đó là KHUNG-63,
 không phải lỗi của bạn.
+
+## 2026-09-10 (30) · harness-loi-02 · R0–R3 chốt · R1 xong (1.9.6) · SÁU vòng audit, 20 lỗi
+
+**Đức chốt VẠCH ĐÍCH** (`R0`): hai vế, vế nào cũng là SỐ. Đức thêm hai ô tôi sót — *bộ sinh BẢNG*
+và *một vòng sửa → đẩy*. Và chốt **ĐÁNH ĐỔI**: mất lớp "artifact còn tươi" để lấy tốc độ.
+
+**`R1`** — thuốc là `generators: []`, **không** phải bỏ file khỏi git. Bản đầu tôi đẩy cả bốn
+artifact ra ngoài và sai: `llms.txt` là GỐC ĐIỀU HƯỚNG của B6, bỏ ra là vàng 27 → 75.
+**`R7`** — suite **850,7s → 445,5s**, không bỏ một vế kiểm nào.
+
+**BÀI HỌC LỚN NHẤT: BỐN PHÉP GHIM TÔI TIN CẬY HOÁ RA KHÔNG ĐO GÌ.**
+1. `TEP_CUA_REPO_DICH` đọc **chính danh sách nó phải canh** — thu danh sách là thu luôn phép kiểm.
+2. Ghim `8b` so **cấu hình**, không gọi hàm → khôi phục đúng bug thì **vẫn xanh**.
+3. `khoa-dau-vet` vế 7 so hai lượt **cùng ĐỎ** (`nen.ma = 1`, đo được) → mọi so sánh khớp. Nó che
+   một lỗi thật cho tới khi `R1` **tình cờ** làm nền xanh lên.
+4. Ca `b2` chỉ đi qua nhánh **được miễn**, chưa thử nhánh **không miễn**.
+Chữa: gọi thẳng hàm · so TỪNG MỤC theo tên · **NEO giá trị kỳ vọng** · thêm đối chứng ngược.
+
+**BA LẦN TIN MÌNH ĐÃ PHÁ MÀ KHÔNG ĐI KIỂM:** đột biến ném lỗi ở dòng sao lưu · `replace` sửa
+**nhầm hàm** · `&&` sau một script lỗi cú pháp in ra câu "đã xong" trong khi không gì xảy ra.
+**Nay: gọi hàm hoặc `grep` xác nhận ĐÃ hỏng, rồi mới chạy phép ghim.**
+
+**HAI LỖI R1 CHỈ LÀM LỘ, không gây ra** — cả hai ẩn sau một nền đang đỏ: cổng **SẬP** với
+`ENOENT` khi thiếu `package.json` · và bản vá của tôi **gộp hai lời miễn trừ khác lý do**, khiến
+phiên chỉ NHẬN/TRẢ KHOÁ bị báo "chưa kiểm" — tức gần như **mọi** phiên.
+
+**`new RegExp("…")` mất một dấu gạch chéo: cú pháp xanh, ngữ nghĩa sai** — và phép thử đầu của tôi
+cũng nói dối vì không đi qua bước escape. Chữa bằng **regex literal**.
+
+**Cho phiên sau:** trích mã cho audit **theo mốc văn bản**, đừng đếm dòng — hai vòng liền tôi
+cắt hụt đúng chỗ quyết định.
+
+**Nợ mở:** `KHUNG-64` **[FAIL-OPEN]** · `KHUNG-65` (mục `###` lách trần byte, chặn oan lane khác).
