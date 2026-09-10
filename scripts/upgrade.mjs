@@ -659,7 +659,16 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(THIS)) {
   } else {
     console.log("  1. Bản đồ file: không có đường dẫn mới, bỏ qua bước này.");
   }
-  console.log("  2. Sinh lại artifact: `node scripts/build-dashboard.mjs` rồi `build-overview.mjs`");
-  console.log("  3. Ghi một dòng Log vào HANDOFF.md, rồi commit CẢ BA phần trên MỘT commit.");
+  /* HAI COMMIT, KHONG PHAI MOT — cau cu noi "commit CA BA phan tren MOT commit" va no KHONG LAM
+   * DUOC. Artifact mang dau NGAY CUA HEAD, nen sinh truoc commit thi no ghi ngay cua HEAD CU va
+   * cong bao "Su that may sinh con tuoi" DO; sinh sau commit thi nó là mot commit thu hai. Do that
+   * 11/09 tren 3 repo: ca 3 deu phai hai commit, va lich su ca 5 repo truoc gio cung vay
+   * (`chore(khung)` roi `chore(bang)`). Mot may in ra huong dan KHONG LAM DUOC la dung con benh
+   * nang nhat cua vong nay: cau sai nam trong OUTPUT cua may. */
+  console.log("  2. Ghi một dòng Log vào HANDOFF.md, rồi commit bước 1 + 2 — commit THỨ NHẤT.");
+  console.log("  3. RỒI MỚI sinh lại artifact: `node scripts/build-dashboard.mjs` rồi");
+  console.log("     `build-overview.mjs`, và commit chúng — commit THỨ HAI.");
+  console.log("     Phải HAI commit: artifact mang dấu NGÀY CỦA HEAD, nên sinh trước commit là");
+  console.log("     cổng ĐỎ ở mục `Sự thật máy sinh còn tươi`. Đo thật 11/09 trên 3 repo.");
   console.log(`${NL}Rồi mới: \`npm test\`, rồi cổng đóng phiên.${NL}`);
 }
