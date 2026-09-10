@@ -231,6 +231,18 @@
             ]
           },
           "khong_co_thi": "Một cây làm việc có ĐÚNG MỘT index: mẻ `git add` của lane này nằm trong `git commit` của lane kia. Xảy ra THẬT hai lần trong một ngày (10/09), hai chiều ngược nhau, và `safe-push` không cứu được vì hai việc đã nằm trong CÙNG một commit."
+        },
+        {
+          "ma": "F3.7",
+          "ten": "Tự trả khoá file ngay sau commit",
+          "tu_ban": "1.9.10",
+          "pham_vi": "ca-hai",
+          "can": {
+            "file": [
+              ".githooks/post-commit"
+            ]
+          },
+          "khong_co_thi": "Luật nói khoá FILE trả NGAY SAU commit, nhưng chỉ CỔNG cưỡng chế — tức cuối phiên, và cổng đỏ chỉ là lưới đỡ. Đo 10/09 ở chính repo nhà: một phiên giữ hai khoá 47 phút dù luật ghi 'vài phút'. Hook chạy trong chính lượt commit nên không có chỗ để quên. Nó chỉ trả khoá của file ĐÃ SẠCH trên cây — file còn sửa dở thì giữ, vì lượt ghi chưa xong."
         }
       ]
     },

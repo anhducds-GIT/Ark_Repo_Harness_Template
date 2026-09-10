@@ -986,7 +986,22 @@ async function main() {
      *
      * FAIL-OPEN khi không đọc được số bản, cố ý: repo không có `package.json` (hoặc đọc không ra
      * số) thì để cổng đóng phiên nói. Cửa này chỉ chặn ca nó CHẮC CHẮN. */
-    {
+    cuaTangMay: {
+      /* CỬA NÀY CHỈ CỦA NƠI PHÁT HÀNH — kiểm toán 10/09, và `core-contract` đỏ ngay lượt đầu.
+       * `laTangMay` coi MỌI `.mjs` là tầng máy. Ở repo NHÀ điều đó đúng: `.mjs` của nó CHÍNH LÀ
+       * nguồn của tầng máy. Ở repo ĐÍCH thì `.mjs` là mã CỦA HỌ, và đòi họ tăng số bản của bộ
+       * khung là vô nghĩa — cửa này sẽ chặn MỌI commit của cả 5 repo đích.
+       *
+       * Repo đã có sẵn phép nhận biết cho đúng lớp bệnh này (`laNoiPhatHanh`, hai dấu hiệu và cả
+       * hai CỐ Ý không đi theo bản trích), sinh ra sau một lần "luật của nơi phát hành lọt sang
+       * repo đích". Dùng lại nó, đừng viết dấu hiệu thứ hai. */
+      const { laNoiPhatHanh } = await import("./features.mjs");
+      /* `break`, KHÔNG `process.exit` — và đây là chỗ tôi vừa suýt tắt cửa KHUNG-59 cho CẢ 5 REPO
+       * ĐÍCH. Khối này nằm TRƯỚC phép kiểm quyền sở hữu index, nên `process.exit(OK)` ở đây làm
+       * cửa thoát sạch và KHÔNG kiểm gì nữa ở mọi repo không phải nơi phát hành. Vế 3a — chính ca
+       * hỏng KHUNG-59 — đỏ ngay và bắt được. Bỏ MỘT phép kiểm thì dùng `break`, đừng dùng lệnh
+       * kết thúc cả tiến trình: hai thứ đó trông giống nhau và khác nhau ở đúng chỗ chết người. */
+      if (!laNoiPhatHanh(goc)) break cuaTangMay;
       const { DUOI_MAY, TEP_MAY_THEM, TEP_CUA_REPO_DICH } = await import("./build-template.mjs");
       const laTangMay = (rel) => {
         const p = String(rel ?? "").replaceAll("\\", "/");

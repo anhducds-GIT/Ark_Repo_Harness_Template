@@ -339,6 +339,13 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     ghi(".repo-structure.json", `${JSON.stringify({ schema_version: 1, repo: "thu", areas: { "scripts/": { steward: "_code", mutability: "rw", ownership_mode: "root" }, ".agents/": { steward: "_root", mutability: "rw", ownership_mode: "root" } } }, null, 2)}\n`);
     ghi(".agents/claims.json", `${JSON.stringify({ claims: { _code: { owner: null }, _root: { owner: null } }, tam: {} }, null, 2)}\n`);
     datBan("1.0.0");
+    /* FIXTURE PHẢI LÀ NƠI PHÁT HÀNH. Cửa tầng máy CHỈ áp ở repo phát hành bộ khung — ở repo
+     * đích thì `.mjs` là mã CỦA HỌ, và đòi họ tăng số bản của bộ khung là vô nghĩa.
+     * `laNoiPhatHanh` đòi HAI dấu hiệu, cả hai cố ý không đi theo bản trích. Không dựng chúng
+     * thì vế này đo một repo mà cửa không áp — tức đo số 0. */
+    ghi("scripts/build-template.mjs", "// dau hieu noi phat hanh\n");
+    ghi("RELEASE-LEDGER.json", JSON.stringify({ ban: {} }, null, 2) + "\n");
+
     ghi("scripts/may.mjs", "// v1\n");
     ghi("docs/tay.md", "# tay\n");
     g2("add", "-A");
@@ -413,7 +420,21 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     const f2 = cm(`feat: repo khong co package.json${nhan}`);
     assert.equal(f2.ma, 0, `khong doc duoc so ban thi phai FAIL-OPEN: ${f2.ra.slice(0, 300)}`);
 
-    ok("6 · cửa tầng máy: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` — bảy nhánh");
+    /* ⑺ KHÔNG PHẢI NƠI PHÁT HÀNH → CỬA TẦNG MÁY KHÔNG ÁP, và đây là ca tôi vừa làm sai.
+     * Bản đầu tôi viết `process.exit(EXIT.OK)` cho nhánh này — mà khối đó nằm TRƯỚC phép kiểm
+     * quyền sở hữu index, nên nó tắt sạch cửa KHUNG-59 ở MỌI repo đích. Vế 3a bắt được. Nay là
+     * `break`, và vế này ghim chính ranh giới đó: bỏ hai dấu hiệu đi thì commit tầng máy KHÔNG
+     * cắt bản phải ĐI QUA (vì repo này không phát hành gì), mà cửa index vẫn phải còn răng. */
+    g2("rm", "-q", "--cached", "scripts/build-template.mjs", "RELEASE-LEDGER.json");
+    fs.rmSync(path.join(t2, "scripts", "build-template.mjs"));
+    fs.rmSync(path.join(t2, "RELEASE-LEDGER.json"));
+    g2("commit", "-q", "-m", `chore: thoi la noi phat hanh${nhan}`);
+    ghi("scripts/may.mjs", "// v4 o repo DICH\n");
+    g2("add", "scripts/may.mjs");
+    const h = cm(`feat: sua .mjs o repo dich${nhan}`);
+    assert.equal(h.ma, 0, `repo KHONG phai noi phat hanh thi cua tang may khong ap: ${h.ra.slice(0, 300)}`);
+
+    ok("6 · cửa tầng máy — TÁM nhánh: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` · và KHÔNG áp ở repo không phải nơi phát hành");
   } finally {
     fs.rmSync(t2, { recursive: true, force: true });
   }

@@ -9,7 +9,7 @@ last_verified_how: "23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHAN
 evidence_ref: HANDOFF.md
 owner: harness-loi-02
 priority_rank: 1
-next_step: "Đọc `docs/ROADMAP-V2.md` mục HÔM NAY. Ba việc, đúng thứ tự: `T1` cắt suite ≤180s · `T2` hook trả khoá + ĐO hiệu quả hook ở repo đích · `T3` đóng gói 5 repo. Mỗi chặng audit Codex trước, cổng sau."
+next_step: "`T1` XONG (cổng 12,2→3,0s, suite 850,7→375,5s) · `T2` XONG (2 cửa máy) · luật 6→3 cửa. Việc kế DUY NHẤT: `T3` đóng gói 5 repo — đọc `docs/ROADMAP-V2.md`. CẢNH BÁO: nạp 4200/4200, hết dư."
 version_source: package.json
 current_focus: "ĐÓNG GÓI, không hoàn thiện. Đo 7 ngày: 522 commit · 191 (37%) chỉ sinh bảng · 78 lần cắt bản · lõi chỉ 22% mã. ĐÓNG BĂNG tính năng và phép kiểm tới khi 5 repo đích cùng bản, cùng xanh."
 human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật."
