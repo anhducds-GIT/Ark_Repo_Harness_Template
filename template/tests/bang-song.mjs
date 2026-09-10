@@ -32,15 +32,17 @@
  */
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { readdirSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { once } from "node:events";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { canSinh, chenBang, khoaChanSinhFrom, KHOA_CHAN_SINH, NHAN_BANG, xetChot } from "../bang-song/loi.mjs";
 import { DUONG, PHUONG_THUC, xuLy } from "../bang-song/may-chu.mjs";
 import { generatorsFrom } from "../scripts/repo-structure.mjs";
+import { createHeadDeps } from "../scripts/build-dashboard.mjs";
 
 let passed = 0;
 const ok = (name) => { passed += 1; console.log(`  ok  ${name}`); };
@@ -346,3 +348,78 @@ const bang = (khoa) => JSON.stringify({ claims: khoa });
 }
 
 console.log(`bang-song: ${passed} vế xanh`);
+
+/* VẾ 13 — T1: BỘ ĐỌC HEAD MỘT-LƯỢT PHẢI KHỚP TỪNG-FILE, KHÔNG CHỈ NHANH HƠN.
+ *
+ * T1 đổi ba đường đọc của `createHeadDeps` từ "một tiến trình git mỗi file" sang "một lệnh cho
+ * cả cây": kiểu ← `ls-tree -r -t` · nội dung ← `cat-file --batch` · ngày ← một lượt `log`.
+ * Cổng 12,2s → 3,0s. Nhưng ba đường đó chỉ có PHÉP ĐO, không có phép ghim — kiểm toán độc lập
+ * nêu đúng chỗ đó ([#5]).
+ *
+ * Ghim bằng ĐỐI CHỨNG với đường cũ, trên chính repo này: `git show HEAD:<f>` và
+ * `git log -1 -- <f>`. Bất biến cần giữ là *"nhanh hơn mà trả về Y HỆT"*; hỏng nó là mọi phép
+ * kiểm dựa trên bộ đọc này đều nói dối mà vẫn xanh.
+ *
+ * ƯU TIÊN FILE CÓ TÊN KHÓ, không lấy 25 file đầu bảng chữ cái: tên có dấu cách hoặc tiếng Việt
+ * là chỗ `cat-file --batch` (tách yêu cầu theo DÒNG) và `-z` từng vấp. Repo này có sẵn một danh
+ * sách `grandfathered` toàn đường dẫn như thế, nên đây không phải ca giả định. */
+{
+  const gitTho = (...a) => execFileSync("git", ["-c", "core.quotepath=false", ...a],
+    { cwd: ROOT, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+  const deps = createHeadDeps(ROOT);
+  const tatCa = gitTho("ls-tree", "-r", "-z", "--name-only", "HEAD").split(String.fromCharCode(0)).filter(Boolean);
+  assert.ok(tatCa.length > 50, `repo phai co du file de doi chieu, dang co ${tatCa.length}`);
+  const kho = tatCa.filter((p) => /[^\x20-\x7e]/.test(p) || p.includes(" "));
+  const mau = [...new Set([...kho, ...tatCa.filter((p) => !kho.includes(p)).slice(0, 20)])];
+  let lechND = 0;
+  let lechNgay = 0;
+  for (const p of mau) {
+    if (gitTho("show", `HEAD:${p}`) !== deps.readFile(p)) lechND += 1;
+    if (gitTho("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", "--", p).trim() !== deps.git.lastCommitDate(p)) lechNgay += 1;
+  }
+  assert.equal(lechND, 0, `noi dung tu \`cat-file --batch\` phai khop \`git show\` tung file (${mau.length} file)`);
+  assert.equal(lechNgay, 0, `ngay tu mot luot \`log\` phai khop \`git log -1 --\` tung file (${mau.length} file)`);
+  // Và bảng KIỂU: thư mục phải là thư mục. Thiếu `-t` trong `ls-tree -r` là mọi thư mục thành
+  // "không tồn tại", `listDirs` rỗng sạch, và số "chưa khai chủ" âm thầm về 0.
+  assert.equal(deps.fileExists("scripts"), true, "thu muc `scripts` phai TON TAI — thieu `-t` la ca nay do");
+  assert.equal(deps.isFile("scripts"), false, "`scripts` la thu muc, khong phai file");
+  assert.ok(deps.listDirs("").includes("docs"), "listDirs o goc repo phai thay `docs`");
+  ok(`13 · bộ đọc HEAD một-lượt khớp từng-file trên ${mau.length} file, và thư mục vẫn là thư mục`);
+  /* VÀ MỘT KHO RIÊNG CHO TÊN KHÓ. Repo này hiện KHÔNG có file nào tên có dấu cách hay tiếng
+   * Việt (`grandfathered` rỗng), nên nhánh tôi lo nhất — `cat-file --batch` tách yêu cầu theo
+   * DÒNG — không được ghim bởi phần trên. Dựng kho thật, tên thật, rồi đối chiếu.
+   *
+   * Lý do đọc theo SHA chứ không theo đường dẫn nằm đúng ở đây: một đường dẫn có ký tự lạ là
+   * một yêu cầu hỏng mà không ai thấy; SHA thì luôn 40 ký tự hex. */
+  {
+    const kh = mkdtempSync(join(tmpdir(), "ark-ten-kho-"));
+    const gk = (...a) => execFileSync("git", a, { cwd: kh, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    try {
+      gk("init", "-q", ".");
+      gk("config", "user.email", "t@t");
+      gk("config", "user.name", "t");
+      gk("config", "core.autocrlf", "false");
+      const ten = ["docs/kế hoạch đợt 1.md", "scripts/bộ sinh.mjs", "docs/a b c.txt"];
+      for (const t of ten) {
+        const abs = join(kh, t);
+        mkdirSync(dirname(abs), { recursive: true });
+        writeFileSync(abs, `noi dung cua ${t}\nhai dong\n`, "utf8");
+      }
+      gk("add", "-A");
+      gk("commit", "-q", "-m", "ten kho");
+      const dk = createHeadDeps(kh);
+      const gkTho = (...a) => execFileSync("git", ["-c", "core.quotepath=false", ...a], { cwd: kh, encoding: "utf8" });
+      let lech = 0;
+      for (const t of ten) {
+        if (gkTho("show", `HEAD:${t}`) !== dk.readFile(t)) lech += 1;
+        if (!dk.fileExists(t)) lech += 1;
+        if (!dk.isFile(t)) lech += 1;
+      }
+      assert.equal(lech, 0, "ten co dau cach / tieng Viet phai doc dung y het duong cu");
+      assert.equal(dk.git.trackedPaths().length, ten.length, "trackedPaths phai thay du ca ba file ten kho");
+      ok(`13b · tên có dấu cách và tiếng Việt: ${ten.length} file, đọc qua \`cat-file --batch\` khớp \`git show\` từng file`);
+    } finally {
+      rmSync(kh, { recursive: true, force: true });
+    }
+  }
+}

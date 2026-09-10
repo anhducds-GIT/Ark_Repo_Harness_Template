@@ -1291,3 +1291,36 @@ cũng nói dối vì không đi qua bước escape. Chữa bằng **regex litera
 cắt hụt đúng chỗ quyết định.
 
 **Nợ mở:** `KHUNG-64` **[FAIL-OPEN]** · `KHUNG-65` (mục `###` lách trần byte, chặn oan lane khác).
+
+## 2026-09-10 (31) · harness-loi-02 · T1 cổng 12,2→3,0s · T2 hai cửa máy · luật 6→3 cửa
+
+**`T1` — MỘT BỆNH, BỐN CHỖ: một tiến trình `git` cho MỖI file.** Đo: một lệnh git 37,5 ms, và
+cổng gọi nó hàng trăm lần cho **cùng một tập file** — `collectModel` đọc hết, `B6` **đọc lại**
+hết để dò link, `B12` đọc nữa. Chữa: nhớ lại trong một lượt · kiểu ← MỘT `ls-tree -r -t` · nội
+dung ← MỘT `cat-file --batch` · ngày ← MỘT lượt `log`. `B6` **4.370 → 40 ms**.
+Cổng **12,2 → 3,0 s** · suite **850,7 → 375,5 s**.
+
+**Vạch ≤180s KHÔNG đạt, có số:** nhóm "chạy riêng" 7 suite, riêng hai cái là 135s + 60,3s =
+**sàn ≥195s**. Xuống dưới đòi chạm thiết kế nhóm đó — đổi một nút thắt ĐO ĐƯỢC thành một nguồn
+CHẬP CHỜN. Để Đức quyết.
+
+**`T2` — LUẬT THÀNH MÁY.** `commit-msg` chặn *"sửa tầng máy mà chưa cắt bản"* — **11 phút → 0,2
+giây**, đã thử ca thật. `post-commit` tự trả khoá, **giữ khoá của file còn sửa dở**. Cả hai đi
+theo bản trích.
+
+**LUẬT: 6 cửa → 3.** Giữ: xoá dữ liệu gốc · gửi ra ngoài · automation tự chạy. Ba cái kia: `--carry` cổng chưa xanh → **CẤM** · giành vùng → **CẤM** · đổi luật an toàn → AI tự
+quyết, đủ ba điều kiện máy. **Cái MẤT: quyền phủ quyết TRƯỚC của Đức** — ghi ở `decisions.md`.
+
+**TÁM VÒNG AUDIT, và chúng bắt HAI LOẠI lỗi khác hẳn.**
+*Lỗi cơ chế* — 4, đều trong bản vá của tôi: parser đổi tên cắt mất 3 ký tự (đã tự dựng lại) ·
+batch nhận thân CỤT · HEAD không chốt nên một lượt chạy thấy hai trạng thái · gộp hai lời miễn
+trừ khác lý do.
+*Lỗi CHỮ* — nhiều hơn, và **ba lần chỉ riêng ở mục 2 hiến pháp**: "thành ĐIỀU CẤM" khi thật ra
+là bỏ quyền phủ quyết · "ở hai hàng cuối" khi hai hàng cuối là việc khác · "dấu cách và tiếng
+Việt làm `--batch` hỏng" khi chỉ ký tự XUỐNG DÒNG mới hỏng.
+**Luật là chữ, nên lỗi của luật là lỗi CHỮ — không cổng nào bắt được, chỉ một người đọc kỹ.**
+
+**Đột biến giả lần thứ tư** — lần này `grep 1→0` cứu tôi. Nếp: xác nhận ĐÃ phá thật rồi mới chạy
+phép ghim.
+
+**Nạp 4200/4200 — HẾT DƯ.** Phiên sau thêm một chữ vào `AGENTS.md`/`STATUS.md` là cổng ĐỎ.

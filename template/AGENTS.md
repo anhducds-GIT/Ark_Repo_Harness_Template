@@ -80,7 +80,7 @@ máy tự chặn và tự nêu tên khoá thiếu: [MULTIFLOW](docs/protocols/MU
 | 3 | Tạo automation tự chạy | Nó chạy cả lúc không ai nhìn |
 
 Đức chốt 10/09, sáu xuống ba — **Đức quyết ĐÁNH ĐỔI, máy quyết ĐÚNG/SAI**; số đo ở
-[decisions](decisions.md). Cái MẤT: **quyền phủ quyết TRƯỚC** của Đức, ở hai hàng cuối.
+[decisions](decisions.md). Cái MẤT: **quyền phủ quyết TRƯỚC** của Đức ở hai gạch đầu dòng cuối.
 
 - **CẤM** `--carry` khi cổng chưa XANH TOÀN BỘ, hoặc có commit không quy thuộc được.
 - **CẤM** giành vùng phiên khác đang giữ — ba đường hợp lệ vẫn như mục 1.

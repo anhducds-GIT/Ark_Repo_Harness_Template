@@ -840,10 +840,24 @@ async function main() {
      * Mot file vua vao commit MA VAN con sua do (dan mot phan bang `git add -p`, hay sua tiep sau
      * khi `git add`) thi luot ghi CHUA xong — tra khoa luc do la lay mat luoi do cua chinh lane
      * dang sua. Hoi git: file nao con hien trong `status --porcelain` thi GIU khoa. */
+    /* BẢN GHI ĐỔI TÊN DÙNG HAI TRƯỜNG — kiểm toán 10/09 [#4], và tôi đã tự dựng lại ca này.
+     * `status --porcelain -z` phát `R  moi cu `: MỘT mục, HAI trường. Bản đầu của tôi tách
+     * theo NUL rồi `slice(3)` cho MỌI trường, nên đường dẫn CŨ bị cắt mất 3 ký tự đầu — đo
+     * được: `scripts/cu ten.mjs` thành `ipts/cu ten.mjs`. Một đường dẫn sai trong bảng "đang
+     * bẩn" nghĩa là file bẩn thật không được nhận ra, và khoá của nó bị trả trong khi lane vẫn
+     * đang sửa — đúng cái lỗ mà bản vá này sinh ra để bịt. Trường thứ hai KHÔNG có tiền tố. */
     let banTrenCay = new Set();
     try {
-      banTrenCay = new Set(gitO("status", "--porcelain", "-z", "-uall")
-        .split(String.fromCharCode(0)).filter(Boolean).map((rec) => chuanDuongDan(rec.slice(3))));
+      const truong = gitO("status", "--porcelain", "-z", "-uall").split(String.fromCharCode(0));
+      for (let k = 0; k < truong.length; k += 1) {
+        const rec = truong[k];
+        if (!rec) continue;
+        banTrenCay.add(chuanDuongDan(rec.slice(3)));
+        if (rec[0] === "R" || rec[0] === "C") {   // đổi tên / sao chép: trường kế là đường CŨ
+          k += 1;
+          if (truong[k]) banTrenCay.add(chuanDuongDan(truong[k]));
+        }
+      }
     } catch { process.exit(EXIT.OK); }   // khong doc duoc trang thai cay thi khong tra gi ca
     let tam = bang.tam;
     const daTra = [];

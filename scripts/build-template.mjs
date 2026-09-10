@@ -678,8 +678,14 @@ function phanLuatChung(text) {
  *   khi cổng xanh, và đổi luật an toàn — là BỎ QUYỀN PHỦ QUYẾT TRƯỚC của Đức. Kiểm toán bắt tôi
  *   vi phạm chính điều kiện tôi vừa đặt ra trong cùng commit đó: *"không làm yếu lớp bảo vệ mà
  *   không GỌI TÊN thứ mất đi"*. Nay mục 2 gọi tên: **quyền phủ quyết TRƯỚC hành động**.
- *   Vân tay trước: 6cabbb5689a02fe049a8c48ad782ca1360ee4f27f0c92bca45591b4d0b6146a5 */
-const COMMON_LAW_SHA256 = "f1655d2f439fab02760c7a43d485f5ac3dcda7134112693b793401eb00b13ddf";
+ *   Vân tay trước: 6cabbb5689a02fe049a8c48ad782ca1360ee4f27f0c92bca45591b4d0b6146a5
+ *
+ *   SỬA LẦN HAI cùng ngày, kiểm toán vòng sau: câu *"ở hai hàng cuối"* MƠ HỒ — hai hàng cuối của
+ *   BẢNG là những việc VẪN phải hỏi, còn thứ mất đi nằm ở hai GẠCH ĐẦU DÒNG cuối. Đổi cho đúng
+ *   chỗ. Ba lượt sửa mục 2 trong một ngày, và cả ba đều do kiểm toán độc lập chỉ ra một câu nói
+ *   không đúng — không phải một cơ chế hỏng. Luật là chữ, nên lỗi của nó là lỗi CHỮ.
+ *   Vân tay trước: f1655d2f439fab02760c7a43d485f5ac3dcda7134112693b793401eb00b13ddf */
+const COMMON_LAW_SHA256 = "9e08b9265e7353a39794261d210588385f932807aef20261adecce39a46b83ff";
 const commonLawHash = (text) => createHash("sha256").update(phanLuatChung(text), "utf8").digest("hex");
 
 export function stripNghe(text) {

@@ -1572,9 +1572,12 @@ export function createHeadDeps(root = ROOT) {
    * ~210 tiến trình × 37,5 ms. `cat-file --batch` nhận danh sách trên stdin và trả tất cả trong
    * MỘT lượt.
    *
-   * ĐỌC THEO SHA, KHÔNG THEO ĐƯỜNG DẪN: tên file trong repo này có dấu tiếng Việt và dấu cách,
-   * và `--batch` tách yêu cầu theo DÒNG — một đường dẫn có ký tự lạ là một yêu cầu hỏng mà
-   * không ai thấy. SHA thì luôn 40 ký tự hex.
+   * ĐỌC THEO SHA, KHÔNG THEO ĐƯỜNG DẪN — và lý do CHÍNH XÁC là gì thì kiểm toán 10/09 buộc tôi
+   * nói lại cho đúng: `--batch` tách yêu cầu theo DÒNG MỚI, nên dấu cách và tiếng Việt KHÔNG
+   * làm nó hỏng (bản đầu tôi viết là có — nói quá). Thứ thật sự hỏng nó là đường dẫn chứa ký tự
+   * XUỐNG DÒNG (git cho phép), và cú pháp `<rev>:<path>` nhập nhằng khi tên chứa dấu hai chấm.
+   * SHA thì luôn 40 ký tự hex, không có ca mờ nào. Đây là lựa chọn được BÀO CHỮA BẰNG LÝ LẼ, và
+   * phép ghim (vế 13/13b ở `tests/bang-song.mjs`) ghim KẾT QUẢ tương đương, không ghim lựa chọn.
    *
    * KHÔNG dùng `encoding` ở đây: `--batch` trả nhị phân xen tiêu đề, nên phải đếm BYTE. Giải mã
    * utf8 lúc trả về, đúng như `git show` cũ vẫn làm. */
@@ -1592,7 +1595,7 @@ export function createHeadDeps(root = ROOT) {
     /* CHI CONG BO BANG KHI DOC DU — kiem toan 10/09 [A]#2. "missing" hay dau ra cut lam vong lap
      * duoi dung som; bang cut thi readFile van dung (thieu duong dan nao thi no hoi lai `git
      * show`), nhung "dung nho may" khong phai mot bao dam. Dung vao bang TAM, dem lai, va chi
-     * nhan neu du so doi tuong da yeu cau. Thieu thi bo ca bang va ve duong cu — cham hon, khong sai. */
+     * nhan neu du so doi tuong da yeu cau. Thieu thi bo ca bang va ve duong cu (`git show` tung file). */
     const tam = new Map();
     const ra = execFileSync("git", ["cat-file", "--batch"], {
       cwd: root, input: [...duongTheoSha.keys()].join("\n") + "\n",
@@ -1605,6 +1608,12 @@ export function createHeadDeps(root = ROOT) {
       const [sha, , co] = ra.slice(i, nl).toString("utf8").split(" ");
       const dai = Number(co);
       if (!Number.isFinite(dai)) break;                 // "<sha> missing" — bỏ qua, không đoán
+      /* ĐỦ BYTE VÀ CÓ LF KẾT THÚC MỚI NHẬN — kiểm toán 10/09 [#2]. Header khai 5 byte mà thân
+       * chỉ còn 2 thì `slice` vẫn trả một chuỗi CỤT, và bản đầu của tôi vẫn nhận nó: đúng ca
+       * "trả sai nội dung mà không nổ". Thiếu byte hay thiếu LF thì dừng, và bảng sẽ không đủ
+       * số dòng nên bị bỏ hẳn ở dưới. */
+      if (nl + 1 + dai + 1 > ra.length) break;
+      if (ra[nl + 1 + dai] !== 10) break;
       const than = ra.slice(nl + 1, nl + 1 + dai).toString("utf8");
       for (const duong of duongTheoSha.get(sha) ?? []) tam.set(duong, than);
       i = nl + 1 + dai + 1;                             // +1 cho dấu xuống dòng sau nội dung
@@ -1656,14 +1665,22 @@ export function createHeadDeps(root = ROOT) {
        * File KHÔNG có trong bảng (bị đổi tên, hoặc chưa từng commit) thì hỏi lại theo cách cũ:
        * bảng thiếu một dòng KHÁC HẲN việc đoán một ngày. */
       lastCommitDate: (relPath) => {
+        /* REPO CÓ COMMIT MERGE THÌ HỎI TỪNG FILE — kiểm toán 10/09 [#3], hai vòng liền.
+         * `git log --name-only` KHÔNG kể file của commit MERGE, nên bảng một-lượt gán cho file
+         * đó một ngày CŨ HƠN, và vì bảng ĐÃ CÓ dòng thì fallback không chạy để cứu. Vòng trước
+         * tôi thêm `--diff-merges=first-parent`, và kiểm toán bác đúng: cờ đó ĐỔI NGHĨA ngày
+         * chứ không trả lại nghĩa cũ. Nên không xấp xỉ nữa — đếm merge một lần: có merge thì
+         * hỏi từng file (chậm, ĐÚNG); không có thì dùng bảng (nhanh, và tương đương thật).
+         * Repo này hiện 0 commit merge; repo đích thì có thể có. */
+        const coMerge = nhoLai("co-merge", () => {
+          try { return Number(git("rev-list", "--count", "--merges", MOC).trim()) > 0; }
+          catch { return true; }   // không đếm được thì chọn đường ĐÚNG, đừng chọn đường nhanh
+        });
+        if (coMerge) return git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d", MOC, "--", relPath).trim();
         const bang = nhoLai("ngay-cuoi", () => {
           const bd = new Map();
           let ngay = null;
-                    /* --diff-merges=first-parent: kiem toan 10/09 [A]#3. `git log --name-only` KHONG ke file
-           * cua commit MERGE, nen mot file chi bi cham trong merge se nhan ngay cua commit CU HON —
-           * va vi bang DA CO dong, duong fallback khong chay de cuu. Repo nay hien 0 commit merge
-           * nen chua voi toi, nhung bo khung phat sang 5 repo dich thi co. */
-          for (const raw of git("log", "--name-only", "--no-renames", "--diff-merges=first-parent", "--format=%x01%cd", "--date=format:%Y-%m-%d", MOC)
+                    for (const raw of git("log", "--name-only", "--no-renames", "--format=%x01%cd", "--date=format:%Y-%m-%d", MOC)
             .replace(/\r\n?/g, "\n").split("\n")) {
             if (raw.startsWith("\x01")) { ngay = raw.slice(1).trim() || null; continue; }
             const f = raw.trim();
