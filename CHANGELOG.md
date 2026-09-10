@@ -3,6 +3,28 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.27 — 2026-09-10 — Bản trích thôi cưỡng chế chính sách mà repo đích chưa nhận
+
+**LỖI 8.** Vế 8b của `bang-song` đóng cứng `DASHBOARD-Ark-Repo-Harness.html` — **tên trang của
+riêng repo nhà** — rồi đòi nó bị `.gitignore` bỏ qua và đòi repo khai `generators: []`. Bản trích
+mang vế này sang **mọi repo đích**, nên ở đó nó Đỏ vì **một tên file không tồn tại** — không phải
+vì repo đó sai. Đo ở `n8n_Local host`: *"trang HTML PHAI bi .gitignore bo qua"* Đỏ, trong khi
+trang của nó mang tên khác.
+
+**Tách đúng hai loại:**
+
+| Phần | Là gì | Chạy ở đâu |
+|---|---|---|
+| (1)(2) | **hành vi của mã** — `generatorsFrom` nhận `[]`, vắng khoá vẫn mặc định, sai kiểu thì ném lỗi | **mọi repo** |
+| (3)(4) | **chính sách `R1` của repo** — trang HTML ra khỏi cây HEAD | **chỉ repo đã khai `generators: []`** |
+
+Repo chưa khai thì vế **nêu tên phần bỏ**, không đỏ oan. Tên trang **suy từ khai báo của chính
+repo** (`tenTrang`), không đóng cứng nữa.
+
+**Câu đáng giữ:** một phép kiểm cưỡng chế chính sách mà repo chưa nhận thì **không phải lưới —
+nó là thuế bắt buộc đóng mà không ai báo trước.** Và đây là lỗi thứ **TÁM** trong ngày thuộc cùng
+một họ: bộ khung chưa tự đi qua con đường nó bán cho người khác.
+
 ## 1.9.26 — 2026-09-10 — `Audit:` là trailer · phép kiểm đếm vế tự mất đối tượng đo
 
 **LỖI 6 (tìm ra ở một repo đích — họ tự vá, lõi thì chưa).** `auditFromMessage` quét **cả dòng
