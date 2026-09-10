@@ -3,21 +3,21 @@
   "_labels": "owner là nhãn phiên tự đặt, ví dụ 'claude-dashboard' — hai phiên khác nhau phải có hai nhãn khác nhau.",
   "claims": {
     "_root": {
-      "owner": null,
+      "owner": "harness-migrate-3repo",
       "ai": null,
-      "claimed_at": "2026-09-09T14:51:16.026Z",
-      "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": "2026-09-09T15:38:07.059Z",
+      "claimed_at": "2026-09-10T03:11:05.091Z",
+      "task": "ban 1.8.11: do BAN chu khong chi do CO",
+      "released_at": null,
       "taken_from": "harness-phat-01",
       "taken_by": "harness-loi-01",
       "duc_decision": "Duc chot 09/09, nguyen van: 'bạn hãy giành root đi, phiên kia đang ko làm gì.'"
     },
     "_docs": {
-      "owner": null,
+      "owner": "harness-migrate-3repo",
       "ai": null,
-      "claimed_at": "2026-09-09T14:51:16.103Z",
-      "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": "2026-09-09T15:38:07.193Z",
+      "claimed_at": "2026-09-10T03:11:05.238Z",
+      "task": "bon luat luot nang + khai doi-hinh",
+      "released_at": null,
       "taken_from": "claude-so-migrate",
       "taken_by": "claude-multiflow",
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
@@ -33,12 +33,22 @@
       "duc_decision": "Đức chốt 04/09: ưu tiên đưa MULTIFLOW vào bộ khung — Đức nhắc hai lần, cây làm việc sạch nên không phá việc ai"
     },
     "_template": {
-      "owner": null,
+      "owner": "harness-migrate-3repo",
       "ai": null,
-      "claimed_at": "2026-09-09T14:51:16.257Z",
-      "task": "Keo dau niem phong bang quyen ve nha truoc khi migrate",
-      "released_at": "2026-09-09T15:38:07.471Z"
+      "claimed_at": "2026-09-10T03:11:05.509Z",
+      "task": "sinh lai ban trich 1.8.11",
+      "released_at": null
     }
   },
-  "_fingerprint": "c2525746ba92bf21"
+  "_fingerprint": "54b3c8d0cb52fa30",
+  "tam": {
+    "scripts/build-template.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T02:24:30.044Z"
+    },
+    "tests/upgrade-smoke.mjs": {
+      "owner": "harness-loi-02",
+      "luc": "2026-09-10T02:24:30.044Z"
+    }
+  }
 }
