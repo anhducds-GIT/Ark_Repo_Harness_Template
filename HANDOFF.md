@@ -26,17 +26,13 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
 **Số đo.** 5 repo từ 3 bản (`1.3.75`·`1.3.76`·`1.8.0`×3) lên cùng `1.9.20`. **8s mỗi repo**,
 5/5 sinh được trang, 5/5 có `core.hooksPath=.githooks`.
 
-**Hai lỗi thật do chính lượt đóng gói lôi ra, cả hai đã ẨN Ở LÕI nhiều ngày:**
-
-1. `upgrade.mjs` dùng `execFileSync` mà **không import**. `try/catch` nuốt `ReferenceError` thành
-   một dòng cảnh báo → **cửa index chưa từng bật ở bất kỳ repo nào đã nâng cấp**. Đúng cái khối
-   chú thích ngay trên nó cảnh báo: *cơ chế đã tắt có triệu chứng y hệt lúc chưa mang gì.*
-   Ghim: `upgrade-smoke` vế 25 — **đo `core.hooksPath`, không đọc chữ in ra**.
-2. `runDashboard` đọc `behaviourOpts` ngoài phạm vi → **chết cả bộ sinh trang** khi có vùng khác
-   `_root` đang bẩn. Repo này `root_dir: null` nên `rows` chỉ có `_root`, lỗi **nằm ngủ**; nó đã
-   **nổ thật** ở `Chrome_Extension_AI_Agentic`. Sửa ở **LÕI** rồi `--force` ghi đè bản vá tay của
-   họ, sau khi đối chiếu **đúng 2 hunk, +8/-2**, trùng nội dung. Ghim: `bang-song` vế 14 — phải
-   **tự dựng repo có vùng con**, đo trên repo này thì xanh mà không kiểm được gì.
+**Ba lỗi thật do chính lượt đóng gói + vòng audit lôi ra, cả ba ẨN Ở LÕI nhiều ngày** — chi
+tiết và số đo ở `CHANGELOG` 1.9.22. Tóm: ① `upgrade.mjs` thiếu `import execFileSync`, `try/catch`
+nuốt `ReferenceError` → **cửa index chưa từng bật ở repo nào đã nâng cấp**. ② `runDashboard` đọc
+`behaviourOpts` sai phạm vi → **chết cả bộ sinh trang** khi có vùng khác `_root` bẩn; repo này
+`root_dir: null` nên lỗi **nằm ngủ**, nó đã nổ thật ở `Chrome_Extension_AI_Agentic`. ③ `git config
+--get` đọc cả global → máy có khoá global thì `upgrade` báo *"đã bật từ trước"* và **không bao
+giờ đặt local**; nay `--local`. Ghim: `upgrade-smoke` vế 25 · `bang-song` vế 14 · `core-contract` F23.
 
 **VẤP:**
 
@@ -49,6 +45,12 @@ Nó **tự dựng bằng chính bộ khung của mình** — không phải một
   đúng ca đó — giữ. **Python ghi file phải `newline=""`.**
 - Cắt **hai** số bản một mẻ vì sinh bản trích **trước** khi vá xong tầng máy; sổ chỉ-thêm nên
   `1.9.19` thành số chết. **Sinh bản trích CUỐI CÙNG.**
+
+**Thêm, vòng audit Codex:** `git config --get` đọc cả global → máy nào có khoá global thì
+`upgrade` báo *"đã bật từ trước"* và **không bao giờ đặt local**; nay đọc `--local`. Câu Đỏ của
+thước nạp in `napDong` rồi nói *"200/4200 dòng"* cho một quyết định tính bằng **token** — sai
+đơn vị, và **chỉ sai ở nhánh Đỏ**. Ghim `core-contract` F23. **Đột biến đầu của tôi là GIẢ**:
+câu XANH và câu Đỏ dùng chuỗi giống nhau nên `replace` sửa nhánh xanh — **neo vào mã lỗi**.
 
 **Còn mở:** `KHUNG-66` · sổ nợ **30/30**, doc **3114/3117**, nạp **4200/4200** — hết dư cả ba.
 Việc kế: `R6` bỏ luật không có máy canh (Đức chốt: T3 trước, rồi R6, không phải R4/R5).

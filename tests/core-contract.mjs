@@ -1148,4 +1148,25 @@ const khoTam = () => mkdtempSync(join(tmpdir(), "core-contract-"));
   ok(`F22 - ${soChep} file test chep CA thu muc scripts/, 0 danh sach go tay`);
 }
 
+/* F23 — CÂU Đỏ PHẢI NÊU ĐÚNG ĐƠN VỊ NÓ DÙNG ĐỂ PHÁN XỬ.
+ * Ca thật 10/09: nhánh XANH của thước "phần nạp" in `napToken` và nói "token", nhánh Đỏ in
+ * `napDong` và nói "dòng" — trong khi `dat` tính bằng `napToken`. Cổng in ra
+ * *"PHAN_NAP_VUOT_TRAN: 200/4200 dòng"*: 200 nhỏ hơn 4200 mà vẫn bảo vượt trần. Và câu đó CHỚ
+ * hiện ở nhánh Đỏ, tức đúng lúc Đức cần đọc số — loại sai khó thấy nhất vì lúc xanh nó đúng.
+ * Đo Ở NGUỒN vì cả hai nhánh là hai chuỗi của cùng một hàm; dựng ca Đỏ thật đòi một repo
+ * fixture có `AGENTS.md` phình quá trần — đắt hơn nhiều mà canh cùng một sự thật.
+ */
+{
+  const maNap = readFileSync(join(ROOT, "scripts", "session-check.mjs"), "utf8");
+  const viTri = maNap.indexOf("PHAN_NAP_VUOT_TRAN");
+  assert.ok(viTri > 0, "khong tim thay cau DO cua thuoc phan nap - ve nay MAT DOI TUONG DO");
+  const cauDo = maNap.slice(viTri, viTri + 400);
+  assert.ok(cauDo.includes("kq.napToken"),
+    "cau DO phai neu `napToken` - do la con so `dat` dung de phan xu");
+  assert.ok(!cauDo.includes("kq.napDong"),
+    "cau DO dang neu `napDong` (so DONG) cho mot quyet dinh tinh bang TOKEN - dung ca that 10/09");
+  assert.ok(cauDo.includes("token"), "cau DO phai noi don vi 'token'");
+  ok("F23 - cau ĐỎ của thước phần nạp nêu đúng đơn vị (`napToken`/token) mà nó dùng để phán xử");
+}
+
 console.log(`\n${passed} passed, 0 failed, ${passed} total`);

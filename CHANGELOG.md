@@ -3,6 +3,34 @@
 > Mỗi bản một khối. **Chỉ thêm, không sửa khối cũ.** Máy đọc file này để dựng mục Nhật ký trên
 > bảng, nên giữ đúng định dạng: `## <phiên bản> — <ngày> — <một câu>`.
 
+## 1.9.22 — 2026-09-10 — Vòng audit sau đóng gói: `--local` thay `--get`; câu Đỏ đúng đơn vị
+
+**Ba chỗ lọt, cả ba dựng lại được:**
+
+1. `git config --get core.hooksPath` **đọc cả global và system**. Đo: đặt khoá global rồi `--get`
+   trả `.githooks` trong khi `--local` **trống**. Nghĩa là trên một máy có khoá global,
+   `upgrade.mjs` báo *"cửa index: đã bật từ trước"* và **không bao giờ đặt config local** — cửa
+   vẫn TẮT, câu thông báo nói dối. Cùng họ với chính lỗi thiếu `import` vừa sửa ở 1.9.20:
+   **một cơ chế đã tắt, kèm một dòng chữ nói nó đang bật.**
+2. Vế 25 cũng đọc `--get`, nên nó **xanh giả** trên máy có khoá global. Nay `--local`.
+3. Vế 14 bỏ hết log (`log() {}`), nên **xoá cả nhánh cảnh báo vẫn xanh** — mà nhánh đó là thứ
+   duy nhất đọc `behaviourOpts`. Nay thu log và đòi **đúng một** cảnh báo cho vùng `goi/mot`,
+   đếm đúng 1 file `.js`. Hai đột biến đã chạy: `if (false)` → đỏ 0 cảnh báo; trả về
+   `behaviourOpts` → đỏ nguyên văn *"behaviourOpts is not defined"*.
+
+**Thêm ca chưa ai ghim:** repo đích đã có `core.hooksPath` **RIÊNG** thì không được ghi đè, và
+phải **nêu tên** chỗ nó đang trỏ tới. Ghi đè là xoá hook của người ta và hỏng **im lặng** vì
+`--apply` vẫn thoát 0.
+
+**Một lỗi của cổng, do cổng tự lộ ra:** thước *"phần nạp"* phán xử bằng `napToken` nhưng
+nhánh Đỏ in `napDong` và nói *"dòng"* — cổng in **`200/4200 dòng`** rồi bảo VƯỢT TRẦN, một
+câu vô nghĩa. Nhánh XANH vẫn in token đúng, nên **sai chỉ hiện đúng lúc Đức cần đọc số**.
+Ghim `core-contract` F23 đo **ở nguồn**: cả hai nhánh là hai chuỗi của cùng một hàm, nên dựng ca
+Đỏ thật đòi một repo fixture có `AGENTS.md` phình quá trần — đắt hơn nhiều mà canh cùng một
+sự thật. **Đột biến đầu của tôi là GIẢ**: câu XANH và câu Đỏ dùng chuỗi giống nhau, nên
+`String.replace` sửa **nhánh xanh** rồi báo thành công — phải **neo vào mã lỗi**, và **đọc lại
+file sau khi ghi** mới được tin là đột biến đã lành.
+
 ## 1.9.20 — 2026-09-10 — T1+T2+T3: cổng 12,2→3,0s · hai cửa máy · 5 repo lên một bản
 
 | Việc | Đầu ngày | Nay |
