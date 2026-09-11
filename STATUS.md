@@ -19,15 +19,6 @@ ref_handoff: HANDOFF.md
 
 # Trạng thái — Ark Repo Harness
 
-> **Khai bằng tay, và là thứ MỌI PHIÊN ĐỌC LÚC MỞ. Giữ nó một trang.** Đừng gõ số nào mà máy đo
-> được — bảng đọc frontmatter phía trên. Lịch sử từng lượt việc ở [HANDOFF.md](HANDOFF.md), từng
-> bản ở [CHANGELOG.md](CHANGELOG.md), cách lắp vào repo mới ở [README.md](README.md).
-
-**Repo này đã ĐÓNG BĂNG (11/09, Đức chốt).** Nó là **kho bằng chứng**, không còn là bộ khung đang
-phát triển. Đừng thêm, đừng sửa, đừng dọn — kể cả khi thấy lỗi. Lỗi thấy được là bằng chứng
-kiến trúc cho Harness Lean, ghi ở bên Lean.
-
-**Đang ở đâu:** bản cuối **1.9.43**. Đã chạy thật trên **5 repo khác nghề**; các repo đó **giữ
-nguyên** bản đang ghim cho tới khi Lean chứng minh được bằng số tại `n8n-orchestrator`.
-
-**Còn mở:** không. `BACKLOG.md` giữ nguyên làm sổ sự cố, không phải sổ việc.
+**ĐÓNG BĂNG 11/09, Đức chốt.** Kho bằng chứng, không còn phát triển. Đừng thêm, sửa, dọn — kể cả
+khi thấy lỗi; lỗi là bằng chứng cho Harness Lean, ghi bên Lean. Bản cuối **1.9.43**; 5 repo consumer
+giữ nguyên bản ghim tới khi Lean đạt số tại `n8n-orchestrator`. Còn mở: không.
