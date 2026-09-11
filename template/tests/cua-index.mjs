@@ -559,13 +559,17 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
  * Dính một trong hai thì nó CHẠM ĐƯỢC vào bản trích, và khai miễn là SAI.
  *
  * MỘT CHIỀU, cố ý: khai THIẾU không đỏ. Thiếu chỉ tốn một lần cắt bản thừa — chiều an toàn. */
+/* MỘT `ok()` DUY NHẤT CHO VẾ NÀY, nhãn đổi theo nhánh — cùng luật với vế 6, và `core-contract`
+   đếm số vế bằng số lời gọi `ok(` TĨNH. Tôi viết hai lời gọi ở bản đầu và nó đỏ ngay: "luật nói
+   14 vế, thực tế 16". */
+let nhan8;
 if (!fs.existsSync(path.join(ROOT, "scripts", "build-template.mjs"))) {
   /* BỎ QUA ở repo dựng từ BẢN TRÍCH — và đây là ca audit độc lập 11/09 bắt được trong chính lượt
    * viết vế này. `tests/cua-index.mjs` ĐƯỢC PHÁT sang repo đích, còn `scripts/build-template.mjs`
    * thì KHÔNG. Bản đầu của tôi `await import(...)` ở tầng ngoài cùng, nên file test vừa phát đi
    * sẽ CHẾT ngay dòng import ở cả 4 repo đích. `claim.mjs` né đúng lỗ này bằng `import()` ĐỘNG
    * nằm sau `laNoiPhatHanh`; vế 6 né bằng `coBoPhatHanh`. Vế này nay né cùng một cách. */
-  ok("8 · miễn cửa cắt bản — BỎ QUA ở repo dựng từ bản trích: cửa đó là của NƠI PHÁT HÀNH");
+  nhan8 = "8 · miễn cửa cắt bản — BỎ QUA ở repo dựng từ bản trích: cửa đó là của NƠI PHÁT HÀNH";
 } else {
   const { buildTemplateFiles, TEP_NHA_KHONG_PHAT } = await import("../scripts/build-template.mjs");
   const trongBanTrich = new Set(buildTemplateFiles().keys());
@@ -633,5 +637,6 @@ if (!fs.existsSync(path.join(ROOT, "scripts", "build-template.mjs"))) {
       `đối chứng hỏng: \`${rel}\` phải chạm được vào bản trích, mà phép tính nói KHÔNG — phép tính sai, không phải danh sách sai`);
     assert.ok(!TEP_NHA_KHONG_PHAT.includes(rel), `\`${rel}\` chạm được vào bản trích, KHÔNG được nằm trong danh sách miễn`);
   }
-  ok(`8 · miễn cửa cắt bản: ${TEP_NHA_KHONG_PHAT.length} tên đều KHÔNG chạm được bản trích (tự tính: ${trongBanTrich.size} file bản trích · ${doThi.size} file đồ thị import) · nội dung không tên nào lọt vào bản trích · 3 đối chứng chạm được đều bị chặn`);
+  nhan8 = `8 · miễn cửa cắt bản: ${TEP_NHA_KHONG_PHAT.length} tên đều KHÔNG chạm được bản trích (tự tính: ${trongBanTrich.size} file bản trích · ${doThi.size} file đồ thị import) · nội dung không tên nào lọt vào bản trích · 3 đối chứng chạm được đều bị chặn`;
 }
+ok(nhan8);
