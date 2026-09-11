@@ -1440,6 +1440,31 @@ export const TEP_CUA_REPO_DICH = Object.freeze([
   "package.json", ".repo-structure.json", ".agents/claims.json"
 ]);
 
+/* SCRIPT CHỈ CỦA REPO NHÀ — KHÔNG chạm được vào bản trích, nên KHÔNG đòi cắt bản.
+ *
+ * Cửa `cuaTangMay` ở `claim.mjs` coi MỌI `.mjs` của repo nhà là tầng máy. Thô CÓ CHỦ Ý, và lý do
+ * vẫn đúng: `.mjs` của repo nhà phần lớn CHÍNH LÀ nguồn của tầng máy. Nhưng đo 11/09: **7 trên 25**
+ * script ở nhà KHÔNG nằm trong bản trích, và sửa chúng KHÔNG THỂ đổi thứ được phát đi. Giá đo
+ * được của một lần chặn oan: lượt `1.9.41` — sửa **3 dòng chữ `upgrade.mjs` in ra**, phải cắt bản
+ * rồi lan dấu ghim xuống **4 repo đích**, **~20 phút**, đổi lấy **0** thay đổi nội dung. Một cửa
+ * chặn oan là ai đó gõ `--no-verify`, và từ lúc đó nó không canh gì nữa.
+ *
+ * VÌ SAO KHÔNG TÍNH CHÍNH XÁC MÀ PHẢI KHAI TAY: cách đúng nhất là bảo cửa tự tính dấu vân tay rồi
+ * so. Đã đo: `build-template.mjs --check` mất **5,7 giây** — nhân với MỌI lượt commit, đắt hơn cả
+ * thứ nó tiết kiệm. Tra một danh sách tốn 0 giây.
+ *
+ * DANH SÁCH NÀY LÀ TỐI ƯU, KHÔNG PHẢI SỰ THẬT. Sự thật là: một `.mjs` chạm được vào bản trích khi
+ * nó ⑴ NẰM TRONG bản trích, hoặc ⑵ nằm trong ĐỒ THỊ IMPORT của `build-template.mjs`. Phép ghim ở
+ * `tests/cua-index.mjs` TỰ TÍNH lại cả hai vế đó rồi so với danh sách — nên khai thừa một tên là
+ * ĐỎ ngay. Khai THIẾU thì không đỏ, và đó là chiều an toàn: chỉ mất một lần cắt bản thừa.
+ *
+ * `build-template.mjs` KHÔNG có trong danh sách dù nó không nằm trong bản trích — nó là thứ ĐỊNH
+ * NGHĨA bản trích, sửa nó là đổi thứ phát đi. */
+export const TEP_NHA_KHONG_PHAT = Object.freeze([
+  "scripts/assess.mjs", "scripts/build-so-migrate.mjs", "scripts/doi-hinh.mjs",
+  "scripts/giao-viec.mjs", "scripts/init-repo.mjs", "scripts/upgrade.mjs"
+]);
+
 /* THỨ CHẠY ĐƯỢC MÀ KHÔNG CÓ ĐUÔI — cùng một lỗ, lần thứ TƯ, và lần này là một git hook.
  *
  * Quy tắc "theo đuôi file" tự đúng khi bộ khung mọc thêm THƯ MỤC mã. Nó KHÔNG tự đúng khi bộ

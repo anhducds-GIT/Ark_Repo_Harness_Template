@@ -431,6 +431,21 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     const e2 = cm(`chore: ban trich${nhan}`);
     assert.equal(e2.ma, 0, `template/ la ban sinh, khong duoc tinh la tang may: ${e2.ra.slice(0, 300)}`);
 
+    /* ⑸b QUA: script CHỈ CỦA REPO NHÀ — cửa PHẢI thật sự tra danh sách miễn.
+     *
+     * Vế 8 chứng minh DANH SÁCH đúng; vế này chứng minh CỬA CÓ DÙNG nó. Thiếu vế này thì xoá dòng
+     * tra danh sách trong `claim.mjs` vẫn XANH — đúng bệnh `CÓ MẶT ≠ ĐANG BẬT`. Đo 11/09: chặn oan
+     * một file không chạm được bản trích tốn ~20 phút lan dấu ghim xuống 4 repo. */
+    {
+      const { TEP_NHA_KHONG_PHAT } = await import("../scripts/build-template.mjs");
+      const chiNha = TEP_NHA_KHONG_PHAT[0];              // đọc từ nhà của nó, không gõ lại tên
+      ghi(chiNha, "// script chi cua repo nha" + String.fromCharCode(10));
+      g2("add", chiNha);
+      const f2 = cm(`chore: sua script chi cua repo nha${nhan}`);
+      assert.equal(f2.ma, 0,
+        `\`${chiNha}\` KHONG nam trong ban trich nen sua no khong doi duoc thu phat di — doi cat ban la CHAN OAN: ${f2.ra.slice(0, 300)}`);
+    }
+
     // ⑹ QUA: không có `package.json` thì FAIL-OPEN — để cổng đóng phiên nói, đừng chặn ở cửa.
     g2("rm", "-q", "--cached", "package.json");
     fs.rmSync(path.join(t2, "package.json"));
@@ -453,7 +468,7 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
     const h = cm(`feat: sua .mjs o repo dich${nhan}`);
     assert.equal(h.ma, 0, `repo KHONG phai noi phat hanh thi cua tang may khong ap: ${h.ra.slice(0, 300)}`);
 
-    nhan6 = "6 · cửa tầng máy — TÁM nhánh: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · thiếu `package.json` · và KHÔNG áp ở repo không phải nơi phát hành";
+    nhan6 = "6 · cửa tầng máy — CHÍN nhánh: chặn khi chưa cắt bản · chặn cả `--amend` thêm nội dung dưới cùng bản · qua khi đã cắt · `--amend` mẻ RỖNG không bị chặn oan · tài liệu · `template/` · script CHỈ của repo nhà KHÔNG bị chặn oan · thiếu `package.json` · và KHÔNG áp ở repo không phải nơi phát hành";
     }
     ok(nhan6);
   } finally {
@@ -531,4 +546,92 @@ console.log(`\n${so} passed, 0 failed, ${so} total — SUITE XANH`);
   } finally {
     fs.rmSync(t3, { recursive: true, force: true });
   }
+}
+
+/* ---- 8. DANH SÁCH "script chỉ của repo nhà" phải KHỚP SỰ THẬT TỰ TÍNH -------
+ *
+ * `claim.mjs` miễn cho `TEP_NHA_KHONG_PHAT` khỏi cửa đòi cắt bản. Miễn SAI một tên là tắt cửa cho
+ * một file THẬT SỰ đổi được thứ phát đi — đổi một lỗ lấy một lỗ, đúng thứ `KHUNG-15` cảnh báo.
+ *
+ * Nên vế này KHÔNG chép lại danh sách. Nó TỰ TÍNH hai vế của sự thật rồi so:
+ *   ⑴ file có nằm trong bản trích không (`buildTemplateFiles()` — thứ dấu vân tay băm)
+ *   ⑵ file có nằm trong ĐỒ THỊ IMPORT của `build-template.mjs` không (thứ định nghĩa bản trích)
+ * Dính một trong hai thì nó CHẠM ĐƯỢC vào bản trích, và khai miễn là SAI.
+ *
+ * MỘT CHIỀU, cố ý: khai THIẾU không đỏ. Thiếu chỉ tốn một lần cắt bản thừa — chiều an toàn. */
+if (!fs.existsSync(path.join(ROOT, "scripts", "build-template.mjs"))) {
+  /* BỎ QUA ở repo dựng từ BẢN TRÍCH — và đây là ca audit độc lập 11/09 bắt được trong chính lượt
+   * viết vế này. `tests/cua-index.mjs` ĐƯỢC PHÁT sang repo đích, còn `scripts/build-template.mjs`
+   * thì KHÔNG. Bản đầu của tôi `await import(...)` ở tầng ngoài cùng, nên file test vừa phát đi
+   * sẽ CHẾT ngay dòng import ở cả 4 repo đích. `claim.mjs` né đúng lỗ này bằng `import()` ĐỘNG
+   * nằm sau `laNoiPhatHanh`; vế 6 né bằng `coBoPhatHanh`. Vế này nay né cùng một cách. */
+  ok("8 · miễn cửa cắt bản — BỎ QUA ở repo dựng từ bản trích: cửa đó là của NƠI PHÁT HÀNH");
+} else {
+  const { buildTemplateFiles, TEP_NHA_KHONG_PHAT } = await import("../scripts/build-template.mjs");
+  const trongBanTrich = new Set(buildTemplateFiles().keys());
+
+  // Đồ thị import của bộ dựng, tự đi, không gõ tay.
+  const doThi = new Set();
+  const hang = ["scripts/build-template.mjs"];
+  while (hang.length) {
+    const f = hang.shift();
+    if (doThi.has(f)) continue;
+    doThi.add(f);
+    let src = "";
+    try { src = fs.readFileSync(path.join(ROOT, f), "utf8"); } catch { continue; }
+    for (const m of src.matchAll(/from\s+["'](\.[^"']+)["']/g)) {
+      hang.push(path.posix.normalize(path.posix.join(path.posix.dirname(f), m[1])));
+    }
+  }
+
+  assert.ok(TEP_NHA_KHONG_PHAT.length > 0, "danh sách rỗng thì vế này không canh gì — bỏ hẳn cửa còn thật thà hơn");
+  for (const rel of TEP_NHA_KHONG_PHAT) {
+    assert.ok(!trongBanTrich.has(rel),
+      `\`${rel}\` NẰM TRONG bản trích mà lại được miễn cửa cắt bản — sửa nó là đổi thứ phát đi, và sổ phát hành sẽ nói dối`);
+    assert.ok(!doThi.has(rel),
+      `\`${rel}\` nằm trong ĐỒ THỊ IMPORT của build-template.mjs — nó ĐỊNH NGHĨA bản trích, không được miễn`);
+    assert.ok(fs.existsSync(path.join(ROOT, rel)),
+      `\`${rel}\` khai miễn nhưng KHÔNG CÓ THẬT — một tên chết trong danh sách miễn là chỗ ai đó sẽ dựa vào`);
+  }
+  /* ĐƯỜNG THỨ BA — audit độc lập 11/09 nêu, và nó đúng: bộ dựng còn ĐỌC THẲNG TỪ ĐĨA theo tên,
+     không chỉ `import`. Hai vế trên không thấy đường đó.
+
+     Bản vá ĐẦU của tôi dò TÊN trong nguồn bộ dựng — và nó tự đỏ ngay, đúng lý: chính
+     `build-template.mjs` là nơi KHAI danh sách, nên tên nào cũng "được nhắc". Phép dò tên trả lời
+     sai câu hỏi.
+
+     Câu hỏi ĐÚNG là: **nội dung file này có lọt vào bản trích không.** Hỏi thẳng bản trích, không
+     hỏi nguồn — nó phủ MỌI đường vào (import · đọc đĩa · dựng tên động), vì thứ được băm là bản
+     ra chứ không phải cách bộ dựng lấy được nó. */
+  const vanBanBanTrich = [...buildTemplateFiles().values()].filter((v) => typeof v === "string");
+  const NL1 = String.fromCharCode(10);
+  const dong = (rel) => fs.readFileSync(path.join(ROOT, rel), "utf8").split(NL1).map((d) => d.trim());
+  const moiScriptNha = fs.readdirSync(path.join(ROOT, "scripts")).filter((f) => f.endsWith(".mjs"));
+  for (const rel of TEP_NHA_KHONG_PHAT) {
+    /* DẤU ĐẶC TRƯNG PHẢI LÀ DÒNG CHỈ FILE NÀY CÓ. Bản trước lấy dòng dài nhất, và nó bắt ngay một
+       DƯƠNG TÍNH GIẢ: `build-so-migrate.mjs` và `build-overview.mjs` (có phát đi) dùng chung một
+       dòng `<link rel="stylesheet" … fonts.googleapis …>`. Dòng dùng chung không chứng minh gì. */
+    const cuaNguoiKhac = new Set();
+    for (const f of moiScriptNha) {
+      if (`scripts/${f}` === rel) continue;
+      for (const d of dong(`scripts/${f}`)) cuaNguoiKhac.add(d);
+    }
+    const dacTrung = dong(rel)
+      .filter((d) => d.length >= 40 && !cuaNguoiKhac.has(d))
+      .sort((a, b) => b.length - a.length)[0];
+    assert.ok(dacTrung,
+      `\`${rel}\` không có dòng nào RIÊNG của nó để làm dấu — vế này không kiểm được nó, và im lặng thì tệ hơn đỏ`);
+    assert.ok(!vanBanBanTrich.some((v) => v.includes(dacTrung)),
+      `NỘI DUNG RIÊNG của \`${rel}\` có mặt trong bản trích — nó CHẠM ĐƯỢC vào thứ phát đi, không được miễn cửa cắt bản`);
+  }
+
+  /* ĐỐI CHỨNG: một tên CHẮC CHẮN chạm được phải bị vế trên bắt. Không có vế này thì mọi assert
+     trên đều đúng tầm thường với một danh sách toàn tên vô hại. */
+  const chamDuoc = ["scripts/build-template.mjs", "scripts/claim.mjs", "scripts/repo-structure.mjs"];
+  for (const rel of chamDuoc) {
+    assert.ok(trongBanTrich.has(rel) || doThi.has(rel),
+      `đối chứng hỏng: \`${rel}\` phải chạm được vào bản trích, mà phép tính nói KHÔNG — phép tính sai, không phải danh sách sai`);
+    assert.ok(!TEP_NHA_KHONG_PHAT.includes(rel), `\`${rel}\` chạm được vào bản trích, KHÔNG được nằm trong danh sách miễn`);
+  }
+  ok(`8 · miễn cửa cắt bản: ${TEP_NHA_KHONG_PHAT.length} tên đều KHÔNG chạm được bản trích (tự tính: ${trongBanTrich.size} file bản trích · ${doThi.size} file đồ thị import) · nội dung không tên nào lọt vào bản trích · 3 đối chứng chạm được đều bị chặn`);
 }

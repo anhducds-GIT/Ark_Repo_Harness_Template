@@ -1002,11 +1002,16 @@ async function main() {
        * hỏng KHUNG-59 — đỏ ngay và bắt được. Bỏ MỘT phép kiểm thì dùng `break`, đừng dùng lệnh
        * kết thúc cả tiến trình: hai thứ đó trông giống nhau và khác nhau ở đúng chỗ chết người. */
       if (!laNoiPhatHanh(goc)) break cuaTangMay;
-      const { DUOI_MAY, TEP_MAY_THEM, TEP_CUA_REPO_DICH } = await import("./build-template.mjs");
+      const { DUOI_MAY, TEP_MAY_THEM, TEP_CUA_REPO_DICH, TEP_NHA_KHONG_PHAT } = await import("./build-template.mjs");
       const laTangMay = (rel) => {
         const p = String(rel ?? "").replaceAll("\\", "/");
         if (!p || p.startsWith("template/")) return false;
         if (TEP_CUA_REPO_DICH.includes(p)) return false;
+        /* CHẶN OAN CŨNG LÀ HỎNG. Script chỉ của repo nhà KHÔNG chạm được vào bản trích, nên đòi
+           cắt bản cho nó là bắt trả ~20 phút lan dấu ghim để đổi lấy 0 thay đổi nội dung (đo
+           11/09, lượt `1.9.41`). Danh sách ở `build-template.mjs`, phép ghim tự tính lại sự thật
+           rồi so — khai thừa một tên là ĐỎ. */
+        if (TEP_NHA_KHONG_PHAT.includes(p)) return false;
         return DUOI_MAY.some((d) => p.endsWith(d)) || TEP_MAY_THEM.includes(p);
       };
       const may = daDan.filter(laTangMay);
