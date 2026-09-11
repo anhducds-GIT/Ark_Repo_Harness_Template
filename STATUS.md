@@ -2,17 +2,17 @@
 schema: extension-status/v2
 id: ark-repo-harness
 name: Ark Repo Harness
-lifecycle: active
-last_verified: 2026-09-10
-last_verified_commit: d6da6a0290bbb58c1837be86f2dfaf6e0982a852
-last_verified_how: "23 suite · cổng XANH TOÀN BỘ · bản 1.8.12 (xem CHANGELOG)"
+lifecycle: archived
+last_verified: 2026-09-11
+last_verified_commit: d15d08e91985d26f8a112ec5abb6ca84fdb6542a
+last_verified_how: "ĐÓNG BĂNG tại 1.9.43 — Đức chốt 11/09, xem decisions.md mục 2026-09-11"
 evidence_ref: HANDOFF.md
-owner: harness-loi-02
+owner: claude-freeze-legacy
 priority_rank: 1
-next_step: "**ĐÓNG GÓI: 4/5 repo đích ghim 1.9.41, 3 đã ĐẨY.** Hai chỗ còn lại chờ ĐỨC chốt, không phải chờ AI — `docs/ROADMAP-V2.md`, bảng *Việc còn lại*. Nạp **sát trần** — thêm gì phải BỎ trước."
+next_step: "**KHÔNG có việc kế ở repo này.** Việc kế nằm ở repo Lean: xây MVP 6 file tại `n8n-orchestrator`, đo 5 ngày làm việc thật. Repo này chỉ mở ĐỌC khi Lean cần kiểm một failure mode — vào `docs/VI-SAO-LUAT.md` · `docs/adr/` · `HANDOFF.md`."
 version_source: package.json
-current_focus: "ĐÓNG GÓI, không hoàn thiện. `R3` ĐÓNG BĂNG: cấm THÊM tính năng · phép kiểm · luật · tài liệu; chỉ được BỎ và GỘP. Số đo 7 ngày ở `docs/ROADMAP-V2.md`."
-human_action: "CÓ — bảng tự đếm, xem nhóm \"Công việc\". Cố ý không giữ số ở đây: 07/09 bản gõ tay đã lệch thật."
+current_focus: "FROZEN / LEGACY. Không thêm · không sửa · không dọn nợ. Kho bằng chứng sự cố cho Harness Lean. Lý do và cái MẤT: `decisions.md` mục 2026-09-11."
+human_action: "KHÔNG — mọi quyết định mở của repo này đã đóng theo quyết định đóng băng."
 ref_readme: README.md
 ref_handoff: HANDOFF.md
 ---
@@ -23,9 +23,11 @@ ref_handoff: HANDOFF.md
 > được — bảng đọc frontmatter phía trên. Lịch sử từng lượt việc ở [HANDOFF.md](HANDOFF.md), từng
 > bản ở [CHANGELOG.md](CHANGELOG.md), cách lắp vào repo mới ở [README.md](README.md).
 
-**Đây là nhà riêng của bộ khung** — nó tự dựng bằng chính mình, và tự sinh lại `template/`.
+**Repo này đã ĐÓNG BĂNG (11/09, Đức chốt).** Nó là **kho bằng chứng**, không còn là bộ khung đang
+phát triển. Đừng thêm, đừng sửa, đừng dọn — kể cả khi thấy lỗi. Lỗi thấy được là bằng chứng
+kiến trúc cho Harness Lean, ghi ở bên Lean.
 
-**Đang ở đâu:** đã chạy thật trên **5 repo khác nghề**, cùng một bản khung, nhận bản vá bằng
-lệnh — bảng kết quả từng repo ở [HANDOFF.md](HANDOFF.md).
+**Đang ở đâu:** bản cuối **1.9.43**. Đã chạy thật trên **5 repo khác nghề**; các repo đó **giữ
+nguyên** bản đang ghim cho tới khi Lean chứng minh được bằng số tại `n8n-orchestrator`.
 
-**Còn mở:** `next_step` ở đầu file này, và [BACKLOG.md](BACKLOG.md).
+**Còn mở:** không. `BACKLOG.md` giữ nguyên làm sổ sự cố, không phải sổ việc.

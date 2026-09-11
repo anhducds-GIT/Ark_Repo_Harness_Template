@@ -1021,3 +1021,32 @@ phút trước. Luật cho đúng ba đường gỡ khoá — lane đó trả ·
 ĐANG BẬT` và `CHẶN ≠ BÁO` · luật khoá file theo **lượt ghi** · và **khối `audit.nguoi_duyet`** —
 tức cửa audit của `safe-push` ở đó **vẫn là cửa CHẾT** ([ADR-0020](docs/adr/0020-cua-audit-o-repo-dich.md)).
 Ai nâng nó sau này phải đọc mục này trước, đừng tưởng nó chỉ chậm vài bản vặt.
+
+## 2026-09-11 · ĐÓNG BĂNG bộ khung này tại 1.9.43 — Harness Lean xây mới từ trang trắng
+
+**Đức chốt**, nguyên văn: *"tôi quyết định đóng băng."* Sau vòng phản biện đọc-không-sửa so hai
+đường: (A) cắt tại chỗ · (B) đóng băng + repo Lean mới. Chọn **B**.
+
+**Vì sao B, có số:** repo tự tuyên bố "R3 ĐÓNG BĂNG: chỉ được BỎ và GỘP" nhiều ngày mà vẫn ra
+1.9.42 · 1.9.43 để sửa chính bộ khung — cắt tại chỗ đã được thử và không hội tụ. Luật vàng 2 · 3
+(mỗi fix một ghim · không nới bảo vệ) làm mỗi lần XOÁ một cơ chế phải đấu với 23 suite ghim nó.
+Payload mỗi repo consumer: **65 file · 22.559 dòng**; token nạp mở phiên từng đo **13.800**.
+
+**Từ nay repo này là:** FROZEN / LEGACY — kho bằng chứng sự cố và hành vi (`docs/VI-SAO-LUAT.md`,
+`docs/adr/`, `HANDOFF.md`). Không thêm tính năng · luật · phép kiểm · tài liệu. Không dọn nợ
+kỹ thuật. Chỉ mở đọc khi Lean cần kiểm một failure mode cụ thể. 5 repo consumer **giữ nguyên**
+bản đang ghim; đổi từng repo sang Lean chỉ sau khi MVP đạt số.
+
+**Lean V0 (chốt hướng, chưa chốt chi tiết):** 4 thành phần `ĐỌC → BIẾT → CHẶN → DÁN NHÃN`, đích
+**6 file · < 500 dòng · 1 hook `pre-commit`**. CORE: AI Assistant (hợp đồng đọc, không code) ·
+Anti-bloat (hai trần, máy đo). SUPPORT: 6 bất biến an toàn · một dòng version. Concurrency là
+**OPTIONAL-LATER**, không thuộc core. Repo trial: `n8n-orchestrator`, MVP 5 ngày làm việc thật.
+
+**CÁI MẤT, nói thẳng:** an toàn nhiều phiên chung một cây (khoá · claim · safe-push · quy thuộc
+commit) — thay bằng mỗi phiên một worktree · nhật ký từng lượt có số đo (`HANDOFF.md`) — thay
+bằng `git log` · dashboard và bảng sống · cổng nghiệm thu bằng suite test ở consumer · bộ biên
+dịch luật · nâng bản có ràng buộc và sổ phát hành · hai vai ① ② được máy canh.
+
+**Đổi chuẩn chung (`CLAUDE.md` toàn cục, bộ bốn file):** `handoff.md` **rời khỏi** bộ bắt buộc
+với repo dùng Lean — nối tiếp ADR-0016 (09/09) đã định `HANDOFF.md` là ledger một-lượt-việc, còn
+`STATUS.md` mới là trạng thái. `decisions.md` giữ nguyên vì không nạp mặc định, không tốn gì.
