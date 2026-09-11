@@ -32,7 +32,7 @@ ttl_days: 120
 | Repo | Đang ở đâu | Đức cần chốt gì |
 |---|---|---|
 | `ALL_SKILL_MANAGEMENT` | `1.9.41` đã commit tại chỗ, **19 commit chưa đẩy** | Đẩy sẽ cuốn theo **6 commit của `harness-phat-01`** và `b742625` (không nhãn `Lane:`). Duyệt `--carry` (luật ở [AGENTS.md](../AGENTS.md) mục 2), hoặc vá nhãn (= **sửa lịch sử**) |
-| `Chrome_Extension_AI_Agentic` | vẫn `1.9.29`, **chưa chạm** | `HANDOFF.md` đang bị lane `harness-loi-01` khoá **>27 giờ**, và lane `claude-gpt-chay-het-job` đang làm việc ở đó. Chỉ ba đường gỡ khoá: lane đó trả · lane đó kết thúc · **Đức chốt** |
+| `Chrome_Extension_AI_Agentic` | **NGOẠI LỆ — Đức chốt 11/09 KHÔNG nâng.** Ở lại `1.9.29`, chậm 12 bản | Không cần chốt gì thêm. Cái MẤT ghi ở [decisions](../decisions.md) — nặng nhất là cửa audit ở đó **vẫn CHẾT** |
 
 Cách chạy lại một lượt nâng, nếu cần: `node scripts/upgrade.mjs --plan "<đường-dẫn>"` rồi `--apply`,
 sau đó **tại repo đích** sinh lại artifact + ghi một dòng Log (`upgrade` in ra đúng các bước) —
@@ -54,9 +54,8 @@ không phải một như `upgrade` đang in.
 - **Đẩy `ALL_SKILL_MANAGEMENT`:** duyệt `--carry` — luật của nó ở [AGENTS.md](../AGENTS.md) mục 2,
   đây chỉ trỏ sang (cuốn theo 6 commit `harness-phat-01`) — hoặc vá
   nhãn `Lane:` cho `b742625` — vá nhãn là **sửa lịch sử**, mục 2 bắt hỏi.
-- **Gỡ khoá `HANDOFF.md` ở `Chrome_Extension_AI_Agentic`** (lane `harness-loi-01` giữ >27 giờ) để
-  lượt nâng ở đó làm được bước ③.
-- Token bị nghi trong `Chrome_Extension_AI_Agentic` (`workers/duc-auto-chatgpt/v0.1.0/tests/`).
+- Token bị nghi trong `Chrome_Extension_AI_Agentic` — nợ của repo đó, **không** chặn lượt nâng
+  (repo đó nay là NGOẠI LỆ, xem bảng trên).
 - Ngưỡng kho chữ của repo đó: đang **9830/9340**.
 - `KHUNG-40` · `KHUNG-37` · `Y-03` · `Y-04` · `Y-07` · `Y-08` — vẫn KHÔNG ĐỘNG.
 

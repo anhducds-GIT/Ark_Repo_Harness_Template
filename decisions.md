@@ -1006,3 +1006,18 @@ nâng cấp, trước khi chủ repo đổi danh sách; thứ mất là trạng 
 trung thực. Repo đích nay vào **cùng thế với repo nhà**: nhãn là lời TỰ KHAI, không máy nào kiểm
 được Codex đã chạy thật (`KHUNG-56`). Lý lẽ, số đo, năm đột biến ghim:
 [ADR-0020](docs/adr/0020-cua-audit-o-repo-dich.md).
+
+## 2026-09-11 · `Chrome_Extension_AI_Agentic` là NGOẠI LỆ có tên — Đức chốt, không nâng
+
+Đức: *"Riêng Extension repo thì ta chưa chạm vào, cứ kệ repo này, bỏ ra làm ngoại lệ."* Repo đó ở
+lại bản **`1.9.29`** trong khi bốn repo còn lại ghim `1.9.41`.
+
+**Vì sao có câu hỏi:** `HANDOFF.md` ở đó đang bị lane `harness-loi-01` khoá **>27 giờ**, nên bước
+③ *ghi Log* của lượt nâng không làm được; và lane `claude-gpt-chay-het-job` vừa commit ở đó vài
+phút trước. Luật cho đúng ba đường gỡ khoá — lane đó trả · lane đó kết thúc · **Đức chốt** — và
+Đức chọn đường thứ tư: **không nâng**.
+
+**CÁI MẤT:** repo đó chậm **12 bản**, nên nó KHÔNG có: hiến pháp 6 mục · hai bất biến `CÓ MẶT ≠
+ĐANG BẬT` và `CHẶN ≠ BÁO` · luật khoá file theo **lượt ghi** · và **khối `audit.nguoi_duyet`** —
+tức cửa audit của `safe-push` ở đó **vẫn là cửa CHẾT** ([ADR-0020](docs/adr/0020-cua-audit-o-repo-dich.md)).
+Ai nâng nó sau này phải đọc mục này trước, đừng tưởng nó chỉ chậm vài bản vặt.
