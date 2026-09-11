@@ -1720,3 +1720,23 @@ bản chứ không tra dấu vân tay; giá là một vòng lan xuống repo đ�
 `Project 3` đều `1.9.41` **đã đẩy** · `ALL_SKILL_MANAGEMENT` `1.9.41` commit rồi, **19 commit chưa
 đẩy — chờ Đức** · `Chrome_Extension_AI_Agentic` vẫn `1.9.29`, **chưa chạm** (`HANDOFF.md` bị lane
 `harness-loi-01` khoá >27 giờ).
+
+## 2026-09-11 · harness-loi-02 — cửa CHẶN OAN cũng là hỏng: `1.9.42` · `1.9.43`
+
+**Đo:** **7/25** script ở repo nhà KHÔNG nằm trong bản trích, nên sửa chúng không đổi được thứ phát
+đi — mà cửa `cuaTangMay` vẫn đòi cắt bản. Giá một lần chặn oan: sửa **3 dòng chữ** `upgrade.mjs`
+in ra → cắt `1.9.41` → lan dấu ghim xuống **4 repo** → **~20 phút**, đổi lấy **0** thay đổi nội
+dung. Nay miễn **6 tên**; vế 8 của `cua-index` **tự tính lại sự thật** (nằm trong bản trích · nằm
+trong đồ thị import · nội dung RIÊNG có lọt vào bản trích) nên khai miễn thừa một tên là **ĐỎ**.
+Cách chính xác hơn — cho cửa tự tính dấu vân tay — đã đo **5,7 giây/commit**, đắt hơn thứ nó tiết
+kiệm. **15 vế · 15 đột biến.**
+
+**Audit độc lập bắt 2 lỗi THẬT trong chính bản vá này:** ⑴ `tests/cua-index.mjs` **CÓ được phát
+đi**, mà bản đầu `import` `build-template.mjs` ở tầng ngoài cùng — file test vừa phát sẽ **chết ở
+cả 4 repo đích**; ⑵ định nghĩa *"chạm được"* thiếu đường **đọc thẳng từ đĩa**, và bản vá đầu dò TÊN
+trong nguồn bộ dựng thì **tự đỏ** — chính bộ dựng là nơi khai danh sách.
+
+**Ba chỗ tôi tự vấp, ghi để phiên sau khỏi trả lại:** ⑴ nối `cổng | grep | tail && safe-push` —
+mã thoát của **pipeline** là của `tail`, nên tôi tự vứt tín hiệu rồi đẩy lúc cổng đang ĐỎ.
+**Đừng bao giờ nối ống vào cổng.** ⑵ Một vế chỉ được **MỘT** lời gọi `ok()`, nhãn đổi theo nhánh.
+⑶ Nếp *"sinh bản trích SAU CÙNG"* cắn **ba lần** trong một phiên — đó là lý do có tới `1.9.43`.
